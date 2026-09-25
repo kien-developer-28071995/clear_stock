@@ -1,0 +1,105 @@
+# Production stack. No source mounts, no node, no mailpit.
+#   docker compose -f docker-compose.prod.yml build
+#   docker compose -f docker-compose.prod.yml up -d
+#   make prod-migrate          # migrations are never run automatically
+# TLS must terminate in front of "web" (load balancer, Caddy, Cloudflare Tunnel...).
+name: clear_stock
+
+x-app: &app
+  image: ${APP_IMAGE:-clear_stock-app:latest}
+  env_file: backend/.env
+  restart: unless-stopped
+  depends_on:
+    mysql:
+      condition: service_healthy
+    redis:
+      condition: service_healthy
+  logging: &logging
+    driver: json-file
+    options:
+      max-size: "10m"
+      max-file: "5"
+
+services:
+  app:
+    <<: *app
+    # Built once here; horizon + scheduler reuse the same image.
+    build:
+      context: .
+      target: app
+    healthcheck:
+      test: ["CMD", "php-fpm-healthcheck"]
+      interval: 15s
+      timeout: 3s
+      retries: 5
+      start_period: 20s
+
+  horizon:
+    <<: *app
+    command: ["php", "artisan", "horizon"]
+    stop_grace_period: 60s
+    healthcheck:
+      test: ["CMD", "php", "artisan", "horizon:status"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+
+  scheduler:
+    <<: *app
+    command: ["php", "artisan", "schedule:work"]
+
+  web:
+    build:
+      context: .
+      target: web
+    image: ${WEB_IMAGE:-clear_stock-web:latest}
+    restart: unless-stopped
+    ports:
+      - "${APP_PORT:-80}:80"
+    depends_on:
+      app:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1/nginx-health"]
+      interval: 15s
+      timeout: 3s
+      retries: 5
+    logging: *logging
+
+  mysql:
+    image: mysql:8.4
+    restart: unless-stopped
+    # Reads backend/.env (same DB credentials as Laravel) and maps them to MYSQL_* vars.
+    env_file: backend/.env
+    entrypoint:
+      - sh
+      - -c
+      - >-
+        export MYSQL_DATABASE="$$DB_DATABASE" MYSQL_USER="$$DB_USERNAME"
+        MYSQL_PASSWORD="$$DB_PASSWORD" MYSQL_ROOT_PASSWORD="$$DB_ROOT_PASSWORD"
+        && exec docker-entrypoint.sh mysqld
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "--silent"]
+      interval: 10s
+      timeout: 3s
+      retries: 20
+    logging: *logging
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes", "--maxmemory-policy", "noeviction"]
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+    logging: *logging
+
+volumes:
+  mysql-data:
+  redis-data:

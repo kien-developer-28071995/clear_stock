@@ -1,0 +1,25 @@
+<?php
+
+return [
+    // Merchant-facing name (technical slug: clear_stock).
+    'app_name' => env('SHOPIFY_APP_NAME', 'Clear Stock'),
+
+    // "Client ID" and "Client secret" from the Dev Dashboard.
+    'api_key' => env('SHOPIFY_API_KEY'),
+    'api_secret' => env('SHOPIFY_API_SECRET'),
+
+    'scopes' => env('SHOPIFY_SCOPES', 'read_products,read_inventory,read_locations,read_orders,read_all_orders'),
+
+    // Latest stable Admin API version (https://shopify.dev/docs/api/usage/versioning).
+    'api_version' => env('SHOPIFY_API_VERSION', '2026-07'),
+
+    // Refresh the expiring offline token this many seconds before it expires.
+    'token_refresh_margin' => 300,
+
+    // Allowed clock skew when validating session tokens (seconds).
+    'jwt_leeway' => 10,
+
+    'http_timeout' => 30,
+
+    'support_email' => env('SUPPORT_EMAIL', 'support@example.com'),
+];

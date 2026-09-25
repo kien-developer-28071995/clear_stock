@@ -1,0 +1,34 @@
+# Shopify app configuration (https://shopify.dev/docs/apps/build/cli-for-apps/app-configuration)
+# Push changes with:  npx @shopify/cli@latest app deploy
+# application_url / redirect_urls are rewritten by `make tunnel` (docker/scripts/set-app-url.sh).
+
+client_id = "585d48be540225310586b5df5dc1348e"
+name = "Clear Stock"
+application_url = "https://dis-viewpicture-kay-surplus.trycloudflare.com"
+embedded = true
+
+[build]
+automatically_update_urls_on_dev = false
+
+[access_scopes]
+# Why each scope is needed: see README "Access scopes".
+scopes = "read_products,read_inventory,read_locations,read_orders,read_all_orders"
+# Shopify-managed installation: Shopify shows the consent screen on install,
+# the app gets tokens via token exchange (no OAuth redirect dance).
+use_legacy_install_flow = false
+
+[auth]
+redirect_urls = [ "https://dis-viewpicture-kay-surplus.trycloudflare.com/auth/callback" ]
+
+[webhooks]
+api_version = "2026-07"
+
+  # All topics go to one endpoint; the backend routes by X-Shopify-Topic.
+  [[webhooks.subscriptions]]
+  topics = [ "app/uninstalled", "app/scopes_update", "bulk_operations/finish" ]
+  uri = "/webhooks"
+
+  # Mandatory for App Store apps (GDPR / privacy law compliance).
+  [[webhooks.subscriptions]]
+  compliance_topics = [ "customers/data_request", "customers/redact", "shop/redact" ]
+  uri = "/webhooks"

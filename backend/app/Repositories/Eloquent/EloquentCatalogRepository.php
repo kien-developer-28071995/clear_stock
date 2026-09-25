@@ -1,0 +1,131 @@
+<?php
+
+namespace App\Repositories\Eloquent;
+
+use App\Models\BundleComponent;
+use App\Models\Shop;
+use App\Repositories\Contracts\CatalogRepositoryInterface;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
+
+class EloquentCatalogRepository implements CatalogRepositoryInterface
+{
+    private const CHUNK = 500;
+
+    public function upsertLocations(Shop $shop, array $rows): void
+    {
+        $now = now();
+        $rows = array_map(fn ($r) => $r + ['shop_id' => $shop->id, 'created_at' => $now, 'updated_at' => $now], $rows);
+
+        foreach (array_chunk($rows, self::CHUNK) as $chunk) {
+            DB::table('locations')->upsert($chunk, ['shop_id', 'shopify_location_id'], ['name', 'is_active', 'updated_at']);
+        }
+    }
+
+    public function activeLocationIds(Shop $shop): array
+    {
+        return DB::table('locations')->where('shop_id', $shop->id)->where('is_active', true)
+            ->pluck('id', 'shopify_location_id')->mapWithKeys(fn ($id, $sid) => [(int) $sid => (int) $id])->all();
+    }
+
+    public function upsertVariants(Shop $shop, array $rows): void
+    {
+        $now = now();
+        $rows = array_map(fn ($r) => $r + ['shop_id' => $shop->id, 'created_at' => $now, 'updated_at' => $now], $rows);
+        // Merchant settings (supplier, lead time, safety days, is_bundle) are never overwritten by the sync.
+        $update = ['shopify_product_id', 'inventory_item_id', 'product_title', 'title', 'sku', 'unit_cost',
+            'tracked', 'is_active', 'shopify_created_at', 'updated_at'];
+
+        foreach (array_chunk($rows, self::CHUNK) as $chunk) {
+            DB::table('variants')->upsert($chunk, ['shop_id', 'shopify_variant_id'], $update);
+        }
+    }
+
+    public function variantIdMap(Shop $shop): array
+    {
+        return DB::table('variants')->where('shop_id', $shop->id)
+            ->pluck('id', 'shopify_variant_id')->mapWithKeys(fn ($id, $sid) => [(int) $sid => (int) $id])->all();
+    }
+
+    public function replaceShopifyBundleComponents(Shop $shop, array $bundleVariantIds, array $components): void
+    {
+        DB::transaction(function () use ($shop, $bundleVariantIds, $components) {
+            foreach (array_chunk($bundleVariantIds, self::CHUNK) as $ids) {
+                DB::table('bundle_components')->where('shop_id', $shop->id)
+                    ->where('source', BundleComponent::SOURCE_SHOPIFY)
+                    ->whereIn('bundle_variant_id', $ids)->delete();
+            }
+
+            $now = now();
+            $rows = array_map(fn ($c) => $c + [
+                'shop_id' => $shop->id, 'source' => BundleComponent::SOURCE_SHOPIFY, 'created_at' => $now, 'updated_at' => $now,
+            ], $components);
+            foreach (array_chunk($rows, self::CHUNK) as $chunk) {
+                // A manual definition of the same pair wins; Shopify's is then skipped.
+                DB::table('bundle_components')->insertOrIgnore($chunk);
+            }
+
+            $bundleIds = array_values(array_unique(array_column($components, 'bundle_variant_id')));
+            foreach (array_chunk($bundleIds, self::CHUNK) as $ids) {
+                DB::table('variants')->where('shop_id', $shop->id)->whereIn('id', $ids)->update(['is_bundle' => true]);
+            }
+        });
+    }
+
+    public function upsertInventoryLevels(Shop $shop, array $rows): void
+    {
+        $now = now();
+        $rows = array_map(fn ($r) => $r + ['shop_id' => $shop->id, 'created_at' => $now, 'updated_at' => $now], $rows);
+
+        foreach (array_chunk($rows, self::CHUNK) as $chunk) {
+            DB::table('inventory_levels')->upsert($chunk, ['variant_id', 'location_id'], ['available', 'updated_at']);
+        }
+    }
+
+    public function deleteInventoryLevelsNotSeenSince(Shop $shop, Carbon $since): int
+    {
+        return DB::table('inventory_levels')->where('shop_id', $shop->id)->where('updated_at', '<', $since)->delete();
+    }
+
+    public function deactivateVariantsNotIn(Shop $shop, array $variantIds): int
+    {
+        $present = array_flip($variantIds);
+        $missing = DB::table('variants')->where('shop_id', $shop->id)->where('is_active', true)->pluck('id')
+            ->reject(fn ($id) => isset($present[$id]))->values()->all();
+
+        foreach (array_chunk($missing, self::CHUNK) as $ids) {
+            DB::table('variants')->whereIn('id', $ids)->update(['is_active' => false, 'updated_at' => now()]);
+        }
+
+        return count($missing);
+    }
+
+    public function updateTracked(Shop $shop, array $rows): void
+    {
+        foreach ([true, false] as $tracked) {
+            $ids = array_column(array_filter($rows, fn ($r) => $r['tracked'] === $tracked), 'variant_id');
+            foreach (array_chunk($ids, self::CHUNK) as $chunk) {
+                DB::table('variants')->where('shop_id', $shop->id)->whereIn('id', $chunk)->update(['tracked' => $tracked]);
+            }
+        }
+    }
+
+    public function stockByVariant(Shop $shop): array
+    {
+        return DB::table('inventory_levels')
+            ->join('locations', 'locations.id', '=', 'inventory_levels.location_id')
+            ->where('inventory_levels.shop_id', $shop->id)
+            ->where('locations.is_active', true)
+            ->groupBy('inventory_levels.variant_id')
+            ->selectRaw('inventory_levels.variant_id as variant_id, SUM(inventory_levels.available) as stock')
+            ->pluck('stock', 'variant_id')->mapWithKeys(fn ($s, $id) => [(int) $id => (int) $s])->all();
+    }
+
+    public function activeVariantInfo(Shop $shop): array
+    {
+        return DB::table('variants')->where('shop_id', $shop->id)->where('is_active', true)
+            ->get(['id', 'tracked', 'shopify_created_at'])
+            ->mapWithKeys(fn ($v) => [(int) $v->id => ['tracked' => (bool) $v->tracked, 'created' => $v->shopify_created_at]])
+            ->all();
+    }
+}
