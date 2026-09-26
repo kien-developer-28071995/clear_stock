@@ -19,6 +19,7 @@ type Entitlements = {
     what_if: boolean;
     supplier_auto_email: boolean;
     flow_triggers: boolean;
+    reference_products: boolean;
 };
 
 const PAGES: [string, string][] = [
@@ -37,9 +38,9 @@ const PAGES: [string, string][] = [
 ];
 
 const EXPECTED: Record<PlanKey, Omit<Entitlements, 'plan'>> = {
-    free: { max_skus: 50, bundles: false, alerts: false, locations: false, purchase_orders: false, realtime_alerts: false, what_if: false, supplier_auto_email: false, flow_triggers: false },
-    starter: { max_skus: null, bundles: true, alerts: true, locations: false, purchase_orders: true, realtime_alerts: false, what_if: true, supplier_auto_email: false, flow_triggers: false },
-    growth: { max_skus: null, bundles: true, alerts: true, locations: true, purchase_orders: true, realtime_alerts: true, what_if: true, supplier_auto_email: true, flow_triggers: true },
+    free: { max_skus: 50, bundles: false, alerts: false, locations: false, purchase_orders: false, realtime_alerts: false, what_if: false, supplier_auto_email: false, flow_triggers: false, reference_products: false },
+    starter: { max_skus: null, bundles: true, alerts: true, locations: false, purchase_orders: true, realtime_alerts: false, what_if: true, supplier_auto_email: false, flow_triggers: false, reference_products: true },
+    growth: { max_skus: null, bundles: true, alerts: true, locations: true, purchase_orders: true, realtime_alerts: true, what_if: true, supplier_auto_email: true, flow_triggers: true, reference_products: true },
 };
 
 for (const plan of ['free', 'starter', 'growth'] as PlanKey[]) {
@@ -159,6 +160,35 @@ for (const plan of ['free', 'starter', 'growth'] as PlanKey[]) {
             if (has.flow_triggers) await expect(section.locator('s-link', { hasText: 'Open Shopify Flow' })).toBeVisible();
             else await expect(section.locator('s-banner[heading="Included in Growth"]')).toBeVisible();
             await section.screenshot({ path: `e2e-results/flow-${plan}.png` }).catch(() => app.screenshot({ path: `e2e-results/flow-${plan}.png`, fullPage: true }));
+        });
+
+        test('a similar product can be set for new products on paid plans', async ({ app }) => {
+            await open(app, '/products');
+            await app.locator('s-table-body s-table-row s-link').first().click();
+            await settled(app);
+            const variantId = Number(app.url().split('/').pop());
+            const pick = app.locator('s-button', { hasText: 'Choose product' });
+
+            if (!has.reference_products) {
+                await expect(pick).toHaveAttribute('disabled');
+                await expect(app.locator('s-banner[heading="Included in Starter"]').first()).toBeVisible();
+                return;
+            }
+
+            const other = variants().find((v) => v.id !== variantId)!;
+            await pickNext(app, [{ id: other.gid, displayName: other.name }]);
+            await pick.click();
+            await expect(app.getByText(other.name, { exact: true })).toBeVisible();
+            await saveBar(app, 'product-settings-save-bar');
+            type Detail = { data: { settings: { reference_variant_id: number | null }; explanation_lines: { code: string }[] } };
+            await expect.poll(async () => (await api<Detail>(app, `/forecasts/${variantId}`)).data.settings.reference_variant_id).toBe(other.id);
+            // Dev store products have months of history: the reference is recorded but no longer needed.
+            const lines = (await api<Detail>(app, `/forecasts/${variantId}`)).data.explanation_lines.map((l) => l.code);
+            expect(lines.some((c) => c.startsWith('reference_'))).toBe(true);
+
+            await app.locator('s-button', { hasText: 'Remove' }).first().click();
+            await saveBar(app, 'product-settings-save-bar');
+            await expect.poll(async () => (await api<Detail>(app, `/forecasts/${variantId}`)).data.settings.reference_variant_id).toBeNull();
         });
 
         test('product detail explains the number, and a temporary adjustment wins until reset', async ({ app }) => {

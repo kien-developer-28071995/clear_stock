@@ -13,6 +13,7 @@ const NONE: Entitlements = {
     what_if: false,
     supplier_auto_email: false,
     flow_triggers: false,
+    reference_products: false,
 };
 
 /** What the current plan allows (defaults to Free while loading). */

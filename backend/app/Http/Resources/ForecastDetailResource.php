@@ -44,6 +44,10 @@ class ForecastDetailResource extends ForecastResource
                 'min_stock' => $v->min_stock,
                 'max_stock' => $v->max_stock,
                 'alerts_muted' => $v->alerts_muted,
+                // New products: similar product whose rate is borrowed (see explanation.reference).
+                'reference_variant_id' => $v->reference_variant_id,
+                'reference_name' => $v->reference_variant_id ? $v->reference?->displayName() : null,
+                'reference_percent' => $v->reference_percent,
             ],
             'defaults' => $shop,
         ];

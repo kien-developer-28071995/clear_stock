@@ -131,6 +131,16 @@
         "overstock": {
             "one": "{{count}} unit more than the {{target}} to hold (lead time, safety and the next order cycle): hold off reordering, or run a promotion.",
             "other": "{{count}} units more than the {{target}} to hold (lead time, safety and the next order cycle): hold off reordering, or run a promotion."
-        }
+        },
+        "reason_uses_reference": "estimate partly from a similar product",
+        "reference_blend": {
+            "one": "New product with {{count}} day of its own sales: {{ref_share}}% of the estimate comes from {{name}} ({{ref_avg}}/day at {{percent}}%) → {{avg}}/day.",
+            "other": "New product with {{count}} days of its own sales: {{ref_share}}% of the estimate comes from {{name}} ({{ref_avg}}/day at {{percent}}%) → {{avg}}/day."
+        },
+        "reference_done": {
+            "one": "Enough own history ({{count}} in-stock day): no longer borrows the rate of {{name}}.",
+            "other": "Enough own history ({{count}} in-stock days): no longer borrows the rate of {{name}}."
+        },
+        "reference_no_forecast": "{{name}} has no forecast yet, so its rate is not used."
     }
 }

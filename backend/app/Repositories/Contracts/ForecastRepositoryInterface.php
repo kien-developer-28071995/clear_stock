@@ -55,6 +55,15 @@ interface ForecastRepositoryInterface
     public function deleteForecastsExcept(Shop $shop, array $keepVariantIds): int;
 
     /**
+     * Reference products (new products borrow their rate): name and current combined
+     * average, null when the reference has no forecast.
+     *
+     * @param  array<int, int>  $variantIds
+     * @return array<int, array{name: string, avg: ?float}>
+     */
+    public function referenceRates(Shop $shop, array $variantIds): array;
+
+    /**
      * Revenue per variant since a date: (units sold - returned) x current price.
      * Variants without a price are left out (they cannot be classified).
      *

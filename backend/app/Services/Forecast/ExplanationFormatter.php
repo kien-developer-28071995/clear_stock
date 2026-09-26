@@ -59,7 +59,7 @@ class ExplanationFormatter
         $s = $e['seasonality'];
         if ($s['applied']) {
             $out[] = $this->line($s['factor'] >= 1 ? 'seasonality_rose' : 'seasonality_fell', [
-                'factor' => $this->round($s['factor'], 2), 'count' => $s['horizon_days'], 'avg' => $this->round($e['computed_avg']),
+                'factor' => $this->round($s['factor'], 2), 'count' => $s['horizon_days'], 'avg' => $this->round($e['own_avg'] ?? $e['computed_avg']),
             ]);
         }
 
@@ -68,6 +68,19 @@ class ExplanationFormatter
             if ($b['units_per_day'] > 0) {
                 $out[] = $this->line('bundle_contribution', ['avg' => $this->round($b['units_per_day']), 'bundle' => $b['name'], 'count' => $b['quantity_per_bundle']]);
             }
+        }
+
+        // New product: similar product's rate (absent in explanations computed before it existed)
+        $ref = $e['reference'] ?? null;
+        if ($ref !== null && $e['avg_source'] !== 'override') {
+            $out[] = match (true) {
+                $ref['applied'] => $this->line('reference_blend', [
+                    'name' => $ref['name'], 'ref_avg' => $this->round($ref['reference_avg']), 'percent' => $ref['percent'],
+                    'count' => $ref['own_days'], 'ref_share' => (int) round((1 - $ref['own_weight']) * 100), 'avg' => $this->round($e['computed_avg']),
+                ]),
+                ($ref['reason'] ?? null) === 'enough_history' => $this->line('reference_done', ['name' => $ref['name'], 'count' => $ref['own_days']]),
+                default => $this->line('reference_no_forecast', ['name' => $ref['name']]),
+            };
         }
 
         // Reorder

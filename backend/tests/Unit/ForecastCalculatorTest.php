@@ -437,3 +437,44 @@ describe('overstock', function () {
         expect([$none->excessUnits, $none->explanation['reorder']['overstock']])->toBe([0, false]);
     });
 });
+
+describe('reference product (new products)', function () {
+    $reference = fn (?float $avg = 10.0, int $percent = 50) => ['reference' => ['variant_id' => 9, 'name' => 'Mug classic', 'avg' => $avg, 'percent' => $percent]];
+
+    it('blends the reference rate with its own in proportion to its in-stock days', function () use ($reference) {
+        // 6 days at 2/day: own weight 6/30 = 20%, reference 10/day x 50% = 5 -> 0.2 x 2 + 0.8 x 5 = 4.4.
+        $r = calc(input(history(6, 2), stock: 100, extra: $reference()));
+
+        expect($r->avgDailySales)->toBe(4.4)
+            ->and($r->explanation['avg_source'])->toBe('reference')
+            ->and($r->explanation['own_avg'])->toBe(2.0)
+            ->and($r->explanation['reference'])->toMatchArray(['applied' => true, 'reference_avg' => 5.0, 'own_days' => 6, 'own_weight' => 0.2])
+            ->and(collect($r->explanation['confidence']['reasons'])->pluck('code'))->toContain('uses_reference');
+
+        $lines = app(ExplanationFormatter::class)->lines($r->explanation);
+        expect(collect($lines)->firstWhere('code', 'reference_blend')['params'])
+            ->toBe(['name' => 'Mug classic', 'ref_avg' => 5, 'percent' => 50, 'count' => 6, 'ref_share' => 80, 'avg' => 4.4]);
+    });
+
+    it('uses only the reference before the first sale', function () use ($reference) {
+        expect(calc(input([], stock: 100, extra: $reference(8.0, 100)))->avgDailySales)->toBe(8.0);
+    });
+
+    it('stops borrowing once the product has enough history of its own', function () use ($reference) {
+        $r = calc(input(history(60, 3), stock: 100, extra: $reference()));
+
+        expect($r->avgDailySales)->toBe(3.0)
+            ->and($r->explanation['avg_source'])->toBe('computed')
+            ->and($r->explanation['reference'])->toMatchArray(['applied' => false, 'reason' => 'enough_history', 'own_days' => 60])
+            ->and(collect(app(ExplanationFormatter::class)->lines($r->explanation))->pluck('code'))->toContain('reference_done');
+    });
+
+    it('lets a manual sales rate win, and ignores a reference without a forecast', function () use ($reference) {
+        $override = ['avg_daily_sales' => ['value' => 7.0, 'note' => null, 'expires_at' => null]];
+        expect(calc(input(history(6, 2), stock: 100, overrides: $override, extra: $reference()))->avgDailySales)->toBe(7.0);
+
+        $r = calc(input(history(6, 2), stock: 100, extra: $reference(null)));
+        expect($r->avgDailySales)->toBe(2.0)
+            ->and($r->explanation['reference']['reason'])->toBe('no_forecast');
+    });
+});

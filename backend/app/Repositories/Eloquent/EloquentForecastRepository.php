@@ -134,6 +134,19 @@ class EloquentForecastRepository implements ForecastRepositoryInterface
         return $deleted;
     }
 
+    public function referenceRates(Shop $shop, array $variantIds): array
+    {
+        if ($variantIds === []) {
+            return [];
+        }
+        $avgs = DB::table('forecasts')->where('shop_id', $shop->id)->whereNull('location_id')->whereIn('variant_id', $variantIds)
+            ->pluck('avg_daily_sales', 'variant_id')->all();
+
+        return Variant::query()->forShop($shop)->whereIn('id', $variantIds)->get()
+            ->mapWithKeys(fn (Variant $v) => [$v->id => ['name' => $v->displayName(), 'avg' => isset($avgs[$v->id]) ? (float) $avgs[$v->id] : null]])
+            ->all();
+    }
+
     public function revenueSince(Shop $shop, array $variantIds, string $fromDate): array
     {
         $out = [];

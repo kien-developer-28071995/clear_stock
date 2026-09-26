@@ -344,7 +344,15 @@
     "muteAlertsHelp": "Leaves it out of summary and real-time emails. Forecasts and the reorder list still include it.",
     "fromForecast": "Forecast: {{qty}}",
     "fromForecastShort": "From the forecast",
-    "fromSupplierQty": "{{qty}} (supplier)"
+    "fromSupplierQty": "{{qty}} (supplier)",
+    "reference": "Similar product (for new products)",
+    "referenceHelp": "Until this product has {{count}} days of its own sales, its forecast borrows this product's sales rate, less and less as its own history grows.",
+    "referencePick": "Choose product",
+    "referenceChange": "Change",
+    "referenceClear": "Remove",
+    "referenceNone": "None",
+    "referencePercent": "Share of its sales rate",
+    "referenceLocked": "Forecast new products from a similar product until they have their own sales history."
   },
   "products": {
     "freeLimit_one": "The Free plan forecasts your best seller.",
@@ -462,7 +470,8 @@
       "realtimeAlerts": "Real-time stock alerts",
       "whatIf": "Sales what-if (\"+20% sales?\")",
       "supplierAutoEmail": "Automatic weekly orders to suppliers",
-      "flowTriggers": "Shopify Flow triggers"
+      "flowTriggers": "Shopify Flow triggers",
+      "referenceProducts": "New products forecast from a similar product"
     },
     "notApproved": "No plan change was approved",
     "nowOn": "You're on {{plan}}",
@@ -603,7 +612,13 @@
     "above_min": "{{stock}} in stock (with stock on the way) is above your minimum; no sales yet, so nothing to order.",
     "no_order_needed": "Nothing to order right now.",
     "overstock_one": "{{count}} unit more than the {{target}} to hold (lead time, safety and the next order cycle): hold off reordering, or run a promotion.",
-    "overstock_other": "{{count}} units more than the {{target}} to hold (lead time, safety and the next order cycle): hold off reordering, or run a promotion."
+    "overstock_other": "{{count}} units more than the {{target}} to hold (lead time, safety and the next order cycle): hold off reordering, or run a promotion.",
+    "reason_uses_reference": "estimate partly from a similar product",
+    "reference_blend_one": "New product with {{count}} day of its own sales: {{ref_share}}% of the estimate comes from {{name}} ({{ref_avg}}/day at {{percent}}%) → {{avg}}/day.",
+    "reference_blend_other": "New product with {{count}} days of its own sales: {{ref_share}}% of the estimate comes from {{name}} ({{ref_avg}}/day at {{percent}}%) → {{avg}}/day.",
+    "reference_done_one": "Enough own history ({{count}} in-stock day): no longer borrows the rate of {{name}}.",
+    "reference_done_other": "Enough own history ({{count}} in-stock days): no longer borrows the rate of {{name}}.",
+    "reference_no_forecast": "{{name}} has no forecast yet, so its rate is not used."
   },
   "import": {
     "fromStocky": "Import from Stocky",
@@ -703,7 +718,9 @@
       "realtime_alerts_active": "Real-time stock alerts to {{email}} stop.",
       "what_if": "The sales what-if is not available.",
       "flow_triggers": "Shopify Flow triggers stop.",
-      "flow_triggers_active": "Your Shopify Flow workflows using Clear Stock triggers stop running."
+      "flow_triggers_active": "Your Shopify Flow workflows using Clear Stock triggers stop running.",
+      "reference_products_one": "{{count}} new product stops borrowing a similar product's sales rate.",
+      "reference_products_other": "{{count}} new products stop borrowing a similar product's sales rate."
     }
   },
   "vendors": {

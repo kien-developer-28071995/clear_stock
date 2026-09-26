@@ -41,6 +41,10 @@ return [
 
     'slow_mover_days' => 180,
 
+    // New products with a reference product: the estimate blends the reference's rate with the
+    // product's own, in proportion to its in-stock days, and is fully its own after this many.
+    'reference_full_after_days' => 30,
+
     // ABC classification by revenue (net units sold x current price) over the last `days`:
     // A = products making up the first 80% of revenue, B = up to 95%, C = the rest.
     'abc' => [

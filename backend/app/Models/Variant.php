@@ -37,6 +37,8 @@ use Illuminate\Support\Carbon;
  * @property ?int $min_stock manual reorder point (units, stock + on the way)
  * @property ?int $max_stock manual order-up-to level (units)
  * @property bool $alerts_muted no alert email mentions this product
+ * @property ?int $reference_variant_id similar product whose sales rate a new product borrows
+ * @property ?int $reference_percent share of the reference's rate (null = 100%)
  * @property bool $is_bundle
  * @property ?Carbon $shopify_created_at
  */
@@ -47,7 +49,7 @@ class Variant extends Model
     protected $fillable = [
         'shop_id', 'shopify_variant_id', 'shopify_product_id', 'inventory_item_id',
         'product_title', 'vendor', 'product_type', 'title', 'sku', 'barcode', 'unit_cost', 'price', 'tracked', 'is_active',
-        'supplier_id', 'lead_time_override', 'safety_days', 'min_order_qty', 'pack_size', 'min_stock', 'max_stock', 'alerts_muted', 'is_bundle', 'shopify_created_at',
+        'supplier_id', 'lead_time_override', 'safety_days', 'min_order_qty', 'pack_size', 'min_stock', 'max_stock', 'alerts_muted', 'reference_variant_id', 'reference_percent', 'is_bundle', 'shopify_created_at',
     ];
 
     protected function casts(): array
@@ -69,6 +71,8 @@ class Variant extends Model
             'min_stock' => 'integer',
             'max_stock' => 'integer',
             'alerts_muted' => 'boolean',
+            'reference_variant_id' => 'integer',
+            'reference_percent' => 'integer',
             'is_bundle' => 'boolean',
             'shopify_created_at' => 'datetime',
         ];
@@ -92,6 +96,11 @@ class Variant extends Model
         return $this->title && $this->title !== 'Default Title'
             ? "{$this->product_title} - {$this->title}"
             : $this->product_title;
+    }
+
+    public function reference(): BelongsTo
+    {
+        return $this->belongsTo(self::class, 'reference_variant_id');
     }
 
     public function supplier(): BelongsTo

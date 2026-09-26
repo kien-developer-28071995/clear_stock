@@ -16,6 +16,7 @@ export interface Entitlements {
     /** Automatic weekly orders to suppliers (emailing one by hand is purchase_orders). */
     supplier_auto_email: boolean;
     flow_triggers: boolean;
+    reference_products: boolean;
 }
 
 export interface Shop {

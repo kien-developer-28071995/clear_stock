@@ -101,6 +101,10 @@ class ForecastInputBuilder
             ? $this->forecasts->manualBundlesContaining($shop, $variantIds)
             : [];
         $overrides = $this->forecasts->activeOverrides($shop, $variantIds);
+        // New products forecast from a similar product (paid plans).
+        $references = Entitlements::for($shop)->has(Feature::ReferenceProducts)
+            ? $this->forecasts->referenceRates($shop, $variants->pluck('reference_variant_id')->filter()->unique()->values()->all())
+            : [];
 
         $bundleIds = array_values(array_unique(array_merge([], ...array_map('array_keys', $bundles))));
         $rows = $this->sales->rowsBetween($shop, array_values(array_unique([...$variantIds, ...$bundleIds])), $historyStart, $yesterday);
@@ -142,6 +146,12 @@ class ForecastInputBuilder
                 minOrderQty: $variant->effectiveMinOrderQty(),
                 packSize: $variant->effectivePackSize(),
                 // Named in the explanation when the rounding comes from the supplier's defaults.
+                reference: isset($references[$variant->reference_variant_id]) ? [
+                    'variant_id' => $variant->reference_variant_id,
+                    'name' => $references[$variant->reference_variant_id]['name'],
+                    'avg' => $references[$variant->reference_variant_id]['avg'],
+                    'percent' => $variant->reference_percent ?? 100,
+                ] : null,
                 orderRulesSupplier: ($variant->min_order_qty === null && $variant->supplier?->min_order_qty !== null)
                     || ($variant->pack_size === null && $variant->supplier?->pack_size !== null) ? $variant->supplier->name : null,
                 minStock: $variant->min_stock,

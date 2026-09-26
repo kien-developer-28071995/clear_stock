@@ -54,7 +54,7 @@ Nghiên cứu ngày 2026-09-26 (Shopify App Store, review 1–3 sao, bài viết
 6. ✅ **Phân loại ABC** (xong 2026-09-26): nhóm A/B/C theo doanh thu 90 ngày = (bán − trả) × giá bán hiện tại (đồng bộ `variants.price`, không lưu giá trong đơn). A = 80% doanh thu đầu, B tới 95%, C phần còn lại (`forecast.abc`). Tính lại ở mỗi lần chạy forecast đầy đủ, xếp hạng mọi sản phẩm được theo dõi (cả ngoài giới hạn gói Free). Cột + bộ lọc + sắp xếp theo doanh thu ở danh sách sản phẩm, dòng giải thích ở trang sản phẩm, bảng tóm tắt ở trang Phân tích. Mở cho mọi gói. Chưa làm: doanh thu combo chưa chia về thành phần.
 7. ✅ **Mô phỏng tăng trưởng (what-if)** (xong 2026-09-26): trang `/what-if` (menu "Mô phỏng"), nhập % thay đổi doanh số (−90…+500, nút nhanh −20/+10/+20/+50/+100), khoảng đơn cần đặt (hôm nay / 14 / 30 ngày), lọc NCC/Vendor/ABC. Tốc độ bán × (1 + %), chạy đúng phép tính đặt hàng của forecast (`ForecastCalculator::reorderPlan`, giữ lead time, safety, Min/Max, MOQ, thùng), không lưu gì. So sánh hiện tại → kịch bản: số sản phẩm cần đặt, số lượng, chi phí theo giá vốn, số sản phẩm hết trước khi hàng về. Mọi gói. Chưa làm: xuất PO theo kịch bản, áp kịch bản thành điều chỉnh tạm thời.
 8. **Gợi ý chuyển kho giữa location** (gói Growth): location thừa → location sắp hết.
-9. **Dự báo sản phẩm mới theo sản phẩm tương tự**: chọn một sản phẩm tham chiếu, dùng tốc độ bán của nó khi chưa đủ lịch sử.
+9. ✅ **Dự báo sản phẩm mới theo sản phẩm tương tự** (xong 2026-09-26, Starter+): `variants.reference_variant_id` + `reference_percent`, ước tính = trộn tốc độ bán của sản phẩm tham chiếu × % với tốc độ riêng theo số ngày còn hàng (đủ 30 ngày thì dùng hẳn dữ liệu riêng), override vẫn thắng, giải thích `reference_blend`/`reference_done`, chỉ áp dụng dự báo tổng.
 10. ✅ **Báo khi sync lỗi liên tục + cam kết giữ giá** (xong 2026-09-26, mọi gói): email một lần khi ≥ 2 lần sync lỗi liên tiếp và không có sync thành công trong 24h (`sync.failure_email`), gửi tới email cảnh báo hoặc email liên hệ shop kể cả khi tắt cảnh báo, reset khi sync thành công. Trang Gói có dòng "Giữ giá". Listing: Phase 7.
 
 ## Nghiên cứu bổ sung (2026-09-26, lần 2)
@@ -91,8 +91,8 @@ Nguồn lần 2: https://community.shopify.dev/t/feature-request-expose-the-exis
 2. ~~**#13 Block dự báo trên trang sản phẩm Shopify** + gán NCC/lead time hàng loạt~~ — xong: 2 admin UI extension (`extensions/`): block trên trang sản phẩm (dự báo từng biến thể + giải thích + link vào app), hành động "Đặt NCC & lead time" cho sản phẩm được chọn ở danh sách sản phẩm.
 3. ~~**#14 Shopify Flow triggers dựa trên dự báo**~~ (xong, Growth).
 5. ~~**#10 Báo khi đồng bộ lỗi liên tục** + cam kết giữ giá~~ (xong; câu giữ giá cho listing làm ở Phase 7).
-6. ~~**#6 Phân loại ABC**~~ (xong), ~~**#7 Mô phỏng tăng trưởng (what-if)**~~ (xong), ~~**#8 Gợi ý chuyển kho** (Growth)~~ (xong: trang Chuyển kho, tạo phiếu chuyển nháp trong Shopify qua scope tùy chọn `write_inventory_transfers`), **#9 Dự báo sản phẩm mới theo sản phẩm tham chiếu**.
-7. **#16 Nhận hàng / kiểm kho bằng barcode** (thấp).
+6. ~~**#6 Phân loại ABC**~~ (xong), ~~**#7 Mô phỏng tăng trưởng (what-if)**~~ (xong), ~~**#8 Gợi ý chuyển kho** (Growth)~~ (xong: trang Chuyển kho, tạo phiếu chuyển nháp trong Shopify qua scope tùy chọn `write_inventory_transfers`), ~~**#9 Dự báo sản phẩm mới theo sản phẩm tham chiếu**~~ (xong, Starter).
+7. **#16 Nhận hàng / kiểm kho bằng barcode**: quyết định không làm (2026-09-26): Shopify admin đã có nhận hàng qua transfer, nhu cầu hẹp.
 8. ~~**Mặc định MOQ / quy cách thùng theo nhà cung cấp**~~ (xong 2026-09-26, mọi gói: `suppliers.min_order_qty`/`pack_size`, cài đặt của sản phẩm thắng, giải thích ghi "mặc định của NCC").
 9. **Phase 7 — chuẩn bị nộp App Store**: gỡ scope `write_orders`, `SHOPIFY_BILLING_TEST=false`, listing có "Stocky alternative", ảnh/icon, hướng dẫn test cho reviewer, domain gửi mail có SPF/DKIM.
 

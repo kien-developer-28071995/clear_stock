@@ -29,6 +29,7 @@ return [
                 'what_if' => false,
                 'supplier_auto_email' => false, // automatic weekly orders to suppliers
                 'flow_triggers' => false,       // Shopify Flow triggers
+                'reference_products' => false,  // new products forecast from a similar product
             ],
         ],
         'starter' => [
@@ -45,6 +46,7 @@ return [
                 'what_if' => true,
                 'supplier_auto_email' => false,
                 'flow_triggers' => false,
+                'reference_products' => true,
             ],
         ],
         'growth' => [
@@ -61,6 +63,7 @@ return [
                 'what_if' => true,
                 'supplier_auto_email' => true,
                 'flow_triggers' => true,
+                'reference_products' => true,
             ],
         ],
     ],

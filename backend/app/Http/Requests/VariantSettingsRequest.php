@@ -28,7 +28,20 @@ class VariantSettingsRequest extends FormRequest
             'min_stock' => ['sometimes', 'nullable', 'integer', 'min:0', 'max:1000000'],
             'max_stock' => ['sometimes', 'nullable', 'integer', 'min:1', 'max:1000000'],
             'alerts_muted' => ['sometimes', 'boolean'],
+            // New products: a similar product (local id or Shopify variant gid) and the share of its rate.
+            'reference_variant' => ['sometimes', 'nullable', function (string $attr, mixed $value, \Closure $fail) {
+                if (! is_int($value) && ! (is_string($value) && preg_match('#^gid://shopify/ProductVariant/\d+$#', $value))) {
+                    $fail('invalid_product');
+                }
+            }],
+            'reference_percent' => ['sometimes', 'nullable', 'integer', 'min:10', 'max:500'],
         ];
+    }
+
+    /** Reference product settings (single product only). @return array{reference_variant?: int|string|null, reference_percent?: ?int} */
+    public function referenceSettings(): array
+    {
+        return $this->safe()->only(['reference_variant', 'reference_percent']);
     }
 
     public function settings(): array

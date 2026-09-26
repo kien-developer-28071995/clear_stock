@@ -114,6 +114,14 @@
         "no_order_needed": "Hiện chưa cần nhập thêm.",
         "overstock": {
             "other": "Thừa {{count}} cái so với mức cần giữ {{target}} (lead time, dự phòng và chu kỳ nhập tới): tạm dừng nhập thêm, hoặc chạy khuyến mãi."
-        }
+        },
+        "reason_uses_reference": "ước tính một phần từ sản phẩm tương tự",
+        "reference_blend": {
+            "other": "Sản phẩm mới có {{count}} ngày bán của riêng nó: {{ref_share}}% ước tính lấy từ {{name}} ({{ref_avg}}/ngày × {{percent}}%) → {{avg}}/ngày."
+        },
+        "reference_done": {
+            "other": "Đã đủ lịch sử riêng ({{count}} ngày còn hàng): không còn dùng tốc độ bán của {{name}}."
+        },
+        "reference_no_forecast": "{{name}} chưa có dự báo nên chưa dùng được tốc độ bán của nó."
     }
 }

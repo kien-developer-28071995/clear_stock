@@ -2,13 +2,16 @@
 
 namespace App\Services\App;
 
+use App\Enums\Feature;
 use App\Enums\OverrideField;
+use App\Exceptions\PlanRequiredException;
 use App\Jobs\Forecast\RecomputeForecasts;
 use App\Models\Shop;
 use App\Models\Variant;
 use App\Repositories\Contracts\ForecastRepositoryInterface;
 use App\Repositories\Contracts\VariantRepositoryInterface;
 use App\Services\Forecast\ForecastService;
+use App\Support\Entitlements;
 use App\Support\Gid;
 use Illuminate\Validation\ValidationException;
 
@@ -45,9 +48,10 @@ class ForecastAdjustmentService
     }
 
     /** @param array{supplier_id?: ?int, lead_time_override?: ?int, safety_days?: ?int, min_order_qty?: ?int, pack_size?: ?int, min_stock?: ?int, max_stock?: ?int, alerts_muted?: bool} $settings */
-    public function updateVariantSettings(Shop $shop, Variant $variant, array $settings): Variant
+    public function updateVariantSettings(Shop $shop, Variant $variant, array $settings, array $reference = []): Variant
     {
         $this->assertMinBelowMax($settings + $variant->only(['min_stock', 'max_stock']));
+        $settings += $this->referenceSettings($shop, $variant, $reference);
         $variant = $this->variants->updateSettings($variant, $settings);
         $this->engine->runForShop($shop, [$variant->id]);
 
@@ -68,6 +72,34 @@ class ForecastAdjustmentService
         RecomputeForecasts::dispatch($shop->id, $variantIds);
 
         return $updated;
+    }
+
+    /**
+     * A similar product for a new one (Starter+). Given as a local id or a Shopify gid (resource
+     * picker); must be another product of the shop. Clearing it is always allowed.
+     *
+     * @param  array{reference_variant?: int|string|null, reference_percent?: ?int}  $data
+     */
+    private function referenceSettings(Shop $shop, Variant $variant, array $data): array
+    {
+        $out = array_key_exists('reference_percent', $data) ? ['reference_percent' => $data['reference_percent']] : [];
+        if (! array_key_exists('reference_variant', $data)) {
+            return $out;
+        }
+        $ref = $data['reference_variant'];
+        if ($ref === null) {
+            return $out + ['reference_variant_id' => null, 'reference_percent' => null];
+        }
+        if (! Entitlements::for($shop)->has(Feature::ReferenceProducts)) {
+            throw new PlanRequiredException(Feature::ReferenceProducts);
+        }
+
+        $target = is_int($ref) ? $this->variants->find($shop, $ref) : $this->variants->findByShopifyIds($shop, [Gid::id($ref)])->first();
+        if ($target === null || $target->id === $variant->id) {
+            throw ValidationException::withMessages(['reference_variant' => 'invalid_product']);
+        }
+
+        return $out + ['reference_variant_id' => $target->id];
     }
 
     /** A manual maximum below the minimum would never order enough. */

@@ -47,4 +47,8 @@ return [
     'reason_no_sales' => 'no sales in 90 days',
     'reason_volatile' => 'sales vary a lot week to week',
     'reason_average_overridden' => 'rate set manually',
+    'reason_uses_reference' => 'estimate partly from a similar product',
+    'reference_blend' => 'New product with :count day(s) of its own sales: :ref_share% of the estimate comes from :name (:ref_avg/day at :percent%) → :avg/day.',
+    'reference_done' => 'Enough own history (:count in-stock days): no longer borrows the rate of :name.',
+    'reference_no_forecast' => ':name has no forecast yet, so its rate is not used.',
 ];

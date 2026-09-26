@@ -7,6 +7,12 @@ import { formatNumber } from '@/utils/format';
 import { SaveBar } from '@/components/ui/SaveBar';
 import { useSuppliers } from '@/features/settings/hooks/useSettings';
 import { NO_VALUE, fromOption, optionValue } from '@/utils/select';
+import { pickVariants } from '@/lib/resourcePicker';
+import { UpgradePrompt } from '@/components/ui/UpgradePrompt';
+import { useEntitlements } from '@/hooks/useEntitlements';
+
+/** Days of own sales after which a new product stops borrowing (backend forecast.reference_full_after_days). */
+const REFERENCE_FULL_AFTER_DAYS = 30;
 
 const toNumberOrNull = (v: string) => (v.trim() === '' ? null : Number(v));
 
@@ -23,6 +29,10 @@ export function ProductSettingsForm({ f }: { f: ForecastDetail }) {
     const [minStock, setMinStock] = useState('');
     const [maxStock, setMaxStock] = useState('');
     const [muted, setMuted] = useState(false);
+    // Similar product: local id (saved) or Shopify gid (just picked); null = none.
+    const [reference, setReference] = useState<{ id: number | string; name: string } | null>(null);
+    const [referencePercent, setReferencePercent] = useState('');
+    const canReference = useEntitlements().reference_products;
 
     const saved = {
         supplierId: f.settings.supplier_id ? String(f.settings.supplier_id) : '',
@@ -33,6 +43,8 @@ export function ProductSettingsForm({ f }: { f: ForecastDetail }) {
         minStock: f.settings.min_stock?.toString() ?? '',
         maxStock: f.settings.max_stock?.toString() ?? '',
         muted: f.settings.alerts_muted,
+        reference: f.settings.reference_variant_id ? { id: f.settings.reference_variant_id, name: f.settings.reference_name ?? '' } : null,
+        referencePercent: f.settings.reference_percent?.toString() ?? '',
     };
     const reset = () => {
         setSupplierId(saved.supplierId);
@@ -43,10 +55,16 @@ export function ProductSettingsForm({ f }: { f: ForecastDetail }) {
         setMinStock(saved.minStock);
         setMaxStock(saved.maxStock);
         setMuted(saved.muted);
+        setReference(saved.reference);
+        setReferencePercent(saved.referencePercent);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(reset, [f.settings]);
-    const current = { supplierId, leadTime, safety, minOrder, pack, minStock, maxStock, muted };
+    const current = { supplierId, leadTime, safety, minOrder, pack, minStock, maxStock, muted, reference, referencePercent };
+    const pickReference = async () => {
+        const [picked] = await pickVariants();
+        if (picked) setReference({ id: picked.gid, name: picked.name });
+    };
     const dirty = JSON.stringify(current) !== JSON.stringify(saved);
 
     const supplier = suppliers.data?.find((s) => String(s.id) === supplierId);
@@ -63,6 +81,9 @@ export function ProductSettingsForm({ f }: { f: ForecastDetail }) {
                 min_stock: toNumberOrNull(minStock),
                 max_stock: toNumberOrNull(maxStock),
                 alerts_muted: muted,
+                // Only sent when changed: a Free shop can still save its other settings.
+                ...(reference?.id !== saved.reference?.id ? { reference_variant: reference?.id ?? null } : {}),
+                ...(reference ? { reference_percent: toNumberOrNull(referencePercent) } : {}),
             },
             { onSuccess: () => shopify.toast.show(t('common.saved')) },
         );
@@ -146,6 +167,37 @@ export function ProductSettingsForm({ f }: { f: ForecastDetail }) {
                         onInput={(e) => setMaxStock(e.currentTarget.value)}
                     />
                 </s-grid>
+                <s-stack gap="small-200">
+                    <s-text type="strong">{t('productSettings.reference')}</s-text>
+                    {!canReference && <UpgradePrompt id="reference-products" plan="starter">{t('productSettings.referenceLocked')}</UpgradePrompt>}
+                    <s-stack direction="inline" gap="small-200" alignItems="center">
+                        <s-text>{reference?.name || t('productSettings.referenceNone')}</s-text>
+                        <s-button disabled={!canReference || undefined} onClick={pickReference}>
+                            {reference ? t('productSettings.referenceChange') : t('productSettings.referencePick')}
+                        </s-button>
+                        {reference && (
+                            <s-button variant="tertiary" onClick={() => setReference(null)}>
+                                {t('productSettings.referenceClear')}
+                            </s-button>
+                        )}
+                    </s-stack>
+                    {reference && (
+                        <s-box maxInlineSize="240px">
+                            <s-number-field
+                                label={t('productSettings.referencePercent')}
+                                suffix="%"
+                                min={10}
+                                max={500}
+                                placeholder="100"
+                                value={referencePercent}
+                                error={fieldError(update.error, 'reference_percent')}
+                                onInput={(e) => setReferencePercent(e.currentTarget.value)}
+                            />
+                        </s-box>
+                    )}
+                    {fieldError(update.error, 'reference_variant') && <s-text tone="critical">{fieldError(update.error, 'reference_variant')}</s-text>}
+                    <s-text color="subdued">{t('productSettings.referenceHelp', { count: REFERENCE_FULL_AFTER_DAYS })}</s-text>
+                </s-stack>
                 <s-checkbox
                     label={t('productSettings.muteAlerts')}
                     details={t('productSettings.muteAlertsHelp')}

@@ -50,9 +50,13 @@ class ForecastCalculator
         $seasonality = $this->seasonality($series, $in, $end);
         $computedAvg = $baseAvg * ($seasonality['applied'] ? $seasonality['factor'] : 1.0);
 
+        // --- 3b. New product: blend in a similar product's rate -----------------------
+        $reference = $this->reference($in, $series, $computedAvg);
+        $estimate = $reference['applied'] ?? false ? $reference['avg'] : $computedAvg;
+
         // --- 4. Overrides -------------------------------------------------------------
         $avgOverride = $in->override(OverrideField::AvgDailySales);
-        $avg = round($avgOverride !== null ? max(0.0, (float) $avgOverride['value']) : $computedAvg, 2);
+        $avg = round($avgOverride !== null ? max(0.0, (float) $avgOverride['value']) : $estimate, 2);
 
         $leadTime = $this->leadTime($in);
         $safety = $this->safetyDays($in);
@@ -69,6 +73,9 @@ class ForecastCalculator
         }
 
         $confidence = $this->confidence($windows, $series, $end, $avgOverride !== null);
+        if (($reference['applied'] ?? false) && $avgOverride === null) {
+            $confidence['reasons'][] = ['code' => 'uses_reference'];
+        }
 
         $explanation = [
             'version' => 1,
@@ -89,8 +96,10 @@ class ForecastCalculator
             'seasonality' => $seasonality,
             'bundles' => $this->bundleContributions($in, $series, $end),
             'avg_daily_sales' => $avg,
-            'avg_source' => $avgOverride !== null ? 'override' : 'computed',
-            'computed_avg' => round($computedAvg, 2),
+            'avg_source' => $avgOverride !== null ? 'override' : (($reference['applied'] ?? false) ? 'reference' : 'computed'),
+            'computed_avg' => round($estimate, 2),
+            'own_avg' => round($computedAvg, 2),
+            'reference' => $reference,
             'lead_time' => $leadTime,
             'safety' => $safety + ['units' => round($avg * $safety['days'], 1)],
             'stock' => ['current' => $stock, 'incoming' => $incoming, 'position' => $position],
@@ -134,6 +143,41 @@ class ForecastCalculator
             confidence: Confidence::from($confidence['level']),
             explanation: $explanation,
         );
+    }
+
+    /**
+     * A new product borrows a similar product's rate (x percent) until it has its own history:
+     * own weight = in-stock days / reference_full_after_days, the rest from the reference.
+     *
+     * @return ?array{variant_id: int, name: string, percent: int, applied: bool, reason?: string, reference_avg?: float, own_days?: int, own_weight?: float, avg?: float}
+     */
+    private function reference(ForecastInput $in, array $series, float $ownAvg): ?array
+    {
+        if ($in->reference === null) {
+            return null;
+        }
+        $ref = $in->reference;
+        $out = ['variant_id' => $ref['variant_id'], 'name' => $ref['name'], 'percent' => $ref['percent'], 'applied' => false];
+        if ($ref['avg'] === null) {
+            return $out + ['reason' => 'no_forecast'];
+        }
+
+        $ownDays = count(array_filter($series, fn ($d) => $d['in_stock']));
+        $full = max(1, (int) ($this->config['reference_full_after_days'] ?? 30));
+        if ($ownDays >= $full) {
+            return $out + ['reason' => 'enough_history', 'own_days' => $ownDays];
+        }
+
+        $referenceAvg = $ref['avg'] * $ref['percent'] / 100;
+        $ownWeight = round($ownDays / $full, 3);
+
+        return array_merge($out, [
+            'applied' => true,
+            'reference_avg' => round($referenceAvg, 2),
+            'own_days' => $ownDays,
+            'own_weight' => $ownWeight,
+            'avg' => $ownWeight * $ownAvg + (1 - $ownWeight) * $referenceAvg,
+        ]);
     }
 
     /**

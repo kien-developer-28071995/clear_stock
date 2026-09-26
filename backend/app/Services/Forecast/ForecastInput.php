@@ -36,6 +36,7 @@ final readonly class ForecastInput
         public ?int $minStock = null,           // manual reorder point (min)
         public ?int $maxStock = null,           // manual order-up-to level (max)
         public ?string $orderRulesSupplier = null, // minimum order / pack size (partly) from this supplier's defaults
+        public ?array $reference = null,        // {variant_id, name, avg: ?float, percent}: similar product for a new one
     ) {}
 
     public function override(OverrideField $field): ?array

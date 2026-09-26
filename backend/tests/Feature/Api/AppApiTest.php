@@ -329,6 +329,42 @@ describe('order rounding', function () {
     });
 });
 
+describe('reference product', function () {
+    it('forecasts a new product from a similar one until it has its own history', function () {
+        $classic = product($this->shop, $this->location, 'Mug classic', stock: 500, perDay: 10);
+        $new = Variant::factory()->for($this->shop)->create(['product_title' => 'Mug blue', 'title' => 'Default Title', 'shopify_created_at' => now()]);
+        InventoryLevel::factory()->create(['shop_id' => $this->shop->id, 'variant_id' => $new->id, 'location_id' => $this->location->id, 'available' => 40]);
+        forecastAll($this->shop);
+
+        $gid = "gid://shopify/ProductVariant/{$classic->shopify_variant_id}";
+        $this->putJson("/api/variants/{$new->id}/settings", ['reference_variant' => $gid, 'reference_percent' => 50], $this->auth)
+            ->assertOk()->assertJsonPath('data.reference_variant_id', $classic->id);
+
+        $this->getJson("/api/forecasts/{$new->id}", $this->auth)
+            ->assertJsonPath('data.settings.reference_name', 'Mug classic')
+            ->assertJsonPath('data.settings.reference_percent', 50)
+            ->assertJsonPath('data.avg_daily_sales', 5)                 // 10/day x 50%, no own sales yet
+            ->assertJsonPath('data.explanation.avg_source', 'reference');
+
+        // Cleared: back to its own (empty) history.
+        $this->putJson("/api/variants/{$new->id}/settings", ['reference_variant' => null], $this->auth)->assertOk();
+        $this->getJson("/api/forecasts/{$new->id}", $this->auth)->assertJsonPath('data.avg_daily_sales', 0)->assertJsonPath('data.settings.reference_percent', null);
+    });
+
+    it('rejects the product itself and is a paid feature', function () {
+        $mug = product($this->shop, $this->location, 'Mug', stock: 10, perDay: 4);
+        $cup = product($this->shop, $this->location, 'Cup', stock: 10, perDay: 4);
+
+        $this->putJson("/api/variants/{$mug->id}/settings", ['reference_variant' => $mug->id], $this->auth)
+            ->assertUnprocessable()->assertJsonPath('errors.reference_variant.0.code', 'invalid_product');
+        $this->putJson("/api/variants/{$mug->id}/settings", ['reference_percent' => 5], $this->auth)->assertUnprocessable();
+
+        $this->shop->update(['plan' => 'free']);
+        $this->putJson("/api/variants/{$mug->id}/settings", ['reference_variant' => $cup->id], $this->auth)
+            ->assertStatus(402)->assertJsonPath('params.feature', 'reference_products')->assertJsonPath('params.plan', 'starter');
+    });
+});
+
 describe('manual min / max', function () {
     it('saves min and max, and rejects a max below the min', function () {
         $mug = product($this->shop, $this->location, 'Mug', stock: 10, perDay: 4);

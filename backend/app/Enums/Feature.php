@@ -17,6 +17,8 @@ enum Feature: string
     case SupplierAutoEmail = 'supplier_auto_email';
     /** Shopify Flow triggers based on the forecast. */
     case FlowTriggers = 'flow_triggers';
+    /** New products forecast from a similar product until they have their own history. */
+    case ReferenceProducts = 'reference_products';
 
     /** The cheapest plan that includes it (for upgrade prompts). */
     public function minimumPlan(): Plan

@@ -96,6 +96,13 @@ class DowngradeImpactService
             $out[] = $this->line($this->flow->hasEnabledFlow($shop) ? 'flow_triggers_active' : 'flow_triggers');
         }
 
+        if ($loses(Feature::ReferenceProducts)) {
+            $count = Variant::query()->forShop($shop)->whereNotNull('reference_variant_id')->count();
+            if ($count > 0) {
+                $out[] = $this->line('reference_products', ['count' => $count]);
+            }
+        }
+
         if ($loses(Feature::WhatIf)) {
             $out[] = $this->line('what_if');
         }
