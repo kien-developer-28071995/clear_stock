@@ -103,7 +103,7 @@ export interface ForecastDetail extends ForecastRow {
     computed_avg: number;
     /** Growth plan only: stock and (when computed) the forecast per location. */
     locations: LocationForecast[] | null;
-    overrides: Partial<Record<OverrideField, Override>>;
+    overrides: Record<OverrideField, Override | null>;
     settings: {
         supplier_id: number | null;
         lead_time_override: number | null;

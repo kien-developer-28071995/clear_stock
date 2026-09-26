@@ -6,7 +6,7 @@ export UID := $(shell id -u)
 export GID := $(shell id -g)
 
 .DEFAULT_GOAL := help
-.PHONY: help setup up down restart build shell migrate fresh test logs tunnel tunnel-url tunnel-down \
+.PHONY: help setup up down restart build shell migrate fresh test e2e logs tunnel tunnel-url tunnel-down \
         app-url webhook artisan composer npm typecheck prod-build prod-up prod-down prod-migrate prod-logs
 
 help: ## List available commands
@@ -46,6 +46,9 @@ fresh: ## Drop all tables and re-run migrations
 
 test: ## Run the backend test suite (Pest)
 	$(DC) exec app php artisan test
+
+e2e: ## End-to-end tests in Chromium on every plan (needs make up + a synced dev store)
+	cd frontend && npx playwright test
 
 logs: ## Tail logs (make logs s=horizon for one service)
 	$(DC) logs -f --tail=100 $(s)

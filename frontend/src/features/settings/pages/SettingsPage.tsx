@@ -12,6 +12,7 @@ import { SaveBar } from '@/components/ui/SaveBar';
 import { SyncStatusCard } from '@/features/sync/components/SyncStatusCard';
 import { useSettings, useUpdateSettings } from '@/features/settings/hooks/useSettings';
 import type { RealtimeAlertMode, Settings } from '@/features/settings/types';
+import { NO_VALUE, fromOption, optionValue } from '@/utils/select';
 
 /** ISO weekday (1 = Monday) → name in the current language. 2024-01-01 was a Monday. */
 const weekdayName = (iso: number) =>
@@ -89,11 +90,11 @@ export function SettingsPage() {
                 <s-select
                     label={t('settings.language')}
                     details={t('settings.languageHelp')}
-                    value={form.locale ?? ''}
+                    value={optionValue(form.locale)}
                     error={fieldError(update.error, 'locale')}
-                    onChange={(e) => setForm({ ...form, locale: e.currentTarget.value || null })}
+                    onChange={(e) => setForm({ ...form, locale: fromOption(e.currentTarget.value) || null })}
                 >
-                    <s-option value="">{t('settings.languageAuto', { language: languageName(adminLanguage()) })}</s-option>
+                    <s-option value={NO_VALUE}>{t('settings.languageAuto', { language: languageName(adminLanguage()) })}</s-option>
                     {SUPPORTED_LOCALES.map((locale) => (
                         <s-option key={locale} value={locale}>{languageName(locale)}</s-option>
                     ))}

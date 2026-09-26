@@ -4,6 +4,7 @@ import { DashboardGate } from '@/features/dashboard/components/DashboardGate';
 import { ActionList } from '@/features/dashboard/components/ActionList';
 import type { ActionGroup, Dashboard } from '@/features/dashboard/types';
 import { Tip } from '@/features/setup/components/Tip';
+import { NO_VALUE, fromOption, optionValue } from '@/utils/select';
 
 /** Only the products of one vendor, to order everything from the same maker at once. */
 function forVendor(dashboard: Dashboard, vendor: string): Dashboard {
@@ -31,8 +32,8 @@ export function ReorderPage() {
                         <Tip id="home_actions">{t('tips.home_actions')}</Tip>
                         {vendors.length > 1 && (
                             <s-box maxInlineSize="320px">
-                                <s-select label={t('products.vendor')} value={vendor} onChange={(e) => setVendor(e.currentTarget.value)}>
-                                    <s-option value="">{t('products.allVendors')}</s-option>
+                                <s-select label={t('products.vendor')} value={optionValue(vendor)} onChange={(e) => setVendor(fromOption(e.currentTarget.value))}>
+                                    <s-option value={NO_VALUE}>{t('products.allVendors')}</s-option>
                                     {vendors.map((v) => (
                                         <s-option key={v} value={v}>{v}</s-option>
                                     ))}

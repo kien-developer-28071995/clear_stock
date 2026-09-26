@@ -6,6 +6,7 @@ import type { ForecastDetail } from '@/features/forecasts/types';
 import { formatNumber } from '@/utils/format';
 import { SaveBar } from '@/components/ui/SaveBar';
 import { useSuppliers } from '@/features/settings/hooks/useSettings';
+import { NO_VALUE, fromOption, optionValue } from '@/utils/select';
 
 const toNumberOrNull = (v: string) => (v.trim() === '' ? null : Number(v));
 
@@ -72,12 +73,12 @@ export function ProductSettingsForm({ f }: { f: ForecastDetail }) {
             <s-stack gap="base">
                 <s-select
                     label={t('table.supplier')}
-                    value={supplierId}
+                    value={optionValue(supplierId)}
                     error={fieldError(update.error, 'supplier_id')}
-                    onChange={(e) => setSupplierId(e.currentTarget.value)}
+                    onChange={(e) => setSupplierId(fromOption(e.currentTarget.value))}
                     details={suppliers.data?.length === 0 ? t('productSettings.noSuppliers') : undefined}
                 >
-                    <s-option value="">{t('productSettings.noSupplier')}</s-option>
+                    <s-option value={NO_VALUE}>{t('productSettings.noSupplier')}</s-option>
                     {suppliers.data?.map((s) => (
                         <s-option key={s.id} value={String(s.id)}>
                             {s.name}

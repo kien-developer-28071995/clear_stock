@@ -8,6 +8,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useFacets, useForecastList, useLocations } from '@/features/forecasts/hooks/useForecasts';
 import type { ForecastFilters } from '@/features/forecasts/types';
 import { formatDate, formatNumber } from '@/utils/format';
+import { NO_VALUE, fromOption, optionValue } from '@/utils/select';
 
 const STATUS_OPTIONS = ['reorder_now', 'out_of_stock', 'overstock', 'slow', 'healthy'] as const;
 const SORT_OPTIONS = ['urgency', 'cover', 'suggested', 'value', 'name'] as const;
@@ -86,10 +87,10 @@ export function ProductsPage() {
                             <s-select
                                 label={t('locations.location')}
                                 labelAccessibilityVisibility="exclusive"
-                                value={String(filters.location_id ?? '')}
-                                onChange={(e) => update({ location_id: e.currentTarget.value ? Number(e.currentTarget.value) : '' })}
+                                value={optionValue(filters.location_id)}
+                                onChange={(e) => update({ location_id: fromOption(e.currentTarget.value) ? Number(e.currentTarget.value) : '' })}
                             >
-                                <s-option value="">{t('products.allLocations')}</s-option>
+                                <s-option value={NO_VALUE}>{t('products.allLocations')}</s-option>
                                 {locations.data?.map((l) => (
                                     <s-option key={l.id} value={String(l.id)}>{l.name}</s-option>
                                 ))}
@@ -99,10 +100,10 @@ export function ProductsPage() {
                             <s-select
                                 label={t('products.vendor')}
                                 labelAccessibilityVisibility="exclusive"
-                                value={filters.vendor ?? ''}
-                                onChange={(e) => update({ vendor: e.currentTarget.value })}
+                                value={optionValue(filters.vendor)}
+                                onChange={(e) => update({ vendor: fromOption(e.currentTarget.value) })}
                             >
-                                <s-option value="">{t('products.allVendors')}</s-option>
+                                <s-option value={NO_VALUE}>{t('products.allVendors')}</s-option>
                                 {facets?.vendors.map((v) => (
                                     <s-option key={v} value={v}>{v}</s-option>
                                 ))}
@@ -112,10 +113,10 @@ export function ProductsPage() {
                             <s-select
                                 label={t('products.productType')}
                                 labelAccessibilityVisibility="exclusive"
-                                value={filters.product_type ?? ''}
-                                onChange={(e) => update({ product_type: e.currentTarget.value })}
+                                value={optionValue(filters.product_type)}
+                                onChange={(e) => update({ product_type: fromOption(e.currentTarget.value) })}
                             >
-                                <s-option value="">{t('products.allTypes')}</s-option>
+                                <s-option value={NO_VALUE}>{t('products.allTypes')}</s-option>
                                 {facets?.product_types.map((v) => (
                                     <s-option key={v} value={v}>{v}</s-option>
                                 ))}
@@ -124,10 +125,10 @@ export function ProductsPage() {
                         <s-select
                             label={t('products.status')}
                             labelAccessibilityVisibility="exclusive"
-                            value={filters.status ?? ''}
-                            onChange={(e) => update({ status: e.currentTarget.value as ForecastFilters['status'] })}
+                            value={optionValue(filters.status)}
+                            onChange={(e) => update({ status: fromOption(e.currentTarget.value) as ForecastFilters['status'] })}
                         >
-                            <s-option value="">{t('products.allProducts')}</s-option>
+                            <s-option value={NO_VALUE}>{t('products.allProducts')}</s-option>
                             {STATUS_OPTIONS.map((value) => (
                                 <s-option key={value} value={value}>{t(`status.${value}`)}</s-option>
                             ))}

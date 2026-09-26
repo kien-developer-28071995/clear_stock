@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Enums\OverrideField;
 use App\Models\Forecast;
 use App\Services\Forecast\ExplanationFormatter;
 use Illuminate\Http\Request;
@@ -24,11 +25,16 @@ class ForecastDetailResource extends ForecastResource
             'computed_avg' => (float) ($this->explanation['computed_avg'] ?? $this->avg_daily_sales),
             // Growth: stock and forecast per location (forecast null when not computed there).
             'locations' => $this->locations($request, $explain),
-            'overrides' => $v->overrides->mapWithKeys(fn ($o) => [$o->field->value => [
-                'value' => (float) $o->value,
-                'note' => $o->note,
-                'expires_at' => $o->expires_at?->toDateString(),
-            ]]),
+            // Every field, null when not overridden (an empty list would serialize as [] instead of {}).
+            'overrides' => collect(OverrideField::cases())->mapWithKeys(function (OverrideField $field) use ($v) {
+                $o = $v->overrides->firstWhere('field', $field);
+
+                return [$field->value => $o === null ? null : [
+                    'value' => (float) $o->value,
+                    'note' => $o->note,
+                    'expires_at' => $o->expires_at?->toDateString(),
+                ]];
+            }),
             'settings' => [
                 'supplier_id' => $v->supplier_id,
                 'lead_time_override' => $v->lead_time_override,
