@@ -13,6 +13,7 @@ type Entitlements = { plan: PlanKey; max_skus: number | null; bundles: boolean; 
 const PAGES: [string, string][] = [
     ['/', 'Clear Stock'],
     ['/reorder', 'Reorder'],
+    ['/transfers', 'Transfers'],
     ['/insights', 'Insights'],
     ['/products', 'Products'],
     ['/suppliers', 'Suppliers'],
@@ -237,6 +238,52 @@ for (const plan of ['free', 'starter', 'growth'] as PlanKey[]) {
             await open(app, '/products');
             const locations = await api<{ data: unknown[] }>(app, '/locations');
             await expect(app.getByRole('combobox', { name: 'Location' })).toHaveCount(has.locations && locations.data.length > 1 ? 1 : 0);
+        });
+
+        test('transfer suggestions follow the plan', async ({ app }) => {
+            await open(app, '/transfers');
+            const status = await app.evaluate(async () => (await fetch('/api/transfers', { headers: { Authorization: `Bearer ${await window.shopify.idToken()}`, Accept: 'application/json' } })).status);
+            if (!has.locations) {
+                expect(status).toBe(402);
+                await expect(app.locator('s-banner', { hasText: 'Move stock between your locations' })).toBeVisible();
+                return;
+            }
+            expect(status).toBe(200);
+            // The dev store's real data: one location holds the stock, nothing to move.
+            const real = await api<{ data: { available: boolean; routes: unknown[] } }>(app, '/transfers');
+            if (real.data.available && real.data.routes.length === 0) await expect(app.locator('s-empty-state[heading="No transfers needed"]')).toBeVisible();
+        });
+
+        test('a suggested transfer is created as a draft in Shopify, after asking for the permission', async ({ app }) => {
+            test.skip(!has.locations, 'Growth only');
+            // A route the dev data doesn't have; creation itself is Shopify's (answered here).
+            const route = {
+                origin: { id: 2, name: 'Warehouse' }, destination: { id: 1, name: 'Store' }, total_units: 35,
+                items: [{ variant_id: 8, name: 'The Minimal Snowboard', sku: 'MIN-1', quantity: 35, origin_stock: 100, destination_stock: 5, destination_days_of_cover: 2.5, destination_stockout_date: '2026-09-28' }],
+            };
+            let posted: Record<string, unknown> | null = null;
+            await app.route('**/api/transfers', (r) => {
+                if (r.request().method() === 'GET') return r.fulfill({ json: { data: { available: true, scope_granted: false, routes: [route], recent: [] } } });
+                posted = r.request().postDataJSON();
+                return r.fulfill({ status: 201, json: { data: { id: 1, shopify_transfer_id: 555, name: '#T0001', total_units: posted!.items && 30 } } });
+            });
+            await open(app, '/transfers');
+            await expect(app.locator('s-section[heading="Warehouse → Store"]')).toContainText('The Minimal Snowboard');
+
+            // Declined: nothing is created.
+            await app.evaluate(() => (window.__e2e.grantScopes = false));
+            await app.getByRole('button', { name: 'Create draft transfer in Shopify' }).click();
+            await expect.poll(() => toasts(app)).toContainEqual(expect.stringContaining("can't be created without the permission"));
+            expect(posted).toBeNull();
+
+            // Approved, with the quantity edited down.
+            await app.evaluate(() => (window.__e2e.grantScopes = true));
+            await app.getByRole('spinbutton', { name: 'Move' }).fill('30');
+            await app.getByRole('button', { name: 'Create draft transfer in Shopify' }).click();
+            await expect.poll(() => posted).toMatchObject({ origin_location_id: 2, destination_location_id: 1, items: [{ variant_id: 8, quantity: 30 }] });
+            expect(String((posted as unknown as { idempotency_key: string }).idempotency_key)).toMatch(/^[0-9a-f-]{36}$/);
+            expect(await app.evaluate(() => window.__e2e.scopeRequests)).toEqual([['write_inventory_transfers'], ['write_inventory_transfers']]);
+            await expect.poll(() => toasts(app)).toContainEqual(expect.stringContaining('Draft transfer #T0001 created (30 units)'));
         });
 
         test('plans page marks the current plan and upgrades go through Shopify billing', async ({ app }) => {

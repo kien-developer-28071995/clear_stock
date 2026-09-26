@@ -19,6 +19,7 @@
     "discard": "Hủy thay đổi"
   },
   "nav": {
+    "transfers": "Chuyển kho",
     "home": "Trang chủ",
     "products": "Sản phẩm",
     "suppliers": "Nhà cung cấp",
@@ -455,6 +456,10 @@
     "lockedHint": "Có trong gói {{plan}}"
   },
   "apiErrors": {
+    "scope_required": "Clear Stock cần được cấp quyền tạo phiếu chuyển kho trong Shopify. Hãy bấm lại nút và chấp thuận.",
+    "transfer_rejected": "Shopify không chấp nhận phiếu chuyển này. Kiểm tra lại chi nhánh và số lượng rồi thử lại.",
+    "invalid_location": "Một trong các chi nhánh này không còn hoạt động trong Shopify.",
+    "invalid_product": "Một trong các sản phẩm này không còn trong Clear Stock.",
     "generic": "Đã có lỗi xảy ra. Vui lòng thử lại.",
     "validation_failed": "Vui lòng kiểm tra các ô được đánh dấu.",
     "plan_required": "Tính năng này có trong gói {{plan}}.",
@@ -661,5 +666,32 @@
     "summary_other": "{{units}} cái vượt mức cần, ở {{count}} sản phẩm vẫn bán được.",
     "advice": "Tạm dừng nhập thêm, hoặc chạy khuyến mãi.",
     "seeAll_other": "Xem tất cả {{count}} sản phẩm tồn thừa"
+  },
+  "transfers": {
+    "beforeOrdering_other": "{{qty}} sản phẩm có thể lấy từ chi nhánh khác",
+    "beforeOrderingBody": "Chuyển hàng sẵn có trước khi đặt thêm.",
+    "see": "Xem gợi ý chuyển kho",
+    "intro": "Chuyển hàng sẵn có trước khi đặt thêm. Chúng tôi so sánh dự báo của từng chi nhánh: chi nhánh sắp thiếu hàng sẽ nhận phần hàng dư của chi nhánh khác.",
+    "locked": "Chuyển hàng giữa các chi nhánh trước khi đặt thêm, và tạo phiếu chuyển trong Shopify chỉ với một cú bấm.",
+    "needsLocations": "Gợi ý chuyển kho cần ít nhất hai chi nhánh đang hoạt động có dự báo theo chi nhánh. Gợi ý sẽ xuất hiện sau lần đồng bộ tới.",
+    "noneHeading": "Không cần chuyển kho",
+    "noneBody": "Mọi chi nhánh đều đủ hàng, hoặc không chi nhánh nào có hàng dư.",
+    "route": "{{origin}} → {{destination}}",
+    "atDestination": "Tại {{name}}",
+    "atOrigin": "Tại {{name}}",
+    "move": "Chuyển",
+    "inStock_other": "Còn {{qty}}",
+    "runsOut": "Hết hàng {{date}}",
+    "outNow": "Đã hết hàng",
+    "total_other": "Chuyển {{qty}} sản phẩm",
+    "create": "Tạo phiếu chuyển nháp trong Shopify",
+    "created_other": "Đã tạo phiếu chuyển nháp {{name}} ({{count}} sản phẩm). Kiểm tra và gửi hàng trong Shopify › Sản phẩm › Chuyển kho.",
+    "permissionDeclined": "Không thể tạo phiếu chuyển khi chưa được cấp quyền. Bạn vẫn có thể chuyển hàng thủ công trong Shopify.",
+    "recentHeading": "Phiếu chuyển nháp gần đây",
+    "recentHelp": "Tạo từ các gợi ý này trong {{days}} ngày qua. Số lượng của chúng không còn được gợi ý nữa.",
+    "transfer": "Phiếu chuyển",
+    "fromTo": "Từ → đến",
+    "units": "Số lượng",
+    "created_at": "Tạo lúc"
   }
 }

@@ -15,6 +15,7 @@ use App\Http\Controllers\Api\ShopController;
 use App\Http\Controllers\Api\SupplierController;
 use App\Http\Controllers\Api\SupplierEmailController;
 use App\Http\Controllers\Api\SyncController;
+use App\Http\Controllers\Api\TransferController;
 use App\Http\Controllers\Api\VariantController;
 use App\Http\Controllers\Api\VendorSupplierController;
 use Illuminate\Support\Facades\Route;
@@ -77,6 +78,10 @@ Route::middleware('shopify.session')->group(function () {
     // Shopify admin extensions: forecast block on the product page, bulk settings on the product list.
     Route::get('/extension/products/{product}', [ProductExtensionController::class, 'show'])->whereNumber('product');
     Route::post('/extension/product-settings', [ProductExtensionController::class, 'updateSettings'])->middleware('throttle:30,1');
+
+    // Growth: move stock between locations before ordering (draft transfers in Shopify).
+    Route::get('/transfers', [TransferController::class, 'index']);
+    Route::post('/transfers', [TransferController::class, 'store'])->middleware('throttle:20,1');
 
     Route::get('/bundles', [BundleController::class, 'index']);
     Route::post('/bundles', [BundleController::class, 'store']);

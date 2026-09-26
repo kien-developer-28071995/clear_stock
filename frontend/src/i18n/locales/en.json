@@ -20,6 +20,7 @@
     "discard": "Discard"
   },
   "nav": {
+    "transfers": "Transfers",
     "home": "Home",
     "products": "Products",
     "suppliers": "Suppliers",
@@ -477,6 +478,10 @@
     "lockedHint": "Included in {{plan}}"
   },
   "apiErrors": {
+    "scope_required": "Clear Stock needs permission to create transfers in Shopify. Click the button again and approve it.",
+    "transfer_rejected": "Shopify didn't accept this transfer. Check the locations and quantities, then try again.",
+    "invalid_location": "One of these locations is no longer active in Shopify.",
+    "invalid_product": "One of these products is no longer in Clear Stock.",
     "generic": "Something went wrong. Please try again.",
     "validation_failed": "Please check the highlighted fields.",
     "plan_required": "This is included in the {{plan}} plan.",
@@ -720,5 +725,36 @@
     "advice": "Hold off reordering them, or run a promotion.",
     "seeAll_one": "See the overstocked product",
     "seeAll_other": "See all {{count}} overstocked products"
+  },
+  "transfers": {
+    "beforeOrdering_one": "{{qty}} unit can come from another location",
+    "beforeOrdering_other": "{{qty}} units can come from your other locations",
+    "beforeOrderingBody": "Move stock you already have before ordering more.",
+    "see": "See transfers",
+    "intro": "Move stock you already have before ordering more. We compare each location's forecast: a location that will run low gets what another location holds beyond what it needs.",
+    "locked": "Move stock between your locations before ordering more, and create the transfer in Shopify in one click.",
+    "needsLocations": "Transfer suggestions need at least two active locations with forecasts per location. They appear after the next sync.",
+    "noneHeading": "No transfers needed",
+    "noneBody": "Every location has enough stock, or no location has stock to spare.",
+    "route": "{{origin}} → {{destination}}",
+    "atDestination": "At {{name}}",
+    "atOrigin": "At {{name}}",
+    "move": "Move",
+    "inStock_one": "{{qty}} in stock",
+    "inStock_other": "{{qty}} in stock",
+    "runsOut": "Runs out {{date}}",
+    "outNow": "Out of stock",
+    "total_one": "{{qty}} unit to move",
+    "total_other": "{{qty}} units to move",
+    "create": "Create draft transfer in Shopify",
+    "created_one": "Draft transfer {{name}} created ({{count}} unit). Review and ship it in Shopify › Products › Transfers.",
+    "created_other": "Draft transfer {{name}} created ({{count}} units). Review and ship it in Shopify › Products › Transfers.",
+    "permissionDeclined": "Transfers can't be created without the permission. You can still move the stock by hand in Shopify.",
+    "recentHeading": "Recent draft transfers",
+    "recentHelp": "Created from these suggestions in the last {{days}} days. Their quantities are no longer suggested.",
+    "transfer": "Transfer",
+    "fromTo": "From → to",
+    "units": "Units",
+    "created_at": "Created"
   }
 }

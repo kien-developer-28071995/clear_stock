@@ -55,13 +55,13 @@ const SHELL = `<!DOCTYPE html>
 
 declare global {
     interface Window {
-        __e2e: { toasts: string[]; saveBar: Record<string, boolean>; pickerSelection: unknown[] };
+        __e2e: { toasts: string[]; saveBar: Record<string, boolean>; pickerSelection: unknown[]; scopes: string[]; grantScopes: boolean; scopeRequests: string[][] };
     }
 }
 
 /** Stub of the App Bridge APIs the app uses (`shopify.*`). */
 function stubAppBridge({ token, locale }: { token: string; locale: string }) {
-    window.__e2e = { toasts: [], saveBar: {}, pickerSelection: [] };
+    window.__e2e = { toasts: [], saveBar: {}, pickerSelection: [], scopes: [], grantScopes: true, scopeRequests: [] };
     (window as unknown as { shopify: unknown }).shopify = {
         config: { locale },
         idToken: async () => token,
@@ -72,6 +72,15 @@ function stubAppBridge({ token, locale }: { token: string; locale: string }) {
             leaveConfirmation: async () => undefined,
         },
         resourcePicker: async () => window.__e2e.pickerSelection,
+        // Optional scopes: the merchant approves (grantScopes) or declines the dialog.
+        scopes: {
+            query: async () => ({ granted: window.__e2e.scopes, required: [], optional: [] }),
+            request: async (scopes: string[]) => {
+                window.__e2e.scopeRequests.push(scopes);
+                if (window.__e2e.grantScopes) window.__e2e.scopes.push(...scopes);
+                return { result: window.__e2e.grantScopes ? 'granted-all' : 'declined-all', detail: { granted: window.__e2e.scopes, required: [], optional: [] } };
+            },
+        },
     };
 }
 

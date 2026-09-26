@@ -87,7 +87,13 @@ Horizon dashboard: http://localhost:8080/horizon (open in local env; basic auth 
 | `read_merchant_managed_fulfillment_orders` | Growth plan, per-location forecasts: which of the merchant's locations each order line is fulfilled from. Only requested in the orders export for Growth shops with 2+ locations. |
 | `read_third_party_fulfillment_orders` | Same, for locations run by a fulfillment service (3PL), so their demand is counted too. |
 
-The app is **read-only**: it never modifies products, inventory or orders. Raw orders are not stored: only aggregated daily units sold/returned per variant. No customer names, emails or addresses are requested or stored.
+**Optional scope** (declared in `optional_scopes`, not requested at install):
+
+| Scope | Why |
+|---|---|
+| `write_inventory_transfers` | Growth, **Transfers** page: create a *draft* inventory transfer from a suggestion. Asked in the app (`shopify.scopes.request`) the first time the merchant clicks "Create draft transfer"; declining only disables that button. |
+
+Apart from creating draft transfers the merchant asked for, the app is **read-only**: it never modifies products, inventory or orders (a draft transfer changes no stock until the merchant ships it in Shopify). Raw orders are not stored: only aggregated daily units sold/returned per variant. No customer names, emails or addresses are requested or stored.
 
 ---
 
@@ -198,6 +204,15 @@ The app is translated into English and Vietnamese (react-i18next). It follows th
 - All UI text lives in the frontend: `frontend/src/i18n/locales/<lang>.json`. The API never returns sentences; it returns snake_case codes with raw params (errors `{code, params}`, validation `errors.<field>[{code, params}]`, forecast `explanation_lines`, sync `stage` and `error`), which the app translates.
 - **Add a language:** copy `en.json` to e.g. `fr.json`, translate, add `'fr'` to `supported_locales` in `backend/config/app.php`. `npm run i18n:check` (also part of `npm run build`) fails on missing keys or plural forms.
 - Alert emails are English only.
+
+## Stock transfers between locations (Growth)
+
+**Transfers** page (`/transfers`): move stock you already have before ordering more.
+
+- **Planner** (`app/Services/Transfer/TransferPlanner.php`, pure, unit-tested): per product and location, from the per-location forecasts. A location *needs* stock when it sells and its stock position (on hand + on the way) is at or below its reorder point; it needs enough to reach its order-up-to level. A location *can spare* what it holds above the level it should keep (its order-up-to level, or everything if the product doesn't sell there), on hand only. Needs are served earliest stock-out first, from the locations with the most to spare.
+- **Routes**: suggestions grouped "from A → to B", quantities editable. **Create draft transfer in Shopify** calls `inventoryTransferCreate` (with an `@idempotent` key from the app, so a retried click never creates two). The merchant reviews and ships it in Shopify › Products › Transfers.
+- Drafts created in the last 7 days (`inventory_transfers`) count as moved, so the same stock isn't suggested twice. The Reorder page shows how many units can come from other locations.
+- Needs forecasts per location (Growth, 2+ active locations, fulfillment order scopes); otherwise the page explains why.
 
 ## Admin extensions (Shopify product pages)
 

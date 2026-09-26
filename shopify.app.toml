@@ -15,6 +15,9 @@ automatically_update_urls_on_dev = false
 # DEV ONLY: write_orders is needed by `php artisan dev:fake-orders` (fake orders in the dev store).
 # REMOVE write_orders before App Store submission (Phase 7 checklist) - the app itself is read-only.
 scopes = "read_products,read_inventory,read_locations,read_orders,read_all_orders,read_merchant_managed_fulfillment_orders,read_third_party_fulfillment_orders,write_orders"
+# Optional: asked in the app only when a Growth merchant first creates a draft transfer
+# from the Transfers page (App Bridge shopify.scopes.request). Not needed to install.
+optional_scopes = [ "write_inventory_transfers" ]
 # Shopify-managed installation: Shopify shows the consent screen on install,
 # the app gets tokens via token exchange (no OAuth redirect dance).
 use_legacy_install_flow = false

@@ -15,6 +15,7 @@ export function AppNav() {
                 {t('nav.home')}
             </NavLink>
             <NavLink href="/reorder">{t('nav.reorder')}</NavLink>
+            <NavLink href="/transfers">{t('nav.transfers')}</NavLink>
             <NavLink href="/products">{t('nav.products')}</NavLink>
             <NavLink href="/insights">{t('nav.insights')}</NavLink>
             <NavLink href="/suppliers">{t('nav.suppliers')}</NavLink>

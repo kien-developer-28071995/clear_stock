@@ -91,7 +91,7 @@ Nguồn lần 2: https://community.shopify.dev/t/feature-request-expose-the-exis
 2. ~~**#13 Block dự báo trên trang sản phẩm Shopify** + gán NCC/lead time hàng loạt~~ — xong: 2 admin UI extension (`extensions/`): block trên trang sản phẩm (dự báo từng biến thể + giải thích + link vào app), hành động "Đặt NCC & lead time" cho sản phẩm được chọn ở danh sách sản phẩm.
 3. **#14 Shopify Flow triggers dựa trên dự báo** ("cần đặt hàng", "sẽ hết trong N ngày", "đơn NCC tới hạn").
 5. **#10 Báo khi đồng bộ lỗi liên tục** (1 email, không spam) + cam kết giữ giá cho khách cũ trên trang Gói / listing.
-6. **#6 Phân loại ABC**, **#7 Mô phỏng tăng trưởng (what-if)**, **#8 Gợi ý chuyển kho** (Growth), **#9 Dự báo sản phẩm mới theo sản phẩm tham chiếu**.
+6. **#6 Phân loại ABC**, **#7 Mô phỏng tăng trưởng (what-if)**, ~~**#8 Gợi ý chuyển kho** (Growth)~~ (xong: trang Chuyển kho, tạo phiếu chuyển nháp trong Shopify qua scope tùy chọn `write_inventory_transfers`), **#9 Dự báo sản phẩm mới theo sản phẩm tham chiếu**.
 7. **#16 Nhận hàng / kiểm kho bằng barcode** (thấp).
 8. **Mặc định MOQ / quy cách thùng theo nhà cung cấp** (hiện chỉ theo từng sản phẩm).
 9. **Phase 7 — chuẩn bị nộp App Store**: gỡ scope `write_orders`, `SHOPIFY_BILLING_TEST=false`, listing có "Stocky alternative", ảnh/icon, hướng dẫn test cho reviewer, domain gửi mail có SPF/DKIM.
