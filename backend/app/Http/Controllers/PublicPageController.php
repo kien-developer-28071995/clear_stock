@@ -19,6 +19,8 @@ class PublicPageController extends Controller
         return [
             'appName' => config('shopify.app_name'),
             'supportEmail' => config('shopify.support_email'),
+            // Bump when the privacy policy text changes.
+            'updated' => 'September 26, 2026',
         ];
     }
 }

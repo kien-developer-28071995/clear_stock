@@ -1,0 +1,38 @@
+# PRODUCTION app (the one submitted to the App Store). A separate app from the dev one in
+# shopify.app.toml, created in the Partner Dashboard. Deploy with:
+#   npx @shopify/cli@latest app deploy --config production
+#
+# First App Store version (see docs/APP_STORE.md, "v1 feature set"):
+#  - no write_orders (dev-only, for dev:fake-orders)
+#  - no fulfillment-order scopes: per-location forecasts are switched off (FEATURE_LOCATIONS=false)
+#  - no optional write_inventory_transfers: transfers are switched off (FEATURE_TRANSFERS=false)
+#  - only the two product-page extensions: Flow triggers are switched off (FEATURE_FLOW_TRIGGERS=false)
+# Switching one of those features on later = add its scope / extension here and deploy again.
+
+client_id = "REPLACE_WITH_PRODUCTION_CLIENT_ID"
+name = "Clear Stock"
+application_url = "https://REPLACE_WITH_PRODUCTION_HOST"
+embedded = true
+extension_directories = [ "extensions/product-forecast-block", "extensions/product-settings-action" ]
+
+[build]
+automatically_update_urls_on_dev = false
+
+[access_scopes]
+# Why each scope is needed: see README "Access scopes".
+scopes = "read_products,read_inventory,read_locations,read_orders,read_all_orders"
+use_legacy_install_flow = false
+
+[auth]
+redirect_urls = [ "https://REPLACE_WITH_PRODUCTION_HOST/auth/callback" ]
+
+[webhooks]
+api_version = "2026-07"
+
+  [[webhooks.subscriptions]]
+  topics = [ "app/uninstalled", "app/scopes_update", "app_subscriptions/update", "bulk_operations/finish" ]
+  uri = "/webhooks"
+
+  [[webhooks.subscriptions]]
+  compliance_topics = [ "customers/data_request", "customers/redact", "shop/redact" ]
+  uri = "/webhooks"

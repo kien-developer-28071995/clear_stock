@@ -81,7 +81,7 @@ Horizon dashboard: http://localhost:8080/horizon (open in local env; basic auth 
 |---|---|
 | `read_products` | Read variants, SKUs, unit cost and bundle composition to forecast per variant. |
 | `read_inventory` | Read inventory items and available quantity per location (current stock, days of cover). |
-| `read_locations` | Multi-location forecasts (Growth plan) and location names in the UI. |
+| `read_locations` | Which locations are active (stock counts only active ones), location names, and multi-location forecasts (Growth). |
 | `read_orders` | Read line-item quantities and refunds to build **daily sales totals per variant**. |
 | `read_all_orders` | Forecasts need more than the default 60 days of orders: up to 1 year for the 90-day window and the seasonality factor (same period last year). |
 | `read_merchant_managed_fulfillment_orders` | Growth plan, per-location forecasts: which of the merchant's locations each order line is fulfilled from. Only requested in the orders export for Growth shops with 2+ locations. |

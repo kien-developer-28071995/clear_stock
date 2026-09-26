@@ -97,7 +97,8 @@ class BillingService
             currency: config('billing.currency'),
             interval: $interval->shopifyInterval(),
             returnUrl: $this->returnUrl($shop),
-            test: (bool) config('billing.test'),
+            // Development stores (incl. the App Store reviewer's) only take test charges.
+            test: (bool) config('billing.test') || $this->billing->isDevelopmentStore($shop),
             trialDays: $this->trialDaysLeft($shop),
         );
 

@@ -1,0 +1,5 @@
+Purchase Order ID,Supplier,Status,Ordered At,Expected On,Received At,SKU,Product,Variant,Quantity,Received,Cost
+PO-1001,Acme Supplies,received,2026-06-01,2026-06-10,2026-06-12,SAMPLE-1,Sample product,,50,50,3.50
+PO-1002,Acme Supplies,received,2026-07-01,2026-07-10,2026-07-11,SAMPLE-2,Sample product 2,,20,20,5.00
+PO-1003,Northwind Trading,received,2026-07-15,,2026-08-05,SAMPLE-3,Sample product 3,,30,30,2.00
+PO-1004,Northwind Trading,ordered,2026-09-01,2026-09-22,,SAMPLE-3,Sample product 3,,30,0,2.00

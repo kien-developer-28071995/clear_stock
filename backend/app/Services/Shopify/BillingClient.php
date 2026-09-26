@@ -4,6 +4,7 @@ namespace App\Services\Shopify;
 
 use App\Exceptions\ShopifyApiException;
 use App\Models\Shop;
+use App\Support\Monitor;
 
 /**
  * Shopify Billing API (app subscriptions).
@@ -39,7 +40,27 @@ class BillingClient
         }
         GQL;
 
+    private const PLAN = <<<'GQL'
+        query ShopPlan { shop { plan { partnerDevelopment } } }
+        GQL;
+
     public function __construct(private readonly AdminApiClient $admin) {}
+
+    /**
+     * Partner development store (e.g. the App Store reviewer's store): charges there must be
+     * test charges. Unknown (API error) = false, so a real store is never given a free test charge.
+     * https://shopify.dev/docs/api/admin-graphql/latest/objects/ShopPlan
+     */
+    public function isDevelopmentStore(Shop $shop): bool
+    {
+        try {
+            return (bool) ($this->admin->query($shop, self::PLAN)['shop']['plan']['partnerDevelopment'] ?? false);
+        } catch (ShopifyApiException $e) {
+            Monitor::expected($e, 'billing: development store check', ['shop' => $shop->domain]);
+
+            return false;
+        }
+    }
 
     /** @return array{id: string, confirmation_url: string} */
     public function create(Shop $shop, string $name, float $price, string $currency, string $interval, string $returnUrl, bool $test, int $trialDays): array

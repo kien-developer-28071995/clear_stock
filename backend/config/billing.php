@@ -5,7 +5,8 @@
  * through the Shopify Billing API. Annual = ~20% off 12 monthly payments.
  */
 return [
-    // Test charges (no real money). Must be false in production; dev stores can only use test charges.
+    // Test charges (no real money) for every shop. Must be false in production: partner development
+    // stores (incl. the App Store reviewer's) get test charges automatically (BillingService).
     'test' => (bool) env('SHOPIFY_BILLING_TEST', true),
 
     'currency' => 'USD',

@@ -79,6 +79,24 @@ it('creates a Shopify subscription and returns the approval URL', function (stri
     'growth annual' => ['growth', 'annual', 58.0, 'ANNUAL'],
 ]);
 
+it('uses test charges on development stores only when test mode is off', function (bool $devStore, bool $expectTest) {
+    config(['billing.test' => false]);
+    Http::fake(fn (Request $r) => match (true) {
+        str_contains($r['query'], 'ShopPlan') => Http::response(['data' => ['shop' => ['plan' => ['partnerDevelopment' => $devStore]]]]),
+        default => Http::response(['data' => ['appSubscriptionCreate' => [
+            'appSubscription' => ['id' => 'gid://shopify/AppSubscription/1', 'status' => 'PENDING'],
+            'confirmationUrl' => 'https://demo.myshopify.com/admin/charges/confirm/1', 'userErrors' => [],
+        ]]]),
+    });
+
+    $this->postJson('/api/billing', ['plan' => 'starter', 'interval' => 'monthly'], $this->auth)->assertOk();
+
+    Http::assertSent(fn (Request $r) => str_contains($r['query'], 'CreateSubscription') && $r['variables']['test'] === $expectTest);
+})->with([
+    'development store' => [true, true],
+    'real store' => [false, false],
+]);
+
 it('activates the plan after approval by re-reading the subscription', function () {
     fakeBilling([['id' => 'gid://shopify/AppSubscription/7', 'name' => BillingService::subscriptionName(Plan::Growth, PlanInterval::Annual), 'status' => 'ACTIVE', 'test' => true, 'currentPeriodEnd' => '2027-09-20T00:00:00Z']]);
 
