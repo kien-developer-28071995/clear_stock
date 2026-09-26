@@ -1,0 +1,8 @@
+# HTTPS in front of the "web" container (Let's Encrypt certificates, automatic renewal).
+# Install Caddy on the server, copy this to /etc/caddy/Caddyfile, replace the domain, then:
+#   sudo systemctl reload caddy
+# The web container listens on 127.0.0.1:8080 (APP_PORT in the deploy dir's .env).
+app.example.com {
+    encode zstd gzip
+    reverse_proxy 127.0.0.1:8080
+}
