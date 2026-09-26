@@ -14,7 +14,8 @@ export default defineConfig(({ mode }) => {
     return {
         plugins: [
             laravel({
-                input: ['src/main.tsx'],
+                // Two apps: the embedded admin app, and the public pages (/privacy, /support).
+                input: ['src/main.tsx', 'src/public.tsx'],
                 // Laravel (backend/) serves the page: write the build + hot file into its public dir.
                 publicDirectory: '../backend/public',
                 hotFile: '../backend/public/hot',

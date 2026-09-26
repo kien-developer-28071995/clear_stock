@@ -198,6 +198,8 @@ API (session-token authenticated): `GET /api/dashboard`, `GET|POST /api/onboardi
 
 ---
 
+**Public pages** (`/privacy`, `/support`, the App Store listing URLs) are a second, small Vite entry: `src/public.tsx` with `src/features/legal`. They run outside the Shopify admin, so they load no App Bridge or Polaris CDN script. Laravel serves the shell `resources/views/public-app.blade.php` with the app name, support email (`SUPPORT_EMAIL`) and policy date. The text is translated like the app (`legal.*` in the locale files; `?lang=vi`, otherwise the browser language).
+
 ## Languages
 
 The app is translated into English and Vietnamese (react-i18next). It follows the Shopify admin language; merchants can override it in **Settings → Language** (saved on the shop).

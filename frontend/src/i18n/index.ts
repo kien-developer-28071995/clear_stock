@@ -80,9 +80,10 @@ export async function applyLanguagePreference(preference: string | null): Promis
 }
 
 /** Initialise with the saved preference, else the Shopify admin language (`shopify.config.locale`). */
-export async function initI18n(shopifyLocale: string | undefined): Promise<void> {
+export async function initI18n(shopifyLocale: string | undefined, options: { explicit?: string | null } = {}): Promise<void> {
     adminLocale = shopifyLocale;
-    const lng = resolveLocale(storedPreference() ?? shopifyLocale);
+    // An explicit language (public pages: ?lang=) wins over the one saved in the app.
+    const lng = resolveLocale(options.explicit ?? storedPreference() ?? shopifyLocale);
 
     await i18n.use(initReactI18next).init({
         lng,

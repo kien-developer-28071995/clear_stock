@@ -52,6 +52,12 @@ it('still renders the shell when the id_token is invalid', function () {
     expect(Shop::count())->toBe(0);
 });
 
-it('serves public privacy and support pages', function (string $path) {
-    $this->get($path)->assertOk();
+it('serves public privacy and support pages as the public React bundle, without App Bridge', function (string $path) {
+    config(['shopify.support_email' => 'help@clearstock.test']);
+
+    $this->get($path)->assertOk()
+        ->assertSee('window.__PUBLIC_CONFIG__', false)
+        ->assertSee('<div id="root"></div>', false)
+        ->assertSee('help@clearstock.test', false)
+        ->assertDontSee('app-bridge.js', false);
 })->with(['/privacy', '/support']);

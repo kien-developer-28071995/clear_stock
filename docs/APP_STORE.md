@@ -33,7 +33,7 @@ Files: `backend/.env.production.example` (all of the above as env), `shopify.app
 - [x] Production app config without `write_orders`, fulfillment scopes or optional scopes (`shopify.app.production.toml`). The dev app keeps them (`dev:fake-orders`).
 - [x] `SHOPIFY_BILLING_TEST=false` in the production env template; **development stores (the reviewer's) get test charges automatically** (`shop.plan.partnerDevelopment`), real stores are charged for real.
 - [x] `php artisan app:preflight`: fails on debug on, test billing, `write_orders`, tunnel URL, log mailer, example emails, impossible feature combinations.
-- [x] Privacy policy finalized (`/privacy`), support page with FAQ (`/support`).
+- [x] Privacy policy finalized (`/privacy`), support page with FAQ (`/support`): public React pages (`frontend/src/public.tsx`, `features/legal`), English and Vietnamese (`?lang=vi`), no App Bridge. Text in `frontend/src/i18n/locales/*.json` under `legal`; bump `PublicPageController::PRIVACY_UPDATED` when the policy changes.
 - [x] Mandatory compliance webhooks, HMAC, session tokens, uninstall cleanup (since Phase 2; tests).
 - [x] Dev-only commands refuse to run outside `APP_ENV=local`.
 - [x] Reviewer instructions and listing draft (below), sample CSV `docs/sample-purchase-orders.csv`.

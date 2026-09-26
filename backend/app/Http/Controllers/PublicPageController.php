@@ -2,25 +2,34 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Contracts\View\View;
+
+/**
+ * Public privacy policy and support pages (App Store listing URLs). The content is the
+ * React bundle frontend/src/public.tsx (translated like the app); this only serves the shell.
+ */
 class PublicPageController extends Controller
 {
-    public function privacy()
+    /** Bump when the privacy policy text changes (frontend/src/i18n/locales, legal.privacy). */
+    private const PRIVACY_UPDATED = '2026-09-26';
+
+    public function privacy(): View
     {
-        return view('public.privacy', $this->shared());
+        return $this->page('Privacy policy');
     }
 
-    public function support()
+    public function support(): View
     {
-        return view('public.support', $this->shared());
+        return $this->page('Support');
     }
 
-    private function shared(): array
+    private function page(string $title): View
     {
-        return [
+        return view('public-app', [
+            'title' => $title,
             'appName' => config('shopify.app_name'),
             'supportEmail' => config('shopify.support_email'),
-            // Bump when the privacy policy text changes.
-            'updated' => 'September 26, 2026',
-        ];
+            'privacyUpdated' => self::PRIVACY_UPDATED,
+        ]);
     }
 }
