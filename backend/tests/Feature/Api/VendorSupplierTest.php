@@ -24,14 +24,14 @@ beforeEach(function () {
     $make('Acme Ceramics', 1, ['tracked' => false]); // not tracked: ignored
 });
 
-it('imports vendor and product type from Shopify', function () {
+it('imports vendor, product type and barcode from Shopify', function () {
     app(VariantImporter::class)->import($this->shop, jsonlFile([[
-        'id' => gid('ProductVariant', 77), 'sku' => 'X', 'title' => 'Default Title', 'createdAt' => '2025-03-01T10:00:00Z', 'requiresComponents' => false,
+        'id' => gid('ProductVariant', 77), 'sku' => 'X', 'barcode' => ' 4006381333931 ', 'title' => 'Default Title', 'createdAt' => '2025-03-01T10:00:00Z', 'requiresComponents' => false,
         'product' => ['id' => gid('Product', 7), 'title' => 'Teapot', 'status' => 'ACTIVE', 'vendor' => '  Acme Ceramics ', 'productType' => ''],
         'inventoryItem' => ['id' => gid('InventoryItem', 770), 'tracked' => true, 'unitCost' => null],
     ]]));
 
-    expect(Variant::where('shopify_variant_id', 77)->first()->only(['vendor', 'product_type']))->toBe(['vendor' => 'Acme Ceramics', 'product_type' => null]);
+    expect(Variant::where('shopify_variant_id', 77)->first()->only(['vendor', 'product_type', 'barcode']))->toBe(['vendor' => 'Acme Ceramics', 'product_type' => null, 'barcode' => '4006381333931']);
 });
 
 it('previews each vendor with its products, matching supplier and own-brand flag', function () {

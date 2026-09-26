@@ -19,6 +19,7 @@ use Illuminate\Support\Carbon;
  * @property string $product_title
  * @property ?string $title
  * @property ?string $sku
+ * @property ?string $barcode
  * @property ?string $unit_cost
  * @property bool $tracked
  * @property bool $is_active
@@ -41,7 +42,7 @@ class Variant extends Model
 
     protected $fillable = [
         'shop_id', 'shopify_variant_id', 'shopify_product_id', 'inventory_item_id',
-        'product_title', 'vendor', 'product_type', 'title', 'sku', 'unit_cost', 'tracked', 'is_active',
+        'product_title', 'vendor', 'product_type', 'title', 'sku', 'barcode', 'unit_cost', 'tracked', 'is_active',
         'supplier_id', 'lead_time_override', 'safety_days', 'min_order_qty', 'pack_size', 'min_stock', 'max_stock', 'alerts_muted', 'is_bundle', 'shopify_created_at',
     ];
 

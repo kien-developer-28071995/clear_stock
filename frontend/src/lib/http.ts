@@ -81,7 +81,8 @@ async function postForm<T>(path: string, form: FormData): Promise<T> {
 }
 
 /** Download a file from the API (auth header included) and hand it to the browser. */
-async function download(path: string): Promise<void> {
+/** Saves the file the API returns; resolves with the response headers (e.g. counts the file comes with). */
+async function download(path: string): Promise<Headers> {
     const response = await fetch(`/api${path}`, { headers: { Accept: 'application/json', ...(await headers()) } });
     if (!response.ok) {
         throw ApiError.fromResponse(response.status, await response.json().catch(() => null));
@@ -93,6 +94,7 @@ async function download(path: string): Promise<void> {
     a.click();
     a.remove();
     URL.revokeObjectURL(url);
+    return response.headers;
 }
 
 export const http = {

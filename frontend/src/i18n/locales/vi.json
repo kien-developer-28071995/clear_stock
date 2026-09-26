@@ -248,7 +248,11 @@
   "po": {
     "export": "Xuất đơn đặt hàng",
     "short": "Đơn đặt hàng",
-    "locked": "{{label}} ({{plan}})"
+    "locked": "{{label}} ({{plan}})",
+    "formatShopify": "Đơn đặt hàng Shopify (file nhập)",
+    "formatCsv": "Bảng tính (CSV)",
+    "shopifyDone": "Đã tải xuống. Trong Shopify, mở Sản phẩm › Đơn đặt hàng › Tạo đơn đặt hàng và nhập file này.",
+    "shopifySkipped_other": "{{count}} sản phẩm không có SKU hoặc mã vạch nên bị bỏ qua."
   },
   "product": {
     "heading": "Sản phẩm",

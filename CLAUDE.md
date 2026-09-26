@@ -176,5 +176,8 @@ Yêu cầu chung:
 - [x] Slack kênh sự kiện kinh doanh (`MONITORING_SLACK_EVENTS_WEBHOOK_URL`, tách khỏi kênh lỗi): cài mới/cài lại, gỡ (gói lúc gỡ, số ngày dùng), nâng/hạ gói, đổi kỳ thanh toán (MRR thay đổi, số shop đang cài); event `PlanChanged`, job queue gửi Slack, 331 test
 - [x] Nhà cung cấp từ Vendor Shopify (roadmap #12): sync `vendor`/`product_type`, `/suppliers/from-vendors`, bộ lọc Vendor/Loại sản phẩm, gợi ý trong setup guide, 336 test
 - [x] Trạng thái Tồn thừa (roadmap #15): `target_stock`/`excess_units`, ngưỡng 50%, lọc, mục Tồn thừa ở Phân tích, ô tiền kẹt trên Home, 340 test
+- [x] Tối ưu API (nhánh refactor/optimize-api-responses, đã merge): trạng thái SQL một nguồn cho số đếm/lọc/badge, slow/overstock tổng hợp bằng SQL, payload dashboard 40→16 KB, danh sách 13.8→6 KB (`ForecastListResource`), cache email liên hệ onboarding, 341 test
+- [x] Test E2E Playwright (`frontend/e2e`, `make e2e`): chạy app thật ngoài admin với App Bridge giả, mọi màn hình + tính năng trên Free/Starter/Growth (lệnh dev `dev:session-token`, `dev:set-plan`), 39 test. Phát hiện và sửa: `<s-option value="">` gửi nhãn thay vì rỗng (dùng `utils/select.ts`), `overrides` trả `[]` thay vì object
+- [x] PO gốc Shopify (roadmap #11): xuất định dạng nhập PO của Shopify (menu Xuất đơn đặt hàng), đồng bộ barcode, header `X-Skipped-Rows`, 342 test
 - [ ] Việc sắp tới: xem mục "Việc sắp tới" trong `docs/ROADMAP.md`
 - [ ] Phase 7: Chuẩn bị nộp App Store (nhớ: gỡ scope write_orders chỉ dùng cho dev:fake-orders khỏi shopify.app.toml và SHOPIFY_SCOPES; SHOPIFY_BILLING_TEST=false ở production)

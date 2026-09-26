@@ -87,7 +87,7 @@ Nguồn lần 2: https://community.shopify.dev/t/feature-request-expose-the-exis
 
 ## Việc sắp tới (tổng hợp, theo thứ tự đề xuất)
 
-1. **#11 Tạo Purchase Order gốc của Shopify từ gợi ý** — trước tiên tải file mẫu CSV nhập PO trong admin Shopify để chốt tên cột; đồng bộ thêm barcode.
+1. ~~**#11 Tạo Purchase Order gốc của Shopify từ gợi ý**~~ — xong: nút xuất PO có thêm định dạng "Đơn đặt hàng Shopify" đúng mẫu `SKU,Barcode,Supplier SKU,Quantity,Cost,Tax` (không có API tạo PO), đồng bộ `variants.barcode`, bỏ qua sản phẩm không có SKU lẫn barcode và báo số lượng.
 2. **#13 Block dự báo trên trang sản phẩm Shopify** + gán NCC/lead time hàng loạt từ danh sách sản phẩm Shopify (admin UI extension).
 3. **#14 Shopify Flow triggers dựa trên dự báo** ("cần đặt hàng", "sẽ hết trong N ngày", "đơn NCC tới hạn").
 5. **#10 Báo khi đồng bộ lỗi liên tục** (1 email, không spam) + cam kết giữ giá cho khách cũ trên trang Gói / listing.

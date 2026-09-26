@@ -262,7 +262,12 @@
   "po": {
     "export": "Export purchase order",
     "short": "Purchase order",
-    "locked": "{{label}} ({{plan}})"
+    "locked": "{{label}} ({{plan}})",
+    "formatShopify": "Shopify purchase order (import file)",
+    "formatCsv": "Spreadsheet (CSV)",
+    "shopifyDone": "Downloaded. In Shopify, open Products › Purchase orders › Create purchase order and import this file.",
+    "shopifySkipped_one": "{{count}} product has no SKU or barcode and was left out.",
+    "shopifySkipped_other": "{{count}} products have no SKU or barcode and were left out."
   },
   "product": {
     "heading": "Product",

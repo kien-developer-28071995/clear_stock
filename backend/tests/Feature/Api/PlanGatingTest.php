@@ -103,4 +103,27 @@ describe('Growth plan', function () {
         expect($lines)->toHaveCount(2)
             ->and($lines[1])->toBe(['All locations', 'Acme Ceramics', 'Mug', 'MUG-1', '10', '4', '2026-09-22', '194', '3.5', '679', 'USD']);
     });
+
+    it('exports in Shopify\'s purchase order import format, leaving out products Shopify cannot match', function () {
+        $acme = Supplier::factory()->for($this->shop)->create(['name' => 'Acme Ceramics']);
+        $this->mug->update(['supplier_id' => $acme->id, 'sku' => 'MUG-1', 'barcode' => '0123456789012']);
+        $bowl = product($this->shop, $this->location, 'Bowl', stock: 0, perDay: 2, attrs: ['supplier_id' => $acme->id, 'sku' => null, 'barcode' => '999', 'unit_cost' => null]);
+        product($this->shop, $this->location, 'Cup', stock: 0, perDay: 2, attrs: ['supplier_id' => $acme->id, 'sku' => null, 'barcode' => null]);
+        app(ForecastService::class)->runForShop($this->shop);
+
+        $response = $this->get("/api/purchase-orders/export?supplier_id={$acme->id}&format=shopify", $this->auth)->assertOk();
+
+        $csv = $response->streamedContent();
+        expect($response->headers->get('content-disposition'))->toContain('shopify-purchase-order-acme-ceramics-2026-09-20.csv')
+            ->and($response->headers->get('x-skipped-rows'))->toBe('1')
+            ->and(str_starts_with($csv, "\xEF\xBB\xBF"))->toBeFalse(); // header must read exactly "SKU"
+        expect(strtok($csv, "\n"))->toBe('SKU,Barcode,Supplier SKU,Quantity,Cost,Tax'); // byte-for-byte like the template
+        $lines = array_map('str_getcsv', explode("\n", trim($csv)));
+        expect($lines[0])->toBe(['SKU', 'Barcode', 'Supplier SKU', 'Quantity', 'Cost', 'Tax'])
+            ->and($lines)->toContain(['MUG-1', '0123456789012', '', (string) $this->mug->fresh()->forecast->suggested_qty, '3.50', ''])
+            ->and(collect($lines)->firstWhere(1, '999'))->toBe(['', '999', '', (string) $bowl->forecast->suggested_qty, '', ''])
+            ->and($lines)->toHaveCount(3);
+
+        $this->getJson('/api/purchase-orders/export?format=xlsx', $this->auth)->assertUnprocessable();
+    });
 });

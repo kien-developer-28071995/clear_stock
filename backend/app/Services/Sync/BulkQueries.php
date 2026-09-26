@@ -17,7 +17,7 @@ final class BulkQueries
             {
               productVariants{$filter} {
                 edges { node {
-                  id sku title createdAt requiresComponents
+                  id sku barcode title createdAt requiresComponents
                   product { id title status vendor productType }
                   inventoryItem { id tracked unitCost { amount } }
                   productVariantComponents { edges { node { quantity productVariant { id } } } }
