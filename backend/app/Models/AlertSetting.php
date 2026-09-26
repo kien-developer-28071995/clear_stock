@@ -4,6 +4,8 @@ namespace App\Models;
 
 use App\Enums\AlertFrequency;
 use App\Models\Concerns\BelongsToShop;
+use App\Observers\AlertSettingObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -15,6 +17,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property AlertFrequency $frequency
  * @property int $weekly_day
  */
+#[ObservedBy(AlertSettingObserver::class)]
 class AlertSetting extends Model
 {
     use BelongsToShop, HasFactory;

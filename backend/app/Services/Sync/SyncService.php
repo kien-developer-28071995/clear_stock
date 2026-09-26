@@ -46,6 +46,7 @@ class SyncService
         private readonly OrderAggregator $orders,
         private readonly StockHistoryBuilder $stockHistory,
         private readonly Cache $cache,
+        private readonly LocationSupport $locationSupport,
     ) {}
 
     public function latest(Shop $shop): ?SyncRun
@@ -53,8 +54,13 @@ class SyncService
         return $this->runs->latestForShop($shop);
     }
 
-    /** Start a sync unless one is already running (then that one is returned). */
-    public function start(Shop $shop, SyncType $type): SyncRun
+    /**
+     * Start a sync unless one is already running (then that one is returned).
+     *
+     * $full re-imports the whole history window (400 days) and catalog, e.g. after the
+     * merchant imported old orders from another platform (backdated processed_at).
+     */
+    public function start(Shop $shop, SyncType $type, bool $full = false): SyncRun
     {
         if ($active = $this->runs->activeForShop($shop)) {
             return $active;
@@ -65,13 +71,13 @@ class SyncService
         $firstSync = $shop->last_synced_at === null;
         $type = $firstSync ? SyncType::Initial : $type;
 
-        $windowStart = $firstSync
+        $windowStart = $firstSync || $full
             ? $today->subDays(config('sync.initial_days'))
             // Re-aggregate the recent window, or everything since the last sync if that is older.
             : min($today->subDays(config('sync.nightly_window_days')), CarbonImmutable::parse($shop->last_synced_at)->setTimezone($shop->timezone)->startOfDay()->subDay());
         $windowStart = max($windowStart, $today->subDays(config('sync.initial_days')));
 
-        $fullCatalog = $firstSync || $today->isoWeekday() === config('sync.full_catalog_weekday');
+        $fullCatalog = $firstSync || $full || $today->isoWeekday() === config('sync.full_catalog_weekday');
 
         $run = $this->runs->create([
             'shop_id' => $shop->id,
@@ -104,10 +110,11 @@ class SyncService
         $estimate = $this->estimateObjects($shop, $run);
 
         $windowStartIso = CarbonImmutable::parse($run->window_start->toDateString(), $shop->timezone)->toIso8601String();
+        $withLocations = $this->locationSupport->enabled($shop);
         $queries = [
             BulkQueryKey::Variants->value => BulkQueries::variants($run->variants_updated_since?->toIso8601String()),
             BulkQueryKey::Inventory->value => BulkQueries::inventory(),
-            BulkQueryKey::Orders->value => BulkQueries::orders($windowStartIso),
+            BulkQueryKey::Orders->value => BulkQueries::orders($windowStartIso, $withLocations),
         ];
 
         $operations = [];
@@ -118,7 +125,7 @@ class SyncService
 
         if ($this->runs->transitionStage($run, SyncStage::Queued, SyncStage::Fetching, [
             'operations' => $operations,
-            'stats' => ['estimated_objects' => $estimate],
+            'stats' => ['estimated_objects' => $estimate, 'with_locations' => $withLocations],
         ])) {
             CheckSyncRun::dispatch($run->id)->delay(now()->addSeconds(5));
         }
@@ -142,6 +149,14 @@ class SyncService
 
             if ($status->isFailed()) {
                 $this->runs->update($run, ['operations' => $operations]);
+
+                // Orders are "protected customer data": the app must be approved for it in the
+                // Partner Dashboard (API access requests), even on development stores.
+                if ($status->errorCode === 'ACCESS_DENIED') {
+                    Log::warning('Bulk operation access denied (protected customer data not approved?)', ['shop' => $shop->domain, 'query' => $key]);
+                    throw new SyncFailedException("Shopify hasn't allowed this app to read your {$key} yet. Please try again later; if this keeps happening, contact support.");
+                }
+
                 throw new SyncFailedException("Shopify could not export your {$key} ({$status->status}".($status->errorCode ? ", {$status->errorCode}" : '').').');
             }
         }
@@ -188,10 +203,14 @@ class SyncService
             $stats['inventory'] = $this->inventory->import($shop, $files['inventory'], $run->started_at);
 
             $this->stage($run, SyncStage::ImportingOrders);
-            $stats['orders'] = $this->orders->import($shop, $files['orders'], $run->window_start->toDateString());
+            $withLocations = (bool) ($stats['with_locations'] ?? false);
+            $stats['orders'] = $this->orders->import($shop, $files['orders'], $run->window_start->toDateString(), $withLocations);
 
             $this->stage($run, SyncStage::RebuildingStock);
             $stats['stock'] = $this->stockHistory->rebuild($shop, $run->window_start->toDateString());
+            if ($withLocations) {
+                $stats['location_stock'] = $this->stockHistory->rebuildLocations($shop, $run->window_start->toDateString());
+            }
 
             $this->runs->update($run, [
                 'status' => SyncRunStatus::Completed,

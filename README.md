@@ -81,6 +81,8 @@ Horizon dashboard: http://localhost:8080/horizon (open in local env; basic auth 
 | `read_locations` | Multi-location forecasts (Growth plan) and location names in the UI. |
 | `read_orders` | Read line-item quantities and refunds to build **daily sales totals per variant**. |
 | `read_all_orders` | Forecasts need more than the default 60 days of orders: up to 1 year for the 90-day window and the seasonality factor (same period last year). |
+| `read_merchant_managed_fulfillment_orders` | Growth plan, per-location forecasts: which of the merchant's locations each order line is fulfilled from. Only requested in the orders export for Growth shops with 2+ locations. |
+| `read_third_party_fulfillment_orders` | Same, for locations run by a fulfillment service (3PL), so their demand is counted too. |
 
 The app is **read-only**: it never modifies products, inventory or orders. Raw orders are not stored: only aggregated daily units sold/returned per variant. No customer names, emails or addresses are requested or stored.
 
@@ -141,6 +143,63 @@ ProcessSyncRun ─► download JSONL ─► variants ─► inventory ─► dai
 - **Reliability:** runs are stored in `sync_runs` (stage, progress, bulk operation ids, stats, error). Transient Shopify errors are retried with backoff. Permanent errors mark the run failed and show a merchant-friendly message. `sync:maintenance` fails runs stuck for more than 6 h and prunes runs older than 30 days.
 - **Queues:** sync jobs run on the `sync` queue of the `redis-long` connection (Horizon `sync-supervisor`, 1 h timeout), separate from webhooks.
 - **API:** `GET /api/sync` returns the status and progress; `POST /api/sync` runs "Sync now" (5-minute cooldown).
+
+---
+
+## Forecast engine
+
+Pure calculator (`app/Services/Forecast/ForecastCalculator.php`, no DB access) plus loader/service around it. Tuning lives in `config/forecast.php`.
+
+1. **Daily demand** = units sold − units returned, plus units sold inside merchant-defined (manual) bundles × quantity per bundle. Native Shopify bundles are not added again, because orders already contain their component lines.
+2. **Sales rate:** averages over the last 7 / 30 / 90 days counting **in-stock days only** (out-of-stock days are excluded and reported). A window needs 4 / 10 / 20 in-stock days to be used. Weights are 20% / 50% / 30%, re-normalised over the usable windows.
+3. **Seasonality:** last year, next 28 days vs previous 28 days (4 full weeks, so weekly order patterns don't look seasonal). It is applied only with ≥ 70% in-stock days and ≥ 10 units last year, and only when the change exceeds ±10%. It is clamped to ×0.5 – ×2.5.
+4. **Overrides:** a merchant override of the sales rate replaces the computed rate. Lead time resolves as override → SKU → supplier → store default (14 days). Safety days resolve as override → SKU → store default (7 days). Expired overrides are ignored.
+5. **Reorder maths:** reorder point = rate × (lead time + safety days). Suggested qty = rate × (lead time + safety + 30-day order cycle) − stock. Days of cover = stock ÷ rate. The stock-out and reorder dates follow from these.
+6. **Confidence:** *low* with fewer than 14 in-stock days or fewer than 5 units in 90 days, or when the weekly coefficient of variation is above 1.0. *high* with ≥ 60 in-stock days, ≥ 30 units and weekly CV ≤ 0.5. Anything else is *medium*.
+
+Every intermediate number is stored in `forecasts.explanation` (JSON). `ExplanationFormatter` turns it into sentences, for example: *"Sells 4/day over the last 30 days (3 out-of-stock days left out). Lead time 14 days (store default) + 7 safety days → reorder point 84 units. 100 in stock runs out around Oct 15 → order 104 units by Sep 24. Confidence: high."*
+
+**When it runs:** after every successful sync (`ShopSynced` → `RecomputeForecasts`, so nightly in each shop's timezone). A safety net, `forecast:nightly`, runs at 05:00 shop time and recomputes forecasts older than 20 h. Tools: `make artisan c="forecast:run"`, `make artisan c="forecast:show --limit=10"`, `make artisan c="sync:run --full"` (re-import 400 days, e.g. after historical orders were imported).
+
+**Dev data:** `make artisan c="dev:fake-orders"` creates about 110 backdated test orders (tag `clear-stock-fake`) in a development store, with one sales scenario per variant. `--purge` deletes them. This needs the dev-only `write_orders` scope.
+
+---
+
+## Embedded app (frontend)
+
+| Screen | What it shows |
+|---|---|
+| **Onboarding** (first open) | Import progress + two questions: default lead time (pre-filled 14 days) and alert email (pre-filled with the store's contact email). |
+| **Home** ("aha") | A to-do list first: products grouped into *Out of stock*, *Order today* and *Order this week*, each with a one-line reason and the quantity to order. Today's rows start selected, so "Export purchase order" produces today's order in one click (Growth). Below that: a stock runway chart (days of stock left vs each product's lead time + safety line), cash tied up in slow stock, and sync status. |
+| **Setup guide + tips** | A 5-step guide on Home (Shopify onboarding guidance: ≤ 5 steps, auto-completed, progress, dismissible): import data, default lead time, see why a product needs reordering, suppliers (skippable), alerts (skippable; points to Plans on Free). Steps complete from real data or recorded events (`shops.setup_guide` JSON). Three one-time contextual tips (home actions, runway, product explanation) are dismissible and remembered per shop. A dismissed guide can be brought back from Settings. |
+| **Products** | Every tracked variant: status, stock, sales/day, days left, order-by date, suggested quantity. Search, status filter and sort live in the URL. |
+| **Product detail** | Summary, "Why these numbers?" (sentences + per-window table + seasonality), a temporary sales-rate adjustment (optional end date), per-product supplier / lead time / safety days. |
+| **Suppliers / Bundles / Settings** | Supplier CRUD + assign products (Shopify resource picker), manual bundles (resource picker; Shopify Bundles shown read-only), store defaults and alert preferences. |
+
+UI: Polaris web components (`s-*`) + App Bridge (title bar, nav menu, toasts, resource picker). Data: React Query. Links rendered by Polaris (`href`) are routed client-side via the `shopify:navigate` event (`useShopifyNavigation`).
+
+API (session-token authenticated): `GET /api/dashboard`, `GET|POST /api/onboarding`, `GET /api/forecasts`, `GET /api/forecasts/{variant}`, `PUT /api/forecasts/{variant}/overrides`, `PUT /api/variants/{variant}/settings`, `PUT /api/variants/settings` (bulk), `GET /api/variants?search=`, `GET|PUT /api/settings`, `GET|POST|PUT|DELETE /api/suppliers`, `GET|POST|DELETE /api/bundles`. Ids in URLs are always resolved through shop-scoped repositories.
+
+**Caching:** the dashboard queries are cached per shop under a *forecast version* key that is bumped on every forecast write, so they never go stale. Supplier lists, alert settings, the shop and the latest sync run are cached too and invalidated by model observers. Laravel 13 only unserializes allow-listed classes from the cache (`config/cache.php` → `serializable_classes`). **Add any new model a Cache repository stores to that list.** Tests serialize the array cache (`CACHE_ARRAY_SERIALIZE=true`) so a missing class fails a test instead of production.
+
+---
+
+## Plans, billing and alerts
+
+| | Free | Starter $2/mo ($19/yr), 7-day trial | Growth $3/mo ($29/yr), 7-day trial |
+|---|---|---|---|
+| Forecasts + reorder suggestions | 50 best sellers | Unlimited | Unlimited |
+| "Why this number?" explanations | ✓ | ✓ | ✓ |
+| Bundles | – | ✓ | ✓ |
+| Email alerts | – | ✓ | ✓ |
+| Forecast per location, purchase order CSV (per supplier / location) | – | – | ✓ |
+
+- Plans and limits live in `config/billing.php`. `App\Support\Entitlements::for($shop)` is the only place that decides access. Locked API features answer `402` with `required_plan`.
+- **Billing API:** `appSubscriptionCreate` (`EVERY_30_DAYS` / `ANNUAL`, `replacementBehavior: STANDARD`). The merchant approves on Shopify's page and returns to `/plans?confirmed=1`, which re-reads `currentAppInstallation.activeSubscriptions`. `app_subscriptions/update` webhooks keep the plan in sync (e.g. a cancel from the Shopify admin). Downgrading to Free cancels the subscription. Plan and interval are derived from the subscription name (`"<App> Starter (monthly)"`).
+- **Free trial:** 7 days on paid plans (`SHOPIFY_BILLING_TRIAL_DAYS`), granted **once per shop**. `shops.trial_started_at` is set when the first paid plan activates. Later subscriptions (switching plans, cancel and re-subscribe) only get the days left.
+- `SHOPIFY_BILLING_TEST=true` creates test charges (development stores only accept these). **Set it to `false` in production.**
+- **Per-location forecasts (Growth):** for shops with 2+ active locations and the fulfillment order scopes, the orders export also reads each order's fulfillment orders (`assignedLocation` + line quantities) into `location_daily_sales`. Out-of-stock days are detected per location from that location's stock, and the same engine runs per location (`forecasts.location_id`). Lead time and safety settings apply per location; a sales-rate override applies to the store total only. Upgrading to Growth triggers a full 400-day resync. Downgrading removes location forecasts.
+- **Alerts:** `alerts:send` runs hourly. Each shop gets one daily or weekly summary from 08:00 shop time, and only when at least one product is new since the last summaries: not alerted in the past 7 days, or escalated from "reorder soon" to "out of stock". Nothing is sent when nothing is new, and never more than once a day. Emails are queued; in dev they land in Mailpit (http://localhost:8025).
 
 ---
 

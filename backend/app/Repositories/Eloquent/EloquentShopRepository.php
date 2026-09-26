@@ -10,7 +10,7 @@ class EloquentShopRepository implements ShopRepositoryInterface
 {
     /** Child tables, deleted leaf-first in batches so a big shop never locks a table for long. */
     private const SHOP_TABLES = [
-        'alert_logs', 'alert_settings', 'forecasts', 'forecast_overrides', 'daily_sales',
+        'alert_logs', 'alert_settings', 'forecasts', 'forecast_overrides', 'location_daily_sales', 'daily_sales',
         'inventory_levels', 'bundle_components', 'variants', 'locations', 'suppliers',
     ];
 

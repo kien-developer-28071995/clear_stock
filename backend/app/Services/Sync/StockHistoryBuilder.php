@@ -5,6 +5,7 @@ namespace App\Services\Sync;
 use App\Models\Shop;
 use App\Repositories\Contracts\CatalogRepositoryInterface;
 use App\Repositories\Contracts\DailySalesRepositoryInterface;
+use App\Repositories\Contracts\LocationSalesRepositoryInterface;
 use Carbon\CarbonImmutable;
 
 /**
@@ -28,7 +29,63 @@ class StockHistoryBuilder
     public function __construct(
         private readonly CatalogRepositoryInterface $catalog,
         private readonly DailySalesRepositoryInterface $sales,
+        private readonly LocationSalesRepositoryInterface $locationSales,
     ) {}
+
+    /**
+     * Same walk per (variant, location) from that location's stock (Growth). Transfers
+     * between locations are unknown, like restocks; there are no stored snapshots per location.
+     *
+     * @return array{pairs: int, out_of_stock_days: int}
+     */
+    public function rebuildLocations(Shop $shop, string $windowStart, ?CarbonImmutable $now = null): array
+    {
+        $today = ($now ?? CarbonImmutable::now())->setTimezone($shop->timezone)->startOfDay();
+        $info = $this->catalog->activeVariantInfo($shop);
+        $stock = $this->catalog->stockByVariantAndLocation($shop);
+        $pairs = array_filter(
+            $this->locationSales->pairsWithSalesSince($shop, $today->subDays(365)->toDateString()),
+            fn ($id) => $info[$id]['tracked'] ?? false,
+            ARRAY_FILTER_USE_KEY,
+        );
+
+        $count = 0;
+        $outOfStockDays = 0;
+        foreach (array_chunk(array_keys($pairs), self::CHUNK) as $chunk) {
+            $rows = $this->locationSales->rowsBetween($shop, $chunk, $windowStart, $today->toDateString());
+            $updates = [];
+
+            foreach ($chunk as $variantId) {
+                $firstDay = $this->firstDay($shop, $info[$variantId]['created'] ?? null, $windowStart);
+                foreach (array_keys($pairs[$variantId]) as $locationId) {
+                    $count++;
+                    $end = $stock[$variantId][$locationId] ?? 0;
+                    for ($day = $today; $day->toDateString() >= $firstDay; $day = $day->subDay()) {
+                        $date = $day->toDateString();
+                        $sold = $rows[$variantId][$locationId][$date]['sold'] ?? 0;
+                        $start = $end + $sold;
+                        $inStock = $start > 0 || $sold > 0;
+                        if (isset($rows[$variantId][$locationId][$date]) || ! $inStock) {
+                            $updates[] = ['variant_id' => $variantId, 'location_id' => $locationId, 'date' => $date, 'units_sold' => $sold, 'was_in_stock' => $inStock];
+                        }
+                        $outOfStockDays += $inStock ? 0 : 1;
+                        $end = $start;
+                    }
+                }
+            }
+
+            $this->locationSales->upsertStockFlags($shop, $updates);
+        }
+
+        return ['pairs' => $count, 'out_of_stock_days' => $outOfStockDays];
+    }
+
+    private function firstDay(Shop $shop, ?string $created, string $windowStart): string
+    {
+        return $created !== null
+            ? max($windowStart, CarbonImmutable::parse($created, 'UTC')->setTimezone($shop->timezone)->toDateString())
+            : $windowStart;
+    }
 
     /** @return array{variants: int, out_of_stock_days: int} */
     public function rebuild(Shop $shop, string $windowStart, ?CarbonImmutable $now = null): array

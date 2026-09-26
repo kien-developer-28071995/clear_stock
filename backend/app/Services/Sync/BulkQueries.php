@@ -50,8 +50,18 @@ final class BulkQueries
      * Order line quantities since a date. Only what the forecast needs:
      * no customer, address or price fields are requested.
      */
-    public static function orders(string $processedSinceIso): string
+    public static function orders(string $processedSinceIso, bool $withLocations = false): string
     {
+        // Growth / multi-location: which location each unit is fulfilled from
+        // (needs the read_*_fulfillment_orders scopes). 4 connections, 2 levels deep.
+        $locations = $withLocations ? <<<'GQL'
+                  fulfillmentOrders { edges { node {
+                    id status
+                    assignedLocation { location { id } }
+                    lineItems { edges { node { totalQuantity variant { id } } } }
+                  } } }
+            GQL : '';
+
         return <<<GQL
             {
               orders(query: "processed_at:>='{$processedSinceIso}'") {
@@ -62,6 +72,7 @@ final class BulkQueries
                     variant { id }
                     lineItemGroup { id quantity variantId }
                   } } }
+            {$locations}
                 } }
               }
             }

@@ -4,14 +4,17 @@
     "type": "module",
     "scripts": {
         "dev": "vite",
-        "build": "tsc --noEmit && vite build",
-        "typecheck": "tsc --noEmit"
+        "build": "node scripts/check-i18n.mjs && tsc --noEmit && vite build",
+        "typecheck": "tsc --noEmit",
+        "i18n:check": "node scripts/check-i18n.mjs"
     },
     "dependencies": {
         "@shopify/app-bridge-react": "^4.2.13",
         "@tanstack/react-query": "^5.103.2",
+        "i18next": "^26.4.2",
         "react": "^19.3.0",
         "react-dom": "^19.3.0",
+        "react-i18next": "^17.0.15",
         "react-router": "^8.4.0"
     },
     "devDependencies": {

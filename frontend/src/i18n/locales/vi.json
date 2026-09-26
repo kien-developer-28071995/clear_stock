@@ -1,0 +1,377 @@
+{
+  "common": {
+    "loading": "Đang tải",
+    "loadingEllipsis": "Đang tải…",
+    "tryAgain": "Thử lại",
+    "days": "ngày",
+    "save": "Lưu",
+    "cancel": "Hủy",
+    "edit": "Sửa",
+    "delete": "Xóa",
+    "remove": "Gỡ",
+    "notSet": "Chưa đặt",
+    "none": "—",
+    "infinite": "∞",
+    "actions": "Thao tác",
+    "daysSuffix": "ngày",
+    "saved": "Đã lưu cài đặt",
+    "dayCount_other": "{{count}} ngày"
+  },
+  "nav": {
+    "home": "Trang chủ",
+    "products": "Sản phẩm",
+    "suppliers": "Nhà cung cấp",
+    "bundles": "Combo",
+    "settings": "Cài đặt",
+    "plans": "Gói dịch vụ"
+  },
+  "notFound": {
+    "heading": "Không tìm thấy trang",
+    "body": "Trang này không tồn tại.",
+    "back": "Về trang chủ"
+  },
+  "errors": {
+    "generic": "Đã có lỗi xảy ra. Vui lòng thử lại.",
+    "loadFailed": "Không tải được trang này",
+    "checkFields": "Vui lòng kiểm tra các ô được đánh dấu.",
+    "requestFailed": "Yêu cầu thất bại ({{status}}). Vui lòng thử lại.",
+    "downloadFailed": "Tải xuống thất bại.",
+    "exportFailed": "Xuất file thất bại"
+  },
+  "status": {
+    "out_of_stock": "Hết hàng",
+    "reorder_now": "Cần đặt ngay",
+    "slow": "Bán chậm",
+    "healthy": "Ổn"
+  },
+  "confidence": {
+    "low": "Độ tin cậy thấp",
+    "medium": "Độ tin cậy trung bình",
+    "high": "Độ tin cậy cao"
+  },
+  "upgrade": {
+    "includedIn": "Có trong gói {{plan}}",
+    "seePlans": "Xem các gói",
+    "upgrade": "Nâng cấp"
+  },
+  "sync": {
+    "heading": "Dữ liệu cửa hàng",
+    "loading": "Đang tải trạng thái đồng bộ",
+    "loadFailed": "Không tải được trạng thái đồng bộ. Vui lòng tải lại trang.",
+    "importingInitial": "Đang nhập sản phẩm, tồn kho và đơn hàng 12 tháng gần nhất. Bạn có thể rời trang này; chúng tôi vẫn tiếp tục chạy nền.",
+    "updating": "Đang cập nhật dữ liệu từ Shopify.",
+    "progressLabel": "Tiến độ đồng bộ",
+    "failed": "Đồng bộ thất bại",
+    "lastSynced": "Đồng bộ lần cuối {{when}}",
+    "notSynced": "Chưa đồng bộ",
+    "stats": "{{variants, number}} biến thể, {{orders, number}} đơn hàng",
+    "retry": "Đồng bộ lại",
+    "syncNow": "Đồng bộ ngay"
+  },
+  "onboarding": {
+    "heading": "Chào mừng đến với {{app}}",
+    "introImported": "Sản phẩm, tồn kho và lịch sử đơn hàng đã được nhập. Trả lời hai câu hỏi, chúng tôi sẽ cho bạn biết sản phẩm nào sắp hết, khi nào hết và cần nhập bao nhiêu.",
+    "introImporting": "Chúng tôi đang đọc sản phẩm, tồn kho và đơn hàng năm qua để cho bạn biết sản phẩm nào sắp hết, khi nào hết và cần nhập bao nhiêu. Việc này mất vài phút; trong lúc đó bạn có thể trả lời các câu hỏi bên dưới.",
+    "questionsHeading": "Hai câu hỏi nhanh",
+    "leadTimeLabel": "Một đơn nhập hàng thường mất bao nhiêu ngày để về tới kho?",
+    "leadTimeHelp": "Thời gian giao hàng thường gặp của nhà cung cấp. Sau này bạn có thể đặt riêng cho từng nhà cung cấp hoặc từng sản phẩm.",
+    "emailLabel": "Gửi cảnh báo tồn kho tới email nào?",
+    "emailHelp": "Một email tóm tắt khi có sản phẩm cần nhập. Không quá một email mỗi ngày. Để trống nếu không muốn nhận cảnh báo.",
+    "submit": "Xem dự báo của tôi"
+  },
+  "table": {
+    "product": "Sản phẩm",
+    "inStock": "Tồn kho",
+    "perDay": "Bán / ngày",
+    "daysLeft": "Còn (ngày)",
+    "orderBy": "Đặt trước ngày",
+    "suggestedOrder": "Nên nhập",
+    "supplier": "Nhà cung cấp",
+    "confidence": "Độ tin cậy"
+  },
+  "home": {
+    "greetingMorning": "Chào buổi sáng.",
+    "greetingAfternoon": "Chào buổi chiều.",
+    "greetingEvening": "Chào buổi tối.",
+    "nothingToday": "Hôm nay không có gì cần nhập",
+    "toReorderToday_other": "Hôm nay cần nhập {{count}} sản phẩm",
+    "forecastUpdated": "Dự báo cập nhật {{when}}",
+    "chip": "{{label}} · {{n}}",
+    "preparingHeading": "Đang chuẩn bị dự báo",
+    "preparingBody": "Chúng tôi đang nhập dữ liệu cửa hàng. Dự báo sẽ hiện ở đây ngay khi xong.",
+    "emptyHeading": "Chưa có dự báo",
+    "emptyBody": "Dự báo cần sản phẩm có theo dõi tồn kho. Hãy đồng bộ lại sau khi thêm sản phẩm."
+  },
+  "actions": {
+    "noneLeft": "Hết hàng",
+    "unitsLeft_other": "Còn {{count}}",
+    "daysLeft_other": "Còn {{count}} ngày",
+    "select": "Chọn",
+    "sellsPerDay": "Bán {{rate}}/ngày",
+    "order": "Nhập {{qty}}",
+    "orderBy": "trước {{date}}",
+    "nothingThisWeek": "Tuần này không có sản phẩm nào cần nhập. Mỗi đêm chúng tôi kiểm tra lại sau khi đồng bộ đơn hàng.",
+    "selected": "Đã chọn {{count}}",
+    "groupTitle": "{{title}} · {{count}}",
+    "showMore": "Xem thêm {{count}}",
+    "seeAll": "Xem tất cả sản phẩm cần nhập",
+    "groups": {
+      "out_of_stock": {
+        "title": "Hết hàng",
+        "hint": "Đang mất doanh số"
+      },
+      "order_today": {
+        "title": "Nhập hôm nay",
+        "hint": "Sẽ hết trước khi hàng mới về"
+      },
+      "this_week": {
+        "title": "Nhập trong tuần",
+        "hint": "Hạn đặt hàng trong 7 ngày tới"
+      }
+    }
+  },
+  "runway": {
+    "heading": "Số ngày còn hàng",
+    "help": "Số ngày hàng còn đủ bán với tốc độ hiện tại. Vạch đứt là lúc cần đặt hàng (lead time + ngày dự phòng); cột đỏ là đã quá vạch.",
+    "listLabel": "Số ngày còn hàng của từng sản phẩm",
+    "barTitle_other": "{{name}}: còn {{count}} ngày, cần đặt khi còn {{reorder}}",
+    "daysShort": "{{days}} ng"
+  },
+  "slow": {
+    "heading": "Tiền đang kẹt ở hàng bán chậm",
+    "summaryWithValue_other": "{{value}} đang nằm ở {{count}} sản phẩm có lượng tồn đủ bán hơn {{days}} ngày.",
+    "summary_other": "{{count}} sản phẩm có lượng tồn đủ bán hơn {{days}} ngày.",
+    "advice": "Cân nhắc giảm giá hoặc bán kèm trước khi nhập thêm.",
+    "addCosts": "Thêm giá vốn sản phẩm trong Shopify để biết bao nhiêu tiền đang bị kẹt.",
+    "missingCosts_other": "{{count}} sản phẩm chưa có giá vốn trong Shopify nên chưa được tính vào tổng.",
+    "daysOfStock": "Số ngày còn hàng",
+    "value": "Giá trị",
+    "noSales": "Không bán được"
+  },
+  "planLimit": {
+    "heading_other": "Đang dự báo {{count}} sản phẩm bán chạy nhất",
+    "body_other": "Gói Miễn phí dự báo {{total}} sản phẩm bán chạy nhất. Còn {{count}} sản phẩm chưa được dự báo; nâng cấp để dự báo tất cả."
+  },
+  "tips": {
+    "label": "Mẹo:",
+    "home_actions": "Các sản phẩm cần nhập hôm nay đã được chọn sẵn. Nút Xuất đơn đặt hàng gộp chúng thành một file gửi nhà cung cấp.",
+    "home_runway": "Mỗi cột là số ngày hàng còn đủ bán. Vạch đứt là lúc cần đặt hàng để hàng mới về kịp.",
+    "product_explanation": "Đây là chính xác các con số tạo nên dự báo. Nếu bạn biết điều chúng tôi chưa biết, hãy chỉnh tốc độ bán ở bên dưới."
+  },
+  "setup": {
+    "heading": "Tận dụng tối đa dự báo",
+    "subheading": "Vài phút thiết lập giúp mọi gợi ý nhập hàng chính xác hơn.",
+    "expand": "Mở hướng dẫn thiết lập",
+    "collapse": "Thu gọn hướng dẫn thiết lập",
+    "dismiss": "Ẩn hướng dẫn thiết lập",
+    "progress": "Đã xong {{done}}/{{total}}",
+    "progressLabel": "Tiến độ thiết lập",
+    "skipped": "{{title}} (đã bỏ qua)",
+    "notNow": "Để sau",
+    "steps": {
+      "import_data": {
+        "title": "Nhập dữ liệu cửa hàng",
+        "bodyRunning": "Chúng tôi đang nhập sản phẩm, tồn kho và lịch sử đơn hàng. Việc này mất vài phút.",
+        "body": "Sản phẩm, tồn kho và đơn hàng một năm qua đã được nhập và được cập nhật mỗi đêm."
+      },
+      "lead_time": {
+        "title": "Đặt lead time mặc định",
+        "body": "Số ngày thường cần để một đơn nhập hàng về tới kho. Mọi ngày đặt hàng đều dựa vào con số này.",
+        "action": "Đặt lead time"
+      },
+      "review_forecast": {
+        "title": "Xem vì sao một sản phẩm cần nhập",
+        "body": "Mở một sản phẩm để xem dự báo được tính thế nào, và chỉnh tốc độ bán nếu bạn nắm rõ hơn (khuyến mãi, tháng vắng khách).",
+        "action": "Mở danh sách sản phẩm",
+        "actionExample": "Mở {{name}}"
+      },
+      "suppliers": {
+        "title": "Thêm nhà cung cấp và lead time",
+        "body": "Sản phẩm từ nhà cung cấp giao chậm sẽ được nhắc nhập sớm hơn. Bạn cũng có thể xuất đơn đặt hàng riêng cho từng nhà cung cấp.",
+        "action": "Thêm nhà cung cấp",
+        "skip": "Tôi không dùng nhà cung cấp"
+      },
+      "alerts": {
+        "title": "Bật cảnh báo tồn kho",
+        "body": "Một email tóm tắt khi có sản phẩm cần nhập. Không quá một email mỗi ngày.",
+        "action": "Bật cảnh báo",
+        "lockedTitle": "Nhận cảnh báo tồn kho qua email",
+        "lockedBody": "Cảnh báo có trong gói Starter, dùng thử miễn phí 7 ngày."
+      }
+    }
+  },
+  "po": {
+    "export": "Xuất đơn đặt hàng",
+    "short": "Đơn đặt hàng",
+    "locked": "{{label}} ({{plan}})"
+  },
+  "product": {
+    "heading": "Sản phẩm",
+    "adjustedByYou": "Bạn đã chỉnh",
+    "sku": "SKU {{sku}}",
+    "sellsPerDay": "Bán mỗi ngày",
+    "runsOut": "Hết hàng vào",
+    "reorderPoint": "Điểm đặt hàng lại",
+    "units_other": "{{qty}} cái"
+  },
+  "why": {
+    "heading": "Vì sao ra các con số này?",
+    "locked": "Xem chính xác cách tính từng dự báo: những ngày được dùng, các ngày hết hàng bị loại bỏ, mùa vụ, combo, lead time và tồn kho dự phòng, bằng lời dễ hiểu.",
+    "period": "Khoảng thời gian",
+    "unitsSold": "Đã bán",
+    "daysInStock": "Ngày còn hàng",
+    "excludedDays": "Ngày hết hàng bị loại",
+    "perDay": "Mỗi ngày",
+    "weight": "Trọng số",
+    "lastDays_other": "{{count}} ngày gần nhất",
+    "notEnoughData": "Chưa đủ dữ liệu",
+    "seasonalityApplied": "Mùa vụ: ×{{factor}} dựa trên {{days}} ngày tiếp theo của năm trước.",
+    "seasonalityNotApplied": "Mùa vụ: không áp dụng ({{reason}}).",
+    "seasonalityReasons": {
+      "not_enough_history": "lịch sử bán chưa đủ một năm",
+      "out_of_stock_last_year": "cùng kỳ năm trước sản phẩm thường xuyên hết hàng",
+      "too_few_sales_last_year": "cùng kỳ năm trước bán quá ít",
+      "no_significant_change": "cùng kỳ năm trước không có thay đổi đáng kể"
+    }
+  },
+  "locations": {
+    "heading": "Theo chi nhánh",
+    "location": "Chi nhánh",
+    "pending": "Dự báo theo chi nhánh sẽ có sau lần đồng bộ tới (mở app một lần để chấp thuận quyền fulfillment mới nếu Shopify yêu cầu).",
+    "why": "Vì sao: {{location}}",
+    "hint": "Chọn một chi nhánh để xem giải thích. Việc chỉnh tốc độ bán chỉ áp dụng cho tổng cửa hàng."
+  },
+  "adjust": {
+    "heading": "Chỉnh tốc độ bán",
+    "saved": "Đã cập nhật dự báo",
+    "resetDone": "Đã quay về dự báo tự động",
+    "intro": "Sắp có khuyến mãi hay tháng vắng khách? Hãy tự đặt số bán mỗi ngày. Ước tính của chúng tôi là {{rate}}/ngày.",
+    "until": "Đến ngày (không bắt buộc)",
+    "untilHelp": "Sau ngày này sẽ quay về dự báo tự động.",
+    "note": "Ghi chú (không bắt buộc)",
+    "notePlaceholder": "VD: khuyến mãi Black Friday",
+    "save": "Lưu điều chỉnh",
+    "reset": "Dùng dự báo tự động"
+  },
+  "productSettings": {
+    "heading": "Cài đặt sản phẩm",
+    "noSuppliers": "Thêm nhà cung cấp tại Cài đặt → Nhà cung cấp.",
+    "noSupplier": "Không có nhà cung cấp",
+    "leadTime": "Lead time của sản phẩm này",
+    "fromSupplier": "{{days}} (theo nhà cung cấp)",
+    "fromDefault": "{{days}} (mặc định cửa hàng)",
+    "safety": "Tồn kho dự phòng",
+    "safetyHelp": "Số ngày hàng giữ thêm phòng khi bán tăng đột biến hoặc hàng về trễ.",
+    "save": "Lưu cài đặt"
+  },
+  "products": {
+    "freeLimit_other": "Gói Miễn phí dự báo {{count}} sản phẩm bán chạy nhất.",
+    "search": "Tìm kiếm",
+    "searchPlaceholder": "Tìm theo tên sản phẩm hoặc SKU",
+    "allLocations": "Tất cả chi nhánh",
+    "allProducts": "Tất cả sản phẩm",
+    "status": "Trạng thái",
+    "sort": "Sắp xếp",
+    "sorts": {
+      "urgency": "Gấp nhất",
+      "cover": "Ít ngày còn hàng nhất",
+      "suggested": "Cần nhập nhiều nhất",
+      "value": "Giá trị tồn cao nhất",
+      "name": "Tên"
+    },
+    "noMatch": "Không có sản phẩm nào khớp bộ lọc.",
+    "pageInfo_other": "{{total}} sản phẩm · trang {{page}}/{{pages}}"
+  },
+  "settings": {
+    "defaultsHeading": "Mặc định cho dự báo",
+    "defaultsIntro": "Dùng cho các sản phẩm chưa có lead time hoặc nhà cung cấp riêng.",
+    "leadTime": "Lead time mặc định",
+    "leadTimeHelp": "Thời gian thường cần để một đơn nhập hàng về tới kho.",
+    "safety": "Tồn kho dự phòng mặc định",
+    "alertsHeading": "Cảnh báo tồn kho",
+    "alertsLocked": "Nhận một email tóm tắt khi có sản phẩm cần nhập. Không quá một email mỗi ngày.",
+    "alertsEnabled": "Gửi email cho tôi khi có sản phẩm cần nhập",
+    "alertsEmail": "Gửi cảnh báo tới",
+    "frequency": "Tần suất",
+    "frequencyHelp": "Một email tóm tắt, chỉ khi có việc cần chú ý.",
+    "daily": "Tóm tắt hằng ngày",
+    "weekly": "Tóm tắt hằng tuần",
+    "sendOn": "Gửi vào",
+    "setupGuide": "Hướng dẫn thiết lập",
+    "setupGuideBack": "Hướng dẫn thiết lập đã hiện lại ở Trang chủ",
+    "showSetupGuide": "Hiện hướng dẫn thiết lập ở Trang chủ"
+  },
+  "suppliers": {
+    "add": "Thêm nhà cung cấp",
+    "edit": "Sửa nhà cung cấp",
+    "added": "Đã thêm nhà cung cấp",
+    "updated": "Đã cập nhật nhà cung cấp",
+    "deleted": "Đã xóa nhà cung cấp",
+    "assigned_other": "Đã gán {{count}} sản phẩm cho {{name}}",
+    "confirmDelete": "Xóa {{name}}? Các sản phẩm của nhà cung cấp này sẽ dùng lead time mặc định.",
+    "emptyHeading": "Chưa có nhà cung cấp",
+    "emptyBody": "Thêm nhà cung cấp và lead time của họ để từng sản phẩm được nhập kịp lúc.",
+    "leadTime": "Lead time",
+    "storeDefault": "Mặc định cửa hàng",
+    "assign": "Gán sản phẩm",
+    "name": "Tên",
+    "leadTimeHelp": "Áp dụng cho mọi sản phẩm của nhà cung cấp này, trừ sản phẩm có lead time riêng.",
+    "email": "Email (không bắt buộc)",
+    "emailHelp": "Dùng cho đơn đặt hàng."
+  },
+  "bundles": {
+    "add": "Thêm combo",
+    "confirmRemove": "Gỡ định nghĩa combo của {{name}}?",
+    "removed": "Đã gỡ combo",
+    "saved": "Đã lưu combo",
+    "locked": "Tính doanh số combo/bộ kit vào từng sản phẩm thành phần, để thành phần được nhập kịp lúc.",
+    "emptyHeading": "Chưa có combo",
+    "emptyBody": "Bạn bán bộ kit hay hộp quà? Cho chúng tôi biết bên trong có gì để doanh số được tính vào dự báo của từng sản phẩm. Combo tạo bằng Shopify Bundles được nhận tự động.",
+    "bundle": "Combo",
+    "contains": "Gồm",
+    "source": "Nguồn",
+    "manual": "Tạo tại đây",
+    "shopify": "Shopify Bundles",
+    "modalIntro": "Khi combo bán được, các thành phần cũng được tính là đã bán, nên dự báo của chúng bao gồm doanh số combo.",
+    "bundleProduct": "Sản phẩm combo",
+    "noneSelected": "Chưa chọn",
+    "change": "Đổi",
+    "selectProduct": "Chọn sản phẩm",
+    "quantity": "Số lượng",
+    "changeProducts": "Đổi sản phẩm",
+    "selectProducts": "Chọn sản phẩm",
+    "save": "Lưu combo"
+  },
+  "plans": {
+    "names": {
+      "free": "Miễn phí",
+      "starter": "Starter",
+      "growth": "Growth"
+    },
+    "features": {
+      "bestSellers_other": "Dự báo {{count}} sản phẩm bán chạy nhất",
+      "unlimited": "Không giới hạn sản phẩm",
+      "forecasts": "Ngày hết hàng và gợi ý nhập hàng",
+      "explanations": "Giải thích \"Vì sao ra con số này?\"",
+      "bundles": "Combo và bộ kit",
+      "alerts": "Cảnh báo qua email (tóm tắt hằng ngày hoặc hằng tuần)",
+      "locations": "Tồn kho theo chi nhánh",
+      "purchaseOrders": "Xuất đơn đặt hàng (CSV)"
+    },
+    "notApproved": "Chưa có thay đổi gói nào được chấp thuận",
+    "nowOn": "Bạn đang dùng gói {{plan}}",
+    "confirmFree_other": "Chuyển sang gói Miễn phí? Gói trả phí sẽ kết thúc ngay và chỉ {{count}} sản phẩm bán chạy nhất còn được dự báo.",
+    "intro": "Giá cố định hằng tháng. Không thu theo doanh số, không hợp đồng, hủy bất cứ lúc nào. Shopify thu phí trên hóa đơn Shopify của bạn.",
+    "tracking_other": "Bạn đang theo dõi {{total}} sản phẩm.",
+    "monthly": "Theo tháng",
+    "yearly": "Theo năm (tiết kiệm 20%)",
+    "current": "Gói hiện tại",
+    "perMonth": "{{price}} / tháng",
+    "perYear": "{{price}} / năm",
+    "freeForever": "Miễn phí mãi mãi",
+    "trialNote": "Dùng thử miễn phí {{count}} ngày, sau đó Shopify thu phí",
+    "switchToFree": "Chuyển sang Miễn phí",
+    "startTrial": "Dùng thử miễn phí {{count}} ngày",
+    "choose": "Chọn gói {{plan}}"
+  }
+}

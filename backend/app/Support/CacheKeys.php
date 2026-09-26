@@ -41,6 +41,48 @@ final class CacheKeys
         return 'lock:sync-run:'.$runId;
     }
 
+    /**
+     * Bumped on every forecast write. Read caches (dashboard) include it in their key,
+     * so they invalidate themselves without tracking which rows changed.
+     */
+    public static function forecastVersion(int $shopId): string
+    {
+        return 'forecast:version:'.$shopId;
+    }
+
+    public const TTL_DASHBOARD = 3600;
+
+    public static function dashboard(int $shopId, int $version, string $today): string
+    {
+        return "dashboard:{$shopId}:v{$version}:{$today}";
+    }
+
+    public const TTL_SUPPLIERS = 3600;
+
+    public static function suppliers(int $shopId): string
+    {
+        return 'suppliers:'.$shopId;
+    }
+
+    public const TTL_ALERT_SETTING = 3600;
+
+    public static function alertSetting(int $shopId): string
+    {
+        return 'alert-setting:'.$shopId;
+    }
+
+    /** Shop contact email from Shopify, used to pre-fill the onboarding form. */
+    public static function shopContactEmail(int $shopId): string
+    {
+        return 'shop:contact-email:'.$shopId;
+    }
+
+    /** Throttles re-exchanging a token to pick up newly granted scopes. */
+    public static function scopeRecheck(int $shopId): string
+    {
+        return 'shop:scope-recheck:'.$shopId;
+    }
+
     public static function webhookDelivery(string $webhookId): string
     {
         return 'webhook:delivery:'.$webhookId;

@@ -11,4 +11,5 @@ enum WebhookTopic: string
     case CustomersRedact = 'customers/redact';
     case ShopRedact = 'shop/redact';
     case BulkOperationsFinish = 'bulk_operations/finish';
+    case AppSubscriptionsUpdate = 'app_subscriptions/update';
 }

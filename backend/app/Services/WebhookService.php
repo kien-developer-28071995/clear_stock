@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Enums\WebhookTopic;
+use App\Jobs\Webhooks\HandleAppSubscriptionUpdate;
 use App\Jobs\Webhooks\HandleAppUninstalled;
 use App\Jobs\Webhooks\HandleBulkOperationFinished;
 use App\Jobs\Webhooks\HandleCustomersDataRequest;
@@ -44,6 +45,7 @@ class WebhookService
             WebhookTopic::CustomersDataRequest => new HandleCustomersDataRequest($shop, $this->requestIds($payload)),
             WebhookTopic::CustomersRedact => new HandleCustomersRedact($shop, $this->requestIds($payload)),
             WebhookTopic::ShopRedact => new HandleShopRedact($shop),
+            WebhookTopic::AppSubscriptionsUpdate => new HandleAppSubscriptionUpdate($shop),
             WebhookTopic::BulkOperationsFinish => new HandleBulkOperationFinished($shop, (string) ($payload['admin_graphql_api_id'] ?? '')),
         };
 

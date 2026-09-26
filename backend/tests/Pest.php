@@ -1,5 +1,11 @@
 <?php
 
+use App\Models\DailySale;
+use App\Models\InventoryLevel;
+use App\Models\Location;
+use App\Models\Shop;
+use App\Models\Variant;
+use Carbon\CarbonImmutable;
 use Firebase\JWT\JWT;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
@@ -68,4 +74,19 @@ function jsonlFile(array $lines): string
 function gid(string $type, int $id): string
 {
     return "gid://shopify/{$type}/{$id}";
+}
+
+/** A variant with 120 days of history at $perDay units/day and $stock in one location. */
+function product(Shop $shop, Location $loc, string $title, int $stock, int $perDay, array $attrs = []): Variant
+{
+    $v = Variant::factory()->for($shop)->create($attrs + ['product_title' => $title, 'title' => 'Default Title', 'shopify_created_at' => '2025-01-01']);
+    InventoryLevel::factory()->create(['shop_id' => $shop->id, 'variant_id' => $v->id, 'location_id' => $loc->id, 'available' => $stock]);
+    $rows = [];
+    for ($ago = 1; $ago <= 120; $ago++) {
+        $rows[] = ['shop_id' => $shop->id, 'variant_id' => $v->id, 'date' => CarbonImmutable::parse('2026-09-20')->subDays($ago)->toDateString(),
+            'units_sold' => $perDay, 'units_returned' => 0, 'end_of_day_stock' => null, 'was_in_stock' => true];
+    }
+    DailySale::insert($rows);
+
+    return $v;
 }

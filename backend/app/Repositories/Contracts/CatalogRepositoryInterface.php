@@ -42,6 +42,9 @@ interface CatalogRepositoryInterface
     /** @return array<int, int> variants.id => total available across active locations */
     public function stockByVariant(Shop $shop): array;
 
+    /** @return array<int, array<int, int>> variants.id => locations.id => available (active locations) */
+    public function stockByVariantAndLocation(Shop $shop): array;
+
     /** @return array<int, array{tracked: bool, created: ?string}> variants.id => info (active variants) */
     public function activeVariantInfo(Shop $shop): array;
 }

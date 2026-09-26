@@ -31,6 +31,10 @@ class ShopLifecycleService
             'refresh_token_expires_at' => null,
             // Shopify cancels app subscriptions on uninstall.
             'plan' => Plan::Free,
+            'plan_interval' => null,
+            'subscription_id' => null,
+            'subscription_status' => null,
+            'plan_renews_at' => null,
         ]);
 
         ShopUninstalled::dispatch($shop);

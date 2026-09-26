@@ -1,0 +1,395 @@
+{
+  "common": {
+    "loading": "Loading",
+    "loadingEllipsis": "Loading…",
+    "tryAgain": "Try again",
+    "days": "days",
+    "save": "Save",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete",
+    "remove": "Remove",
+    "notSet": "Not set",
+    "none": "—",
+    "infinite": "∞",
+    "actions": "Actions",
+    "daysSuffix": "days",
+    "saved": "Settings saved",
+    "dayCount_one": "{{count}} day",
+    "dayCount_other": "{{count}} days"
+  },
+  "nav": {
+    "home": "Home",
+    "products": "Products",
+    "suppliers": "Suppliers",
+    "bundles": "Bundles",
+    "settings": "Settings",
+    "plans": "Plans"
+  },
+  "notFound": {
+    "heading": "Page not found",
+    "body": "This page doesn't exist.",
+    "back": "Back to home"
+  },
+  "errors": {
+    "generic": "Something went wrong. Please try again.",
+    "loadFailed": "We couldn't load this page",
+    "checkFields": "Please check the highlighted fields.",
+    "requestFailed": "Request failed ({{status}}). Please try again.",
+    "downloadFailed": "Download failed.",
+    "exportFailed": "Export failed"
+  },
+  "status": {
+    "out_of_stock": "Out of stock",
+    "reorder_now": "Reorder now",
+    "slow": "Slow-moving",
+    "healthy": "OK"
+  },
+  "confidence": {
+    "low": "Low confidence",
+    "medium": "Medium confidence",
+    "high": "High confidence"
+  },
+  "upgrade": {
+    "includedIn": "Included in {{plan}}",
+    "seePlans": "See plans",
+    "upgrade": "Upgrade"
+  },
+  "sync": {
+    "heading": "Store data",
+    "loading": "Loading sync status",
+    "loadFailed": "We couldn't load the sync status. Please reload the page.",
+    "importingInitial": "Importing your products, inventory and the last 12 months of orders. You can leave this page; we keep working in the background.",
+    "updating": "Updating your data from Shopify.",
+    "progressLabel": "Sync progress",
+    "failed": "Sync failed",
+    "lastSynced": "Last synced {{when}}",
+    "notSynced": "Not synced yet",
+    "stats": "{{variants, number}} variants, {{orders, number}} orders",
+    "retry": "Retry sync",
+    "syncNow": "Sync now"
+  },
+  "onboarding": {
+    "heading": "Welcome to {{app}}",
+    "introImported": "Your products, inventory and order history are imported. Answer two questions and we'll show which products will run out, when, and how many to reorder.",
+    "introImporting": "We're reading your products, inventory and last year's orders so we can tell you which products will run out, when, and how many to reorder. This takes a few minutes; you can answer the questions below meanwhile.",
+    "questionsHeading": "Two quick questions",
+    "leadTimeLabel": "How many days does a reorder usually take to arrive?",
+    "leadTimeHelp": "Your typical supplier lead time. You can set it per supplier or per product later.",
+    "emailLabel": "Where should we send stock alerts?",
+    "emailHelp": "One summary email when something needs reordering. Never more than one a day. Leave empty to turn alerts off.",
+    "submit": "Show my forecast"
+  },
+  "table": {
+    "product": "Product",
+    "inStock": "In stock",
+    "perDay": "Sells / day",
+    "daysLeft": "Days left",
+    "orderBy": "Order by",
+    "suggestedOrder": "Suggested order",
+    "supplier": "Supplier",
+    "confidence": "Confidence"
+  },
+  "home": {
+    "greetingMorning": "Good morning.",
+    "greetingAfternoon": "Good afternoon.",
+    "greetingEvening": "Good evening.",
+    "nothingToday": "Nothing to reorder today",
+    "toReorderToday_one": "{{count}} product to reorder today",
+    "toReorderToday_other": "{{count}} products to reorder today",
+    "forecastUpdated": "Forecast updated {{when}}",
+    "chip": "{{label}} · {{n}}",
+    "preparingHeading": "Preparing your forecast",
+    "preparingBody": "We're importing your store data. Your forecast appears here as soon as it's ready.",
+    "emptyHeading": "No forecasts yet",
+    "emptyBody": "Forecasts need products with tracked inventory. Run a sync after adding products."
+  },
+  "actions": {
+    "noneLeft": "0 left",
+    "unitsLeft_one": "{{count}} left",
+    "unitsLeft_other": "{{count}} left",
+    "daysLeft_one": "{{count}} day left",
+    "daysLeft_other": "{{count}} days left",
+    "select": "Select",
+    "sellsPerDay": "Sells {{rate}}/day",
+    "order": "Order {{qty}}",
+    "orderBy": "by {{date}}",
+    "nothingThisWeek": "Nothing needs reordering this week. We check again every night after syncing your orders.",
+    "selected": "{{count}} selected",
+    "groupTitle": "{{title}} · {{count}}",
+    "showMore": "Show {{count}} more",
+    "seeAll": "See every product to reorder",
+    "groups": {
+      "out_of_stock": {
+        "title": "Out of stock",
+        "hint": "Losing sales now"
+      },
+      "order_today": {
+        "title": "Order today",
+        "hint": "Would run out before a delivery arrives"
+      },
+      "this_week": {
+        "title": "Order this week",
+        "hint": "Reorder date in the next 7 days"
+      }
+    }
+  },
+  "runway": {
+    "heading": "Stock runway",
+    "help": "Days of stock left at the current pace. The dashed line is when you need to reorder (lead time + safety days); red bars are past it.",
+    "listLabel": "Days of stock left per product",
+    "barTitle_one": "{{name}}: {{count}} day left, reorder at {{reorder}}",
+    "barTitle_other": "{{name}}: {{count}} days left, reorder at {{reorder}}",
+    "daysShort": "{{days}}d"
+  },
+  "slow": {
+    "heading": "Money tied up in slow stock",
+    "summaryWithValue_one": "{{value}} is sitting in {{count}} product with more than {{days}} days of stock.",
+    "summaryWithValue_other": "{{value}} is sitting in {{count}} products with more than {{days}} days of stock.",
+    "summary_one": "{{count}} product has more than {{days}} days of stock.",
+    "summary_other": "{{count}} products have more than {{days}} days of stock.",
+    "advice": "Consider a discount or bundle before ordering more.",
+    "addCosts": "Add product costs in Shopify to see how much money is tied up.",
+    "missingCosts_one": "{{count}} product has no cost in Shopify and isn't included in the total.",
+    "missingCosts_other": "{{count}} products have no cost in Shopify and aren't included in the total.",
+    "daysOfStock": "Days of stock left",
+    "value": "Value",
+    "noSales": "No sales"
+  },
+  "planLimit": {
+    "heading_one": "Forecasting your best seller",
+    "heading_other": "Forecasting your {{count}} best sellers",
+    "body_one": "The Free plan forecasts your {{total}} best sellers. {{count}} more product is not forecast; upgrade to include every product.",
+    "body_other": "The Free plan forecasts your {{total}} best sellers. {{count}} more products are not forecast; upgrade to include every product."
+  },
+  "tips": {
+    "label": "Tip:",
+    "home_actions": "Today's products are already ticked. Export purchase order turns them into one file for your supplier.",
+    "home_runway": "Each bar is how many days of stock are left. The dashed line is when to reorder so new stock arrives in time.",
+    "product_explanation": "These are the exact numbers behind the forecast. If you know something we don't, adjust the sales rate below."
+  },
+  "setup": {
+    "heading": "Get the most out of your forecasts",
+    "subheading": "A few minutes of setup makes every reorder suggestion more accurate.",
+    "expand": "Expand setup guide",
+    "collapse": "Collapse setup guide",
+    "dismiss": "Dismiss setup guide",
+    "progress": "{{done}} of {{total}} done",
+    "progressLabel": "Setup progress",
+    "skipped": "{{title}} (skipped)",
+    "notNow": "Not now",
+    "steps": {
+      "import_data": {
+        "title": "Import your store data",
+        "bodyRunning": "We're importing your products, inventory and order history. This takes a few minutes.",
+        "body": "Products, inventory and a year of orders are imported and refreshed every night."
+      },
+      "lead_time": {
+        "title": "Set your default lead time",
+        "body": "How many days a reorder usually takes to arrive. Every reorder date is based on it.",
+        "action": "Set lead time"
+      },
+      "review_forecast": {
+        "title": "See why a product needs reordering",
+        "body": "Open a product to see how its forecast was built, and adjust the sales rate if you know better (a promotion, a quiet month).",
+        "action": "Open products",
+        "actionExample": "Open {{name}}"
+      },
+      "suppliers": {
+        "title": "Add your suppliers and their lead times",
+        "body": "Products from a slower supplier get reordered earlier. You can also export one purchase order per supplier.",
+        "action": "Add suppliers",
+        "skip": "I don't use suppliers"
+      },
+      "alerts": {
+        "title": "Turn on stock alerts",
+        "body": "One summary email when products need reordering. Never more than one a day.",
+        "action": "Turn on alerts",
+        "lockedTitle": "Get stock alerts by email",
+        "lockedBody": "Alerts are included in Starter, with a 7-day free trial."
+      }
+    }
+  },
+  "po": {
+    "export": "Export purchase order",
+    "short": "Purchase order",
+    "locked": "{{label}} ({{plan}})"
+  },
+  "product": {
+    "heading": "Product",
+    "adjustedByYou": "Adjusted by you",
+    "sku": "SKU {{sku}}",
+    "sellsPerDay": "Sells per day",
+    "runsOut": "Runs out",
+    "reorderPoint": "Reorder point",
+    "units_one": "{{qty}} unit",
+    "units_other": "{{qty}} units"
+  },
+  "why": {
+    "heading": "Why these numbers?",
+    "locked": "See exactly how each forecast is built: which days were used, out-of-stock days left out, seasonality, bundles, lead time and safety stock, in plain language.",
+    "period": "Period",
+    "unitsSold": "Units sold",
+    "daysInStock": "Days in stock",
+    "excludedDays": "Out-of-stock days left out",
+    "perDay": "Per day",
+    "weight": "Weight",
+    "lastDays_one": "Last {{count}} day",
+    "lastDays_other": "Last {{count}} days",
+    "notEnoughData": "Not enough data",
+    "seasonalityApplied": "Seasonality: ×{{factor}} based on the next {{days}} days last year.",
+    "seasonalityNotApplied": "Seasonality: not applied ({{reason}}).",
+    "seasonalityReasons": {
+      "not_enough_history": "less than a year of sales history",
+      "out_of_stock_last_year": "the product was often out of stock at this time last year",
+      "too_few_sales_last_year": "too few sales at this time last year",
+      "no_significant_change": "no meaningful change at this time last year"
+    }
+  },
+  "locations": {
+    "heading": "By location",
+    "location": "Location",
+    "pending": "Per-location forecasts appear after the next sync (open the app once to approve the new fulfillment permissions if Shopify asks).",
+    "why": "Why: {{location}}",
+    "hint": "Select a location to see why. Sales-rate adjustments apply to the store total only."
+  },
+  "adjust": {
+    "heading": "Adjust the sales rate",
+    "saved": "Forecast updated",
+    "resetDone": "Back to the automatic forecast",
+    "intro": "Expecting a promotion or a quiet month? Set the sales per day yourself. Our estimate is {{rate}}/day.",
+    "until": "Until (optional)",
+    "untilHelp": "Afterwards we go back to the automatic forecast.",
+    "note": "Note (optional)",
+    "notePlaceholder": "e.g. Black Friday promotion",
+    "save": "Save adjustment",
+    "reset": "Use automatic forecast"
+  },
+  "productSettings": {
+    "heading": "Product settings",
+    "noSuppliers": "Add suppliers in Settings → Suppliers.",
+    "noSupplier": "No supplier",
+    "leadTime": "Lead time for this product",
+    "fromSupplier": "{{days}} (supplier)",
+    "fromDefault": "{{days}} (store default)",
+    "safety": "Safety stock",
+    "safetyHelp": "Extra days of stock kept in case sales jump or a delivery is late.",
+    "save": "Save settings"
+  },
+  "products": {
+    "freeLimit_one": "The Free plan forecasts your best seller.",
+    "freeLimit_other": "The Free plan forecasts your {{count}} best sellers.",
+    "search": "Search",
+    "searchPlaceholder": "Search by product or SKU",
+    "allLocations": "All locations",
+    "allProducts": "All products",
+    "status": "Status",
+    "sort": "Sort",
+    "sorts": {
+      "urgency": "Most urgent",
+      "cover": "Fewest days of stock",
+      "suggested": "Largest order",
+      "value": "Highest stock value",
+      "name": "Name"
+    },
+    "noMatch": "No products match these filters.",
+    "pageInfo_one": "{{total}} product · page {{page}} of {{pages}}",
+    "pageInfo_other": "{{total}} products · page {{page}} of {{pages}}"
+  },
+  "settings": {
+    "defaultsHeading": "Forecast defaults",
+    "defaultsIntro": "Used for products without their own lead time or supplier.",
+    "leadTime": "Default lead time",
+    "leadTimeHelp": "How long a reorder usually takes to arrive.",
+    "safety": "Default safety stock",
+    "alertsHeading": "Stock alerts",
+    "alertsLocked": "Get one summary email when products need reordering. Never more than one a day.",
+    "alertsEnabled": "Email me when products need reordering",
+    "alertsEmail": "Send alerts to",
+    "frequency": "How often",
+    "frequencyHelp": "One summary email, only when something needs attention.",
+    "daily": "Daily summary",
+    "weekly": "Weekly summary",
+    "sendOn": "Send on",
+    "setupGuide": "Setup guide",
+    "setupGuideBack": "Setup guide is back on Home",
+    "showSetupGuide": "Show setup guide on Home"
+  },
+  "suppliers": {
+    "add": "Add supplier",
+    "edit": "Edit supplier",
+    "added": "Supplier added",
+    "updated": "Supplier updated",
+    "deleted": "Supplier deleted",
+    "assigned_one": "{{count}} product assigned to {{name}}",
+    "assigned_other": "{{count}} products assigned to {{name}}",
+    "confirmDelete": "Delete {{name}}? Its products will use the default lead time.",
+    "emptyHeading": "No suppliers yet",
+    "emptyBody": "Add your suppliers and their lead times so each product is reordered on time.",
+    "leadTime": "Lead time",
+    "storeDefault": "Store default",
+    "assign": "Assign products",
+    "name": "Name",
+    "leadTimeHelp": "Used for all products from this supplier unless a product has its own lead time.",
+    "email": "Email (optional)",
+    "emailHelp": "For purchase orders."
+  },
+  "bundles": {
+    "add": "Add bundle",
+    "confirmRemove": "Remove the bundle definition for {{name}}?",
+    "removed": "Bundle removed",
+    "saved": "Bundle saved",
+    "locked": "Count bundle and kit sales toward each product inside them, so components are reordered in time.",
+    "emptyHeading": "No bundles yet",
+    "emptyBody": "Selling kits or gift boxes? Tell us what's inside so their sales count toward each product's forecast. Bundles made with Shopify Bundles are picked up automatically.",
+    "bundle": "Bundle",
+    "contains": "Contains",
+    "source": "Source",
+    "manual": "Set up here",
+    "shopify": "Shopify Bundles",
+    "modalIntro": "When the bundle sells, we count its components as sold too, so their forecasts include bundle sales.",
+    "bundleProduct": "Bundle product",
+    "noneSelected": "None selected",
+    "change": "Change",
+    "selectProduct": "Select product",
+    "quantity": "Quantity",
+    "changeProducts": "Change products",
+    "selectProducts": "Select products",
+    "save": "Save bundle"
+  },
+  "plans": {
+    "names": {
+      "free": "Free",
+      "starter": "Starter",
+      "growth": "Growth"
+    },
+    "features": {
+      "bestSellers_one": "Forecasts for your best seller",
+      "bestSellers_other": "Forecasts for your {{count}} best sellers",
+      "unlimited": "Unlimited products",
+      "forecasts": "Stock-out dates and reorder suggestions",
+      "explanations": "\"Why this number?\" explanations",
+      "bundles": "Bundles and kits",
+      "alerts": "Email alerts (daily or weekly summary)",
+      "locations": "Stock by location",
+      "purchaseOrders": "Purchase order export (CSV)"
+    },
+    "notApproved": "No plan change was approved",
+    "nowOn": "You're on {{plan}}",
+    "confirmFree_one": "Switch to Free? Your paid plan ends now and only your best seller keeps its forecast.",
+    "confirmFree_other": "Switch to Free? Your paid plan ends now and only your {{count}} best sellers keep forecasts.",
+    "intro": "Flat monthly price. No share of your sales, no contract, cancel anytime. Billed by Shopify on your Shopify invoice.",
+    "tracking_one": "You track {{total}} product.",
+    "tracking_other": "You track {{total}} products.",
+    "monthly": "Monthly",
+    "yearly": "Yearly (save 20%)",
+    "current": "Current plan",
+    "perMonth": "{{price}} / month",
+    "perYear": "{{price}} / year",
+    "freeForever": "Free forever",
+    "trialNote": "{{count}}-day free trial, then billed by Shopify",
+    "switchToFree": "Switch to Free",
+    "startTrial": "Start {{count}}-day free trial",
+    "choose": "Choose {{plan}}"
+  }
+}

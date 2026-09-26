@@ -87,13 +87,14 @@ Mỗi forecast lưu explanation gồm: các cửa sổ ngày đã dùng và tr�
 5. Nhà cung cấp, lead time từng SKU và bundle chỉnh sau trong Settings
 
 ## Gói giá (Billing API)
-- Free: dưới 50 SKU, có dự báo và gợi ý nhập hàng đầy đủ
-- Starter $9/tháng: không giới hạn SKU, bundle, giải thích dự báo, cảnh báo email
-- Growth $24/tháng: multi-location, xuất purchase order
+- Free: dưới 50 SKU, có dự báo, gợi ý nhập hàng và giải thích dự báo đầy đủ (quyết định 2026-09-26: giải thích mở cho mọi gói vì là lời hứa "minh bạch")
+- Starter $2/tháng ($19/năm): không giới hạn SKU, bundle, cảnh báo email (dùng thử 7 ngày, một lần mỗi shop)
+- Growth $3/tháng ($29/năm): multi-location, xuất purchase order (dùng thử 7 ngày)
+- Giá hạ từ $9/$24 xuống $2/$3 ngày 2026-09-26 (quyết định của chủ app)
 - Gói năm giảm ~20%
 
 Giá cố định, không tính theo GMV, không hợp đồng, hủy bất cứ lúc nào.
-Tối ưu chi phí hạ tầng mỗi shop để gói $9 vẫn có lãi: job gộp theo lô, chỉ đồng bộ phần thay đổi sau lần sync đầu, không lưu dữ liệu thừa.
+Tối ưu chi phí hạ tầng mỗi shop để gói $2 vẫn có lãi: job gộp theo lô, chỉ đồng bộ phần thay đổi sau lần sync đầu, không lưu dữ liệu thừa.
 
 ## Độ tin cậy đồng bộ
 Hiển thị trạng thái đồng bộ cho merchant (lần sync cuối, lỗi nếu có). Job lỗi phải retry có backoff và được ghi log để theo dõi.
@@ -154,7 +155,9 @@ Yêu cầu chung:
 - [x] Phase 1: Docker + khởi tạo + OAuth (managed install + token exchange, expiring offline token, session token middleware, trang hello world, 46 test pass)
 - [x] Phase 2: Schema + webhook (11 bảng scope theo shop_id, trait BelongsToShop, endpoint /webhooks HMAC + dedupe + queue, uninstall/scopes_update/GDPR, xóa dữ liệu khi shop/redact, 73 test pass)
 - [x] Phase 3: Bulk sync (3 bulk op song song + poll/webhook, daily_sales theo timezone shop, tái dựng ngày hết hàng, nightly 30 ngày + variant thay đổi, sync_runs + thanh tiến độ, 110 test pass, đã chạy thật trên store dev)
-- [ ] Phase 4: Forecast engine
-- [ ] Phase 5: Frontend
-- [ ] Phase 6: Billing + alert
-- [ ] Phase 7: Chuẩn bị nộp App Store
+- [x] Phase 4: Forecast engine (calculator thuần 7/30/90 bỏ ngày hết hàng, mùa vụ 28 ngày năm trước (bỏ qua thay đổi < ±10%), bundle manual, override + thứ tự ưu tiên lead time/safety, confidence theo CV tuần, explanation JSON + câu giải thích, chạy sau mỗi sync + safety net 5h sáng, 149 test pass; dev:fake-orders + sync:run --full)
+- [x] Phase 5: Frontend (onboarding 2 câu hỏi, màn hình aha, danh sách SKU lọc/sắp xếp/tìm, chi tiết + giải thích + điều chỉnh tạm thời, Settings/Suppliers/Bundles với resource picker, cache dashboard theo version, 171 test pass, đã kiểm tra UI bằng preview)
+- [x] Phase 6: Billing + alert (Free/Starter/Growth tháng+năm qua Billing API, webhook app_subscriptions/update, Entitlements + 402, giới hạn 50 SKU bán chạy, khóa giải thích/bundle/alert/location/PO theo gói, digest email chống spam, export PO CSV, 201 test pass, đã thử billing + email thật)
+- [x] Bổ sung sau Phase 6: dùng thử 7 ngày (1 lần/shop), giải thích dự báo mở cho Free, dự báo riêng từng location cho Growth (fulfillment orders → location_daily_sales, engine chạy theo location, lọc + PO theo location, resync khi lên Growth; thêm 2 scope read_*_fulfillment_orders), 218 test pass
+- [x] Giao diện: Home phương án D (danh sách việc + đường băng tồn kho), setup guide 5 bước + mẹo ngữ cảnh, 228 test pass
+- [ ] Phase 7: Chuẩn bị nộp App Store (nhớ: gỡ scope write_orders chỉ dùng cho dev:fake-orders khỏi shopify.app.toml và SHOPIFY_SCOPES; SHOPIFY_BILLING_TEST=false ở production)

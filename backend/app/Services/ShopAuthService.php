@@ -11,6 +11,9 @@ use App\Repositories\Contracts\ShopRepositoryInterface;
 use App\Services\Shopify\SessionToken;
 use App\Services\Shopify\SessionTokenValidator;
 use App\Services\Shopify\ShopTokenService;
+use App\Support\CacheKeys;
+use Illuminate\Contracts\Cache\Repository as Cache;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Turns an App Bridge session token into an authenticated, installed Shop.
@@ -19,11 +22,14 @@ use App\Services\Shopify\ShopTokenService;
  */
 class ShopAuthService
 {
+    private const SCOPE_RECHECK_SECONDS = 600;
+
     public function __construct(
         private readonly SessionTokenValidator $validator,
         private readonly ShopRepositoryInterface $shops,
         private readonly ShopTokenService $tokens,
         private readonly ShopService $shopService,
+        private readonly Cache $cache,
         private readonly string $requiredScopes,
         private readonly int $refreshMargin = 300,
     ) {}
@@ -37,19 +43,30 @@ class ShopAuthService
         $session = $this->validator->validate($idToken);
         $shop = $this->shops->findByDomain($session->shopDomain);
 
-        if ($shop !== null && ! $this->needsTokenExchange($shop)) {
-            return $shop;
+        if ($shop === null || $this->needsTokenExchange($shop)) {
+            return $this->install($session, $shop);
         }
 
-        return $this->install($session, $shop);
+        // New scopes declared but not granted on this token yet (e.g. right after an app update,
+        // before the merchant approves them). The current token still works: re-exchange at most
+        // every few minutes to pick up the new grant, and never fail the request over it.
+        if (! $this->hasRequiredScopes($shop->scopes)
+            && $this->cache->add(CacheKeys::scopeRecheck($shop->id), true, self::SCOPE_RECHECK_SECONDS)) {
+            try {
+                return $this->tokens->exchange($session->shopDomain, $session->raw);
+            } catch (InvalidSessionTokenException|ShopifyApiException $e) {
+                Log::info('Scope re-check skipped', ['shop' => $shop->domain, 'error' => $e->getMessage()]);
+            }
+        }
+
+        return $shop;
     }
 
     private function needsTokenExchange(Shop $shop): bool
     {
         return ! $shop->isInstalled()
             // Merchant has an active session: acquire a new token instead of refreshing.
-            || $shop->accessTokenNeedsRefresh($this->refreshMargin)
-            || ! $this->hasRequiredScopes($shop->scopes);
+            || $shop->accessTokenNeedsRefresh($this->refreshMargin);
     }
 
     private function install(SessionToken $session, ?Shop $existing): Shop

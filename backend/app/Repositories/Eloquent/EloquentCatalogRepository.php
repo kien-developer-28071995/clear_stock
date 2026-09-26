@@ -121,6 +121,20 @@ class EloquentCatalogRepository implements CatalogRepositoryInterface
             ->pluck('stock', 'variant_id')->mapWithKeys(fn ($s, $id) => [(int) $id => (int) $s])->all();
     }
 
+    public function stockByVariantAndLocation(Shop $shop): array
+    {
+        $out = [];
+        DB::table('inventory_levels')
+            ->join('locations', 'locations.id', '=', 'inventory_levels.location_id')
+            ->where('inventory_levels.shop_id', $shop->id)->where('locations.is_active', true)
+            ->orderBy('inventory_levels.id')
+            ->each(function ($r) use (&$out) {
+                $out[(int) $r->variant_id][(int) $r->location_id] = (int) $r->available;
+            }, 5000);
+
+        return $out;
+    }
+
     public function activeVariantInfo(Shop $shop): array
     {
         return DB::table('variants')->where('shop_id', $shop->id)->where('is_active', true)

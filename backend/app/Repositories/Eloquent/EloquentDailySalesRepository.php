@@ -25,6 +25,18 @@ class EloquentDailySalesRepository implements DailySalesRepositoryInterface
         }
     }
 
+    public function topSellers(Shop $shop, array $candidateIds, string $fromDate, int $limit): array
+    {
+        $sold = DB::table('daily_sales')->where('shop_id', $shop->id)->where('date', '>=', $fromDate)
+            ->groupBy('variant_id')->selectRaw('variant_id, SUM(units_sold) as units')
+            ->pluck('units', 'variant_id')->all();
+
+        $ranked = $candidateIds;
+        usort($ranked, fn ($a, $b) => [(int) ($sold[$b] ?? 0), $a] <=> [(int) ($sold[$a] ?? 0), $b]);
+
+        return array_slice($ranked, 0, $limit);
+    }
+
     public function variantIdsWithSalesSince(Shop $shop, string $fromDate): array
     {
         return DB::table('daily_sales')->where('shop_id', $shop->id)->where('date', '>=', $fromDate)
@@ -43,6 +55,7 @@ class EloquentDailySalesRepository implements DailySalesRepositoryInterface
                         'sold' => (int) $r->units_sold,
                         'returned' => (int) $r->units_returned,
                         'stock' => $r->end_of_day_stock === null ? null : (int) $r->end_of_day_stock,
+                        'in_stock' => (bool) $r->was_in_stock,
                     ];
                 }, 5000);
         }

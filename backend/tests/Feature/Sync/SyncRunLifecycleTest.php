@@ -79,14 +79,14 @@ beforeEach(function () {
     $this->sync = app(SyncService::class);
 });
 
-it('starts an initial sync with a one-year window and marks the shop as syncing', function () {
+it('starts an initial sync with a 400-day window and marks the shop as syncing', function () {
     Queue::fake();
     $this->travelTo('2026-09-20 10:00:00');
 
     $run = $this->sync->start($this->shop, SyncType::Manual);
 
     expect($run->type)->toBe(SyncType::Initial)
-        ->and($run->window_start->toDateString())->toBe('2025-09-20')
+        ->and($run->window_start->toDateString())->toBe('2025-08-16')
         ->and($run->variants_updated_since)->toBeNull()
         ->and($this->shop->fresh()->sync_status->value)->toBe('running');
     Queue::assertPushed(StartSyncRun::class, fn ($job) => $job->runId === $run->id && $job->queue === 'sync');
@@ -112,6 +112,18 @@ it('uses a 30-day window and changed variants only after the first sync', functi
     expect($run->type)->toBe(SyncType::Nightly)
         ->and($run->window_start->toDateString())->toBe('2026-08-24')
         ->and($run->variants_updated_since->toDateTimeString())->toBe('2026-09-22 01:00:00');
+});
+
+it('re-imports the whole history window on a full resync', function () {
+    Queue::fake();
+    $this->travelTo('2026-09-23 03:00:00');
+    $this->shop->update(['last_synced_at' => '2026-09-22 02:00:00']);
+
+    $run = $this->sync->start($this->shop->fresh(), SyncType::Manual, full: true);
+
+    expect($run->type)->toBe(SyncType::Manual)
+        ->and($run->window_start->toDateString())->toBe('2025-08-19')
+        ->and($run->variants_updated_since)->toBeNull();
 });
 
 it('refreshes the whole catalog on the weekly full-catalog day', function () {
@@ -167,6 +179,19 @@ it('fails the run with a clear message when Shopify cannot export', function () 
     expect($run->fresh()->status)->toBe(SyncRunStatus::Failed)
         ->and($this->shop->fresh()->sync_status->value)->toBe('failed')
         ->and($this->shop->fresh()->sync_error)->toContain('could not export your orders');
+});
+
+it('explains an access-denied export (protected customer data not approved)', function () {
+    Queue::fake();
+    Http::fake(['*' => Http::response(['data' => ['bulkOperation' => [
+        'id' => gid('BulkOperation', 3), 'status' => 'FAILED', 'errorCode' => 'ACCESS_DENIED', 'objectCount' => '0', 'url' => null,
+    ]]])]);
+    $run = $this->sync->start($this->shop, SyncType::Initial);
+    $run->update(['stage' => SyncStage::Fetching, 'operations' => ['orders' => ['id' => gid('BulkOperation', 3), 'status' => 'RUNNING', 'object_count' => 0, 'url' => null, 'error_code' => null]]]);
+
+    (new CheckSyncRun($run->id))->handle($this->sync);
+
+    expect($this->shop->fresh()->sync_error)->toContain("hasn't allowed this app to read your orders");
 });
 
 it('imports everything once all operations complete', function () {

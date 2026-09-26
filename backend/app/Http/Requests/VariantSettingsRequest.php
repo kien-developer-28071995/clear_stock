@@ -1,0 +1,33 @@
+<?php
+
+namespace App\Http\Requests;
+
+use App\Support\ShopContext;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
+
+class VariantSettingsRequest extends FormRequest
+{
+    public function rules(): array
+    {
+        $shopId = app(ShopContext::class)->shop()->id;
+
+        return [
+            'variant_ids' => ['sometimes', 'array', 'min:1', 'max:500'],
+            // Local ids or Shopify variant gids (App Bridge resource picker).
+            'variant_ids.*' => ['required', function (string $attr, mixed $value, \Closure $fail) {
+                if (! is_int($value) && ! (is_string($value) && preg_match('#^gid://shopify/ProductVariant/\d+$#', $value))) {
+                    $fail('Invalid product.');
+                }
+            }],
+            'supplier_id' => ['sometimes', 'nullable', 'integer', Rule::exists('suppliers', 'id')->where('shop_id', $shopId)],
+            'lead_time_override' => ['sometimes', 'nullable', 'integer', 'min:0', 'max:365'],
+            'safety_days' => ['sometimes', 'nullable', 'integer', 'min:0', 'max:365'],
+        ];
+    }
+
+    public function settings(): array
+    {
+        return $this->safe()->only(['supplier_id', 'lead_time_override', 'safety_days']);
+    }
+}

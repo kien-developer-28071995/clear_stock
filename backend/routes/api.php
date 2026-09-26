@@ -1,12 +1,62 @@
 <?php
 
+use App\Http\Controllers\Api\BillingController;
+use App\Http\Controllers\Api\BundleController;
+use App\Http\Controllers\Api\DashboardController;
+use App\Http\Controllers\Api\ForecastController;
+use App\Http\Controllers\Api\OnboardingController;
+use App\Http\Controllers\Api\PurchaseOrderController;
+use App\Http\Controllers\Api\SettingsController;
+use App\Http\Controllers\Api\SetupGuideController;
 use App\Http\Controllers\Api\ShopController;
+use App\Http\Controllers\Api\SupplierController;
 use App\Http\Controllers\Api\SyncController;
+use App\Http\Controllers\Api\VariantController;
 use Illuminate\Support\Facades\Route;
 
 // All API routes are called by the embedded app with an App Bridge session token.
+// Ids in URLs are resolved through repositories scoped to the authenticated shop
+// (no implicit route-model binding: it would run before the shop is known).
 Route::middleware('shopify.session')->group(function () {
     Route::get('/shop', [ShopController::class, 'show']);
+
     Route::get('/sync', [SyncController::class, 'show']);
     Route::post('/sync', [SyncController::class, 'store'])->middleware('throttle:10,1');
+
+    Route::get('/onboarding', [OnboardingController::class, 'show']);
+    Route::post('/onboarding', [OnboardingController::class, 'store']);
+
+    Route::get('/dashboard', DashboardController::class);
+
+    Route::get('/setup-guide', [SetupGuideController::class, 'show']);
+    Route::post('/setup-guide/events', [SetupGuideController::class, 'event']);
+    Route::post('/setup-guide/skip', [SetupGuideController::class, 'skip']);
+    Route::post('/setup-guide/dismiss', [SetupGuideController::class, 'dismiss']);
+    Route::post('/setup-guide/tips', [SetupGuideController::class, 'dismissTip']);
+
+    Route::get('/forecasts', [ForecastController::class, 'index']);
+    Route::get('/locations', [ForecastController::class, 'locations']);
+    Route::get('/forecasts/{variant}', [ForecastController::class, 'show'])->whereNumber('variant');
+    Route::put('/forecasts/{variant}/overrides', [ForecastController::class, 'updateOverrides'])->whereNumber('variant');
+
+    Route::get('/variants', [VariantController::class, 'index']);
+    Route::put('/variants/settings', [VariantController::class, 'bulkUpdateSettings']);
+    Route::put('/variants/{variant}/settings', [VariantController::class, 'updateSettings'])->whereNumber('variant');
+
+    Route::get('/settings', [SettingsController::class, 'show']);
+    Route::put('/settings', [SettingsController::class, 'update']);
+
+    Route::get('/suppliers', [SupplierController::class, 'index']);
+    Route::post('/suppliers', [SupplierController::class, 'store']);
+    Route::put('/suppliers/{supplier}', [SupplierController::class, 'update'])->whereNumber('supplier');
+    Route::delete('/suppliers/{supplier}', [SupplierController::class, 'destroy'])->whereNumber('supplier');
+
+    Route::get('/billing', [BillingController::class, 'show']);
+    Route::post('/billing', [BillingController::class, 'store'])->middleware('throttle:10,1');
+
+    Route::get('/purchase-orders/export', [PurchaseOrderController::class, 'export']);
+
+    Route::get('/bundles', [BundleController::class, 'index']);
+    Route::post('/bundles', [BundleController::class, 'store']);
+    Route::delete('/bundles/{variant}', [BundleController::class, 'destroy'])->whereNumber('variant');
 });

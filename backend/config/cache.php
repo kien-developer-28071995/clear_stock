@@ -1,5 +1,13 @@
 <?php
 
+use App\Models\AlertSetting;
+use App\Models\Forecast;
+use App\Models\Shop;
+use App\Models\Supplier;
+use App\Models\SyncRun;
+use App\Models\Variant;
+use Carbon\CarbonImmutable;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
 return [
@@ -36,7 +44,8 @@ return [
 
         'array' => [
             'driver' => 'array',
-            'serialize' => false,
+            // Tests set this to true so cached values go through serialize() like in Redis.
+            'serialize' => (bool) env('CACHE_ARRAY_SERIALIZE', false),
         ],
 
         'database' => [
@@ -131,6 +140,20 @@ return [
     |
     */
 
-    'serializable_classes' => false,
+    // Only these classes may be unserialized from the cache (everything else comes back
+    // as __PHP_Incomplete_Class). Keep it to the models our Cache repositories store.
+    'serializable_classes' => [
+        Shop::class,
+        SyncRun::class,
+        Supplier::class,
+        AlertSetting::class,
+        Forecast::class,
+        Variant::class,
+        Illuminate\Database\Eloquent\Collection::class,
+        Collection::class,
+        Illuminate\Support\Carbon::class,
+        Carbon\Carbon::class,
+        CarbonImmutable::class,
+    ],
 
 ];

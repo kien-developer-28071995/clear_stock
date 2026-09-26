@@ -1,9 +1,13 @@
+import { useTranslation } from 'react-i18next';
+
 export function NotFoundPage() {
+    const { t } = useTranslation();
+
     return (
-        <s-page heading="Page not found">
+        <s-page heading={t('notFound.heading')}>
             <s-section>
-                <s-paragraph>This page does not exist.</s-paragraph>
-                <s-link href="/">Back to home</s-link>
+                <s-paragraph>{t('notFound.body')}</s-paragraph>
+                <s-link href="/">{t('notFound.back')}</s-link>
             </s-section>
         </s-page>
     );

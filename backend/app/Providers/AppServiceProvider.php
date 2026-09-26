@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Repositories\Contracts\ShopRepositoryInterface;
+use App\Services\Forecast\ForecastCalculator;
 use App\Services\ShopAuthService;
 use App\Services\Shopify\AdminApiClient;
 use App\Services\Shopify\SessionTokenValidator;
@@ -48,11 +49,14 @@ class AppServiceProvider extends ServiceProvider
             (int) config('shopify.http_timeout'),
         ));
 
+        $this->app->singleton(ForecastCalculator::class, fn () => ForecastCalculator::fromConfig());
+
         $this->app->singleton(ShopAuthService::class, fn ($app) => new ShopAuthService(
             $app->make(SessionTokenValidator::class),
             $app->make(ShopRepositoryInterface::class),
             $app->make(ShopTokenService::class),
             $app->make(ShopService::class),
+            $app->make(Cache::class),
             (string) config('shopify.scopes'),
             (int) config('shopify.token_refresh_margin'),
         ));

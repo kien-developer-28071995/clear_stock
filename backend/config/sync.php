@@ -4,8 +4,9 @@ return [
     // Queue connection for sync jobs (Horizon supervisor "sync-supervisor").
     'queue_connection' => env('SYNC_QUEUE_CONNECTION', 'redis-long'),
 
-    // First sync after install: days of order history (also feeds the seasonality factor).
-    'initial_days' => (int) env('SYNC_INITIAL_DAYS', 365),
+    // First sync after install: days of order history. 400 = one year + the 30-day
+    // window before "same period last year" used by the seasonality factor.
+    'initial_days' => (int) env('SYNC_INITIAL_DAYS', 400),
 
     // Nightly sync re-aggregates this many recent days (catches late refunds/cancellations).
     'nightly_window_days' => (int) env('SYNC_NIGHTLY_WINDOW_DAYS', 30),

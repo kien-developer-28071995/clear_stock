@@ -1,24 +1,26 @@
+import { useTranslation } from 'react-i18next';
 import { ApiError } from '@/lib/http';
 import { useStartSync, useSyncStatus } from '@/features/sync/hooks/useSync';
-import { formatNumber, timeAgo } from '@/utils/format';
+import { timeAgo } from '@/utils/format';
 
 /** Sync progress, last sync time and errors, with a "Sync now" action. */
 export function SyncStatusCard() {
+    const { t } = useTranslation();
     const { data: sync, isPending, error } = useSyncStatus();
     const start = useStartSync();
 
     if (isPending) {
         return (
-            <s-section heading="Store data">
-                <s-spinner accessibilityLabel="Loading sync status" />
+            <s-section heading={t('sync.heading')}>
+                <s-spinner accessibilityLabel={t('sync.loading')} />
             </s-section>
         );
     }
 
     if (error || !sync) {
         return (
-            <s-section heading="Store data">
-                <s-banner tone="critical">We couldn't load the sync status. Please reload the page.</s-banner>
+            <s-section heading={t('sync.heading')}>
+                <s-banner tone="critical">{t('sync.loadFailed')}</s-banner>
             </s-section>
         );
     }
@@ -28,16 +30,12 @@ export function SyncStatusCard() {
     const startError = start.error instanceof ApiError ? start.error.message : null;
 
     return (
-        <s-section heading="Store data">
+        <s-section heading={t('sync.heading')}>
             <s-stack gap="base">
                 {running && run && (
                     <s-stack gap="small-200">
-                        <s-text>
-                            {run.type === 'initial'
-                                ? 'Importing your products, inventory and the last 12 months of orders. You can leave this page; we keep working in the background.'
-                                : 'Updating your data from Shopify.'}
-                        </s-text>
-                        <s-progress value={run.progress} max={100} accessibilityLabel="Sync progress" />
+                        <s-text>{run.type === 'initial' ? t('sync.importingInitial') : t('sync.updating')}</s-text>
+                        <s-progress value={run.progress} max={100} accessibilityLabel={t('sync.progressLabel')} />
                         <s-text color="subdued">
                             {run.stage_label} · {run.progress}%
                         </s-text>
@@ -45,7 +43,7 @@ export function SyncStatusCard() {
                 )}
 
                 {sync.status === 'failed' && sync.error && (
-                    <s-banner tone="critical" heading="Sync failed">
+                    <s-banner tone="critical" heading={t('sync.failed')}>
                         <s-paragraph>{sync.error}</s-paragraph>
                     </s-banner>
                 )}
@@ -55,14 +53,11 @@ export function SyncStatusCard() {
                 {!running && (
                     <s-stack direction="inline" gap="base" alignItems="center" justifyContent="space-between">
                         <s-text color="subdued">
-                            {sync.last_synced_at
-                                ? `Last synced ${timeAgo(sync.last_synced_at)}`
-                                : 'Not synced yet'}
-                            {run?.stats &&
-                                ` · ${formatNumber(run.stats.variants)} variants, ${formatNumber(run.stats.orders)} orders`}
+                            {sync.last_synced_at ? t('sync.lastSynced', { when: timeAgo(sync.last_synced_at) }) : t('sync.notSynced')}
+                            {run?.stats && ` · ${t('sync.stats', { variants: run.stats.variants, orders: run.stats.orders })}`}
                         </s-text>
                         <s-button onClick={() => start.mutate()} loading={start.isPending || undefined}>
-                            {sync.status === 'failed' ? 'Retry sync' : 'Sync now'}
+                            {sync.status === 'failed' ? t('sync.retry') : t('sync.syncNow')}
                         </s-button>
                     </s-stack>
                 )}

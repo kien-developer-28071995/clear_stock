@@ -1,0 +1,46 @@
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use App\Http\Requests\VariantSettingsRequest;
+use App\Http\Resources\VariantOptionResource;
+use App\Repositories\Contracts\VariantRepositoryInterface;
+use App\Services\App\ForecastAdjustmentService;
+use App\Support\ShopContext;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+
+class VariantController extends Controller
+{
+    public function __construct(
+        private readonly VariantRepositoryInterface $variants,
+        private readonly ForecastAdjustmentService $adjust,
+    ) {}
+
+    /** Search for pickers. */
+    public function index(Request $request, ShopContext $context): AnonymousResourceCollection
+    {
+        $term = (string) $request->validate(['search' => ['nullable', 'string', 'max:100']])['search'] ?? '';
+
+        return VariantOptionResource::collection($this->variants->search($context->shop(), $term, 20));
+    }
+
+    public function updateSettings(VariantSettingsRequest $request, ShopContext $context, int $variant): JsonResponse
+    {
+        $shop = $context->shop();
+        $model = $this->variants->find($shop, $variant) ?? abort(404, 'Product not found.');
+        $this->adjust->updateVariantSettings($shop, $model, $request->settings());
+
+        return response()->json(['data' => $model->only(['id', 'supplier_id', 'lead_time_override', 'safety_days'])]);
+    }
+
+    public function bulkUpdateSettings(VariantSettingsRequest $request, ShopContext $context): JsonResponse
+    {
+        $request->validate(['variant_ids' => ['required']]);
+        $updated = $this->adjust->bulkUpdateVariantSettings($context->shop(), $request->validated('variant_ids'), $request->settings());
+
+        return response()->json(['data' => ['updated' => $updated]]);
+    }
+}

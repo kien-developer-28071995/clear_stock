@@ -8,7 +8,7 @@ return [
     'api_key' => env('SHOPIFY_API_KEY'),
     'api_secret' => env('SHOPIFY_API_SECRET'),
 
-    'scopes' => env('SHOPIFY_SCOPES', 'read_products,read_inventory,read_locations,read_orders,read_all_orders'),
+    'scopes' => env('SHOPIFY_SCOPES', 'read_products,read_inventory,read_locations,read_orders,read_all_orders,read_merchant_managed_fulfillment_orders,read_third_party_fulfillment_orders'),
 
     // Latest stable Admin API version (https://shopify.dev/docs/api/usage/versioning).
     'api_version' => env('SHOPIFY_API_VERSION', '2026-07'),

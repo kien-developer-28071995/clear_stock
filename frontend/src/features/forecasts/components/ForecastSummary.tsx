@@ -1,0 +1,41 @@
+import type { ForecastDetail } from '@/features/forecasts/types';
+import { useTranslation } from 'react-i18next';
+import { ConfidenceBadge, StatusBadge } from '@/components/ui/StatusBadge';
+import { formatDate, formatNumber } from '@/utils/format';
+
+function Metric({ label, value }: { label: string; value: string }) {
+    return (
+        <s-stack gap="small-100">
+            <s-text color="subdued">{label}</s-text>
+            <s-text type="strong">{value}</s-text>
+        </s-stack>
+    );
+}
+
+export function ForecastSummary({ f }: { f: ForecastDetail }) {
+    const { t } = useTranslation();
+    const selling = f.avg_daily_sales > 0;
+
+    return (
+        <s-section>
+            <s-stack gap="base">
+                <s-stack direction="inline" gap="small-200">
+                    <StatusBadge status={f.status} />
+                    <ConfidenceBadge confidence={f.confidence} />
+                    {f.overrides.avg_daily_sales && <s-badge tone="info">{t('product.adjustedByYou')}</s-badge>}
+                    {f.sku && <s-text color="subdued">{t('product.sku', { sku: f.sku })}</s-text>}
+                </s-stack>
+                <s-grid gridTemplateColumns="@container (inline-size > 500px) 1fr 1fr 1fr 1fr, 1fr 1fr" gap="base">
+                    <Metric label={t('table.inStock')} value={formatNumber(f.current_stock, 0)} />
+                    <Metric label={t('product.sellsPerDay')} value={formatNumber(f.avg_daily_sales, 2)} />
+                    <Metric label={t('slow.daysOfStock')} value={f.days_of_cover === null ? t('slow.noSales') : formatNumber(f.days_of_cover, 0)} />
+                    <Metric label={t('product.runsOut')} value={selling ? formatDate(f.stockout_date) : '—'} />
+                    <Metric label={t('product.reorderPoint')} value={t('product.units', { count: f.reorder_point, qty: formatNumber(f.reorder_point, 0) })} />
+                    <Metric label={t('table.orderBy')} value={selling ? formatDate(f.reorder_date) : '—'} />
+                    <Metric label={t('table.suggestedOrder')} value={t('product.units', { count: f.suggested_qty, qty: formatNumber(f.suggested_qty, 0) })} />
+                    <Metric label={t('table.supplier')} value={f.supplier?.name ?? t('common.notSet')} />
+                </s-grid>
+            </s-stack>
+        </s-section>
+    );
+}

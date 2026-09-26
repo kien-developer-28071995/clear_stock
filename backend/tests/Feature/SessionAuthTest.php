@@ -81,6 +81,23 @@ it('re-exchanges when required scopes are missing', function () {
     expect(Shop::first()->scopes)->toContain('read_orders');
 });
 
+it('re-checks missing scopes at most every 10 minutes and never fails the request over it', function () {
+    // Shopify still grants the old scopes (the merchant hasn't approved the new ones yet).
+    Http::fake(['*/admin/oauth/access_token' => Http::response(tokenResponse('shpat_same', ['scope' => 'read_products']))]);
+    Shop::factory()->create(['domain' => 'demo.myshopify.com', 'scopes' => 'read_products']);
+
+    foreach (range(1, 3) as $i) {
+        $this->getJson('/api/shop', ['Authorization' => 'Bearer '.sessionToken()])->assertOk();
+    }
+    Http::assertSentCount(1);
+
+    // A failing re-check keeps the (still valid) current token.
+    $this->travel(11)->minutes();
+    Http::fake(['*/admin/oauth/access_token' => Http::response('down', 503)]);
+    Shop::first()->update(['access_token_expires_at' => now()->addHour()]);
+    $this->getJson('/api/shop', ['Authorization' => 'Bearer '.sessionToken()])->assertOk();
+});
+
 it('reinstalls a previously uninstalled shop', function () {
     Event::fake([ShopInstalled::class]);
     fakeShopify();
