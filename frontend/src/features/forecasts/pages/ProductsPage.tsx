@@ -5,11 +5,11 @@ import { ErrorBanner } from '@/components/ui/ErrorBanner';
 import { ExportPurchaseOrderButton } from '@/features/forecasts/components/ExportPurchaseOrderButton';
 import { useShop } from '@/features/shop/hooks/useShop';
 import { StatusBadge } from '@/components/ui/StatusBadge';
-import { useForecastList, useLocations } from '@/features/forecasts/hooks/useForecasts';
+import { useFacets, useForecastList, useLocations } from '@/features/forecasts/hooks/useForecasts';
 import type { ForecastFilters } from '@/features/forecasts/types';
 import { formatDate, formatNumber } from '@/utils/format';
 
-const STATUS_OPTIONS = ['reorder_now', 'out_of_stock', 'slow', 'healthy'] as const;
+const STATUS_OPTIONS = ['reorder_now', 'out_of_stock', 'overstock', 'slow', 'healthy'] as const;
 const SORT_OPTIONS = ['urgency', 'cover', 'suggested', 'value', 'name'] as const;
 
 /** Every tracked product with its forecast. Filters live in the URL so dashboard cards can link here. */
@@ -20,6 +20,8 @@ export function ProductsPage() {
     const filters: ForecastFilters = {
         location_id: params.get('location_id') ? Number(params.get('location_id')) : '',
         status: (params.get('status') ?? '') as ForecastFilters['status'],
+        vendor: params.get('vendor') ?? '',
+        product_type: params.get('product_type') ?? '',
         search: params.get('search') ?? '',
         sort: (params.get('sort') ?? 'urgency') as ForecastFilters['sort'],
         page: Number(params.get('page') ?? 1),
@@ -30,6 +32,10 @@ export function ProductsPage() {
     const limit = entitlements?.max_skus ?? null;
     const locations = useLocations(!!entitlements?.locations);
     const showLocations = (locations.data?.length ?? 0) > 1;
+    const facets = useFacets().data;
+    const showVendors = (facets?.vendors.length ?? 0) > 1;
+    const showTypes = (facets?.product_types.length ?? 0) > 1;
+    const selects = 2 + [showLocations, showVendors, showTypes].filter(Boolean).length;
 
     const update = (patch: Partial<ForecastFilters>) => {
         const next = { ...filters, page: 1, ...patch };
@@ -67,10 +73,8 @@ export function ProductsPage() {
                     onPreviousPage={() => update({ page: (filters.page ?? 1) - 1 })}
                     onNextPage={() => update({ page: (filters.page ?? 1) + 1 })}
                 >
-                    <s-grid slot="filters" gap="small-200" gridTemplateColumns={
-                            // Narrow screens: one filter per line.
-                            showLocations ? '@container (inline-size > 560px) 1fr auto auto auto, 1fr' : '@container (inline-size > 560px) 1fr auto auto, 1fr'
-                        }>
+                    {/* All filters on one line: search takes the remaining width. */}
+                    <s-grid slot="filters" gap="small-200" alignItems="center" gridTemplateColumns={`minmax(0, 1fr)${' auto'.repeat(selects)}`}>
                         <s-search-field
                             label={t('products.search')}
                             labelAccessibilityVisibility="exclusive"
@@ -88,6 +92,32 @@ export function ProductsPage() {
                                 <s-option value="">{t('products.allLocations')}</s-option>
                                 {locations.data?.map((l) => (
                                     <s-option key={l.id} value={String(l.id)}>{l.name}</s-option>
+                                ))}
+                            </s-select>
+                        )}
+                        {showVendors && (
+                            <s-select
+                                label={t('products.vendor')}
+                                labelAccessibilityVisibility="exclusive"
+                                value={filters.vendor ?? ''}
+                                onChange={(e) => update({ vendor: e.currentTarget.value })}
+                            >
+                                <s-option value="">{t('products.allVendors')}</s-option>
+                                {facets?.vendors.map((v) => (
+                                    <s-option key={v} value={v}>{v}</s-option>
+                                ))}
+                            </s-select>
+                        )}
+                        {showTypes && (
+                            <s-select
+                                label={t('products.productType')}
+                                labelAccessibilityVisibility="exclusive"
+                                value={filters.product_type ?? ''}
+                                onChange={(e) => update({ product_type: e.currentTarget.value })}
+                            >
+                                <s-option value="">{t('products.allTypes')}</s-option>
+                                {facets?.product_types.map((v) => (
+                                    <s-option key={v} value={v}>{v}</s-option>
                                 ))}
                             </s-select>
                         )}
@@ -131,7 +161,7 @@ export function ProductsPage() {
                                         <s-link id={`product-${row.variant_id}`} onClick={() => navigate(`/products/${row.variant_id}`)}>
                                             {row.name}
                                         </s-link>
-                                        {row.sku && <s-text color="subdued">{row.sku}</s-text>}
+                                        {(row.sku || row.vendor) && <s-text color="subdued">{[row.sku, row.vendor].filter(Boolean).join(' · ')}</s-text>}
                                     </s-stack>
                                 </s-table-cell>
                                 <s-table-cell>

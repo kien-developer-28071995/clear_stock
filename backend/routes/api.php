@@ -12,8 +12,10 @@ use App\Http\Controllers\Api\SettingsController;
 use App\Http\Controllers\Api\SetupGuideController;
 use App\Http\Controllers\Api\ShopController;
 use App\Http\Controllers\Api\SupplierController;
+use App\Http\Controllers\Api\SupplierEmailController;
 use App\Http\Controllers\Api\SyncController;
 use App\Http\Controllers\Api\VariantController;
+use App\Http\Controllers\Api\VendorSupplierController;
 use Illuminate\Support\Facades\Route;
 
 // All API routes are called by the embedded app with an App Bridge session token.
@@ -41,6 +43,7 @@ Route::middleware('shopify.session')->group(function () {
 
     Route::get('/forecasts', [ForecastController::class, 'index']);
     Route::get('/locations', [ForecastController::class, 'locations']);
+    Route::get('/facets', [ForecastController::class, 'facets']);
     Route::get('/forecasts/{variant}', [ForecastController::class, 'show'])->whereNumber('variant');
     Route::put('/forecasts/{variant}/overrides', [ForecastController::class, 'updateOverrides'])->whereNumber('variant');
 
@@ -52,11 +55,16 @@ Route::middleware('shopify.session')->group(function () {
     Route::put('/settings', [SettingsController::class, 'update']);
 
     Route::get('/suppliers', [SupplierController::class, 'index']);
+    Route::get('/suppliers/from-vendors', [VendorSupplierController::class, 'show']);
+    Route::post('/suppliers/from-vendors', [VendorSupplierController::class, 'store'])->middleware('throttle:10,1');
     Route::post('/suppliers', [SupplierController::class, 'store']);
     Route::put('/suppliers/{supplier}', [SupplierController::class, 'update'])->whereNumber('supplier');
     Route::delete('/suppliers/{supplier}', [SupplierController::class, 'destroy'])->whereNumber('supplier');
+    Route::get('/suppliers/{supplier}/email', [SupplierEmailController::class, 'show'])->whereNumber('supplier');
+    Route::post('/suppliers/{supplier}/email', [SupplierEmailController::class, 'store'])->whereNumber('supplier')->middleware('throttle:20,1');
 
     Route::get('/billing', [BillingController::class, 'show']);
+    Route::get('/billing/impact', [BillingController::class, 'impact']);
     Route::post('/billing', [BillingController::class, 'store'])->middleware('throttle:10,1');
 
     Route::get('/purchase-orders/export', [PurchaseOrderController::class, 'export']);

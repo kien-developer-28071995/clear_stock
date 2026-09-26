@@ -1,12 +1,14 @@
 <?php
 
 use App\Exceptions\ApiException;
+use App\Listeners\ReportLongQueueWait;
 use App\Models\Shop;
 use App\Services\App\DashboardService;
 use App\Support\Monitor;
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Laravel\Horizon\Events\LongWaitDetected;
 
 // Errors (unhandled exceptions, caught system errors, frontend crashes) go to one
 // Slack channel, throttled per error, without secrets.
@@ -128,4 +130,12 @@ it('does not report ApiException even when thrown outside HTTP', function () {
     report(new ApiException('product_not_found', 404));
 
     expect(slackPosts())->toBe([]);
+});
+
+it('alerts when a queue is backed up', function () {
+    // Called directly: dispatching the event would also run Horizon's own listeners (real Redis).
+    (new ReportLongQueueWait)->handle(new LongWaitDetected('redis', 'webhooks', 95));
+
+    expect(slackPosts())->toHaveCount(1)
+        ->and(slackPosts()[0])->toContain('Queue redis:webhooks is backed up')->toContain('Oldest job waited 95s');
 });

@@ -116,6 +116,11 @@ class ExplanationFormatter
             };
         }
 
+        // Overstock: holding clearly more than needed (still selling).
+        if (($e['reorder']['overstock'] ?? false) === true) {
+            $out[] = $this->line('overstock', ['count' => $e['reorder']['excess'], 'target' => $e['reorder']['target']]);
+        }
+
         // Confidence
         $c = $e['confidence'];
         $reasons = collect($c['reasons'])->map(fn ($r) => match ($r['code']) {

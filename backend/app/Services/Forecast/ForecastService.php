@@ -109,6 +109,8 @@ class ForecastService
             'reorder_date' => $r->reorderDate,
             'reorder_point' => $r->reorderPoint,
             'suggested_qty' => $r->suggestedQty,
+            'target_stock' => $r->targetStock,
+            'excess_units' => $r->excessUnits,
             'confidence' => $r->confidence->value,
             'explanation' => json_encode($r->explanation, JSON_THROW_ON_ERROR),
             'computed_at' => $computedAt,

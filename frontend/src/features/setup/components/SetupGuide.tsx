@@ -36,7 +36,10 @@ function copy(key: SetupStepKey, ctx: SetupGuideState['context'], t: TFunction):
             return {
                 title: t('setup.steps.suppliers.title'),
                 body: t('setup.steps.suppliers.body'),
-                action: { label: t('setup.steps.suppliers.action'), href: '/suppliers' },
+                // Shopify vendors can become suppliers in one step.
+                action: ctx.vendor_count > 0
+                    ? { label: t('setup.steps.suppliers.fromVendors', { count: ctx.vendor_count }), href: '/suppliers/from-vendors' }
+                    : { label: t('setup.steps.suppliers.action'), href: '/suppliers' },
                 skipLabel: t('setup.steps.suppliers.skip'),
             };
         case 'alerts':

@@ -49,7 +49,8 @@
     "out_of_stock": "Out of stock",
     "reorder_now": "Reorder now",
     "slow": "Slow-moving",
-    "healthy": "OK"
+    "healthy": "OK",
+    "overstock": "Overstock"
   },
   "confidence": {
     "low": "Low confidence",
@@ -139,7 +140,9 @@
       "slowValue_one": "Tied up in {{count}} product",
       "slowValue_other": "Tied up in {{count}} products",
       "slowCount_one": "Product with 180+ days of stock",
-      "slowCount_other": "Products with 180+ days of stock"
+      "slowCount_other": "Products with 180+ days of stock",
+      "tiedUpLabel": "Money tied up in stock",
+      "tiedUpHint": "{{slow}} slow-moving · {{overstock}} overstocked"
     },
     "urgentHeading": "Most urgent",
     "thisWeekHeading": "Coming up this week",
@@ -243,7 +246,9 @@
         "title": "Add your suppliers and their lead times",
         "body": "Products from a slower supplier get reordered earlier. You can also export one purchase order per supplier. Coming from Stocky? Import your purchase orders to set this up in one go.",
         "action": "Add suppliers",
-        "skip": "I don't use suppliers"
+        "skip": "I don't use suppliers",
+        "fromVendors_one": "Create a supplier from your vendor",
+        "fromVendors_other": "Create suppliers from your {{count}} vendors"
       },
       "alerts": {
         "title": "Turn on stock alerts",
@@ -308,7 +313,6 @@
     "untilHelp": "Afterwards we go back to the automatic forecast.",
     "note": "Note (optional)",
     "notePlaceholder": "e.g. Black Friday promotion",
-    "save": "Save adjustment",
     "reset": "Use automatic forecast"
   },
   "productSettings": {
@@ -320,7 +324,6 @@
     "fromDefault": "{{days}} (store default)",
     "safety": "Safety stock",
     "safetyHelp": "Extra days of stock kept in case sales jump or a delivery is late.",
-    "save": "Save settings",
     "minOrder": "Minimum order",
     "minOrderHelp": "The supplier's minimum order in units. Suggestions below it are raised to it.",
     "packSize": "Pack size",
@@ -330,6 +333,8 @@
     "minStockHelp": "Reorder when stock plus stock on the way falls to this. Leave empty to let the forecast decide.",
     "maxStock": "Max (order up to)",
     "maxStockHelp": "Orders fill stock up to this level. Leave empty to let the forecast decide.",
+    "muteAlerts": "Don't send alerts for this product",
+    "muteAlertsHelp": "Leaves it out of summary and real-time emails. Forecasts and the reorder list still include it.",
     "fromForecast": "Forecast: {{qty}}",
     "fromForecastShort": "From the forecast"
   },
@@ -351,7 +356,11 @@
     },
     "noMatch": "No products match these filters.",
     "pageInfo_one": "{{total}} product · page {{page}} of {{pages}}",
-    "pageInfo_other": "{{total}} products · page {{page}} of {{pages}}"
+    "pageInfo_other": "{{total}} products · page {{page}} of {{pages}}",
+    "vendor": "Vendor",
+    "allVendors": "All vendors",
+    "productType": "Product type",
+    "allTypes": "All product types"
   },
   "settings": {
     "defaultsHeading": "Forecast defaults",
@@ -368,6 +377,12 @@
     "daily": "Daily summary",
     "weekly": "Weekly summary",
     "sendOn": "Send on",
+    "realtime": "Real-time alerts",
+    "realtimeHelp": "An email as soon as stock crosses a threshold. Changes are grouped into one email every 15 minutes, a product is mentioned at most once a week, at most 3 emails a day and never at night.",
+    "realtimeOff": "Off",
+    "realtimeOutOfStock": "Only when a product sells out",
+    "realtimeAll": "When a product needs reordering or sells out",
+    "realtimeLocked": "Hear about a sell-out when it happens, not the next morning. Grouped and capped, so your inbox stays quiet.",
     "setupGuide": "Setup guide",
     "setupGuideBack": "Setup guide is back on Home",
     "showSetupGuide": "Show setup guide on Home",
@@ -433,17 +448,19 @@
       "bundles": "Bundles and kits",
       "alerts": "Email alerts (daily or weekly summary)",
       "locations": "Stock by location",
-      "purchaseOrders": "Purchase order export (CSV)"
+      "purchaseOrders": "Purchase order export (CSV)",
+      "realtimeAlerts": "Real-time stock alerts"
     },
     "notApproved": "No plan change was approved",
     "nowOn": "You're on {{plan}}",
-    "confirmFree_one": "Switch to Free? Your paid plan ends now and only your best seller keeps its forecast.",
-    "confirmFree_other": "Switch to Free? Your paid plan ends now and only your {{count}} best sellers keep forecasts.",
     "intro": "Flat monthly price. No share of your sales, no contract, cancel anytime. Billed by Shopify on your Shopify invoice.",
     "tracking_one": "You track {{total}} product.",
     "tracking_other": "You track {{total}} products.",
     "monthly": "Monthly",
-    "yearly": "Yearly (save 20%)",
+    "yearly": "Yearly",
+    "save": "Save 20%",
+    "billingPeriod": "Billing period",
+    "billedYearly": "{{price}} / month, billed yearly",
     "current": "Current plan",
     "perMonth": "{{price}} / month",
     "perYear": "{{price}} / year",
@@ -470,7 +487,9 @@
     "bundle_not_found": "This bundle no longer exists.",
     "forbidden": "You don't have access to this.",
     "server_error": "Something went wrong on our side. Please try again.",
-    "unavailable": "The app is being updated. Please try again in a minute."
+    "unavailable": "The app is being updated. Please try again in a minute.",
+    "supplier_has_no_email": "This supplier has no email address.",
+    "supplier_email_too_soon": "This order was just sent. Wait a minute before sending again."
   },
   "validation": {
     "invalid": "This value isn't valid.",
@@ -502,7 +521,9 @@
     "no_rows": "This file has no rows.",
     "too_many_rows": "This file is too large. Split it into smaller files.",
     "mapping_incomplete": "Choose the supplier column and a product column (SKU, variant ID or product name).",
-    "max_below_min": "Max must be at least the min."
+    "max_below_min": "Max must be at least the min.",
+    "no_items": "Add at least one product.",
+    "auto_email_needs_email": "Add the supplier email first."
   },
   "explanation": {
     "unknown": "—",
@@ -560,7 +581,9 @@
     "below_min_order_one": "{{stock}} in stock (with stock on the way) is at or below your minimum → order {{count}} unit today.",
     "below_min_order_other": "{{stock}} in stock (with stock on the way) is at or below your minimum → order {{count}} units today.",
     "above_min": "{{stock}} in stock (with stock on the way) is above your minimum; no sales yet, so nothing to order.",
-    "no_order_needed": "Nothing to order right now."
+    "no_order_needed": "Nothing to order right now.",
+    "overstock_one": "{{count}} unit more than the {{target}} to hold (lead time, safety and the next order cycle): hold off reordering, or run a promotion.",
+    "overstock_other": "{{count}} units more than the {{target}} to hold (lead time, safety and the next order cycle): hold off reordering, or run a promotion."
   },
   "import": {
     "fromStocky": "Import from Stocky",
@@ -616,7 +639,81 @@
   },
   "confirm": {
     "deleteSupplier": "Delete supplier?",
-    "removeBundle": "Remove bundle?",
-    "switchToFree": "Switch to Free?"
+    "removeBundle": "Remove bundle?"
+  },
+  "supplierEmail": {
+    "button": "Email order",
+    "heading": "Email a purchase order to {{name}}",
+    "to": "To: {{email}}",
+    "noEmail": "This supplier has no email address. Add one with Edit first.",
+    "nothingDue": "Nothing from this supplier needs ordering right now.",
+    "total_one": "Total: {{count}} unit",
+    "total_other": "Total: {{count}} units",
+    "message": "Message (optional)",
+    "messagePlaceholder": "e.g. Please confirm the delivery date.",
+    "replyTo": "Replies go to",
+    "replyToHelp": "The supplier answers this address. The order is also attached as a CSV file.",
+    "send": "Send email",
+    "sent": "Purchase order emailed to {{name}}",
+    "lastSent": "Last emailed {{when}}",
+    "autoBadge": "Auto email",
+    "auto": "Email purchase orders automatically",
+    "autoHelp": "When this supplier's products need ordering, we email them the purchase order (at most once a week, from 8am your time). Replies go to your alert email.",
+    "autoPaused": "Auto email paused (Growth)"
+  },
+  "downgrade": {
+    "heading": "Switch to {{plan}}?",
+    "intro": "On this plan, the following stops working for your store:",
+    "nothingLost": "Nothing you use today stops working.",
+    "kept": "Your data and settings are kept. Upgrade again at any time and everything works as before.",
+    "lost": {
+      "unknown": "Some features of your current plan",
+      "forecast_limit_one": "{{count}} product beyond your {{limit}} best sellers loses its forecast and reorder suggestion.",
+      "forecast_limit_other": "{{count}} products beyond your {{limit}} best sellers lose their forecast and reorder suggestions.",
+      "bundles_one": "Bundle sales no longer count toward component forecasts ({{count}} bundle set up).",
+      "bundles_other": "Bundle sales no longer count toward component forecasts ({{count}} bundles set up).",
+      "alerts": "Stock alert emails are not available.",
+      "alerts_active": "Stock alert emails to {{email}} stop.",
+      "locations_one": "Forecasts per location stop ({{count}} location).",
+      "locations_other": "Forecasts per location stop ({{count}} locations).",
+      "purchase_orders": "Purchase order export and emailing orders to suppliers stop.",
+      "supplier_auto_emails_one": "{{count}} supplier stops receiving automatic purchase orders.",
+      "supplier_auto_emails_other": "{{count}} suppliers stop receiving automatic purchase orders.",
+      "realtime_alerts": "Real-time stock alerts are not available.",
+      "realtime_alerts_active": "Real-time stock alerts to {{email}} stop."
+    }
+  },
+  "vendors": {
+    "button": "Create from vendors",
+    "heading": "Create suppliers from vendors",
+    "intro": "Your Shopify products already have a Vendor. Each vendor you tick becomes a supplier (or uses the supplier with that name) and its products are linked to it. You can add lead times and emails afterwards.",
+    "result": "Result",
+    "newSupplier": "New supplier",
+    "reuses": "Uses supplier \"{{name}}\"",
+    "ownBrand": "Your own brand",
+    "alreadyLinked_one": "{{count}} product already has a supplier",
+    "alreadyLinked_other": "{{count}} products already have a supplier",
+    "summary_one": "{{vendors}} vendor selected, {{count}} product.",
+    "summary_other": "{{vendors}} vendors selected, {{count}} products.",
+    "replace_one": "Also replace the supplier of {{count}} product that already has one",
+    "replace_other": "Also replace the supplier of {{count}} products that already have one",
+    "apply_one": "Create {{count}} supplier",
+    "apply_other": "Create {{count}} suppliers",
+    "done_one": "{{suppliers}} suppliers ready, {{count}} product linked",
+    "done_other": "{{suppliers}} suppliers ready, {{count}} products linked",
+    "emptyHeading": "No vendors on your products",
+    "emptyBody": "Fill the Vendor field of your products in Shopify, or add suppliers by hand."
+  },
+  "overstock": {
+    "heading": "Overstock",
+    "target": "Level to hold",
+    "excess": "Excess",
+    "summaryWithValue_one": "{{value}} is tied up in {{units}} units more than needed, across {{count}} product that still sells.",
+    "summaryWithValue_other": "{{value}} is tied up in {{units}} units more than needed, across {{count}} products that still sell.",
+    "summary_one": "{{units}} units more than needed, across {{count}} product that still sells.",
+    "summary_other": "{{units}} units more than needed, across {{count}} products that still sell.",
+    "advice": "Hold off reordering them, or run a promotion.",
+    "seeAll_one": "See the overstocked product",
+    "seeAll_other": "See all {{count}} overstocked products"
   }
 }

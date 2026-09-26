@@ -12,4 +12,6 @@ enum WebhookTopic: string
     case ShopRedact = 'shop/redact';
     case BulkOperationsFinish = 'bulk_operations/finish';
     case AppSubscriptionsUpdate = 'app_subscriptions/update';
+    /** Shop-specific subscription, created only while real-time alerts are on (see RealtimeAlertService). */
+    case InventoryLevelsUpdate = 'inventory_levels/update';
 }

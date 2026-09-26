@@ -9,6 +9,7 @@ const NONE: Entitlements = {
     alerts: false,
     locations: false,
     purchase_orders: false,
+    realtime_alerts: false,
 };
 
 /** What the current plan allows (defaults to Free while loading). */

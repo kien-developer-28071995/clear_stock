@@ -411,3 +411,29 @@ describe('manual min / max (Stocky style)', function () {
         expect($r->suggestedQty)->toBe(216); // 200 -> 9 packs of 24
     });
 });
+
+describe('overstock', function () {
+    // Steady 4/day, lead 14 + safety 7 + 30-day cycle: hold 204 units.
+    it('measures stock above the level to hold', function () {
+        $fine = calc(input(history(120, 4), stock: 250));
+        $over = calc(input(history(120, 4), stock: 250, extra: ['incomingStock' => 100]));
+
+        expect([$fine->targetStock, $fine->excessUnits, $fine->explanation['reorder']['overstock']])->toBe([204, 46, false]) // 23%: not overstock
+            ->and([$over->targetStock, $over->excessUnits, $over->explanation['reorder']['overstock']])->toBe([204, 146, true]); // 72%, incl. on the way
+    });
+
+    it('uses the merchant max as the level to hold', function () {
+        $r = calc(input(history(120, 4), stock: 400, extra: ['maxStock' => 200]));
+
+        expect([$r->targetStock, $r->excessUnits, $r->explanation['reorder']['overstock']])->toBe([200, 200, true]);
+    });
+
+    it('explains it, and leaves products without sales to "slow"', function () {
+        $r = calc(input(history(120, 4), stock: 400));
+        expect((new ExplanationFormatter)->sentences($r->explanation, 'en'))
+            ->toContain('196 units more than the 204 to hold (lead time, safety and the next order cycle): hold off reordering, or run a promotion.');
+
+        $none = calc(input(history(120, 0), stock: 400));
+        expect([$none->excessUnits, $none->explanation['reorder']['overstock']])->toBe([0, false]);
+    });
+});

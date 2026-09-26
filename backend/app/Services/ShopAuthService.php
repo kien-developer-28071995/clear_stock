@@ -85,7 +85,7 @@ class ShopAuthService
         if ($isNewInstall) {
             // One small GraphQL call so the first screen already knows currency + timezone.
             $this->shopService->refreshDetails($shop);
-            ShopInstalled::dispatch($shop);
+            ShopInstalled::dispatch($shop, $existing !== null);
         }
 
         return $shop;

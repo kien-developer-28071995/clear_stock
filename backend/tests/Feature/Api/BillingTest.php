@@ -3,12 +3,15 @@
 use App\Enums\Plan;
 use App\Enums\PlanInterval;
 use App\Jobs\Forecast\RecomputeForecasts;
+use App\Jobs\ReconcileBilling;
+use App\Jobs\SyncRealtimeWebhook;
 use App\Jobs\Webhooks\HandleAppSubscriptionUpdate;
 use App\Models\Shop;
 use App\Repositories\Contracts\ShopRepositoryInterface;
 use App\Services\App\BillingService;
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Queue;
 
 beforeEach(function () {
@@ -150,4 +153,49 @@ it('parses only its own subscription names', function () {
 it('rejects unknown plans', function () {
     Http::fake();
     $this->postJson('/api/billing', ['plan' => 'enterprise'], $this->auth)->assertUnprocessable();
+});
+
+describe('daily reconciliation (missed webhooks)', function () {
+    it('downgrades a shop whose subscription was cancelled without a webhook, and logs the drift', function () {
+        Log::spy();
+        $this->shop->update(['plan' => 'growth', 'plan_interval' => 'monthly', 'subscription_id' => 'gid://shopify/AppSubscription/1']);
+        fakeBilling([]); // Shopify: nothing active
+
+        expect(app(BillingService::class)->reconcile($this->shop->fresh()))->toBeTrue()
+            ->and($this->shop->fresh()->plan)->toBe(Plan::Free);
+        // The real-time inventory webhook of the lost Growth plan is removed too.
+        Queue::assertPushed(SyncRealtimeWebhook::class, fn ($job) => $job->shopId === $this->shop->id);
+        Log::shouldHaveReceived('warning')->withArgs(fn ($msg, $ctx) => str_contains($msg, 'Billing drift') && $ctx['from'] === 'growth (monthly)' && $ctx['to'] === 'free');
+        Queue::assertPushed(RecomputeForecasts::class);
+    });
+
+    it('unlocks a plan that was paid while the app missed both the return page and the webhook', function () {
+        fakeBilling([[
+            'id' => 'gid://shopify/AppSubscription/9', 'name' => BillingService::subscriptionName(Plan::Starter, PlanInterval::Annual),
+            'status' => 'ACTIVE', 'currentPeriodEnd' => '2027-09-20T00:00:00Z', 'test' => true,
+        ]]);
+
+        expect(app(BillingService::class)->reconcile($this->shop->fresh()))->toBeTrue()
+            ->and($this->shop->fresh()->only(['plan', 'plan_interval', 'subscription_id']))->toBe([
+                'plan' => Plan::Starter, 'plan_interval' => PlanInterval::Annual, 'subscription_id' => 'gid://shopify/AppSubscription/9',
+            ]);
+    });
+
+    it('changes nothing when the app already agrees with Shopify', function () {
+        fakeBilling([]);
+
+        expect(app(BillingService::class)->reconcile($this->shop->fresh()))->toBeFalse();
+        Queue::assertNotPushed(RecomputeForecasts::class);
+    });
+
+    it('checks every installed shop once a day, and skips shops without a usable token', function () {
+        Shop::factory()->create(['uninstalled_at' => now()]);
+        $gone = Shop::factory()->create(['access_token' => 'x']);
+        $gone->forceFill(['access_token' => null])->save();
+
+        $this->artisan('billing:reconcile')->assertSuccessful();
+
+        Queue::assertPushed(ReconcileBilling::class, 1);
+        Queue::assertPushed(ReconcileBilling::class, fn ($job) => $job->shopId === $this->shop->id);
+    });
 });

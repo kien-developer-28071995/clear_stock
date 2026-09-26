@@ -35,6 +35,7 @@ return [
     'rounded_min_and_pack' => 'You need :needed; the supplier minimum is :min, in packs of :pack → :count.',
     'order_today_out_of_stock' => 'Out of stock now → order :count unit today.|Out of stock now → order :count units today.',
     'runs_out' => ':stock in stock runs out around :stockout_date → order :count unit by :reorder_date.|:stock in stock runs out around :stockout_date → order :count units by :reorder_date.',
+    'overstock' => ':count unit more than the :target to hold (lead time, safety and the next order cycle): hold off reordering, or run a promotion.|:count units more than the :target to hold (lead time, safety and the next order cycle): hold off reordering, or run a promotion.',
     'confidence' => 'Confidence: :level.',
     'confidence_with_reasons' => 'Confidence: :level (:reasons).',
     'confidence_high' => 'high',

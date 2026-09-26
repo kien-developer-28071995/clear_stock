@@ -10,6 +10,10 @@ return [
     // Slack incoming webhook (https://api.slack.com/messaging/webhooks). Empty = off.
     'slack_webhook_url' => env('MONITORING_SLACK_WEBHOOK_URL'),
 
+    // Business events (install, uninstall, upgrade, downgrade) go to this channel's webhook.
+    // Kept apart from errors on purpose. Empty = no event messages.
+    'events_slack_webhook_url' => env('MONITORING_SLACK_EVENTS_WEBHOOK_URL'),
+
     // Lowest level sent to Slack: error (default), warning to also get handled/expected problems.
     'level' => env('MONITORING_SLACK_LEVEL', 'error'),
 

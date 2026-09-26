@@ -17,6 +17,11 @@ export function useForecastList(filters: ForecastFilters) {
 }
 
 /** Active locations (Growth). Empty on other plans. */
+/** Vendors and product types of tracked products (list filters). */
+export function useFacets() {
+    return useQuery({ queryKey: ['facets'], queryFn: forecastApi.facets, staleTime: 5 * 60_000 });
+}
+
 export function useLocations(enabled: boolean) {
     return useQuery({ queryKey: ['locations'], queryFn: forecastApi.locations, enabled, staleTime: 5 * 60_000 });
 }

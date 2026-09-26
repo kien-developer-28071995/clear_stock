@@ -11,5 +11,6 @@ class ShopInstalled
 {
     use Dispatchable, SerializesModels;
 
-    public function __construct(public readonly Shop $shop) {}
+    /** @param bool $reinstall the shop had installed the app before */
+    public function __construct(public readonly Shop $shop, public readonly bool $reinstall = false) {}
 }

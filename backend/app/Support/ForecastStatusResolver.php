@@ -17,6 +17,8 @@ final class ForecastStatusResolver
             $f->current_stock <= 0 && $avg > 0 => ForecastStatus::OutOfStock,
             $f->reorder_date !== null && $f->reorder_date->toDateString() <= $today => ForecastStatus::ReorderNow,
             $f->current_stock > 0 && ($avg == 0 || ($cover !== null && $cover > config('forecast.slow_mover_days'))) => ForecastStatus::Slow,
+            $f->current_stock > 0 && $avg > 0 && $f->target_stock > 0
+                && $f->excess_units > $f->target_stock * (float) config('forecast.overstock_ratio') => ForecastStatus::Overstock,
             default => ForecastStatus::Healthy,
         };
     }

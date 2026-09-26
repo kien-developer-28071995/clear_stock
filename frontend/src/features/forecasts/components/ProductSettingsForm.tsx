@@ -21,6 +21,7 @@ export function ProductSettingsForm({ f }: { f: ForecastDetail }) {
     const [pack, setPack] = useState('');
     const [minStock, setMinStock] = useState('');
     const [maxStock, setMaxStock] = useState('');
+    const [muted, setMuted] = useState(false);
 
     const saved = {
         supplierId: f.settings.supplier_id ? String(f.settings.supplier_id) : '',
@@ -30,6 +31,7 @@ export function ProductSettingsForm({ f }: { f: ForecastDetail }) {
         pack: f.settings.pack_size?.toString() ?? '',
         minStock: f.settings.min_stock?.toString() ?? '',
         maxStock: f.settings.max_stock?.toString() ?? '',
+        muted: f.settings.alerts_muted,
     };
     const reset = () => {
         setSupplierId(saved.supplierId);
@@ -39,10 +41,11 @@ export function ProductSettingsForm({ f }: { f: ForecastDetail }) {
         setPack(saved.pack);
         setMinStock(saved.minStock);
         setMaxStock(saved.maxStock);
+        setMuted(saved.muted);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(reset, [f.settings]);
-    const current = { supplierId, leadTime, safety, minOrder, pack, minStock, maxStock };
+    const current = { supplierId, leadTime, safety, minOrder, pack, minStock, maxStock, muted };
     const dirty = JSON.stringify(current) !== JSON.stringify(saved);
 
     const supplier = suppliers.data?.find((s) => String(s.id) === supplierId);
@@ -58,6 +61,7 @@ export function ProductSettingsForm({ f }: { f: ForecastDetail }) {
                 pack_size: toNumberOrNull(pack),
                 min_stock: toNumberOrNull(minStock),
                 max_stock: toNumberOrNull(maxStock),
+                alerts_muted: muted,
             },
             { onSuccess: () => shopify.toast.show(t('common.saved')) },
         );
@@ -141,6 +145,12 @@ export function ProductSettingsForm({ f }: { f: ForecastDetail }) {
                         onInput={(e) => setMaxStock(e.currentTarget.value)}
                     />
                 </s-grid>
+                <s-checkbox
+                    label={t('productSettings.muteAlerts')}
+                    details={t('productSettings.muteAlertsHelp')}
+                    checked={muted || undefined}
+                    onChange={(e) => setMuted(e.currentTarget.checked)}
+                />
             </s-stack>
         </s-section>
     );

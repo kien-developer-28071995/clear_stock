@@ -54,6 +54,11 @@ class CachedVariantRepository implements VariantRepositoryInterface
         return $this->inner->find($shop, $id);
     }
 
+    public function findMany(Shop $shop, array $ids): Collection
+    {
+        return $this->inner->findMany($shop, $ids);
+    }
+
     public function search(Shop $shop, string $term, int $limit): Collection
     {
         return $this->inner->search($shop, $term, $limit);

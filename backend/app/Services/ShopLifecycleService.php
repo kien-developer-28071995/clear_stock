@@ -23,6 +23,7 @@ class ShopLifecycleService
             return; // idempotent
         }
 
+        $plan = $shop->plan;
         $this->shops->update($shop, [
             'uninstalled_at' => now(),
             'access_token' => null,
@@ -35,9 +36,11 @@ class ShopLifecycleService
             'subscription_id' => null,
             'subscription_status' => null,
             'plan_renews_at' => null,
+            // Shopify removes the app's shop-specific webhook subscriptions on uninstall.
+            'realtime_webhook_id' => null,
         ]);
 
-        ShopUninstalled::dispatch($shop);
+        ShopUninstalled::dispatch($shop, $plan);
         Log::info('Shop uninstalled', ['shop' => $shopDomain]);
     }
 

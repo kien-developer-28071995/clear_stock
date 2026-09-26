@@ -16,6 +16,8 @@ class ForecastIndexRequest extends FormRequest
             'sort' => ['nullable', Rule::in(['urgency', 'cover', 'name', 'suggested', 'value'])],
             'page' => ['nullable', 'integer', 'min:1'],
             'location_id' => ['nullable', 'integer'],
+            'vendor' => ['nullable', 'string', 'max:255'],
+            'product_type' => ['nullable', 'string', 'max:255'],
         ];
     }
 }

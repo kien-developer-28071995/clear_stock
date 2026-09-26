@@ -16,6 +16,8 @@ final readonly class ForecastResult
         public ?string $reorderDate,
         public int $reorderPoint,
         public int $suggestedQty,
+        public int $targetStock,     // order-up-to level (units)
+        public int $excessUnits,     // stock + on the way above it
         public Confidence $confidence,
         public array $explanation,
     ) {}

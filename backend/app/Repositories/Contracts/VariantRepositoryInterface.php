@@ -10,6 +10,9 @@ interface VariantRepositoryInterface
 {
     public function find(Shop $shop, int $id): ?Variant;
 
+    /** @param array<int, int> $ids @return Collection<int, Variant> keyed by id, this shop's only */
+    public function findMany(Shop $shop, array $ids): Collection;
+
     /** @return Collection<int, Variant> active variants matching title/SKU */
     public function search(Shop $shop, string $term, int $limit): Collection;
 

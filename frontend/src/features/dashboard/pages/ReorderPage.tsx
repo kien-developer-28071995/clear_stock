@@ -1,21 +1,49 @@
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DashboardGate } from '@/features/dashboard/components/DashboardGate';
 import { ActionList } from '@/features/dashboard/components/ActionList';
+import type { ActionGroup, Dashboard } from '@/features/dashboard/types';
 import { Tip } from '@/features/setup/components/Tip';
+
+/** Only the products of one vendor, to order everything from the same maker at once. */
+function forVendor(dashboard: Dashboard, vendor: string): Dashboard {
+    if (vendor === '') return dashboard;
+    const actions = Object.fromEntries(
+        Object.entries(dashboard.actions).map(([group, items]) => [group, items.filter((i) => i.vendor === vendor)]),
+    ) as Record<ActionGroup, Dashboard['actions'][ActionGroup]>;
+
+    return { ...dashboard, actions };
+}
 
 /** Everything to reorder in the next 7 days, grouped by urgency, ready to export as a purchase order. */
 export function ReorderPage() {
     const { t } = useTranslation();
+    const [vendor, setVendor] = useState('');
 
     return (
         <DashboardGate heading={t('nav.reorder')}>
-            {(data) => (
-                <s-page heading={t('nav.reorder')}>
-                    <s-link slot="breadcrumb-actions" href="/">{t('nav.home')}</s-link>
-                    <Tip id="home_actions">{t('tips.home_actions')}</Tip>
-                    <ActionList dashboard={data} />
-                </s-page>
-            )}
+            {(data) => {
+                const vendors = [...new Set(Object.values(data.actions).flat().map((i) => i.vendor).filter((v): v is string => !!v))].sort();
+
+                return (
+                    <s-page heading={t('nav.reorder')}>
+                        <s-link slot="breadcrumb-actions" href="/">{t('nav.home')}</s-link>
+                        <Tip id="home_actions">{t('tips.home_actions')}</Tip>
+                        {vendors.length > 1 && (
+                            <s-box maxInlineSize="320px">
+                                <s-select label={t('products.vendor')} value={vendor} onChange={(e) => setVendor(e.currentTarget.value)}>
+                                    <s-option value="">{t('products.allVendors')}</s-option>
+                                    {vendors.map((v) => (
+                                        <s-option key={v} value={v}>{v}</s-option>
+                                    ))}
+                                </s-select>
+                            </s-box>
+                        )}
+                        {/* key: a new vendor starts a fresh selection */}
+                        <ActionList key={vendor} dashboard={forVendor(data, vendor)} />
+                    </s-page>
+                );
+            }}
         </DashboardGate>
     );
 }

@@ -1,10 +1,11 @@
 import { useTranslation } from 'react-i18next';
 import type { Confidence, ForecastStatus } from '@/types/forecast';
 
-const STATUS_TONE: Record<ForecastStatus, 'critical' | 'warning' | 'neutral' | 'success'> = {
+const STATUS_TONE: Record<ForecastStatus, 'critical' | 'warning' | 'neutral' | 'success' | 'caution'> = {
     out_of_stock: 'critical',
     reorder_now: 'warning',
     slow: 'neutral',
+    overstock: 'caution',
     healthy: 'success',
 };
 

@@ -11,7 +11,7 @@ import { useDismissSetupGuide, useSetupGuide } from '@/features/setup/hooks/useS
 import { SaveBar } from '@/components/ui/SaveBar';
 import { SyncStatusCard } from '@/features/sync/components/SyncStatusCard';
 import { useSettings, useUpdateSettings } from '@/features/settings/hooks/useSettings';
-import type { Settings } from '@/features/settings/types';
+import type { RealtimeAlertMode, Settings } from '@/features/settings/types';
 
 /** ISO weekday (1 = Monday) → name in the current language. 2024-01-01 was a Monday. */
 const weekdayName = (iso: number) =>
@@ -43,7 +43,7 @@ export function SettingsPage() {
 
     const dirty = JSON.stringify(form) !== JSON.stringify(data);
     const setAlerts = (patch: Partial<Settings['alerts']>) => setForm({ ...form, alerts: { ...form.alerts, ...patch } });
-    const { available: _available, ...alerts } = form.alerts;
+    const { available: _available, realtime_available: _realtimeAvailable, ...alerts } = form.alerts;
     const save = () =>
         update.mutate(
             { ...form, alerts: { ...alerts, email: alerts.email?.trim() || null } as Settings['alerts'] },
@@ -103,7 +103,7 @@ export function SettingsPage() {
             <s-section heading={t('settings.alertsHeading')}>
                 <s-stack gap="base">
                     {!form.alerts.available && (
-                        <UpgradePrompt plan="starter">{t('settings.alertsLocked')}</UpgradePrompt>
+                        <UpgradePrompt id="alerts" plan="starter">{t('settings.alertsLocked')}</UpgradePrompt>
                     )}
                     <s-switch
                         label={t('settings.alertsEnabled')}
@@ -140,6 +140,20 @@ export function SettingsPage() {
                             ))}
                         </s-select>
                     )}
+                    {form.alerts.available && !form.alerts.realtime_available && (
+                        <UpgradePrompt id="realtime-alerts" plan="growth">{t('settings.realtimeLocked')}</UpgradePrompt>
+                    )}
+                    <s-select
+                        label={t('settings.realtime')}
+                        disabled={!form.alerts.realtime_available || undefined}
+                        details={t('settings.realtimeHelp')}
+                        value={form.alerts.realtime}
+                        onChange={(e) => setAlerts({ realtime: e.currentTarget.value as RealtimeAlertMode })}
+                    >
+                        <s-option value="off">{t('settings.realtimeOff')}</s-option>
+                        <s-option value="out_of_stock">{t('settings.realtimeOutOfStock')}</s-option>
+                        <s-option value="all">{t('settings.realtimeAll')}</s-option>
+                    </s-select>
                 </s-stack>
             </s-section>
 

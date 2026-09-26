@@ -6,6 +6,7 @@ use App\Enums\Feature;
 use App\Enums\SetupStep;
 use App\Models\Shop;
 use App\Repositories\Contracts\AlertSettingRepositoryInterface;
+use App\Repositories\Contracts\CatalogRepositoryInterface;
 use App\Repositories\Contracts\ForecastQueryRepositoryInterface;
 use App\Repositories\Contracts\ShopRepositoryInterface;
 use App\Repositories\Contracts\SupplierRepositoryInterface;
@@ -29,6 +30,7 @@ class SetupGuideService
         private readonly SupplierRepositoryInterface $suppliers,
         private readonly AlertSettingRepositoryInterface $alerts,
         private readonly ForecastQueryRepositoryInterface $forecasts,
+        private readonly CatalogRepositoryInterface $catalog,
     ) {}
 
     public function state(Shop $shop): array
@@ -66,6 +68,8 @@ class SetupGuideService
                 'alerts_available' => $alertsAvailable,
                 // The product to open for "see why a product needs reordering".
                 'example_variant' => $this->exampleVariant($shop),
+                // Suppliers can be created from Shopify vendors in one step.
+                'vendor_count' => count($this->catalog->facets($shop)['vendors']),
             ],
         ];
     }

@@ -1,5 +1,5 @@
 import { http } from '@/lib/http';
-import type { Bundle, BundleInput, Settings, Supplier, SupplierInput } from '@/features/settings/types';
+import type { Bundle, BundleInput, Settings, Supplier, SupplierEmailDraft, SupplierEmailInput, SupplierInput, VendorCandidate, VendorImportResult } from '@/features/settings/types';
 
 export const settingsApi = {
     get: async () => (await http.get<{ data: Settings }>('/settings')).data,
@@ -12,6 +12,12 @@ export const supplierApi = {
     update: async ({ id, ...body }: SupplierInput & { id: number }) =>
         (await http.put<{ data: Supplier }>(`/suppliers/${id}`, body)).data,
     remove: (id: number) => http.delete<null>(`/suppliers/${id}`),
+    vendorCandidates: async () => (await http.get<{ data: { vendors: VendorCandidate[] } }>('/suppliers/from-vendors')).data.vendors,
+    fromVendors: async (body: { vendors: string[]; replace_existing: boolean }) =>
+        (await http.post<{ data: VendorImportResult }>('/suppliers/from-vendors', body)).data,
+    emailDraft: async (id: number) => (await http.get<{ data: SupplierEmailDraft }>(`/suppliers/${id}/email`)).data,
+    sendEmail: async ({ id, ...body }: SupplierEmailInput) =>
+        (await http.post<{ data: { items: number; total_units: number } }>(`/suppliers/${id}/email`, body)).data,
 };
 
 export const bundleApi = {

@@ -44,6 +44,23 @@ export const useCreateSupplier = () => useSupplierMutation(supplierApi.create);
 export const useUpdateSupplier = () => useSupplierMutation(supplierApi.update);
 export const useDeleteSupplier = () => useSupplierMutation(supplierApi.remove);
 export const useAssignSupplier = () => useSupplierMutation(variantApi.bulkSettings);
+export const useSendSupplierEmail = () => useSupplierMutation(supplierApi.sendEmail);
+export const useSuppliersFromVendors = () => useSupplierMutation(supplierApi.fromVendors);
+
+export function useVendorCandidates() {
+    return useQuery({ queryKey: ['vendor-candidates'], queryFn: supplierApi.vendorCandidates, staleTime: 0 });
+}
+
+/** Draft of a purchase order email; fetched fresh each time the dialog opens. */
+export function useSupplierEmailDraft(id: number | null) {
+    return useQuery({
+        queryKey: ['supplier-email', id],
+        queryFn: () => supplierApi.emailDraft(id!),
+        enabled: id !== null,
+        staleTime: 0,
+        gcTime: 0,
+    });
+}
 
 export function useBundles() {
     return useQuery({ queryKey: settingsKeys.bundles, queryFn: bundleApi.list });

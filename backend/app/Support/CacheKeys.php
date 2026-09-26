@@ -95,6 +95,12 @@ final class CacheKeys
     }
 
     /** Shop contact email from Shopify, used to pre-fill the onboarding form. */
+    /** Short lock against sending the same supplier two emails by double-clicking. */
+    public static function supplierEmailLock(int $supplierId): string
+    {
+        return 'supplier-email:lock:'.$supplierId;
+    }
+
     public static function shopContactEmail(int $shopId): string
     {
         return 'shop:contact-email:'.$shopId;

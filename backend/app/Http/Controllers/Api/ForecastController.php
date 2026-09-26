@@ -11,6 +11,7 @@ use App\Http\Requests\OverrideRequest;
 use App\Http\Resources\ForecastDetailResource;
 use App\Http\Resources\ForecastResource;
 use App\Models\Shop;
+use App\Repositories\Contracts\CatalogRepositoryInterface;
 use App\Repositories\Contracts\VariantRepositoryInterface;
 use App\Services\App\ForecastAdjustmentService;
 use App\Services\App\ForecastQueryService;
@@ -26,6 +27,7 @@ class ForecastController extends Controller
         private readonly ForecastQueryService $query,
         private readonly ForecastAdjustmentService $adjust,
         private readonly VariantRepositoryInterface $variants,
+        private readonly CatalogRepositoryInterface $catalog,
     ) {}
 
     public function index(ForecastIndexRequest $request, ShopContext $context): AnonymousResourceCollection
@@ -34,7 +36,7 @@ class ForecastController extends Controller
         // Resources read the container's base request, not this FormRequest copy.
         request()->attributes->set('today', $this->query->today($shop));
 
-        $filters = $request->safe()->only(['status', 'search', 'sort']);
+        $filters = $request->safe()->only(['status', 'search', 'sort', 'vendor', 'product_type']);
         if ($request->filled('location_id')) {
             if (! Entitlements::for($shop)->has(Feature::Locations)) {
                 throw new PlanRequiredException(Feature::Locations);
@@ -43,6 +45,12 @@ class ForecastController extends Controller
         }
 
         return ForecastResource::collection($this->query->list($shop, $filters, (int) $request->validated('page', 1)));
+    }
+
+    /** Vendors and product types of tracked products, for the list filters. */
+    public function facets(ShopContext $context): JsonResponse
+    {
+        return response()->json(['data' => $this->catalog->facets($context->shop())]);
     }
 
     /** Active locations (for the Growth location filter). */

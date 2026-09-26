@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { DashboardGate } from '@/features/dashboard/components/DashboardGate';
 import { RunwayChart } from '@/features/dashboard/components/RunwayChart';
+import { Overstock } from '@/features/dashboard/components/Overstock';
 import { SlowMovers } from '@/features/dashboard/components/SlowMovers';
 import { Tip } from '@/features/setup/components/Tip';
 
@@ -15,8 +16,9 @@ export function InsightsPage() {
                     <s-link slot="breadcrumb-actions" href="/">{t('nav.home')}</s-link>
                     <Tip id="home_runway">{t('tips.home_runway')}</Tip>
                     <RunwayChart items={data.runway} />
+                    <Overstock dashboard={data} />
                     <SlowMovers dashboard={data} />
-                    {data.runway.length === 0 && data.slow_movers.count === 0 && (
+                    {data.runway.length === 0 && data.slow_movers.count === 0 && data.overstock.count === 0 && (
                         <s-section>
                             <s-paragraph>{t('insights.empty')}</s-paragraph>
                         </s-section>

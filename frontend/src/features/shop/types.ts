@@ -11,6 +11,7 @@ export interface Entitlements {
     alerts: boolean;
     locations: boolean;
     purchase_orders: boolean;
+    realtime_alerts: boolean;
 }
 
 export interface Shop {

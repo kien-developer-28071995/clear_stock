@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\AlertFrequency;
+use App\Enums\RealtimeAlertMode;
 use App\Models\Concerns\BelongsToShop;
 use App\Observers\AlertSettingObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
@@ -16,15 +17,16 @@ use Illuminate\Database\Eloquent\Model;
  * @property bool $enabled
  * @property AlertFrequency $frequency
  * @property int $weekly_day
+ * @property RealtimeAlertMode $realtime
  */
 #[ObservedBy(AlertSettingObserver::class)]
 class AlertSetting extends Model
 {
     use BelongsToShop, HasFactory;
 
-    protected $fillable = ['shop_id', 'email', 'enabled', 'frequency', 'weekly_day'];
+    protected $fillable = ['shop_id', 'email', 'enabled', 'frequency', 'weekly_day', 'realtime'];
 
-    protected $attributes = ['enabled' => true, 'frequency' => 'daily', 'weekly_day' => 1];
+    protected $attributes = ['enabled' => true, 'frequency' => 'daily', 'weekly_day' => 1, 'realtime' => 'off'];
 
     protected function casts(): array
     {
@@ -32,6 +34,7 @@ class AlertSetting extends Model
             'enabled' => 'boolean',
             'frequency' => AlertFrequency::class,
             'weekly_day' => 'integer',
+            'realtime' => RealtimeAlertMode::class,
         ];
     }
 }

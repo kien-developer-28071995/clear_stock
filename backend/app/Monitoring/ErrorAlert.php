@@ -14,7 +14,7 @@ final readonly class ErrorAlert
     /** Context keys worth showing (ids, domains, topics); everything else is dropped. */
     private const CONTEXT_KEYS = [
         'shop', 'run', 'run_id', 'job', 'topic', 'webhook_id', 'query', 'status', 'error_code',
-        'variant_id', 'attempts', 'source', 'url', 'component', 'where', 'command', 'request',
+        'variant_id', 'attempts', 'source', 'url', 'component', 'where', 'command', 'request', 'queue',
     ];
 
     /** @param array<string, string> $context */

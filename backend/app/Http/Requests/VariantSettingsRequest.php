@@ -27,11 +27,12 @@ class VariantSettingsRequest extends FormRequest
             'pack_size' => ['sometimes', 'nullable', 'integer', 'min:1', 'max:100000'],
             'min_stock' => ['sometimes', 'nullable', 'integer', 'min:0', 'max:1000000'],
             'max_stock' => ['sometimes', 'nullable', 'integer', 'min:1', 'max:1000000'],
+            'alerts_muted' => ['sometimes', 'boolean'],
         ];
     }
 
     public function settings(): array
     {
-        return $this->safe()->only(['supplier_id', 'lead_time_override', 'safety_days', 'min_order_qty', 'pack_size', 'min_stock', 'max_stock']);
+        return $this->safe()->only(['supplier_id', 'lead_time_override', 'safety_days', 'min_order_qty', 'pack_size', 'min_stock', 'max_stock', 'alerts_muted']);
     }
 }

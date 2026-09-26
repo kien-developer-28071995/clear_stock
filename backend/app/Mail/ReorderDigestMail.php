@@ -4,17 +4,11 @@ namespace App\Mail;
 
 use App\Enums\AlertFrequency;
 use App\Models\Shop;
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
-use Illuminate\Queue\SerializesModels;
 
-class ReorderDigestMail extends Mailable implements ShouldQueue
+class ReorderDigestMail extends QueuedMailable
 {
-    use Queueable, SerializesModels;
-
     /** @param array<int, array<string, mixed>> $items */
     public function __construct(
         public Shop $shop,

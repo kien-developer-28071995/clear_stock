@@ -46,6 +46,8 @@ class VariantImporter
                 'inventory_item_id' => Gid::id($line['inventoryItem']['id'] ?? null),
                 'product_title' => mb_substr((string) $line['product']['title'], 0, 255),
                 'title' => $line['title'] !== null ? mb_substr((string) $line['title'], 0, 255) : null,
+                'vendor' => trim((string) ($line['product']['vendor'] ?? '')) !== '' ? mb_substr(trim($line['product']['vendor']), 0, 255) : null,
+                'product_type' => trim((string) ($line['product']['productType'] ?? '')) !== '' ? mb_substr(trim($line['product']['productType']), 0, 255) : null,
                 'sku' => ($line['sku'] ?? '') !== '' ? mb_substr((string) $line['sku'], 0, 255) : null,
                 'unit_cost' => $line['inventoryItem']['unitCost']['amount'] ?? null,
                 'tracked' => (bool) ($line['inventoryItem']['tracked'] ?? false),

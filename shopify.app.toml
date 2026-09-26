@@ -4,7 +4,7 @@
 
 client_id = "585d48be540225310586b5df5dc1348e"
 name = "Clear Stock"
-application_url = "https://dis-viewpicture-kay-surplus.trycloudflare.com"
+application_url = "https://host-enlargement-systematic-instrumentation.trycloudflare.com"
 embedded = true
 
 [build]
@@ -20,7 +20,7 @@ scopes = "read_products,read_inventory,read_locations,read_orders,read_all_order
 use_legacy_install_flow = false
 
 [auth]
-redirect_urls = [ "https://dis-viewpicture-kay-surplus.trycloudflare.com/auth/callback" ]
+redirect_urls = [ "https://host-enlargement-systematic-instrumentation.trycloudflare.com/auth/callback" ]
 
 [webhooks]
 api_version = "2026-07"

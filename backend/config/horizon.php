@@ -105,6 +105,9 @@ return [
 
     'waits' => [
         'redis:default' => 60,
+        'redis:webhooks' => 30,  // Shopify webhooks (incl. real-time inventory) should be handled fast
+        'redis:mail' => 120,
+        'redis-long:sync' => 600,
     ],
 
     /*
@@ -206,8 +209,7 @@ return [
     'defaults' => [
         'supervisor-1' => [
             'connection' => 'redis',
-            // Priority order: webhooks first, then regular work.
-            'queue' => ['webhooks', 'default'],
+            'queue' => ['default'],
             'balance' => 'auto',
             'autoScalingStrategy' => 'time',
             'maxProcesses' => 1,
@@ -215,6 +217,35 @@ return [
             'maxJobs' => 0,
             'memory' => 128,
             'tries' => 1,
+            'timeout' => 60,
+            'nice' => 0,
+        ],
+        // Shopify webhooks only: inventory_levels/update (real-time alerts) can be frequent for
+        // busy shops, and must never wait behind forecast work (Shopify expects fast handling).
+        'webhooks-supervisor' => [
+            'connection' => 'redis',
+            'queue' => ['webhooks'],
+            'balance' => 'auto',
+            'autoScalingStrategy' => 'size',
+            'minProcesses' => 1,
+            'maxProcesses' => 1,
+            'maxTime' => 0,
+            'maxJobs' => 0,
+            'memory' => 128,
+            'tries' => 1,   // webhook jobs set their own tries/backoff (RetriesWithBackoff)
+            'timeout' => 60,
+            'nice' => 0,
+        ],
+        // Email only (App\Mail\QueuedMailable): never waits behind forecast or sync work.
+        'mail-supervisor' => [
+            'connection' => 'redis',
+            'queue' => ['mail'],
+            'balance' => 'simple',
+            'maxProcesses' => 1,
+            'maxTime' => 0,
+            'maxJobs' => 0,
+            'memory' => 128,
+            'tries' => 3,   // mailables set their own tries/backoff; this is the fallback
             'timeout' => 60,
             'nice' => 0,
         ],
@@ -242,6 +273,14 @@ return [
             ],
             'sync-supervisor' => [
                 'maxProcesses' => 4,
+            ],
+            'mail-supervisor' => [
+                'maxProcesses' => 2,
+            ],
+            'webhooks-supervisor' => [
+                'maxProcesses' => 5,
+                'balanceMaxShift' => 1,
+                'balanceCooldown' => 3,
             ],
         ],
 

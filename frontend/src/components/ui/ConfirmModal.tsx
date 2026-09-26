@@ -1,10 +1,10 @@
-import { useId, useRef, useState } from 'react';
+import { useId, useRef, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { ModalElement } from '@/hooks/useModal';
 
 interface Request {
     heading: string;
-    body: string;
+    body: ReactNode;
     confirmLabel: string;
     destructive?: boolean;
     resolve: (ok: boolean) => void;
@@ -38,7 +38,7 @@ export function useConfirm() {
 
     const modal = (
         <s-modal ref={ref} id={id} heading={request?.heading ?? ''} onHide={() => request && finish(false)}>
-            <s-paragraph>{request?.body}</s-paragraph>
+            {typeof request?.body === 'string' ? <s-paragraph>{request.body}</s-paragraph> : request?.body}
             <s-button slot="primary-action" variant="primary" tone={request?.destructive ? 'critical' : undefined} onClick={() => finish(true)}>
                 {request?.confirmLabel}
             </s-button>

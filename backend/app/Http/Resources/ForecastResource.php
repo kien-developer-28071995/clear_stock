@@ -25,6 +25,8 @@ class ForecastResource extends JsonResource
             'product_title' => $v->product_title,
             'variant_title' => $v->title !== 'Default Title' ? $v->title : null,
             'sku' => $v->sku,
+            'vendor' => $v->vendor,
+            'product_type' => $v->product_type,
             'unit_cost' => $v->unit_cost !== null ? (float) $v->unit_cost : null,
             'supplier' => $v->relationLoaded('supplier') && $v->supplier ? ['id' => $v->supplier->id, 'name' => $v->supplier->name] : null,
             'is_bundle' => $v->is_bundle,
@@ -36,6 +38,8 @@ class ForecastResource extends JsonResource
             'reorder_date' => $this->reorder_date?->toDateString(),
             'reorder_point' => $this->reorder_point,
             'suggested_qty' => $this->suggested_qty,
+            'target_stock' => $this->target_stock,     // order-up-to level
+            'excess_units' => $this->excess_units,     // above it (overstock when clearly above)
             'confidence' => $this->confidence->value,
             'status' => ForecastStatusResolver::for($this->resource, $request->attributes->get('today', now()->toDateString()))->value,
             'computed_at' => $this->computed_at->toIso8601String(),

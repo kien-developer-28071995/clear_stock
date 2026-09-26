@@ -15,8 +15,14 @@ class SlackNotifier
             return false;
         }
 
+        return $this->post($url, $this->payload($alert, $suppressed));
+    }
+
+    /** Post any Block Kit message to an incoming webhook. Never throws. */
+    public function post(string $url, array $payload): bool
+    {
         try {
-            return Http::timeout(5)->connectTimeout(3)->post($url, $this->payload($alert, $suppressed))->successful();
+            return Http::timeout(5)->connectTimeout(3)->post($url, $payload)->successful();
         } catch (Throwable $e) {
             // Must not log at error level here: that would be reported to Slack again.
             error_log('[monitoring] Slack post failed: '.$e->getMessage());

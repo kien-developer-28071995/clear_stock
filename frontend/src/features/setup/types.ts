@@ -18,5 +18,7 @@ export interface SetupGuideState {
         sync_running: boolean;
         alerts_available: boolean;
         example_variant: { id: number; name: string } | null;
+        /** Distinct Shopify vendors: suppliers can be created from them in one step. */
+        vendor_count: number;
     };
 }

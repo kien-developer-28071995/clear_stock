@@ -58,6 +58,8 @@ class DashboardService
                 'reorder_days' => (int) (($f->explanation['lead_time']['days'] ?? 0) + ($f->explanation['safety']['days'] ?? 0)),
             ])->values()->all(),
             'slow_movers' => $this->forecasts->slowMovers($shop, 5) + ['days' => (int) config('forecast.slow_mover_days')],
+            // Still selling, but more stock than the forecast says to hold.
+            'overstock' => $this->forecasts->overstock($shop, $todayYmd, 5),
             'explanations_locked' => ! $explain,
         ];
     }
@@ -70,6 +72,7 @@ class DashboardService
             'variant_id' => $f->variant_id,
             'name' => $f->variant->displayName(),
             'sku' => $f->variant->sku,
+            'vendor' => $f->variant->vendor,
             'current_stock' => $f->current_stock,
             'avg_daily_sales' => (float) $f->avg_daily_sales,
             'days_of_cover' => $f->days_of_cover !== null ? (float) $f->days_of_cover : null,

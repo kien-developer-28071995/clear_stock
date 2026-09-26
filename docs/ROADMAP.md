@@ -50,12 +50,51 @@ Nghiên cứu ngày 2026-09-26 (Shopify App Store, review 1–3 sao, bài viết
 
 ### Sau khi ra mắt
 
-5. **Vòng đời đơn đặt hàng**: nháp → đã gửi → đã nhận; xuất PDF / gửi email cho nhà cung cấp; nhận hàng xong thì hết tính là incoming.
+5. ~~**Vòng đời đơn đặt hàng**~~ → **thay bằng mục 11** (dùng Purchase Order gốc của Shopify, xem bên dưới). Gửi email cho NCC đã xong (2026-09-26).
 6. **Phân loại ABC**: nhóm A/B/C theo đóng góp doanh thu. Chỉ cần thêm cột và bộ lọc trong danh sách sản phẩm, không cần AI.
 7. **Mô phỏng tăng trưởng (what-if)**: "doanh số +20% thì cần nhập bao nhiêu". Hợp với định vị minh bạch.
 8. **Gợi ý chuyển kho giữa location** (gói Growth): location thừa → location sắp hết.
 9. **Dự báo sản phẩm mới theo sản phẩm tương tự**: chọn một sản phẩm tham chiếu, dùng tốc độ bán của nó khi chưa đủ lịch sử.
 10. **Báo khi sync lỗi liên tục** (email một lần, không spam) + cam kết giữ giá cho khách cũ trên trang Plans / listing.
+
+## Nghiên cứu bổ sung (2026-09-26, lần 2)
+
+### Phát hiện
+- **Shopify đã có Purchase Order gốc trong admin nhưng chưa có API** (không có object/mutation PurchaseOrder tới bản 2026-07). PO gốc **nhập được từ CSV** (nhận diện biến thể theo SKU và/hoặc barcode, số lượng, giá vốn và thuế tùy chọn); nhận hàng đi qua inventory transfer, tạo ra số `incoming` mà app đã đọc. → Không nên tự xây vòng đời PO; nên **khớp với PO gốc**.
+- **Thêm đối thủ cùng định vị "giải thích được"**: Foreshelf (ra mắt 2026-07-30, Free 50 SKU, $19/$49, có overstock, nhận hàng bằng barcode). Cùng với Stockcast, "minh bạch" không còn là khác biệt duy nhất → khác biệt phải đến từ **giá + combo + đa ngôn ngữ + tích hợp sâu vào Shopify**.
+- Review IFH: merchant muốn **lọc/gom theo nhà sản xuất (vendor) và loại sản phẩm** để đặt cùng lúc; muốn lịch sử dài hơn 60 ngày (ta có 400 ngày → điểm bán hàng).
+- Shopify Flow có trigger tồn kho sẵn nhưng chỉ theo ngưỡng cố định; app có thể cung cấp **trigger dựa trên dự báo** qua Flow trigger extension.
+- Admin UI extension cho phép **block trên trang sản phẩm / biến thể** (`admin.product-details.block.render`, `admin.product-variant-details.block.render`) và **hành động hàng loạt** trên trang danh sách sản phẩm; gọi backend app bằng ID token tự động.
+
+### Tính năng đề xuất (xếp theo ưu tiên)
+
+11. **Tạo Purchase Order gốc của Shopify từ gợi ý** (ưu tiên cao)
+    - Nút "Tạo PO trong Shopify": xuất CSV đúng mẫu nhập PO của Shopify (SKU/barcode, số lượng, giá vốn) theo nhà cung cấp, kèm hướng dẫn / link mở trang tạo PO trong admin.
+    - PO gốc → incoming → app đã tự trừ khỏi gợi ý: khép kín vòng "gợi ý → đặt → đang về → nhận".
+    - Cần: đồng bộ thêm `barcode` của variant; **tải file mẫu CSV thật từ admin Shopify để chốt tên cột trước khi làm**.
+12. ✅ **Tự tạo nhà cung cấp từ trường Vendor của Shopify** (xong 2026-09-26: đồng bộ `vendor` + `product_type`, trang `/suppliers/from-vendors` xem trước rồi tạo/dùng lại NCC và gán sản phẩm, bỏ chọn sẵn vendor trùng tên cửa hàng, bộ lọc Vendor/Loại sản phẩm ở Sản phẩm và Vendor ở Cần nhập hàng, setup guide gợi ý. Lưu ý: đồng bộ đêm chỉ lấy biến thể vừa đổi, nên đổi Vendor trên Shopify cần lần đồng bộ đầy đủ mới cập nhật hết)
+    - Hầu hết shop đã điền Vendor cho sản phẩm → onboarding đề xuất "Tạo 8 nhà cung cấp từ Vendor và gán 214 sản phẩm" một lần bấm (xem trước như import Stocky).
+    - Thêm bộ lọc Vendor / Product type trong danh sách sản phẩm và trang Cần nhập hàng (đáp ứng yêu cầu "đặt cùng nhà sản xuất").
+13. **Block dự báo trên trang sản phẩm Shopify** (admin UI extension)
+    - Hiện "Hết hàng khoảng 7/10 · nên nhập 153 · vì sao" ngay trong trang sản phẩm/biến thể của admin, link vào app. Merchant thấy giá trị mà không cần mở app; tăng cảm giác "native" (tốt cho Built for Shopify).
+    - Kèm hành động hàng loạt trên danh sách sản phẩm Shopify: "Gán nhà cung cấp / lead time".
+14. **Shopify Flow triggers dựa trên dự báo**
+    - "Sản phẩm cần đặt hàng", "Sản phẩm sẽ hết trong N ngày", "Đơn cho nhà cung cấp tới hạn" (biến: SKU, số lượng gợi ý, ngày, nhà cung cấp) → merchant tự nối Slack, tag, task… Không ép AI, không spam: merchant tự chọn.
+15. ✅ **Trạng thái Overstock rõ ràng** (xong 2026-09-26: `forecasts.target_stock`/`excess_units`, trạng thái "Tồn thừa" khi thừa > 50% mức cần giữ (`forecast.overstock_ratio`), lọc được, mục Tồn thừa + tiền kẹt ở trang Phân tích, ô "Tiền kẹt trong kho" trên Home, dòng giải thích) (Foreshelf có): ngoài "bán chậm", đánh dấu sản phẩm có tồn vượt mức Max / vượt N ngày bán, kèm số tiền kẹt; lọc được.
+16. **Nhận hàng / kiểm kho bằng barcode** (thấp, cho nhóm bán lẻ/POS cũ của Stocky): cân nhắc sau vì Shopify admin đã có nhận hàng qua transfer.
+
+Nguồn lần 2: https://community.shopify.dev/t/feature-request-expose-the-existing-purchase-orders-to-the-admin-graphql-api/35229 · https://help.shopify.com/en/manual/products/inventory/purchase-orders/creating-purchase-orders · https://apps.shopify.com/stockahead-1 · https://apps.shopify.com/inventory-forecasting-hero/reviews · https://shopify.dev/docs/apps/build/flow/triggers · https://shopify.dev/docs/api/admin-extensions · https://help.shopify.com/en/manual/shopify-flow/reference/triggers/product-variant-inventory-quantity-changed
+
+## Việc sắp tới (tổng hợp, theo thứ tự đề xuất)
+
+1. **#11 Tạo Purchase Order gốc của Shopify từ gợi ý** — trước tiên tải file mẫu CSV nhập PO trong admin Shopify để chốt tên cột; đồng bộ thêm barcode.
+2. **#13 Block dự báo trên trang sản phẩm Shopify** + gán NCC/lead time hàng loạt từ danh sách sản phẩm Shopify (admin UI extension).
+3. **#14 Shopify Flow triggers dựa trên dự báo** ("cần đặt hàng", "sẽ hết trong N ngày", "đơn NCC tới hạn").
+5. **#10 Báo khi đồng bộ lỗi liên tục** (1 email, không spam) + cam kết giữ giá cho khách cũ trên trang Gói / listing.
+6. **#6 Phân loại ABC**, **#7 Mô phỏng tăng trưởng (what-if)**, **#8 Gợi ý chuyển kho** (Growth), **#9 Dự báo sản phẩm mới theo sản phẩm tham chiếu**.
+7. **#16 Nhận hàng / kiểm kho bằng barcode** (thấp).
+8. **Mặc định MOQ / quy cách thùng theo nhà cung cấp** (hiện chỉ theo từng sản phẩm).
+9. **Phase 7 — chuẩn bị nộp App Store**: gỡ scope `write_orders`, `SHOPIFY_BILLING_TEST=false`, listing có "Stocky alternative", ảnh/icon, hướng dẫn test cho reviewer, domain gửi mail có SPF/DKIM.
 
 ## Nguồn
 

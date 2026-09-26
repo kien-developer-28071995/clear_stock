@@ -15,7 +15,7 @@ export function WhyThisNumber({ f }: { f: ForecastDetail }) {
     if (e === null) {
         return (
             <s-section heading={t('why.heading')}>
-                <UpgradePrompt plan="starter">{t('why.locked')}</UpgradePrompt>
+                <UpgradePrompt id="explanations" plan="starter">{t('why.locked')}</UpgradePrompt>
             </s-section>
         );
     }

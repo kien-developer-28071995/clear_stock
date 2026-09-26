@@ -31,7 +31,7 @@ class CachedForecastQueryRepository implements ForecastQueryRepositoryInterface
             return $this->inner->paginate($shop, $filters, $today, $perPage, $page);
         }
 
-        $hash = md5(json_encode([$filters['status'] ?? null, $filters['sort'] ?? null, $filters['location_id'] ?? null, $perPage, $page]));
+        $hash = md5(json_encode([$filters['status'] ?? null, $filters['sort'] ?? null, $filters['location_id'] ?? null, $filters['vendor'] ?? null, $filters['product_type'] ?? null, $perPage, $page]));
         $key = CacheKeys::forecastPage($shop->id, $this->forecastVersion($shop), CacheVersion::catalog($shop->id), $today, $hash);
 
         return $this->cache->remember($key, CacheKeys::TTL_DASHBOARD, fn () => $this->inner->paginate($shop, $filters, $today, $perPage, $page));
@@ -79,6 +79,11 @@ class CachedForecastQueryRepository implements ForecastQueryRepositoryInterface
     public function slowMovers(Shop $shop, int $limit): array
     {
         return $this->remember($shop, 'any', "slow{$limit}", fn () => $this->inner->slowMovers($shop, $limit));
+    }
+
+    public function overstock(Shop $shop, string $today, int $limit): array
+    {
+        return $this->remember($shop, $today, "overstock{$limit}", fn () => $this->inner->overstock($shop, $today, $limit));
     }
 
     private function remember(Shop $shop, string $today, string $part, callable $resolve): mixed

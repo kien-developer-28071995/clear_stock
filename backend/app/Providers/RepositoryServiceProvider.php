@@ -16,7 +16,9 @@ use App\Repositories\Contracts\DailySalesRepositoryInterface;
 use App\Repositories\Contracts\ForecastQueryRepositoryInterface;
 use App\Repositories\Contracts\ForecastRepositoryInterface;
 use App\Repositories\Contracts\LocationSalesRepositoryInterface;
+use App\Repositories\Contracts\RealtimeAlertRepositoryInterface;
 use App\Repositories\Contracts\ShopRepositoryInterface;
+use App\Repositories\Contracts\SupplierEmailRepositoryInterface;
 use App\Repositories\Contracts\SupplierRepositoryInterface;
 use App\Repositories\Contracts\SyncRunRepositoryInterface;
 use App\Repositories\Contracts\VariantRepositoryInterface;
@@ -27,7 +29,9 @@ use App\Repositories\Eloquent\EloquentDailySalesRepository;
 use App\Repositories\Eloquent\EloquentForecastQueryRepository;
 use App\Repositories\Eloquent\EloquentForecastRepository;
 use App\Repositories\Eloquent\EloquentLocationSalesRepository;
+use App\Repositories\Eloquent\EloquentRealtimeAlertRepository;
 use App\Repositories\Eloquent\EloquentShopRepository;
+use App\Repositories\Eloquent\EloquentSupplierEmailRepository;
 use App\Repositories\Eloquent\EloquentSupplierRepository;
 use App\Repositories\Eloquent\EloquentSyncRunRepository;
 use App\Repositories\Eloquent\EloquentVariantRepository;
@@ -65,6 +69,8 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->singleton(ForecastRepositoryInterface::class, EloquentForecastRepository::class);
         $this->app->singleton(LocationSalesRepositoryInterface::class, EloquentLocationSalesRepository::class);
         $this->app->singleton(AlertLogRepositoryInterface::class, EloquentAlertLogRepository::class);
+        $this->app->singleton(SupplierEmailRepositoryInterface::class, EloquentSupplierEmailRepository::class);
+        $this->app->singleton(RealtimeAlertRepositoryInterface::class, EloquentRealtimeAlertRepository::class);
 
         $this->app->singleton(ForecastQueryRepositoryInterface::class, fn ($app) => new CachedForecastQueryRepository(
             new EloquentForecastQueryRepository,

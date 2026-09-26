@@ -33,7 +33,7 @@ class EloquentCatalogRepository implements CatalogRepositoryInterface
         $now = now();
         $rows = array_map(fn ($r) => $r + ['shop_id' => $shop->id, 'created_at' => $now, 'updated_at' => $now], $rows);
         // Merchant settings (supplier, lead time, safety days, is_bundle) are never overwritten by the sync.
-        $update = ['shopify_product_id', 'inventory_item_id', 'product_title', 'title', 'sku', 'unit_cost',
+        $update = ['shopify_product_id', 'inventory_item_id', 'product_title', 'title', 'vendor', 'product_type', 'sku', 'unit_cost',
             'tracked', 'is_active', 'shopify_created_at', 'updated_at'];
 
         foreach (array_chunk($rows, self::CHUNK) as $chunk) {
@@ -168,5 +168,29 @@ class EloquentCatalogRepository implements CatalogRepositoryInterface
     public function countTrackedVariants(Shop $shop): int
     {
         return DB::table('variants')->where('shop_id', $shop->id)->where('is_active', true)->where('tracked', true)->count();
+    }
+
+    public function facets(Shop $shop): array
+    {
+        $values = fn (string $column) => DB::table('variants')->where('shop_id', $shop->id)->where('is_active', true)->where('tracked', true)
+            ->whereNotNull($column)->distinct()->orderBy($column)->pluck($column)->all();
+
+        return ['vendors' => $values('vendor'), 'product_types' => $values('product_type')];
+    }
+
+    public function vendorSummary(Shop $shop): array
+    {
+        return DB::table('variants')->where('shop_id', $shop->id)->where('is_active', true)->where('tracked', true)
+            ->whereNotNull('vendor')
+            ->groupBy('vendor')->orderByRaw('COUNT(*) DESC')->orderBy('vendor')
+            ->selectRaw('vendor, COUNT(*) as products, SUM(CASE WHEN supplier_id IS NULL THEN 0 ELSE 1 END) as with_supplier')
+            ->get()->map(fn ($r) => ['vendor' => $r->vendor, 'products' => (int) $r->products, 'with_supplier' => (int) $r->with_supplier])->all();
+    }
+
+    public function variantsOfVendor(Shop $shop, string $vendor): array
+    {
+        return DB::table('variants')->where('shop_id', $shop->id)->where('is_active', true)->where('tracked', true)
+            ->where('vendor', $vendor)->get(['id', 'supplier_id'])
+            ->map(fn ($r) => ['id' => (int) $r->id, 'supplier_id' => $r->supplier_id !== null ? (int) $r->supplier_id : null])->all();
     }
 }

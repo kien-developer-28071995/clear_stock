@@ -52,4 +52,11 @@ interface ForecastQueryRepositoryInterface
 
     /** @return array{value: float, count: int, missing_cost: int, top: array<int, array{variant_id: int, name: string, sku: ?string, stock: int, value: float, days_of_cover: ?float}>} */
     public function slowMovers(Shop $shop, int $limit): array;
+
+    /**
+     * Overstocked products: units above the order-up-to level and their cost value.
+     *
+     * @return array{value: float, units: int, count: int, missing_cost: int, top: array<int, array{variant_id: int, name: string, sku: ?string, stock: int, target: int, excess: int, value: float}>}
+     */
+    public function overstock(Shop $shop, string $today, int $limit): array;
 }

@@ -34,7 +34,7 @@ class VariantController extends Controller
         $model = $this->variants->find($shop, $variant) ?? throw ApiException::notFound('product');
         $this->adjust->updateVariantSettings($shop, $model, $request->settings());
 
-        return response()->json(['data' => $model->only(['id', 'supplier_id', 'lead_time_override', 'safety_days', 'min_order_qty', 'pack_size', 'min_stock', 'max_stock'])]);
+        return response()->json(['data' => $model->only(['id', 'supplier_id', 'lead_time_override', 'safety_days', 'min_order_qty', 'pack_size', 'min_stock', 'max_stock', 'alerts_muted'])]);
     }
 
     public function bulkUpdateSettings(VariantSettingsRequest $request, ShopContext $context): JsonResponse

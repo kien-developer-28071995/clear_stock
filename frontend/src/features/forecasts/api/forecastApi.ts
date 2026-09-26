@@ -14,6 +14,7 @@ export const forecastApi = {
         Object.entries(filters).forEach(([k, v]) => v !== undefined && v !== '' && params.set(k, String(v)));
         return http.get<Paginated<ForecastRow>>(`/forecasts?${params}`);
     },
+    facets: async () => (await http.get<{ data: { vendors: string[]; product_types: string[] } }>('/facets')).data,
     locations: async () => (await http.get<{ data: { id: number; name: string }[] }>('/locations')).data,
     detail: async (variantId: number) => (await http.get<{ data: ForecastDetail }>(`/forecasts/${variantId}`)).data,
     setOverrides: async (variantId: number, body: OverridesInput) =>

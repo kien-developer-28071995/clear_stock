@@ -1,10 +1,13 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
 import { http, ApiError, errorMessage } from '@/lib/http';
 import { useEntitlements } from '@/hooks/useEntitlements';
 
-/** Growth plan: download a CSV purchase order of everything to reorder now (optionally one supplier). */
+/**
+ * Growth plan: download a CSV purchase order of everything to reorder now (optionally one
+ * supplier). On other plans the button is disabled and labelled with the plan, with a
+ * link to the plans page (Built for Shopify 4.3.7).
+ */
 interface Props {
     supplierId?: number;
     locationId?: number;
@@ -18,14 +21,9 @@ export function ExportPurchaseOrderButton({ supplierId, locationId, variantIds, 
     const { t } = useTranslation();
     const text = label ?? t('po.export');
     const { purchase_orders: allowed } = useEntitlements();
-    const navigate = useNavigate();
     const [busy, setBusy] = useState(false);
 
     const exportCsv = async () => {
-        if (!allowed) {
-            navigate('/plans');
-            return;
-        }
         setBusy(true);
         try {
             const params = new URLSearchParams();
@@ -40,9 +38,20 @@ export function ExportPurchaseOrderButton({ supplierId, locationId, variantIds, 
         }
     };
 
+    if (!allowed) {
+        return (
+            <s-stack direction="inline" gap="small-200" alignItems="center">
+                <s-button disabled icon="lock" variant={variant}>
+                    {t('po.locked', { label: text, plan: t('plans.names.growth') })}
+                </s-button>
+                <s-link href="/plans">{t('upgrade.seePlans')}</s-link>
+            </s-stack>
+        );
+    }
+
     return (
-        <s-button onClick={exportCsv} loading={busy || undefined} icon={allowed ? 'export' : 'lock'} variant={variant}>
-            {allowed ? text : t('po.locked', { label: text, plan: t('plans.names.growth') })}
+        <s-button onClick={exportCsv} loading={busy || undefined} icon="export" variant={variant}>
+            {text}
         </s-button>
     );
 }

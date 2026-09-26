@@ -56,4 +56,17 @@ interface CatalogRepositoryInterface
 
     /** Number of active variants with tracked inventory (what the plan limit counts). */
     public function countTrackedVariants(Shop $shop): int;
+
+    /** @return array{vendors: array<int, string>, product_types: array<int, string>} distinct values of active tracked products */
+    public function facets(Shop $shop): array;
+
+    /**
+     * Active tracked products grouped by Shopify vendor.
+     *
+     * @return array<int, array{vendor: string, products: int, with_supplier: int}>
+     */
+    public function vendorSummary(Shop $shop): array;
+
+    /** @return array<int, array{id: int, supplier_id: ?int}> active tracked products of a vendor (exact name) */
+    public function variantsOfVendor(Shop $shop, string $vendor): array;
 }

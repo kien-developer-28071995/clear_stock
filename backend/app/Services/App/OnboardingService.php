@@ -51,7 +51,8 @@ class OnboardingService
     }
 
     /** The store's contact email, only to pre-fill the form (cached, never required). */
-    private function contactEmail(Shop $shop): ?string
+    /** Store contact email from Shopify (cached a day), for pre-filling email fields. */
+    public function contactEmail(Shop $shop): ?string
     {
         return $this->cache->remember(CacheKeys::shopContactEmail($shop->id), 86400, function () use ($shop) {
             try {

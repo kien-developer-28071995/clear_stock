@@ -48,7 +48,8 @@
     "out_of_stock": "Hết hàng",
     "reorder_now": "Cần đặt ngay",
     "slow": "Bán chậm",
-    "healthy": "Ổn"
+    "healthy": "Ổn",
+    "overstock": "Tồn thừa"
   },
   "confidence": {
     "low": "Độ tin cậy thấp",
@@ -135,7 +136,9 @@
       "thisWeek": "Hạn đặt hàng trong 7 ngày tới",
       "slowLabel": "Hàng bán chậm",
       "slowValue_other": "Đang kẹt ở {{count}} sản phẩm",
-      "slowCount_other": "Sản phẩm tồn trên 180 ngày"
+      "slowCount_other": "Sản phẩm tồn trên 180 ngày",
+      "tiedUpLabel": "Tiền kẹt trong kho",
+      "tiedUpHint": "{{slow}} bán chậm · {{overstock}} tồn thừa"
     },
     "urgentHeading": "Gấp nhất",
     "thisWeekHeading": "Sắp tới trong tuần",
@@ -230,7 +233,8 @@
         "title": "Thêm nhà cung cấp và lead time",
         "body": "Sản phẩm từ nhà cung cấp giao chậm sẽ được nhắc nhập sớm hơn. Bạn cũng có thể xuất đơn đặt hàng riêng cho từng nhà cung cấp. Chuyển từ Stocky sang? Nhập đơn đặt hàng cũ để thiết lập một lần là xong.",
         "action": "Thêm nhà cung cấp",
-        "skip": "Tôi không dùng nhà cung cấp"
+        "skip": "Tôi không dùng nhà cung cấp",
+        "fromVendors_other": "Tạo nhà cung cấp từ {{count}} vendor của bạn"
       },
       "alerts": {
         "title": "Bật cảnh báo tồn kho",
@@ -293,7 +297,6 @@
     "untilHelp": "Sau ngày này sẽ quay về dự báo tự động.",
     "note": "Ghi chú (không bắt buộc)",
     "notePlaceholder": "VD: khuyến mãi Black Friday",
-    "save": "Lưu điều chỉnh",
     "reset": "Dùng dự báo tự động"
   },
   "productSettings": {
@@ -305,7 +308,6 @@
     "fromDefault": "{{days}} (mặc định cửa hàng)",
     "safety": "Tồn kho dự phòng",
     "safetyHelp": "Số ngày hàng giữ thêm phòng khi bán tăng đột biến hoặc hàng về trễ.",
-    "save": "Lưu cài đặt",
     "minOrder": "Số lượng đặt tối thiểu",
     "minOrderHelp": "Số lượng tối thiểu nhà cung cấp nhận cho một đơn. Gợi ý thấp hơn sẽ được nâng lên mức này.",
     "packSize": "Quy cách thùng",
@@ -315,6 +317,8 @@
     "minStockHelp": "Đặt hàng khi tồn kho cộng hàng đang về giảm xuống mức này. Để trống để dự báo tự quyết định.",
     "maxStock": "Max (nhập tới mức)",
     "maxStockHelp": "Mỗi lần nhập sẽ bù tồn kho lên mức này. Để trống để dự báo tự quyết định.",
+    "muteAlerts": "Không gửi cảnh báo cho sản phẩm này",
+    "muteAlertsHelp": "Bỏ sản phẩm khỏi email tóm tắt và email tức thời. Dự báo và danh sách cần nhập hàng vẫn có sản phẩm này.",
     "fromForecast": "Theo dự báo: {{qty}}",
     "fromForecastShort": "Theo dự báo"
   },
@@ -334,7 +338,11 @@
       "name": "Tên"
     },
     "noMatch": "Không có sản phẩm nào khớp bộ lọc.",
-    "pageInfo_other": "{{total}} sản phẩm · trang {{page}}/{{pages}}"
+    "pageInfo_other": "{{total}} sản phẩm · trang {{page}}/{{pages}}",
+    "vendor": "Vendor",
+    "allVendors": "Tất cả vendor",
+    "productType": "Loại sản phẩm",
+    "allTypes": "Tất cả loại sản phẩm"
   },
   "settings": {
     "defaultsHeading": "Mặc định cho dự báo",
@@ -351,6 +359,12 @@
     "daily": "Tóm tắt hằng ngày",
     "weekly": "Tóm tắt hằng tuần",
     "sendOn": "Gửi vào",
+    "realtime": "Cảnh báo tức thời",
+    "realtimeHelp": "Gửi email ngay khi tồn kho vượt ngưỡng. Các thay đổi được gom thành một email mỗi 15 phút, mỗi sản phẩm tối đa một lần mỗi tuần, tối đa 3 email mỗi ngày và không gửi ban đêm.",
+    "realtimeOff": "Tắt",
+    "realtimeOutOfStock": "Chỉ khi sản phẩm hết hàng",
+    "realtimeAll": "Khi sản phẩm cần đặt hàng hoặc hết hàng",
+    "realtimeLocked": "Biết ngay khi sản phẩm hết hàng thay vì sáng hôm sau. Được gom và giới hạn số lượng để hộp thư luôn gọn.",
     "setupGuide": "Hướng dẫn thiết lập",
     "setupGuideBack": "Hướng dẫn thiết lập đã hiện lại ở Trang chủ",
     "showSetupGuide": "Hiện hướng dẫn thiết lập ở Trang chủ",
@@ -414,15 +428,18 @@
       "bundles": "Combo và bộ kit",
       "alerts": "Cảnh báo qua email (tóm tắt hằng ngày hoặc hằng tuần)",
       "locations": "Tồn kho theo chi nhánh",
-      "purchaseOrders": "Xuất đơn đặt hàng (CSV)"
+      "purchaseOrders": "Xuất đơn đặt hàng (CSV)",
+      "realtimeAlerts": "Cảnh báo tồn kho tức thời"
     },
     "notApproved": "Chưa có thay đổi gói nào được chấp thuận",
     "nowOn": "Bạn đang dùng gói {{plan}}",
-    "confirmFree_other": "Chuyển sang gói Miễn phí? Gói trả phí sẽ kết thúc ngay và chỉ {{count}} sản phẩm bán chạy nhất còn được dự báo.",
     "intro": "Giá cố định hằng tháng. Không thu theo doanh số, không hợp đồng, hủy bất cứ lúc nào. Shopify thu phí trên hóa đơn Shopify của bạn.",
     "tracking_other": "Bạn đang theo dõi {{total}} sản phẩm.",
     "monthly": "Theo tháng",
-    "yearly": "Theo năm (tiết kiệm 20%)",
+    "yearly": "Theo năm",
+    "save": "Tiết kiệm 20%",
+    "billingPeriod": "Chu kỳ thanh toán",
+    "billedYearly": "{{price}} / tháng, thanh toán theo năm",
     "current": "Gói hiện tại",
     "perMonth": "{{price}} / tháng",
     "perYear": "{{price}} / năm",
@@ -449,7 +466,9 @@
     "bundle_not_found": "Combo này không còn tồn tại.",
     "forbidden": "Bạn không có quyền truy cập mục này.",
     "server_error": "Hệ thống gặp lỗi. Vui lòng thử lại.",
-    "unavailable": "App đang được cập nhật. Vui lòng thử lại sau một phút."
+    "unavailable": "App đang được cập nhật. Vui lòng thử lại sau một phút.",
+    "supplier_has_no_email": "Nhà cung cấp này chưa có email.",
+    "supplier_email_too_soon": "Đơn này vừa được gửi. Vui lòng chờ một phút rồi gửi lại."
   },
   "validation": {
     "invalid": "Giá trị không hợp lệ.",
@@ -481,7 +500,9 @@
     "no_rows": "File này không có dữ liệu.",
     "too_many_rows": "File quá lớn. Hãy chia thành các file nhỏ hơn.",
     "mapping_incomplete": "Hãy chọn cột nhà cung cấp và một cột sản phẩm (SKU, ID biến thể hoặc tên sản phẩm).",
-    "max_below_min": "Max phải lớn hơn hoặc bằng Min."
+    "max_below_min": "Max phải lớn hơn hoặc bằng Min.",
+    "no_items": "Hãy thêm ít nhất một sản phẩm.",
+    "auto_email_needs_email": "Hãy nhập email nhà cung cấp trước."
   },
   "explanation": {
     "unknown": "—",
@@ -523,7 +544,8 @@
     "order_up_to_max_other": "Mỗi lần nhập bù tồn kho lên mức tối đa {{count}} cái bạn đặt.",
     "below_min_order_other": "Tồn {{stock}} cái (tính cả hàng đang về) đã chạm mức tối thiểu → nhập {{count}} cái ngay hôm nay.",
     "above_min": "Tồn {{stock}} cái (tính cả hàng đang về) vẫn trên mức tối thiểu; chưa có doanh số nên chưa cần nhập.",
-    "no_order_needed": "Hiện chưa cần nhập thêm."
+    "no_order_needed": "Hiện chưa cần nhập thêm.",
+    "overstock_other": "Thừa {{count}} cái so với mức cần giữ {{target}} (lead time, dự phòng và chu kỳ nhập tới): tạm dừng nhập thêm, hoặc chạy khuyến mãi."
   },
   "import": {
     "fromStocky": "Nhập từ Stocky",
@@ -572,7 +594,68 @@
   },
   "confirm": {
     "deleteSupplier": "Xóa nhà cung cấp?",
-    "removeBundle": "Gỡ combo?",
-    "switchToFree": "Chuyển sang gói Miễn phí?"
+    "removeBundle": "Gỡ combo?"
+  },
+  "supplierEmail": {
+    "button": "Gửi đơn qua email",
+    "heading": "Gửi đơn đặt hàng qua email cho {{name}}",
+    "to": "Gửi tới: {{email}}",
+    "noEmail": "Nhà cung cấp này chưa có email. Hãy thêm email bằng nút Sửa trước.",
+    "nothingDue": "Hiện chưa có sản phẩm nào của nhà cung cấp này cần nhập.",
+    "total_other": "Tổng: {{count}} cái",
+    "message": "Lời nhắn (không bắt buộc)",
+    "messagePlaceholder": "VD: Vui lòng xác nhận ngày giao hàng.",
+    "replyTo": "Email nhận phản hồi",
+    "replyToHelp": "Nhà cung cấp sẽ trả lời vào địa chỉ này. Đơn hàng cũng được đính kèm dạng file CSV.",
+    "send": "Gửi email",
+    "sent": "Đã gửi đơn đặt hàng cho {{name}}",
+    "lastSent": "Gửi email lần cuối {{when}}",
+    "autoBadge": "Tự gửi email",
+    "auto": "Tự động gửi đơn đặt hàng qua email",
+    "autoHelp": "Khi sản phẩm của nhà cung cấp này cần nhập, app tự gửi email đơn đặt hàng cho họ (tối đa 1 lần mỗi tuần, từ 8 giờ sáng theo giờ cửa hàng). Phản hồi sẽ gửi về email cảnh báo của bạn.",
+    "autoPaused": "Tự gửi email tạm dừng (Growth)"
+  },
+  "downgrade": {
+    "heading": "Chuyển sang gói {{plan}}?",
+    "intro": "Ở gói này, những tính năng sau sẽ ngừng hoạt động với cửa hàng của bạn:",
+    "nothingLost": "Không có tính năng nào bạn đang dùng bị ảnh hưởng.",
+    "kept": "Dữ liệu và cài đặt của bạn vẫn được giữ nguyên. Nâng cấp lại bất cứ lúc nào, mọi thứ sẽ hoạt động như trước.",
+    "lost": {
+      "unknown": "Một số tính năng của gói hiện tại",
+      "forecast_limit_other": "{{count}} sản phẩm ngoài {{limit}} sản phẩm bán chạy nhất sẽ không còn dự báo và gợi ý nhập hàng.",
+      "bundles_other": "Doanh số combo không còn được tính vào dự báo của sản phẩm thành phần ({{count}} combo đã thiết lập).",
+      "alerts": "Không dùng được email cảnh báo tồn kho.",
+      "alerts_active": "Email cảnh báo tồn kho gửi tới {{email}} sẽ dừng.",
+      "locations_other": "Dự báo theo từng chi nhánh sẽ dừng ({{count}} chi nhánh).",
+      "purchase_orders": "Xuất đơn đặt hàng và gửi đơn qua email cho nhà cung cấp sẽ dừng.",
+      "supplier_auto_emails_other": "{{count}} nhà cung cấp sẽ không còn nhận đơn đặt hàng tự động.",
+      "realtime_alerts": "Không dùng được cảnh báo tồn kho tức thì.",
+      "realtime_alerts_active": "Cảnh báo tồn kho tức thì gửi tới {{email}} sẽ dừng."
+    }
+  },
+  "vendors": {
+    "button": "Tạo từ vendor",
+    "heading": "Tạo nhà cung cấp từ vendor",
+    "intro": "Sản phẩm trên Shopify của bạn đã có trường Vendor. Mỗi vendor bạn chọn sẽ thành một nhà cung cấp (hoặc dùng nhà cung cấp trùng tên), và các sản phẩm của vendor đó được gán vào. Lead time và email có thể thêm sau.",
+    "result": "Kết quả",
+    "newSupplier": "Nhà cung cấp mới",
+    "reuses": "Dùng nhà cung cấp \"{{name}}\"",
+    "ownBrand": "Thương hiệu của bạn",
+    "alreadyLinked_other": "{{count}} sản phẩm đã có nhà cung cấp",
+    "summary_other": "Đã chọn {{vendors}} vendor, {{count}} sản phẩm.",
+    "replace_other": "Thay luôn nhà cung cấp của {{count}} sản phẩm đã có nhà cung cấp",
+    "apply_other": "Tạo {{count}} nhà cung cấp",
+    "done_other": "Đã có {{suppliers}} nhà cung cấp, gán {{count}} sản phẩm",
+    "emptyHeading": "Sản phẩm chưa có vendor",
+    "emptyBody": "Hãy điền trường Vendor cho sản phẩm trong Shopify, hoặc thêm nhà cung cấp thủ công."
+  },
+  "overstock": {
+    "heading": "Tồn thừa",
+    "target": "Mức cần giữ",
+    "excess": "Thừa",
+    "summaryWithValue_other": "{{value}} đang kẹt trong {{units}} cái vượt mức cần, ở {{count}} sản phẩm vẫn bán được.",
+    "summary_other": "{{units}} cái vượt mức cần, ở {{count}} sản phẩm vẫn bán được.",
+    "advice": "Tạm dừng nhập thêm, hoặc chạy khuyến mãi.",
+    "seeAll_other": "Xem tất cả {{count}} sản phẩm tồn thừa"
   }
 }

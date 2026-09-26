@@ -16,6 +16,11 @@ class EloquentVariantRepository implements VariantRepositoryInterface
         return Variant::query()->forShop($shop)->find($id);
     }
 
+    public function findMany(Shop $shop, array $ids): Collection
+    {
+        return Variant::query()->forShop($shop)->whereIn('id', $ids)->get()->keyBy('id');
+    }
+
     public function search(Shop $shop, string $term, int $limit): Collection
     {
         $like = '%'.str_replace(['%', '_'], ['\%', '\_'], trim($term)).'%';

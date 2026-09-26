@@ -326,3 +326,26 @@ describe('manual min / max', function () {
             ->assertUnprocessable()->assertJsonPath('errors.max_stock.0.code', 'max_below_min');
     });
 });
+
+describe('overstock', function () {
+    it('flags products holding clearly more than needed, and counts the money tied up', function () {
+        $mug = product($this->shop, $this->location, 'Mug', stock: 400, perDay: 4, attrs: ['unit_cost' => 2.5]);   // holds 204: overstock
+        $plate = product($this->shop, $this->location, 'Plate', stock: 250, perDay: 4);                           // +23%: fine
+        $vase = product($this->shop, $this->location, 'Vase', stock: 9000, perDay: 4);                            // > 180 days: slow
+        forecastAll($this->shop);
+
+        $this->getJson('/api/forecasts?status=overstock', $this->auth)
+            ->assertJsonPath('meta.total', 1)
+            ->assertJsonPath('data.0.name', 'Mug')
+            ->assertJsonPath('data.0.status', 'overstock')
+            ->assertJsonPath('data.0.excess_units', 196);
+        $this->getJson('/api/forecasts?status=healthy', $this->auth)->assertJsonPath('data.*.name', ['Plate']);
+        $this->getJson('/api/forecasts?status=slow', $this->auth)->assertJsonPath('data.*.name', ['Vase']);
+
+        $this->getJson('/api/dashboard', $this->auth)
+            ->assertJsonPath('data.counts.overstock', 1)
+            ->assertJsonPath('data.overstock.value', 490)       // 196 x 2.50
+            ->assertJsonPath('data.overstock.units', 196)
+            ->assertJsonPath('data.overstock.top.0', ['variant_id' => $mug->id, 'name' => 'Mug', 'sku' => $mug->sku, 'stock' => 400, 'target' => 204, 'excess' => 196, 'value' => 490]);
+    });
+});

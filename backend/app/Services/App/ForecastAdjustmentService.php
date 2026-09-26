@@ -44,7 +44,7 @@ class ForecastAdjustmentService
         $this->engine->runForShop($shop, [$variant->id]);
     }
 
-    /** @param array{supplier_id?: ?int, lead_time_override?: ?int, safety_days?: ?int, min_order_qty?: ?int, pack_size?: ?int, min_stock?: ?int, max_stock?: ?int} $settings */
+    /** @param array{supplier_id?: ?int, lead_time_override?: ?int, safety_days?: ?int, min_order_qty?: ?int, pack_size?: ?int, min_stock?: ?int, max_stock?: ?int, alerts_muted?: bool} $settings */
     public function updateVariantSettings(Shop $shop, Variant $variant, array $settings): Variant
     {
         $this->assertMinBelowMax($settings + $variant->only(['min_stock', 'max_stock']));

@@ -27,8 +27,11 @@ use Illuminate\Support\Carbon;
  * @property ?int $safety_days
  * @property ?int $min_order_qty suggested orders are raised to at least this many units
  * @property ?int $pack_size suggested orders are rounded up to whole packs of this many units
+ * @property ?string $vendor Shopify product vendor
+ * @property ?string $product_type Shopify product type
  * @property ?int $min_stock manual reorder point (units, stock + on the way)
  * @property ?int $max_stock manual order-up-to level (units)
+ * @property bool $alerts_muted no alert email mentions this product
  * @property bool $is_bundle
  * @property ?Carbon $shopify_created_at
  */
@@ -38,8 +41,8 @@ class Variant extends Model
 
     protected $fillable = [
         'shop_id', 'shopify_variant_id', 'shopify_product_id', 'inventory_item_id',
-        'product_title', 'title', 'sku', 'unit_cost', 'tracked', 'is_active',
-        'supplier_id', 'lead_time_override', 'safety_days', 'min_order_qty', 'pack_size', 'min_stock', 'max_stock', 'is_bundle', 'shopify_created_at',
+        'product_title', 'vendor', 'product_type', 'title', 'sku', 'unit_cost', 'tracked', 'is_active',
+        'supplier_id', 'lead_time_override', 'safety_days', 'min_order_qty', 'pack_size', 'min_stock', 'max_stock', 'alerts_muted', 'is_bundle', 'shopify_created_at',
     ];
 
     protected function casts(): array
@@ -57,6 +60,7 @@ class Variant extends Model
             'pack_size' => 'integer',
             'min_stock' => 'integer',
             'max_stock' => 'integer',
+            'alerts_muted' => 'boolean',
             'is_bundle' => 'boolean',
             'shopify_created_at' => 'datetime',
         ];

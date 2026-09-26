@@ -19,7 +19,8 @@ function Kpi({ label, value, hint, href, tone }: { label: string; value: string;
 /** Four numbers that say how the stock is doing; each opens the page with the details. */
 export function HomeKpis({ dashboard }: { dashboard: Dashboard }) {
     const { t } = useTranslation();
-    const { counts, actions, slow_movers: slow } = dashboard;
+    const { counts, actions, slow_movers: slow, overstock } = dashboard;
+    const tiedUp = slow.value + overstock.value;
 
     return (
         <s-grid gridTemplateColumns="@container (inline-size > 600px) 1fr 1fr 1fr 1fr, 1fr 1fr" gap="base">
@@ -38,10 +39,11 @@ export function HomeKpis({ dashboard }: { dashboard: Dashboard }) {
                 tone={counts.reorder_now > 0 ? 'warning' : undefined}
             />
             <Kpi label={t('home.kpi.thisWeekLabel')} value={formatNumber(actions.this_week.length, 0)} hint={t('home.kpi.thisWeek')} href="/reorder" />
+            {/* Money tied up in stock: slow movers + overstock. */}
             <Kpi
-                label={t('home.kpi.slowLabel')}
-                value={slow.value > 0 ? formatMoney(slow.value, dashboard.currency) : formatNumber(slow.count, 0)}
-                hint={slow.value > 0 ? t('home.kpi.slowValue', { count: slow.count }) : t('home.kpi.slowCount', { count: slow.count })}
+                label={t('home.kpi.tiedUpLabel')}
+                value={tiedUp > 0 ? formatMoney(tiedUp, dashboard.currency) : formatNumber(slow.count + overstock.count, 0)}
+                hint={t('home.kpi.tiedUpHint', { slow: slow.count, overstock: overstock.count })}
                 href="/insights"
             />
         </s-grid>

@@ -35,6 +35,10 @@ return [
     ],
 
     // Stock counts as "slow-moving" (cash tied up) when it would last longer than this, or never sells.
+    // Overstock: stock + on the way exceeds the order-up-to level by more than this share
+    // (0.5 = 50% more than the forecast says to hold). Slow movers are reported as slow instead.
+    'overstock_ratio' => 0.5,
+
     'slow_mover_days' => 180,
 
     // Suggested order covers lead time + safety days + this many days of sales.

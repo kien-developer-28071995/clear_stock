@@ -6,6 +6,9 @@ import { pickVariants } from '@/lib/resourcePicker';
 import { ErrorBanner } from '@/components/ui/ErrorBanner';
 import { ExportPurchaseOrderButton } from '@/features/forecasts/components/ExportPurchaseOrderButton';
 import { SupplierModal } from '@/features/settings/components/SupplierModal';
+import { SupplierEmailModal } from '@/features/settings/components/SupplierEmailModal';
+import { useEntitlements } from '@/hooks/useEntitlements';
+import { timeAgo } from '@/utils/format';
 import { useAssignSupplier, useDeleteSupplier, useSuppliers } from '@/features/settings/hooks/useSettings';
 import type { Supplier } from '@/features/settings/types';
 
@@ -16,6 +19,13 @@ export function SuppliersPage() {
     const assign = useAssignSupplier();
     const modal = useModal();
     const { confirm, modal: confirmModal } = useConfirm();
+    const emailModal = useModal();
+    const [emailing, setEmailing] = useState<Supplier | null>(null);
+    const { purchase_orders: canEmail } = useEntitlements();
+    const openEmail = (s: Supplier) => {
+        setEmailing(s);
+        emailModal.open();
+    };
     const [editing, setEditing] = useState<Supplier | null>(null);
 
     const openNew = () => {
@@ -44,6 +54,9 @@ export function SuppliersPage() {
             <s-button slot="primary-action" variant="primary" onClick={openNew}>
                 {t('suppliers.add')}
             </s-button>
+            <s-button slot="secondary-actions" href="/suppliers/from-vendors">
+                {t('vendors.button')}
+            </s-button>
             <s-button slot="secondary-actions" href="/suppliers/import">
                 {t('import.fromStocky')}
             </s-button>
@@ -53,7 +66,8 @@ export function SuppliersPage() {
                 <s-section>
                     <s-empty-state heading={t('suppliers.emptyHeading')}>
                         <s-paragraph slot="subheading">{t('suppliers.emptyBody')}</s-paragraph>
-                        <s-button slot="primary-action" onClick={openNew}>{t('suppliers.add')}</s-button>
+                        <s-button slot="primary-action" href="/suppliers/from-vendors">{t('vendors.button')}</s-button>
+                        <s-button slot="secondary-actions" onClick={openNew}>{t('suppliers.add')}</s-button>
                         <s-button slot="secondary-actions" href="/suppliers/import">{t('import.fromStocky')}</s-button>
                     </s-empty-state>
                 </s-section>
@@ -73,6 +87,8 @@ export function SuppliersPage() {
                                         <s-stack gap="small-100">
                                             <s-text type="strong">{s.name}</s-text>
                                             {s.email && <s-text color="subdued">{s.email}</s-text>}
+                                            {s.last_emailed_at && <s-text color="subdued">{t('supplierEmail.lastSent', { when: timeAgo(s.last_emailed_at) })}</s-text>}
+                                            {s.auto_email && (canEmail ? <s-badge>{t('supplierEmail.autoBadge')}</s-badge> : <s-badge tone="warning">{t('supplierEmail.autoPaused')}</s-badge>)}
                                         </s-stack>
                                     </s-table-cell>
                                     <s-table-cell>{s.lead_time_days == null ? t('suppliers.storeDefault') : t('common.dayCount', { count: s.lead_time_days })}</s-table-cell>
@@ -81,6 +97,14 @@ export function SuppliersPage() {
                                         <s-button-group>
                                             <s-button slot="secondary-actions" onClick={() => assignProducts(s)}>{t('suppliers.assign')}</s-button>
                                             <ExportPurchaseOrderButton supplierId={s.id} label={t('po.short')} />
+                                            <s-button
+                                                slot="secondary-actions"
+                                                icon={canEmail ? 'email' : 'lock'}
+                                                disabled={!canEmail || !s.email || undefined}
+                                                onClick={() => openEmail(s)}
+                                            >
+                                                {t('supplierEmail.button')}
+                                            </s-button>
                                             <s-button slot="secondary-actions" onClick={() => openEdit(s)}>{t('common.edit')}</s-button>
                                             <s-button slot="secondary-actions" tone="critical" onClick={() => confirmDelete(s)}>{t('common.delete')}</s-button>
                                         </s-button-group>
@@ -93,6 +117,7 @@ export function SuppliersPage() {
             )}
 
             <SupplierModal modalRef={modal.ref} supplier={editing} onDone={modal.close} />
+            <SupplierEmailModal modalRef={emailModal.ref} supplier={emailing} onDone={emailModal.close} />
             {confirmModal}
         </s-page>
     );

@@ -5,6 +5,7 @@ namespace App\Http\Resources;
 use App\Models\Supplier;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Carbon;
 
 /** @mixin Supplier */
 class SupplierResource extends JsonResource
@@ -16,6 +17,8 @@ class SupplierResource extends JsonResource
             'name' => $this->name,
             'email' => $this->email,
             'lead_time_days' => $this->lead_time_days,
+            'auto_email' => $this->auto_email,
+            'last_emailed_at' => $this->last_emailed_at ? Carbon::parse($this->last_emailed_at)->toIso8601String() : null,
             'variants_count' => $this->variants_count ?? null,
         ];
     }

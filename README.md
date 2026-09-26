@@ -156,6 +156,7 @@ Pure calculator (`app/Services/Forecast/ForecastCalculator.php`, no DB access) p
 4. **Overrides:** a merchant override of the sales rate replaces the computed rate. Lead time resolves as override → SKU → supplier → store default (14 days). Safety days resolve as override → SKU → store default (7 days). Expired overrides are ignored.
 5. **Reorder maths:** reorder point = rate × (lead time + safety days). Reordering uses the **stock position** = on hand + on the way (Shopify's `incoming` quantity: purchase orders and transfers created in Shopify). Suggested qty = rate × (lead time + safety + 30-day order cycle) − stock position, and the reorder date is when the stock position reaches the reorder point. Shopify gives no arrival date for incoming stock, so days of cover (= on hand ÷ rate) and the stock-out date use on-hand stock only.
    Per product, merchants can also set a **minimum order quantity** and **pack size** (the order is raised to the minimum, then rounded up to whole packs; never changes when to order), and a manual **min / max** as in Stocky (min replaces the reorder point, max the order-up-to level; products without sales reorder only through min). Min/max apply to the store-wide forecast, not per location.
+   **Overstock:** the order-up-to level (lead time + safety + order cycle, or the merchant's max) is stored as `target_stock`, and stock + on the way above it as `excess_units`. A product that still sells and holds more than 50% above its level (`forecast.overstock_ratio`) is *Overstock* (status order: out of stock → reorder now → slow → overstock → OK); the Insights page shows the excess and its cost value.
 6. **Confidence:** *low* with fewer than 14 in-stock days or fewer than 5 units in 90 days, or when the weekly coefficient of variation is above 1.0. *high* with ≥ 60 in-stock days, ≥ 30 units and weekly CV ≤ 0.5. Anything else is *medium*.
 
 Every intermediate number is stored in `forecasts.explanation` (JSON). `ExplanationFormatter` turns it into sentences, for example: *"Sells 4/day over the last 30 days (3 out-of-stock days left out). Lead time 14 days (store default) + 7 safety days → reorder point 84 units. 100 in stock runs out around Oct 15 → order 104 units by Sep 24. Confidence: high."*
@@ -255,6 +256,39 @@ Backend and frontend are separate projects; the repo root only holds infra.
 - Running tools outside Docker: `cd backend && composer install && php artisan test`, `cd frontend && npm install && npm run dev`.
 
 ---
+
+## Emailing purchase orders to suppliers (Growth)
+
+- **Merchant-sent:** Suppliers → *Email order*. The dialog lists the supplier's products due now with the suggested quantities; the merchant edits quantities, removes lines, adds a message and the reply-to address, then sends. `GET/POST /api/suppliers/{id}/email`.
+- **Automatic (opt-in per supplier):** tick *Email purchase orders automatically* on the supplier. `suppliers:send-orders` runs hourly; from 8am shop time, if the supplier has products due and the forecast is fresh, their purchase order goes out, at most once per `alerts.supplier_auto_interval_days` (7).
+- The email is from "{store} via Clear Stock" with **Reply-To the merchant** (alert email, else the store contact email), lists SKU / product / quantity and attaches the same list as CSV. Every send is logged in `supplier_emails` (history, last-emailed date, weekly limit). A double click can't send twice (60 s lock).
+
+## Downgrades
+
+Before a move to a smaller plan, the Plans page shows what stops working **for this shop** (`GET /api/billing/impact?plan=`, codes + the shop's numbers): products beyond the SKU limit, bundles set up, active alert emails, locations, purchase orders, suppliers with automatic orders. Nothing is deleted on downgrade: settings are kept and apply again on upgrade. Forecasts are recomputed right after the plan changes (SKU limit, bundle demand, per-location forecasts removed). Cancelling from the Shopify admin (webhook) applies the same rules without the dialog.
+
+**Missed billing webhooks:** `billing:reconcile` runs daily (04:20 UTC) and re-reads every installed shop's active subscription from Shopify (`BillingService::reconcile`). A drift is fixed (plan, interval, subscription id, forecasts recomputed) and logged as a warning (`Billing drift fixed (missed webhook?)`). The Plans page also re-reads the subscription right after the merchant approves a charge.
+
+## Queues (Horizon)
+
+| Supervisor | Queue | Jobs | Processes (local / production) |
+|---|---|---|---|
+| `webhooks-supervisor` | `webhooks` | Shopify webhooks, incl. frequent `inventory_levels/update` (real-time alerts) | 1 / up to 5 |
+| `mail-supervisor` | `mail` | every email (`QueuedMailable`) | 1 / 2 |
+| `supervisor-1` | `default` | forecasts, alert checks, billing reconciliation, supplier orders | 3 / up to 10 |
+| `sync-supervisor` | `sync` (`redis-long`) | bulk operation downloads and imports | 2 / 4 |
+
+Each queue has a wait threshold (`waits` in `config/horizon.php`: webhooks 30 s, default 60 s, mail 120 s, sync 600 s). A backed-up queue fires Horizon's `LongWaitDetected`, logged as an error, so it reaches Slack.
+
+## Business events (Slack)
+
+Installs, uninstalls, upgrades, downgrades and billing-interval changes are posted to a **separate** Slack channel (`MONITORING_SLACK_EVENTS_WEBHOOK_URL`; empty = off), kept apart from errors. Events: `ShopInstalled` (new install / reinstall), `ShopUninstalled` (with the plan the shop was on), `PlanChanged` (fired by `BillingService` whether the change came from the app, a webhook or the daily reconciliation, once per change). Messages show the shop name and domain, the plans with prices, the MRR change and the number of active installs. They are posted by a queued job (`PostShopEventToSlack`, 3 tries), so Slack never slows an install or a billing change.
+
+## Email log
+
+All emails extend `App\Mail\QueuedMailable`: they run on the dedicated `mail` queue (Horizon `mail-supervisor`, so forecast and sync work never delays them) with 3 tries (retry after 1 and 5 minutes). A test fails if a new mailable doesn't extend it.
+
+Every email the app sends is logged in `email_logs`, whatever feature sent it (reorder digest, supplier purchase orders, anything added later): a listener on Laravel's `MessageSent` event writes `sent` rows, and one on `JobFailed` writes `failed` rows for queued emails that gave up after their retries (the exception also goes to Slack monitoring). Rows hold metadata only: mailable class, shop, from / to / cc / bcc / reply-to, subject, attachment names, message id, error. Never the body. Kept `EMAIL_LOG_RETENTION_DAYS` (180) days (`model:prune`, daily) and deleted with the shop on `shop/redact`.
 
 ## Error monitoring (Slack)
 

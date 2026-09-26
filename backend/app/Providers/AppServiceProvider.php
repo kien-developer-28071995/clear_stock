@@ -2,6 +2,12 @@
 
 namespace App\Providers;
 
+use App\Events\PlanChanged;
+use App\Events\ShopInstalled;
+use App\Events\ShopUninstalled;
+use App\Listeners\LogEmails;
+use App\Listeners\ReportLongQueueWait;
+use App\Listeners\ReportShopEventsToSlack;
 use App\Monitoring\ReportErrorsToSlack;
 use App\Repositories\Contracts\ShopRepositoryInterface;
 use App\Services\Forecast\ForecastCalculator;
@@ -16,11 +22,14 @@ use Illuminate\Console\Events\CommandStarting;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Http\Client\Factory as Http;
 use Illuminate\Log\Events\MessageLogged;
+use Illuminate\Mail\Events\MessageSent;
+use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Support\Facades\Context;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\ServiceProvider;
+use Laravel\Horizon\Events\LongWaitDetected;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -73,6 +82,18 @@ class AppServiceProvider extends ServiceProvider
     {
         // Error monitoring: every log record at error level (unhandled exceptions included) goes to Slack.
         Event::listen(MessageLogged::class, ReportErrorsToSlack::class);
+
+        // Every email sent (or failed for good) is logged in email_logs, whatever sent it.
+        Event::listen(MessageSent::class, [LogEmails::class, 'sent']);
+        Event::listen(JobFailed::class, [LogEmails::class, 'failed']);
+
+        // A queue waiting longer than its threshold (config/horizon.php "waits") reaches Slack.
+        Event::listen(LongWaitDetected::class, ReportLongQueueWait::class);
+
+        // Business events for the events Slack channel.
+        Event::listen(ShopInstalled::class, [ReportShopEventsToSlack::class, 'installed']);
+        Event::listen(ShopUninstalled::class, [ReportShopEventsToSlack::class, 'uninstalled']);
+        Event::listen(PlanChanged::class, [ReportShopEventsToSlack::class, 'planChanged']);
 
         // Where an error happened, attached to its alert.
         Queue::before(fn (JobProcessing $e) => Context::add('job', $e->job->resolveName()));

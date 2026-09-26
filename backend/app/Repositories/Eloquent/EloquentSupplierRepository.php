@@ -12,6 +12,7 @@ class EloquentSupplierRepository implements SupplierRepositoryInterface
     public function allForShop(Shop $shop): Collection
     {
         return Supplier::query()->forShop($shop)->withCount(['variants' => fn ($q) => $q->where('is_active', true)])
+            ->withMax('emails as last_emailed_at', 'created_at')
             ->orderBy('name')->get();
     }
 

@@ -2,6 +2,7 @@ import { useEffect, useState, type RefObject } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { ModalElement } from '@/hooks/useModal';
 import { fieldError } from '@/lib/http';
+import { useEntitlements } from '@/hooks/useEntitlements';
 import { useCreateSupplier, useUpdateSupplier } from '@/features/settings/hooks/useSettings';
 import type { Supplier } from '@/features/settings/types';
 
@@ -19,18 +20,27 @@ export function SupplierModal({ modalRef, supplier, onDone }: Props) {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [lead, setLead] = useState('');
+    const [autoEmail, setAutoEmail] = useState(false);
+    // Automatic purchase order emails are part of Growth (with purchase orders).
+    const canAutoEmail = useEntitlements().purchase_orders;
 
     useEffect(() => {
         setName(supplier?.name ?? '');
         setEmail(supplier?.email ?? '');
         setLead(supplier?.lead_time_days?.toString() ?? '');
+        setAutoEmail(supplier?.auto_email ?? false);
         create.reset();
         update.reset();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [supplier]);
 
     const submit = () => {
-        const body = { name: name.trim(), email: email.trim() || null, lead_time_days: lead === '' ? null : Number(lead) };
+        const body = {
+            name: name.trim(),
+            email: email.trim() || null,
+            lead_time_days: lead === '' ? null : Number(lead),
+            ...(canAutoEmail ? { auto_email: autoEmail && email.trim() !== '' } : {}),
+        };
         const options = { onSuccess: () => { shopify.toast.show(supplier ? t('suppliers.updated') : t('suppliers.added')); onDone(); } };
         if (supplier) update.mutate({ id: supplier.id, ...body }, options);
         else create.mutate(body, options);
@@ -55,6 +65,14 @@ export function SupplierModal({ modalRef, supplier, onDone }: Props) {
                     value={email}
                     error={fieldError(mutation.error, 'email')}
                     onInput={(e) => setEmail(e.currentTarget.value)}
+                />
+                <s-checkbox
+                    label={t('supplierEmail.auto')}
+                    details={canAutoEmail ? t('supplierEmail.autoHelp') : t('plans.lockedHint', { plan: t('plans.names.growth') })}
+                    checked={(autoEmail && email.trim() !== '') || undefined}
+                    disabled={!canAutoEmail || email.trim() === '' || undefined}
+                    error={fieldError(mutation.error, 'auto_email')}
+                    onChange={(e) => setAutoEmail(e.currentTarget.checked)}
                 />
             </s-stack>
             <s-button slot="primary-action" variant="primary" onClick={submit} loading={mutation.isPending || undefined} disabled={!name.trim() || undefined}>

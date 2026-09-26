@@ -8,6 +8,7 @@ use App\Jobs\Webhooks\HandleAppUninstalled;
 use App\Jobs\Webhooks\HandleBulkOperationFinished;
 use App\Jobs\Webhooks\HandleCustomersDataRequest;
 use App\Jobs\Webhooks\HandleCustomersRedact;
+use App\Jobs\Webhooks\HandleInventoryLevelUpdate;
 use App\Jobs\Webhooks\HandleScopesUpdate;
 use App\Jobs\Webhooks\HandleShopRedact;
 use App\Support\CacheKeys;
@@ -47,6 +48,12 @@ class WebhookService
             WebhookTopic::ShopRedact => new HandleShopRedact($shop),
             WebhookTopic::AppSubscriptionsUpdate => new HandleAppSubscriptionUpdate($shop),
             WebhookTopic::BulkOperationsFinish => new HandleBulkOperationFinished($shop, (string) ($payload['admin_graphql_api_id'] ?? '')),
+            WebhookTopic::InventoryLevelsUpdate => new HandleInventoryLevelUpdate($shop, [
+                'inventory_item_id' => isset($payload['inventory_item_id']) ? (int) $payload['inventory_item_id'] : null,
+                'location_id' => isset($payload['location_id']) ? (int) $payload['location_id'] : null,
+                'available' => isset($payload['available']) ? (int) $payload['available'] : null,
+                'updated_at' => isset($payload['updated_at']) ? (string) $payload['updated_at'] : null,
+            ]),
         };
 
         try {

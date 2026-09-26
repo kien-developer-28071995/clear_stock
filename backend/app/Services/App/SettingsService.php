@@ -4,7 +4,9 @@ namespace App\Services\App;
 
 use App\Enums\AlertFrequency;
 use App\Enums\Feature;
+use App\Enums\RealtimeAlertMode;
 use App\Jobs\Forecast\RecomputeForecasts;
+use App\Jobs\SyncRealtimeWebhook;
 use App\Models\Shop;
 use App\Repositories\Contracts\AlertSettingRepositoryInterface;
 use App\Repositories\Contracts\ShopRepositoryInterface;
@@ -32,6 +34,9 @@ class SettingsService
                 'enabled' => $alert?->enabled ?? false,
                 'frequency' => ($alert?->frequency ?? AlertFrequency::Daily)->value,
                 'weekly_day' => $alert?->weekly_day ?? 1,
+                // Growth only; the inventory webhook exists only while this is on.
+                'realtime_available' => Entitlements::for($shop)->has(Feature::RealtimeAlerts),
+                'realtime' => ($alert?->realtime ?? RealtimeAlertMode::Off)->value,
             ],
         ];
     }
@@ -52,9 +57,21 @@ class SettingsService
         }
 
         if (isset($data['alerts'])) {
-            $this->alerts->upsert($shop, array_intersect_key($data['alerts'], array_flip(['email', 'enabled', 'frequency', 'weekly_day'])));
+            $before = $this->realtimeWanted($shop);
+            $this->alerts->upsert($shop, array_intersect_key($data['alerts'], array_flip(['email', 'enabled', 'frequency', 'weekly_day', 'realtime'])));
+            if ($this->realtimeWanted($shop) !== $before) {
+                SyncRealtimeWebhook::dispatch($shop->id);
+            }
         }
 
         return $this->get($shop);
+    }
+
+    private function realtimeWanted(Shop $shop): bool
+    {
+        $alert = $this->alerts->forShop($shop);
+
+        return Entitlements::for($shop)->has(Feature::RealtimeAlerts)
+            && $alert !== null && $alert->enabled && (bool) $alert->email && ($alert->realtime ?? RealtimeAlertMode::Off) !== RealtimeAlertMode::Off;
     }
 }

@@ -25,6 +25,7 @@ return [
                 'alerts' => false,
                 'locations' => false,
                 'purchase_orders' => false,
+                'realtime_alerts' => false,
             ],
         ],
         'starter' => [
@@ -37,6 +38,7 @@ return [
                 'alerts' => true,
                 'locations' => false,
                 'purchase_orders' => false,
+                'realtime_alerts' => false,
             ],
         ],
         'growth' => [
@@ -49,6 +51,7 @@ return [
                 'alerts' => true,
                 'locations' => true,
                 'purchase_orders' => true,
+                'realtime_alerts' => true,
             ],
         ],
     ],

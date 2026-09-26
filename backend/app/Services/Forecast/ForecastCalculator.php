@@ -73,6 +73,10 @@ class ForecastCalculator
         $reorderPoint = $min ?? ($max !== null ? min($computedPoint, $max) : $computedPoint);
         $target = $max ?? max($computedTarget, (float) $reorderPoint);
         $needed = max(0, (int) ceil($target - $position - 1e-9));
+        // Overstock: what is held beyond the level the forecast (or the merchant's max) says to hold.
+        $targetStock = (int) ceil($target - 1e-9);
+        $excess = ($avg > 0 || $max !== null) ? max(0, $position - $targetStock) : 0;
+        $overstock = $avg > 0 && $targetStock > 0 && $excess > $targetStock * (float) ($this->config['overstock_ratio'] ?? 0.5);
         $rounding = $this->roundOrder($needed, $in->minOrderQty, $in->packSize);
         $suggested = $rounding['final'];
 
@@ -120,6 +124,9 @@ class ForecastCalculator
                 'order_cycle_days' => $cycle,
                 'suggested_qty' => $suggested,
                 'computed_point' => $computedPoint,
+                'target' => $targetStock,
+                'excess' => $excess,
+                'overstock' => $overstock,
                 'min_stock' => $min,
                 'max_stock' => $max,
                 // What the supplier accepts: minimum order and whole packs (only when ordering).
@@ -145,6 +152,8 @@ class ForecastCalculator
             reorderDate: $reorderDate,
             reorderPoint: $reorderPoint,
             suggestedQty: $suggested,
+            targetStock: $targetStock,
+            excessUnits: $excess,
             confidence: Confidence::from($confidence['level']),
             explanation: $explanation,
         );

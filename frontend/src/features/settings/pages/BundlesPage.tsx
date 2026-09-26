@@ -28,7 +28,7 @@ export function BundlesPage() {
             </s-button>
             {error && <ErrorBanner error={error} onRetry={() => refetch()} />}
             {!allowed && (
-                <UpgradePrompt plan="starter">{t('bundles.locked')}</UpgradePrompt>
+                <UpgradePrompt id="bundles" plan="starter">{t('bundles.locked')}</UpgradePrompt>
             )}
 
             {data && data.length === 0 ? (

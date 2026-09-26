@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Enums\AlertFrequency;
+use App\Enums\RealtimeAlertMode;
 use App\Support\Locales;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -21,6 +22,7 @@ class SettingsRequest extends FormRequest
             'alerts.enabled' => ['sometimes', 'boolean'],
             'alerts.frequency' => ['sometimes', Rule::enum(AlertFrequency::class)],
             'alerts.weekly_day' => ['sometimes', 'integer', 'between:1,7'],
+            'alerts.realtime' => ['sometimes', Rule::enum(RealtimeAlertMode::class)],
         ];
     }
 }

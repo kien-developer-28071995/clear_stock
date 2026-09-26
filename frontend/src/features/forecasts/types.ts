@@ -7,6 +7,9 @@ export interface ForecastRow {
     product_title: string;
     variant_title: string | null;
     sku: string | null;
+    /** Shopify product vendor / product type (filters, suppliers from vendors). */
+    vendor: string | null;
+    product_type: string | null;
     unit_cost: number | null;
     supplier: { id: number; name: string } | null;
     is_bundle: boolean;
@@ -19,6 +22,9 @@ export interface ForecastRow {
     reorder_date: string | null;
     reorder_point: number;
     suggested_qty: number;
+    /** Order-up-to level, and stock (+ on the way) above it. */
+    target_stock: number;
+    excess_units: number;
     confidence: Confidence;
     status: ForecastStatus;
     computed_at: string;
@@ -93,6 +99,8 @@ export interface ForecastDetail extends ForecastRow {
         min_stock: number | null;
         /** Manual order-up-to level; null = from the forecast. */
         max_stock: number | null;
+        /** No alert email (digest or real-time) mentions this product. */
+        alerts_muted: boolean;
     };
     defaults: { lead_time_days: number; safety_days: number };
 }
@@ -117,6 +125,8 @@ export interface LocationForecast {
 export interface ForecastFilters {
     location_id?: number | '';
     status?: ForecastStatus | '';
+    vendor?: string;
+    product_type?: string;
     search?: string;
     sort?: 'urgency' | 'cover' | 'name' | 'suggested' | 'value';
     page?: number;
@@ -133,4 +143,5 @@ export interface VariantSettingsInput {
     pack_size?: number | null;
     min_stock?: number | null;
     max_stock?: number | null;
+    alerts_muted?: boolean;
 }

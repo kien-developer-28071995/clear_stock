@@ -30,6 +30,25 @@ class CachedCatalogRepository implements CatalogRepositoryInterface
         );
     }
 
+    public function facets(Shop $shop): array
+    {
+        return $this->cache->remember(
+            CacheKeys::catalog($shop->id, CacheVersion::catalog($shop->id), 'facets'),
+            CacheKeys::TTL_CATALOG,
+            fn () => $this->inner->facets($shop),
+        );
+    }
+
+    public function vendorSummary(Shop $shop): array
+    {
+        return $this->inner->vendorSummary($shop);
+    }
+
+    public function variantsOfVendor(Shop $shop, string $vendor): array
+    {
+        return $this->inner->variantsOfVendor($shop, $vendor);
+    }
+
     // --- writes: bump the catalog version ------------------------------------------------
 
     public function upsertLocations(Shop $shop, array $rows): void

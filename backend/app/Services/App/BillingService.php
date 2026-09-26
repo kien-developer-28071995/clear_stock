@@ -6,7 +6,9 @@ use App\Enums\Feature;
 use App\Enums\Plan;
 use App\Enums\PlanInterval;
 use App\Enums\SyncType;
+use App\Events\PlanChanged;
 use App\Jobs\Forecast\RecomputeForecasts;
+use App\Jobs\SyncRealtimeWebhook;
 use App\Models\Shop;
 use App\Repositories\Contracts\CatalogRepositoryInterface;
 use App\Repositories\Contracts\ShopRepositoryInterface;
@@ -106,6 +108,28 @@ class BillingService
         return $this->apply($shop, Plan::Free, null, null, null, null);
     }
 
+    /**
+     * Safety net for missed app_subscriptions/update webhooks: re-read the subscription
+     * from Shopify and fix the plan if it drifted. A drift is logged as a warning (it
+     * means a webhook was lost). @return bool whether the plan had drifted
+     */
+    public function reconcile(Shop $shop): bool
+    {
+        $before = [$shop->plan, $shop->plan_interval, $shop->subscription_id];
+        $shop = $this->refresh($shop);
+        $drifted = $before !== [$shop->plan, $shop->plan_interval, $shop->subscription_id];
+
+        if ($drifted) {
+            Log::warning('Billing drift fixed (missed webhook?)', [
+                'shop' => $shop->domain,
+                'from' => $before[0]?->value.($before[1] ? " ({$before[1]->value})" : ''),
+                'to' => $shop->plan->value.($shop->plan_interval ? " ({$shop->plan_interval->value})" : ''),
+            ]);
+        }
+
+        return $drifted;
+    }
+
     /** Trial days still available: the full trial once, then whatever is left of it. */
     public function trialDaysLeft(Shop $shop): int
     {
@@ -140,6 +164,7 @@ class BillingService
     private function apply(Shop $shop, Plan $plan, ?PlanInterval $interval, ?string $subscriptionId, ?string $status, ?Carbon $renewsAt): Shop
     {
         $previous = $shop->plan;
+        $previousInterval = $shop->plan_interval;
         $shop = $this->shops->update($shop, [
             'plan' => $plan,
             'plan_interval' => $interval,
@@ -163,6 +188,12 @@ class BillingService
                 // SKU limit, bundle demand and location forecasts depend on the plan.
                 RecomputeForecasts::dispatch($shop->id);
             }
+            // Real-time alerts are Growth only: subscribe or drop the inventory webhook.
+            SyncRealtimeWebhook::dispatch($shop->id);
+        }
+
+        if ($previous !== $plan || $previousInterval !== $interval) {
+            PlanChanged::dispatch($shop, $previous, $previousInterval, $plan, $interval);
         }
 
         return $shop;

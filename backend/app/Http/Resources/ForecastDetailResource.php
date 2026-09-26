@@ -37,6 +37,7 @@ class ForecastDetailResource extends ForecastResource
                 'pack_size' => $v->pack_size,
                 'min_stock' => $v->min_stock,
                 'max_stock' => $v->max_stock,
+                'alerts_muted' => $v->alerts_muted,
             ],
             'defaults' => $shop,
         ];

@@ -22,6 +22,12 @@ class EloquentForecastQueryRepository implements ForecastQueryRepositoryInterfac
             $this->whereStatus($query, $status, $today);
         }
 
+        foreach (['vendor', 'product_type'] as $field) {
+            if (($filters[$field] ?? '') !== '') {
+                $query->where("variants.{$field}", $filters[$field]);
+            }
+        }
+
         if ($search = trim((string) ($filters['search'] ?? ''))) {
             $like = '%'.str_replace(['%', '_'], ['\%', '\_'], $search).'%';
             $query->where(fn ($q) => $q->where('variants.product_title', 'like', $like)
@@ -148,6 +154,32 @@ class EloquentForecastQueryRepository implements ForecastQueryRepositoryInterfac
         ];
     }
 
+    public function overstock(Shop $shop, string $today, int $limit): array
+    {
+        $query = $this->base($shop);
+        $this->whereStatus($query, ForecastStatus::Overstock, $today);
+        $rows = $query->with('variant')->get(['forecasts.*']);
+
+        $withCost = $rows->filter(fn (Forecast $f) => $f->variant->unit_cost !== null);
+        $value = fn (Forecast $f) => round($f->excess_units * (float) $f->variant->unit_cost, 2);
+
+        return [
+            'value' => round($withCost->sum($value), 2),
+            'units' => (int) $rows->sum('excess_units'),
+            'count' => $rows->count(),
+            'missing_cost' => $rows->count() - $withCost->count(),
+            'top' => $rows->sortByDesc(fn (Forecast $f) => [$value($f), $f->excess_units])->take($limit)->map(fn (Forecast $f) => [
+                'variant_id' => $f->variant_id,
+                'name' => $f->variant->displayName(),
+                'sku' => $f->variant->sku,
+                'stock' => $f->current_stock,
+                'target' => $f->target_stock,
+                'excess' => $f->excess_units,
+                'value' => $f->variant->unit_cost !== null ? $value($f) : null,
+            ])->values()->all(),
+        ];
+    }
+
     /**
      * Forecasts of active variants of this shop, joined to variants for search/sort.
      * Combined (all locations) by default, or one location's forecasts.
@@ -164,13 +196,20 @@ class EloquentForecastQueryRepository implements ForecastQueryRepositoryInterfac
     private function whereStatus(Builder $query, ForecastStatus $status, string $today): void
     {
         $slowDays = (int) config('forecast.slow_mover_days');
+        $ratio = (float) config('forecast.overstock_ratio');
+        // Same rules as ForecastStatusResolver.
+        $overstock = fn ($q) => $q->where('forecasts.avg_daily_sales', '>', 0)->where('forecasts.target_stock', '>', 0)
+            ->whereRaw('forecasts.excess_units > forecasts.target_stock * ?', [$ratio]);
 
         match ($status) {
             ForecastStatus::ReorderNow => $query->where('forecasts.reorder_date', '<=', $today),
             ForecastStatus::OutOfStock => $query->where('forecasts.current_stock', '<=', 0)->where('forecasts.avg_daily_sales', '>', 0),
             ForecastStatus::Slow => $query->where('forecasts.current_stock', '>', 0)
                 ->where(fn ($q) => $q->where('forecasts.avg_daily_sales', '=', 0)->orWhere('forecasts.days_of_cover', '>', $slowDays)),
-            ForecastStatus::Healthy => $query->where('forecasts.reorder_date', '>', $today)->where('forecasts.days_of_cover', '<=', $slowDays),
+            ForecastStatus::Overstock => $query->where('forecasts.reorder_date', '>', $today)->where('forecasts.days_of_cover', '<=', $slowDays)
+                ->where('forecasts.current_stock', '>', 0)->where($overstock),
+            ForecastStatus::Healthy => $query->where('forecasts.reorder_date', '>', $today)->where('forecasts.days_of_cover', '<=', $slowDays)
+                ->whereNot($overstock),
         };
     }
 }
