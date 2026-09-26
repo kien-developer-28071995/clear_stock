@@ -10,6 +10,7 @@ use App\Events\ShopSynced;
 use App\Exceptions\ShopifyApiException;
 use App\Exceptions\ShopifyReauthorizeException;
 use App\Exceptions\SyncFailedException;
+use App\Jobs\NotifySyncFailing;
 use App\Jobs\Sync\CheckSyncRun;
 use App\Jobs\Sync\ProcessSyncRun;
 use App\Jobs\Sync\StartSyncRun;
@@ -223,6 +224,7 @@ class SyncService
             $shop = $this->shops->update($shop, [
                 'sync_status' => SyncRunStatus::Completed->value,
                 'sync_error' => null,
+                'sync_failure_notified_at' => null,   // a new streak of failures may email again
                 'last_synced_at' => $run->started_at,
             ]);
 
@@ -271,6 +273,7 @@ class SyncService
         $this->shops->update($shop, ['sync_status' => SyncRunStatus::Failed->value, 'sync_error' => $error]);
 
         Log::error('Sync failed', ['shop' => $shop->domain, 'run' => $runId, 'exception' => $e]);
+        NotifySyncFailing::dispatch($shop->id);
     }
 
     /** @return array{0: ?SyncRun, 1: ?Shop} */

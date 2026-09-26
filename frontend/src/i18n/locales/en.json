@@ -480,7 +480,9 @@
     "switchToFree": "Switch to Free",
     "startTrial": "Start {{count}}-day free trial",
     "choose": "Choose {{plan}}",
-    "lockedHint": "Included in {{plan}}"
+    "lockedHint": "Included in {{plan}}",
+    "priceLockBadge": "Price lock",
+    "priceLock": "The price you subscribe at never goes up while you stay on that plan. If our prices rise, you keep yours."
   },
   "apiErrors": {
     "scope_required": "Clear Stock needs permission to create transfers in Shopify. Click the button again and approve it.",

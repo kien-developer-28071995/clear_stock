@@ -26,4 +26,11 @@ return [
 
     // Minimum minutes between two manual syncs.
     'manual_cooldown_minutes' => 5,
+
+    // One email to the merchant when syncing keeps failing: after this many failed runs in a
+    // row and no successful sync for this many hours. Sent once per streak (no spam).
+    'failure_email' => [
+        'min_failures' => 2,
+        'stale_hours' => 24,
+    ],
 ];

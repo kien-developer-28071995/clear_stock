@@ -38,6 +38,7 @@ use Illuminate\Support\Carbon;
  * @property ?array{events?: array<string, string>, skipped?: array<int, string>, dismissed_at?: ?string, tips_dismissed?: array<int, string>} $setup_guide
  * @property SyncStatus $sync_status
  * @property ?array{code: string, params: array<string, mixed>} $sync_error
+ * @property ?Carbon $sync_failure_notified_at merchant emailed about this streak of failed syncs
  * @property ?Carbon $last_synced_at
  * @property ?Carbon $forecasted_at
  * @property ?string $realtime_webhook_id shop-specific inventory_levels/update subscription (real-time alerts)
@@ -54,7 +55,7 @@ class Shop extends Model
         'domain', 'name',
         'access_token', 'access_token_expires_at', 'refresh_token', 'refresh_token_expires_at', 'scopes',
         'plan', 'plan_interval', 'subscription_id', 'subscription_status', 'plan_renews_at', 'trial_started_at', 'currency', 'timezone', 'locale', 'default_lead_time_days', 'default_safety_days', 'onboarded_at', 'setup_guide',
-        'sync_status', 'sync_error', 'last_synced_at', 'forecasted_at', 'realtime_webhook_id',
+        'sync_status', 'sync_error', 'sync_failure_notified_at', 'last_synced_at', 'forecasted_at', 'realtime_webhook_id',
         'installed_at', 'uninstalled_at',
     ];
 
@@ -81,6 +82,7 @@ class Shop extends Model
             'trial_started_at' => 'datetime',
             'sync_status' => SyncStatus::class,
             'sync_error' => 'array',
+            'sync_failure_notified_at' => 'datetime',
             'last_synced_at' => 'datetime',
             'forecasted_at' => 'datetime',
             'installed_at' => 'datetime',

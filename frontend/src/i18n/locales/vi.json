@@ -458,7 +458,9 @@
     "switchToFree": "Chuyển sang Miễn phí",
     "startTrial": "Dùng thử miễn phí {{count}} ngày",
     "choose": "Chọn gói {{plan}}",
-    "lockedHint": "Có trong gói {{plan}}"
+    "lockedHint": "Có trong gói {{plan}}",
+    "priceLockBadge": "Giữ giá",
+    "priceLock": "Giá lúc bạn đăng ký không bao giờ tăng khi bạn còn dùng gói đó. Nếu chúng tôi tăng giá, bạn vẫn giữ giá cũ."
   },
   "apiErrors": {
     "scope_required": "Clear Stock cần được cấp quyền tạo phiếu chuyển kho trong Shopify. Hãy bấm lại nút và chấp thuận.",

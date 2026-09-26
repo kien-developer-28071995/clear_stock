@@ -29,5 +29,8 @@ interface SyncRunRepositoryInterface
     /** @return Collection<int, SyncRun> running runs started before $before */
     public function runningStartedBefore(Carbon $before): Collection;
 
+    /** Failed runs since the last completed one (newest first, running runs skipped). */
+    public function consecutiveFailures(Shop $shop): int;
+
     public function pruneFinishedBefore(Carbon $before): int;
 }

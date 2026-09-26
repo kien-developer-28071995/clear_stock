@@ -100,6 +100,11 @@ export function PlansPage() {
                     <s-paragraph>
                         {t('plans.intro')} {t('plans.tracking', { count: data.usage.tracked_skus, total: formatNumber(data.usage.tracked_skus) })}
                     </s-paragraph>
+                    {/* Price lock: Shopify subscriptions keep their price; we never move a shop to a new price. */}
+                    <s-stack direction="inline" gap="small-200" alignItems="center">
+                        <s-badge tone="success" icon="lock">{t('plans.priceLockBadge')}</s-badge>
+                        <s-text>{t('plans.priceLock')}</s-text>
+                    </s-stack>
                 </s-stack>
             </s-section>
 

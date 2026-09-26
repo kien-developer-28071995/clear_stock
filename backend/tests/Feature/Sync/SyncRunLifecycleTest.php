@@ -214,6 +214,7 @@ it('imports everything once all operations complete', function () {
             ['quantity' => 4, 'currentQuantity' => 4, 'variant' => ['id' => gid('ProductVariant', 1)], 'lineItemGroup' => null, '__parentId' => gid('Order', 5)],
         ],
     ]);
+    $this->shop->update(['sync_failure_notified_at' => now()->subDay()]);   // emailed about an earlier streak
     $run = $this->sync->start($this->shop, SyncType::Initial);
     $this->sync->submit($run->id);
     $this->sync->check($run->id);
@@ -223,7 +224,8 @@ it('imports everything once all operations complete', function () {
 
     $run->refresh();
     $variant = Variant::forShop($this->shop)->first();
-    expect($run->status)->toBe(SyncRunStatus::Completed)
+    expect($this->shop->fresh()->sync_failure_notified_at)->toBeNull()   // a new streak may email again
+        ->and($run->status)->toBe(SyncRunStatus::Completed)
         ->and($run->progress)->toBe(100)
         ->and($variant->sku)->toBe('MUG')
         ->and(InventoryLevel::where('variant_id', $variant->id)->value('available'))->toBe(0)

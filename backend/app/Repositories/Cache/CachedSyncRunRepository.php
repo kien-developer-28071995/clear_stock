@@ -73,6 +73,11 @@ class CachedSyncRunRepository implements SyncRunRepositoryInterface
         return $this->inner->runningStartedBefore($before);
     }
 
+    public function consecutiveFailures(Shop $shop): int
+    {
+        return $this->inner->consecutiveFailures($shop);
+    }
+
     public function pruneFinishedBefore(Carbon $before): int
     {
         return $this->inner->pruneFinishedBefore($before);

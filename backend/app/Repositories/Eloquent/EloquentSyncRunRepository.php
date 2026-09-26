@@ -76,6 +76,15 @@ class EloquentSyncRunRepository implements SyncRunRepositoryInterface
             ->get();
     }
 
+    public function consecutiveFailures(Shop $shop): int
+    {
+        $lastCompleted = SyncRun::query()->forShop($shop)->where('status', SyncRunStatus::Completed)->max('id');
+
+        return SyncRun::query()->forShop($shop)->where('status', SyncRunStatus::Failed)
+            ->when($lastCompleted !== null, fn ($q) => $q->where('id', '>', $lastCompleted))
+            ->count();
+    }
+
     public function pruneFinishedBefore(Carbon $before): int
     {
         return SyncRun::query()->withoutGlobalScope('shop')

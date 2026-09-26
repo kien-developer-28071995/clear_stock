@@ -90,7 +90,7 @@ Mỗi forecast lưu explanation gồm: các cửa sổ ngày đã dùng và tr�
 - Free: dưới 50 SKU, có dự báo, gợi ý nhập hàng và giải thích dự báo đầy đủ (quyết định 2026-09-26: giải thích mở cho mọi gói vì là lời hứa "minh bạch")
 - Starter $4/tháng ($38/năm): không giới hạn SKU, bundle, cảnh báo email, xuất PO + gửi đơn cho NCC thủ công, mô phỏng tăng trưởng (dùng thử 7 ngày, một lần mỗi shop)
 - Growth $6/tháng ($58/năm): multi-location, chuyển kho, tự động gửi đơn NCC hằng tuần, cảnh báo tức thời, Flow triggers (dùng thử 7 ngày)
-- Giá hạ từ $9/$24 xuống $2/$3 rồi nâng lên $4/$5, sau đó Growth lên $6 ngày 2026-09-26 (quyết định của chủ app). Xuất PO, gửi đơn thủ công và mô phỏng chuyển từ Growth xuống Starter cùng ngày. Shop đang trả tiền giữ giá cũ tới khi tự đổi gói (subscription Shopify giữ nguyên giá)
+- Giá hạ từ $9/$24 xuống $2/$3 rồi nâng lên $4/$5, sau đó Growth lên $6 ngày 2026-09-26 (quyết định của chủ app). Xuất PO, gửi đơn thủ công và mô phỏng chuyển từ Growth xuống Starter cùng ngày. Shop đang trả tiền giữ giá cũ tới khi tự đổi gói (subscription Shopify giữ nguyên giá). Đây là cam kết công khai "Giữ giá" trên trang Gói: không bao giờ chuyển shop sang giá mới
 - Gói năm giảm ~20%
 
 Giá cố định, không tính theo GMV, không hợp đồng, hủy bất cứ lúc nào.
@@ -185,5 +185,6 @@ Yêu cầu chung:
 - [x] Mô phỏng tăng trưởng (roadmap #7): `/api/what-if` + trang `/what-if`, tách `ForecastCalculator::reorderPlan` dùng chung cho forecast và kịch bản, lượng đặt theo ngày đặt (hôm nay: từ vị thế tồn; sau: từ điểm đặt lại), mọi gói, 379 test + 53 E2E
 - [x] Phân gói lại + giá Growth $6 ($58/năm): xuất PO + gửi đơn NCC thủ công + mô phỏng xuống Starter; tự động gửi NCC (`supplier_auto_email`) và Flow ở Growth; feature mới `what_if`, `supplier_auto_email`, `flow_triggers`, hộp hạ gói cập nhật
 - [x] Shopify Flow triggers (roadmap #14, Growth): 3 extension `extensions/flow-*` + `flow-lifecycle` (callback `/flow/lifecycle`, HMAC), `FlowTriggerPlanner` thuần (mỗi thay đổi 1 lần, ngưỡng hết hàng 30/14/7/0 có hysteresis), `SendFlowTriggers` sau mỗi lần forecast, chỉ shop có workflow bật, thẻ Shopify Flow trong Settings, 392 test + 56 E2E. Chưa thử với Flow thật (cần `app deploy`)
+- [x] Báo sync lỗi liên tục + giữ giá (roadmap #10, mọi gói): `SyncFailureNotifier` sau mỗi lần sync lỗi, 1 email/chuỗi lỗi (≥ 2 lỗi liên tiếp + 24h không sync được), `shops.sync_failure_notified_at` reset khi sync thành công; badge "Giữ giá" trên trang Gói, 397 test
 - [ ] Việc sắp tới: xem mục "Việc sắp tới" trong `docs/ROADMAP.md`
 - [ ] Phase 7: Chuẩn bị nộp App Store (nhớ: gỡ scope write_orders chỉ dùng cho dev:fake-orders khỏi shopify.app.toml và SHOPIFY_SCOPES; SHOPIFY_BILLING_TEST=false ở production)
