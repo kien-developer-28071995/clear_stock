@@ -1,0 +1,98 @@
+# Build the production images once, push them to GitHub Container Registry, and roll them out
+# on the server over SSH (deploy/deploy.sh). Setup: docs/DEPLOY.md.
+#
+# - Automatic after CI passes on main (never runs migrations: stops if the release has pending ones).
+# - Manual (Actions -> Deploy -> Run workflow): run migrations, or roll back to an earlier image tag.
+name: Deploy
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      migrate:
+        description: Run database migrations (php artisan migrate --force) before switching
+        type: boolean
+        default: false
+      tag:
+        description: Deploy an existing image tag instead of building (rollback), e.g. sha-1a2b3c4
+        type: string
+        default: ''
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  IMAGE_PREFIX: ghcr.io/${{ github.repository_owner }}/clear_stock
+
+jobs:
+  build:
+    # Automatic runs only when CI succeeded; manual rollbacks skip the build.
+    if: >-
+      (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success') ||
+      (github.event_name == 'workflow_dispatch' && inputs.tag == '')
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.tag.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+      - id: tag
+        run: echo "tag=sha-$(git rev-parse --short=7 HEAD)" >> "$GITHUB_OUTPUT"
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push app (PHP-FPM, Horizon, scheduler)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          target: app
+          push: true
+          tags: ${{ env.IMAGE_PREFIX }}-app:${{ steps.tag.outputs.tag }},${{ env.IMAGE_PREFIX }}-app:latest
+          cache-from: type=gha,scope=app
+          cache-to: type=gha,scope=app,mode=max
+      - name: Build and push web (nginx + frontend build)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          target: web
+          push: true
+          tags: ${{ env.IMAGE_PREFIX }}-web:${{ steps.tag.outputs.tag }},${{ env.IMAGE_PREFIX }}-web:latest
+          cache-from: type=gha,scope=web
+          cache-to: type=gha,scope=web,mode=max
+
+  deploy:
+    needs: build
+    # Also runs for a manual rollback (build skipped).
+    if: always() && (needs.build.result == 'success' || (github.event_name == 'workflow_dispatch' && inputs.tag != ''))
+    runs-on: ubuntu-latest
+    # Settings -> Environments -> production: add required reviewers to approve every deploy.
+    environment: production
+    steps:
+      - uses: actions/checkout@v5
+      - name: SSH key
+        run: |
+          install -m 700 -d ~/.ssh
+          echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_deploy
+          chmod 600 ~/.ssh/id_deploy
+          echo "${{ secrets.DEPLOY_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+      - name: Copy compose file and deploy script
+        run: |
+          scp -i ~/.ssh/id_deploy -P "${{ secrets.DEPLOY_PORT || 22 }}" \
+            docker-compose.prod.yml deploy/deploy.sh \
+            "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:${{ secrets.DEPLOY_PATH }}/"
+      - name: Roll out
+        run: |
+          ssh -i ~/.ssh/id_deploy -p "${{ secrets.DEPLOY_PORT || 22 }}" "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}" \
+            "cd '${{ secrets.DEPLOY_PATH }}' && IMAGE_PREFIX='${{ env.IMAGE_PREFIX }}' bash deploy.sh '${{ inputs.tag || needs.build.outputs.tag }}' ${{ inputs.migrate && '--migrate' || '' }}"

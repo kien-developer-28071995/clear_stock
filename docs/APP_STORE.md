@@ -14,6 +14,8 @@ switched off with `FEATURE_*` (README "Feature switches") and can be released la
 | ABC classes | **On** | Read-only view of existing data. |
 | Purchase order CSV export | **On** (Starter) | A download, nothing sent anywhere. |
 | Sales what-if | **On** (Starter) | Read-only calculation. |
+| Purchase plan (12 weeks of orders and spend) | **On** (Starter) | Read-only calculation. |
+| One-off sales spikes ignored, sales lost to stock-outs | **On** (every plan) | Forecast quality and a read-only view; merchants can turn spike filtering off in Settings. |
 | New products from a similar product | **On** (Starter) | A setting on the product page. |
 | Emailing orders to suppliers | Off | Sends email to third parties on the merchant's behalf: more review questions and needs a verified sending domain first. |
 | Per-location forecasts | Off | Needs 2 extra protected scopes (`read_*_fulfillment_orders`). |

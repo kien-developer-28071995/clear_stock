@@ -22,6 +22,7 @@ export function SupplierModal({ modalRef, supplier, onDone }: Props) {
     const [lead, setLead] = useState('');
     const [minOrder, setMinOrder] = useState('');
     const [pack, setPack] = useState('');
+    const [cycle, setCycle] = useState('');
     const [autoEmail, setAutoEmail] = useState(false);
     // Emailing an order by hand is Starter; automatic weekly orders are Growth.
     const canAutoEmail = useEntitlements().supplier_auto_email;
@@ -33,6 +34,7 @@ export function SupplierModal({ modalRef, supplier, onDone }: Props) {
         setLead(supplier?.lead_time_days?.toString() ?? '');
         setMinOrder(supplier?.min_order_qty?.toString() ?? '');
         setPack(supplier?.pack_size?.toString() ?? '');
+        setCycle(supplier?.order_cycle_days?.toString() ?? '');
         setAutoEmail(supplier?.auto_email ?? false);
         create.reset();
         update.reset();
@@ -46,6 +48,7 @@ export function SupplierModal({ modalRef, supplier, onDone }: Props) {
             lead_time_days: lead === '' ? null : Number(lead),
             min_order_qty: minOrder === '' ? null : Number(minOrder),
             pack_size: pack === '' ? null : Number(pack),
+            order_cycle_days: cycle === '' ? null : Number(cycle),
             ...(canAutoEmail ? { auto_email: autoEmail && email.trim() !== '' } : {}),
         };
         const options = { onSuccess: () => { shopify.toast.show(supplier ? t('suppliers.updated') : t('suppliers.added')); onDone(); } };
@@ -85,6 +88,17 @@ export function SupplierModal({ modalRef, supplier, onDone }: Props) {
                     />
                 </s-grid>
                 <s-text color="subdued">{t('suppliers.orderRulesHelp')}</s-text>
+                <s-number-field
+                    label={t('suppliers.orderCycle')}
+                    suffix={t('common.daysSuffix')}
+                    min={1}
+                    max={365}
+                    placeholder={t('suppliers.orderCycleDefault', { count: 30 })}
+                    details={t('suppliers.orderCycleHelp')}
+                    value={cycle}
+                    error={fieldError(mutation.error, 'order_cycle_days')}
+                    onInput={(e) => setCycle(e.currentTarget.value)}
+                />
                 <s-email-field
                     label={t('suppliers.email')}
                     details={t('suppliers.emailHelp')}

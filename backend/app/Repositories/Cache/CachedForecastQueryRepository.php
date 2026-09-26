@@ -86,6 +86,11 @@ class CachedForecastQueryRepository implements ForecastQueryRepositoryInterface
         return $this->remember($shop, $today, "overstock{$limit}", fn () => $this->inner->overstock($shop, $today, $limit));
     }
 
+    public function lostSales(Shop $shop, int $limit): array
+    {
+        return $this->remember($shop, 'any', "lost{$limit}", fn () => $this->inner->lostSales($shop, $limit));
+    }
+
     public function planningRows(Shop $shop, array $filters): iterable
     {
         return $this->inner->planningRows($shop, $filters);

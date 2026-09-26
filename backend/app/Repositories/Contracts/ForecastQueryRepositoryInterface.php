@@ -61,6 +61,14 @@ interface ForecastQueryRepositoryInterface
     public function overstock(Shop $shop, string $today, int $limit): array;
 
     /**
+     * Sales missed on the out-of-stock days of the last 30 days (combined forecasts): units, and
+     * revenue at the current selling price. Top products by lost revenue.
+     *
+     * @return array{units: float, revenue: float, count: int, missing_price: int, top: array<int, array{variant_id: int, name: string, sku: ?string, stock: int, out_of_stock_days: int, units: float, revenue: ?float}>}
+     */
+    public function lostSales(Shop $shop, int $limit): array;
+
+    /**
      * Per ABC class (combined forecasts of active products): products, revenue and stock value.
      *
      * @return array{classes: array<string, array{count: int, revenue: float, revenue_share: float, stock_value: float}>, unclassified: int, missing_cost: int}

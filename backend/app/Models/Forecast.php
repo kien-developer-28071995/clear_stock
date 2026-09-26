@@ -17,6 +17,7 @@ use Illuminate\Support\Carbon;
  * @property int $current_stock
  * @property int $target_stock order-up-to level
  * @property int $excess_units stock + on the way above target_stock
+ * @property string $lost_units_30d units that would have sold on the out-of-stock days of the last 30 days
  * @property int $incoming_stock on the way (Shopify "incoming"), counted toward reordering
  * @property string $avg_daily_sales
  * @property ?string $days_of_cover
@@ -34,7 +35,7 @@ class Forecast extends Model
 
     protected $fillable = [
         'shop_id', 'variant_id', 'location_id', 'current_stock', 'incoming_stock', 'avg_daily_sales', 'days_of_cover',
-        'stockout_date', 'reorder_date', 'reorder_point', 'suggested_qty', 'target_stock', 'excess_units', 'confidence', 'explanation', 'computed_at',
+        'stockout_date', 'reorder_date', 'reorder_point', 'suggested_qty', 'target_stock', 'excess_units', 'lost_units_30d', 'confidence', 'explanation', 'computed_at',
     ];
 
     protected function casts(): array
@@ -43,6 +44,7 @@ class Forecast extends Model
             'current_stock' => 'integer',
             'target_stock' => 'integer',
             'excess_units' => 'integer',
+            'lost_units_30d' => 'decimal:2',
             'incoming_stock' => 'integer',
             'avg_daily_sales' => 'decimal:3',
             'days_of_cover' => 'decimal:1',

@@ -77,6 +77,8 @@ class ForecastInputBuilder
                     minOrderQty: $base->minOrderQty,
                     packSize: $base->packSize,
                     orderRulesSupplier: $base->orderRulesSupplier,
+                    orderCycleDays: $base->orderCycleDays,
+                    filterSpikes: $base->filterSpikes,
                 )];
             }
         }
@@ -108,6 +110,7 @@ class ForecastInputBuilder
 
         $bundleIds = array_values(array_unique(array_merge([], ...array_map('array_keys', $bundles))));
         $rows = $this->sales->rowsBetween($shop, array_values(array_unique([...$variantIds, ...$bundleIds])), $historyStart, $yesterday);
+        $filterSpikes = $shop->filter_sales_spikes && Entitlements::for($shop)->has(Feature::SpikeFilter);
 
         $inputs = [];
         foreach ($variantIds as $id) {
@@ -156,6 +159,8 @@ class ForecastInputBuilder
                     || ($variant->pack_size === null && $variant->supplier?->pack_size !== null) ? $variant->supplier->name : null,
                 minStock: $variant->min_stock,
                 maxStock: $variant->max_stock,
+                orderCycleDays: $variant->supplier?->order_cycle_days,
+                filterSpikes: $filterSpikes,
             );
         }
 

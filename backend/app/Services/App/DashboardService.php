@@ -61,6 +61,8 @@ class DashboardService
             'slow_movers' => $this->forecasts->slowMovers($shop, 5) + ['days' => (int) config('forecast.slow_mover_days')],
             // Still selling, but more stock than the forecast says to hold.
             'overstock' => $this->forecasts->overstock($shop, $todayYmd, 5),
+            // Sales missed while out of stock, last 30 days (Insights).
+            'lost_sales' => Features::enabled(Feature::LostSales) ? $this->forecasts->lostSales($shop, 5) + ['days' => 30] : null,
             // Products, revenue and stock value per ABC class (Insights).
             'abc' => ! Features::enabled(Feature::Abc) ? null : $this->forecasts->abcSummary($shop) + [
                 'days' => (int) config('forecast.abc.days'),

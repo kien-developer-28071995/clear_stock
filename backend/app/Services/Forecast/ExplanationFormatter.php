@@ -2,6 +2,8 @@
 
 namespace App\Services\Forecast;
 
+use App\Enums\Feature;
+use App\Support\Features;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Number;
 
@@ -55,6 +57,16 @@ class ExplanationFormatter
             }
         }
 
+        // One-off spikes capped (absent in explanations computed before it existed)
+        $spikes = $e['spikes'] ?? null;
+        if ($e['avg_source'] !== 'override' && ($spikes['applied'] ?? false)) {
+            $top = $spikes['days'][0];
+            $out[] = $this->line('spikes_capped', [
+                'count' => count($spikes['days']), 'units' => $this->round($spikes['units_removed']),
+                'top' => $this->round($top['units']), 'top_date' => $top['date'], 'usual' => $this->round($top['usual']),
+            ]);
+        }
+
         // Seasonality
         $s = $e['seasonality'];
         if ($s['applied']) {
@@ -100,6 +112,8 @@ class ExplanationFormatter
             }
             if ($max !== null) {
                 $out[] = $this->line('order_up_to_max', ['count' => $max]);
+            } elseif (($e['reorder']['order_cycle_source'] ?? null) === 'supplier') {
+                $out[] = $this->line('order_cycle_supplier', ['count' => $e['reorder']['order_cycle_days'], 'supplier' => $e['reorder']['order_cycle_supplier']]);
             }
 
             $stock = $e['stock']['current'];
@@ -135,6 +149,12 @@ class ExplanationFormatter
         // Overstock: holding clearly more than needed (still selling).
         if (($e['reorder']['overstock'] ?? false) === true) {
             $out[] = $this->line('overstock', ['count' => $e['reorder']['excess'], 'target' => $e['reorder']['target']]);
+        }
+
+        // Sales missed while out of stock (absent in explanations computed before it existed)
+        $lost = $e['lost_sales'] ?? null;
+        if ($lost !== null && $lost['units'] > 0 && Features::enabled(Feature::LostSales)) {
+            $out[] = $this->line('lost_sales', ['count' => $lost['out_of_stock_days'], 'units' => $this->round($lost['units']), 'days' => $lost['days']]);
         }
 
         // Confidence

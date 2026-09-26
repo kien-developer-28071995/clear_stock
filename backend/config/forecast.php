@@ -34,6 +34,20 @@ return [
         'max_factor' => 2.5,
     ],
 
+    // One-off spikes (a wholesale order, a viral day) in the last `days` days are capped to the usual
+    // level: a day selling at least `min_units` and more than `factor` x the average of the other in-stock
+    // days. Only for products with enough in-stock days and selling days to know what "usual" is.
+    // More than `max_days` such days is a pattern (a weekly wholesale customer), not a spike: kept.
+    // Merchants can switch it off in Settings (shops.filter_sales_spikes).
+    'spikes' => [
+        'days' => 90,
+        'max_days' => 3,
+        'factor' => 5,
+        'min_units' => 10,
+        'min_in_stock_days' => 20,
+        'min_selling_days' => 5,
+    ],
+
     // Stock counts as "slow-moving" (cash tied up) when it would last longer than this, or never sells.
     // Overstock: stock + on the way exceeds the order-up-to level by more than this share
     // (0.5 = 50% more than the forecast says to hold). Slow movers are reported as slow instead.
@@ -53,7 +67,8 @@ return [
         'b' => 0.95,
     ],
 
-    // Suggested order covers lead time + safety days + this many days of sales.
+    // Suggested order covers lead time + safety days + this many days of sales
+    // (a supplier's own order cycle, suppliers.order_cycle_days, wins).
     'order_cycle_days' => 30,
 
     'confidence' => [

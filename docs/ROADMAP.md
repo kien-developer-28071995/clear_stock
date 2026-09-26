@@ -85,6 +85,26 @@ Nghiên cứu ngày 2026-09-26 (Shopify App Store, review 1–3 sao, bài viết
 
 Nguồn lần 2: https://community.shopify.dev/t/feature-request-expose-the-existing-purchase-orders-to-the-admin-graphql-api/35229 · https://help.shopify.com/en/manual/products/inventory/purchase-orders/creating-purchase-orders · https://apps.shopify.com/stockahead-1 · https://apps.shopify.com/inventory-forecasting-hero/reviews · https://shopify.dev/docs/apps/build/flow/triggers · https://shopify.dev/docs/api/admin-extensions · https://help.shopify.com/en/manual/shopify-flow/reference/triggers/product-variant-inventory-quantity-changed
 
+## Nghiên cứu bổ sung (2026-09-27, lần 3)
+
+### Phát hiện
+- **Forthcast** ($19.99): "lost sales & stockout tracking", "demand spike & anomaly detection", báo cáo độ chính xác dự báo, 24 ngôn ngữ.
+- **Forstock** ($79–159 theo doanh thu): tính đến lead time + MOQ + quy cách thùng, loại sản phẩm bán một lần khỏi kế hoạch, dự báo 12 tháng.
+- **Assisty** ($19–199): "buying calendar", nhịp đặt hàng theo NCC (supplier cadence), duyệt PO.
+- **Inventory Planner (Sage)**: lập kế hoạch dòng tiền (cash flow planning) cho hàng nhập.
+- **Prediko** ($49–199): BOM nguyên liệu, 20+ báo cáo, đồng bộ Amazon/Faire/Etsy.
+
+### Đã làm (2026-09-27)
+17. ✅ **Bỏ qua ngày bán đột biến** (mọi gói, `FEATURE_SPIKE_FILTER`, tắt được trong Settings `shops.filter_sales_spikes`): trong 90 ngày, ngày bán ≥ 10 cái và > 5 lần trung bình các ngày còn hàng khác được tính theo mức thường ngày; cần ≥ 20 ngày còn hàng và ≥ 5 ngày có bán; hơn 3 ngày như vậy là quy luật (khách sỉ hằng tuần) nên giữ nguyên (`forecast.spikes`). Explanation `spikes` + dòng `spikes_capped`. (Forthcast, Monocle có.)
+18. ✅ **Doanh thu mất do hết hàng** (mọi gói, `FEATURE_LOST_SALES`): `forecasts.lost_units_30d` = tốc độ bán × số ngày hết hàng trong 30 ngày; mục ở Phân tích (× giá bán hiện tại), dòng giải thích `lost_sales`. (Forthcast có.)
+19. ✅ **Chu kỳ đặt hàng theo NCC** (mọi gói, cài đặt lõi): `suppliers.order_cycle_days` thay cho 30 ngày mặc định khi tính lượng đặt; dùng chung cho what-if và kế hoạch nhập; dòng giải thích `order_cycle_supplier`. (Assisty "supplier cadence".)
+20. ✅ **Kế hoạch nhập hàng 12 tuần** (Starter+, `FEATURE_PURCHASE_PLAN`): trang `/purchase-plan`, `PurchasePlanner` thuần mô phỏng từng ngày với đúng phép tính đặt hàng, tổng theo tuần (biểu đồ chi phí), theo NCC, theo sản phẩm; lọc NCC/Vendor, 4/8/12 tuần; không lưu gì. (Inventory Planner cash flow, Assisty buying calendar.)
+
+### Đề xuất tiếp
+- **Báo cáo độ chính xác dự báo** (Forthcast): lưu snapshot tốc độ bán hằng tuần (nhỏ), so với bán thực tế 4 tuần sau, hiển thị sai số theo sản phẩm → tăng niềm tin "minh bạch".
+- **Loại sản phẩm khỏi kế hoạch** (Forstock): đánh dấu hàng bán một lần/ngừng kinh doanh, không tính vào giới hạn 50 SKU của Free.
+- **Xuất PO theo kế hoạch nhập** và lịch đặt hàng (calendar) theo NCC.
+
 ## Việc sắp tới (tổng hợp, theo thứ tự đề xuất)
 
 1. ~~**#11 Tạo Purchase Order gốc của Shopify từ gợi ý**~~ — xong: nút xuất PO có thêm định dạng "Đơn đặt hàng Shopify" đúng mẫu `SKU,Barcode,Supplier SKU,Quantity,Cost,Tax` (không có API tạo PO), đồng bộ `variants.barcode`, bỏ qua sản phẩm không có SKU lẫn barcode và báo số lượng.

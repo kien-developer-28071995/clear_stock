@@ -37,8 +37,19 @@ it('explains a typical forecast in plain language', function () {
         'Sells 4/day over the last 30 days (3 out-of-stock days left out).',
         'Lead time 14 days (store default) + 7 safety days → reorder point 84 units.',
         '100 in stock runs out around Oct 15 → order 104 units by Sep 24.',
+        'Out of stock 3 days in the last 30 days: about 12 sales missed.',
         'Confidence: high.',
     ]);
+});
+
+it('explains capped spikes and a supplier order cycle', function () {
+    $d = days(120, fn ($ago) => ['sold' => $ago === 5 ? 60 : 4, 'returned' => 0, 'in_stock' => true]);
+
+    $lines = explain($d, 100, ['filterSpikes' => true, 'orderCycleDays' => 14, 'supplierName' => 'Acme']);
+
+    expect($lines)->toContain('Counted 1 one-off spike at the usual level (60 sold on Sep 15, usually 4/day).')
+        ->and($lines)->toContain('Orders cover 14 days of sales: the order cycle of Acme.')
+        ->and($lines[0])->toBe('Sells 4/day over the last 30 days.');
 });
 
 it('explains overrides, suppliers, bundles and low confidence', function () {

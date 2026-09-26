@@ -29,7 +29,8 @@
     "plans": "Plans",
     "reorder": "Reorder",
     "insights": "Insights",
-    "whatIf": "What-if"
+    "whatIf": "What-if",
+    "purchasePlan": "Purchase plan"
   },
   "notFound": {
     "heading": "Page not found",
@@ -384,6 +385,8 @@
   "settings": {
     "defaultsHeading": "Forecast defaults",
     "defaultsIntro": "Used for products without their own lead time or supplier.",
+    "filterSpikes": "Ignore one-off sales spikes",
+    "filterSpikesHelp": "A day that sells over 5× the usual (a wholesale order, a viral post) counts at the usual level, so one big order doesn't inflate reorders. Each forecast says when it happened.",
     "leadTime": "Default lead time",
     "leadTimeHelp": "How long a reorder usually takes to arrive.",
     "safety": "Default safety stock",
@@ -428,7 +431,11 @@
     "leadTimeHelp": "Used for all products from this supplier unless a product has its own lead time.",
     "email": "Email (optional)",
     "emailHelp": "For purchase orders.",
-    "orderRulesHelp": "Minimum order and pack size apply to all products from this supplier unless a product has its own."
+    "orderRulesHelp": "Minimum order and pack size apply to all products from this supplier unless a product has its own.",
+    "orderCycle": "Order every",
+    "orderCycleDefault_one": "Default: {{count}} day",
+    "orderCycleDefault_other": "Default: {{count}} days",
+    "orderCycleHelp": "How often you order from this supplier. Each suggested order covers this many days of sales on top of lead time and safety stock."
   },
   "bundles": {
     "add": "Add bundle",
@@ -471,12 +478,15 @@
       "purchaseOrders": "Purchase order export (CSV)",
       "realtimeAlerts": "Real-time stock alerts",
       "whatIf": "Sales what-if (\"+20% sales?\")",
+      "purchasePlan": "12-week purchase plan and spend",
       "supplierAutoEmail": "Automatic weekly orders to suppliers",
       "flowTriggers": "Shopify Flow triggers",
       "referenceProducts": "New products forecast from a similar product",
       "supplierEmails": "Email orders to suppliers",
       "transfers": "Stock transfers between locations",
-      "abc": "ABC classes by revenue"
+      "abc": "ABC classes by revenue",
+      "spikeFilter": "One-off sales spikes ignored",
+      "lostSales": "Sales lost to stock-outs"
     },
     "notApproved": "No plan change was approved",
     "nowOn": "You're on {{plan}}",
@@ -578,6 +588,12 @@
     "seasonality_rose_other": "Last year, sales rose ×{{factor}} over the next {{count}} days, so we adjusted to {{avg}}/day.",
     "seasonality_fell_one": "Last year, sales fell ×{{factor}} over the next {{count}} day, so we adjusted to {{avg}}/day.",
     "seasonality_fell_other": "Last year, sales fell ×{{factor}} over the next {{count}} days, so we adjusted to {{avg}}/day.",
+    "spikes_capped_one": "Counted {{count}} one-off spike at the usual level ({{top}} sold on {{top_date}}, usually {{usual}}/day).",
+    "spikes_capped_other": "Counted {{count}} one-off spikes at the usual level (biggest: {{top}} sold on {{top_date}}, usually {{usual}}/day).",
+    "order_cycle_supplier_one": "Orders cover {{count}} day of sales: the order cycle of {{supplier}}.",
+    "order_cycle_supplier_other": "Orders cover {{count}} days of sales: the order cycle of {{supplier}}.",
+    "lost_sales_one": "Out of stock {{count}} day in the last {{days}} days: about {{units}} sales missed.",
+    "lost_sales_other": "Out of stock {{count}} days in the last {{days}} days: about {{units}} sales missed.",
     "bundle_contribution_one": "Includes {{avg}}/day sold inside \"{{bundle}}\" ({{count}} per bundle).",
     "bundle_contribution_other": "Includes {{avg}}/day sold inside \"{{bundle}}\" ({{count}} per bundle).",
     "reorder_point_one": "Lead time {{lead_days}} days ({{lead_source}}) + {{safety_days}} safety days → reorder point {{count}} unit.",
@@ -724,6 +740,7 @@
       "realtime_alerts": "Real-time stock alerts are not available.",
       "realtime_alerts_active": "Real-time stock alerts to {{email}} stop.",
       "what_if": "The sales what-if is not available.",
+      "purchase_plan": "The purchase plan is not available.",
       "flow_triggers": "Shopify Flow triggers stop.",
       "flow_triggers_active": "Your Shopify Flow workflows using Clear Stock triggers stop running.",
       "reference_products_one": "{{count}} new product stops borrowing a similar product's sales rate.",
@@ -959,5 +976,47 @@
         }
       }
     }
+  },
+  "lostSales": {
+    "heading": "Sales lost to stock-outs",
+    "summaryWithRevenue_one": "About {{revenue}} ({{units}} units) missed in the last {{days}} days while {{count}} product was out of stock.",
+    "summaryWithRevenue_other": "About {{revenue}} ({{units}} units) missed in the last {{days}} days while {{count}} products were out of stock.",
+    "summary_one": "About {{units}} units missed in the last {{days}} days while {{count}} product was out of stock.",
+    "summary_other": "About {{units}} units missed in the last {{days}} days while {{count}} products were out of stock.",
+    "how": "Estimate: each product's sales rate × its out-of-stock days, at today's selling price.",
+    "missingPrice_one": "{{count}} product has no selling price and is not in the total.",
+    "missingPrice_other": "{{count}} products have no selling price and are not in the total.",
+    "daysOut": "Days out",
+    "units": "Units missed",
+    "revenue": "Revenue missed"
+  },
+  "purchasePlan": {
+    "intro": "Every order you'll need over the coming weeks if sales keep their current pace, and what it costs, so you can plan cash for stock. Same maths as the reorder suggestions: lead time, safety stock, min/max, minimum order, pack size and each supplier's order cycle. Nothing is saved.",
+    "locked": "Plan your orders and stock spending week by week.",
+    "period": "Period",
+    "weeks_one": "Next {{count}} week",
+    "weeks_other": "Next {{count}} weeks",
+    "nothing_one": "Nothing to order in the next {{count}} week at current sales.",
+    "nothing_other": "Nothing to order in the next {{count}} weeks at current sales.",
+    "summaryHeading": "{{from}} – {{to}}",
+    "totalCost": "Spend at unit cost",
+    "orders": "Orders",
+    "units": "Units",
+    "products": "Products",
+    "cost": "Cost",
+    "chartCost": "Spend per week",
+    "chartUnits": "Units per week (add unit costs to see spend)",
+    "chartLabel": "Spend per week",
+    "barTitle_one": "Week of {{week}}: {{value}}, {{count}} order",
+    "barTitle_other": "Week of {{week}}: {{value}}, {{count}} orders",
+    "unitsValue_one": "{{units}} unit",
+    "unitsValue_other": "{{units}} units",
+    "how": "Each product sells at its forecast rate; when its stock (with stock on the way) reaches the reorder point, it orders what the forecast suggests, and that order counts as on the way.",
+    "bySupplier": "By supplier",
+    "byProduct": "By product",
+    "firstOrder": "First order",
+    "noSupplier": "No supplier",
+    "orderDates": "Orders",
+    "orderOn": "{{date}}: {{qty}}"
   }
 }

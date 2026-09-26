@@ -15,6 +15,8 @@ class SettingsRequest extends FormRequest
         return [
             'default_lead_time_days' => ['sometimes', 'integer', 'min:1', 'max:365'],
             'default_safety_days' => ['sometimes', 'integer', 'min:0', 'max:365'],
+            // null = switched off app-wide (the settings page sends back what it got)
+            'filter_sales_spikes' => ['sometimes', 'nullable', 'boolean'],
             // null = follow the Shopify admin language
             'locale' => ['sometimes', 'nullable', Rule::in(Locales::supported())],
             'alerts' => ['sometimes', 'array'],

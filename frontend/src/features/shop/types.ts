@@ -20,6 +20,12 @@ export interface Entitlements {
     transfers: boolean;
     supplier_emails: boolean;
     abc: boolean;
+    /** One-off sales spikes capped before averaging (every plan). */
+    spike_filter: boolean;
+    /** Sales lost while out of stock (every plan). */
+    lost_sales: boolean;
+    /** 12-week order and spend plan (Starter and up). */
+    purchase_plan: boolean;
     /** App-wide switches (backend config/features.php): off = hide, don't upsell. */
     features: FeatureSwitches;
 }
@@ -28,6 +34,9 @@ export type FeatureSwitch =
     | 'what_if'
     | 'reference_products'
     | 'abc'
+    | 'purchase_plan'
+    | 'spike_filter'
+    | 'lost_sales'
     | 'purchase_orders'
     | 'supplier_emails'
     | 'locations'

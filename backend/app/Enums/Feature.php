@@ -25,12 +25,18 @@ enum Feature: string
     case SupplierEmails = 'supplier_emails';
     /** ABC classes by revenue (every plan; can be switched off app-wide). */
     case Abc = 'abc';
+    /** One-off sales spikes capped before averaging (every plan; merchants can switch it off in Settings). */
+    case SpikeFilter = 'spike_filter';
+    /** Estimated sales lost while out of stock (every plan). */
+    case LostSales = 'lost_sales';
+    /** Purchase plan: what to order and spend week by week over the next 12 weeks. */
+    case PurchasePlan = 'purchase_plan';
 
     /** The cheapest plan that includes it (for upgrade prompts). */
     public function minimumPlan(): Plan
     {
         return match ($this) {
-            self::Explanations, self::Abc => Plan::Free,
+            self::Explanations, self::Abc, self::SpikeFilter, self::LostSales => Plan::Free,
             self::Locations, self::Transfers, self::RealtimeAlerts, self::SupplierAutoEmail, self::FlowTriggers => Plan::Growth,
             default => Plan::Starter,
         };

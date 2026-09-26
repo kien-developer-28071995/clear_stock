@@ -41,6 +41,7 @@ it('lists what Growth to Free takes away, with the shop numbers', function () {
             ['code' => 'supplier_auto_emails', 'params' => ['count' => 1]],
             ['code' => 'flow_triggers', 'params' => []],
             ['code' => 'what_if', 'params' => []],
+            ['code' => 'purchase_plan', 'params' => []],
         ]);
 });
 

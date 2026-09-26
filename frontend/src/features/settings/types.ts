@@ -3,6 +3,8 @@ export type RealtimeAlertMode = 'off' | 'out_of_stock' | 'all';
 export interface Settings {
     default_lead_time_days: number;
     default_safety_days: number;
+    /** Cap one-off sales spikes before averaging; null when switched off app-wide. */
+    filter_sales_spikes: boolean | null;
     /** null = follow the Shopify admin language */
     locale: string | null;
     alerts: {
@@ -27,13 +29,15 @@ export interface Supplier {
     /** Defaults for this supplier's products (a product's own setting wins). */
     min_order_qty: number | null;
     pack_size: number | null;
+    /** How often orders go to this supplier: an order covers this many days of sales (null = app default). */
+    order_cycle_days: number | null;
     variants_count: number | null;
     /** Growth: purchase orders emailed automatically when this supplier's products are due. */
     auto_email: boolean;
     last_emailed_at: string | null;
 }
 
-export type SupplierInput = Pick<Supplier, 'name' | 'email' | 'lead_time_days' | 'min_order_qty' | 'pack_size'> & { auto_email?: boolean };
+export type SupplierInput = Pick<Supplier, 'name' | 'email' | 'lead_time_days' | 'min_order_qty' | 'pack_size' | 'order_cycle_days'> & { auto_email?: boolean };
 
 /** A Shopify vendor that can become a supplier. */
 export interface VendorCandidate {

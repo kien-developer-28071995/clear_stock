@@ -37,6 +37,8 @@ final readonly class ForecastInput
         public ?int $maxStock = null,           // manual order-up-to level (max)
         public ?string $orderRulesSupplier = null, // minimum order / pack size (partly) from this supplier's defaults
         public ?array $reference = null,        // {variant_id, name, avg: ?float, percent}: similar product for a new one
+        public ?int $orderCycleDays = null,     // supplier's order cycle (days of sales an order covers); null = app default
+        public bool $filterSpikes = false,      // cap one-off sales spikes to the usual level before averaging
     ) {}
 
     public function override(OverrideField $field): ?array

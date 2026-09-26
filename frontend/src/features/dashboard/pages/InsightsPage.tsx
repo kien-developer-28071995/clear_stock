@@ -3,6 +3,7 @@ import { DashboardGate } from '@/features/dashboard/components/DashboardGate';
 import { RunwayChart } from '@/features/dashboard/components/RunwayChart';
 import { Overstock } from '@/features/dashboard/components/Overstock';
 import { SlowMovers } from '@/features/dashboard/components/SlowMovers';
+import { LostSales } from '@/features/dashboard/components/LostSales';
 import { AbcSummary } from '@/features/dashboard/components/AbcSummary';
 import { Tip } from '@/features/setup/components/Tip';
 
@@ -17,6 +18,7 @@ export function InsightsPage() {
                     <s-link slot="breadcrumb-actions" href="/">{t('nav.home')}</s-link>
                     <Tip id="home_runway">{t('tips.home_runway')}</Tip>
                     <RunwayChart items={data.runway} />
+                    <LostSales dashboard={data} />
                     <AbcSummary dashboard={data} />
                     <Overstock dashboard={data} />
                     <SlowMovers dashboard={data} />

@@ -195,6 +195,34 @@ class EloquentForecastQueryRepository implements ForecastQueryRepositoryInterfac
         ];
     }
 
+    public function lostSales(Shop $shop, int $limit): array
+    {
+        $revenue = 'forecasts.lost_units_30d * variants.price';
+        $query = fn () => $this->base($shop)->where('forecasts.lost_units_30d', '>', 0);
+        $sum = $query()
+            ->selectRaw("COUNT(*) as n, COALESCE(SUM(forecasts.lost_units_30d), 0) as units, SUM(CASE WHEN variants.price IS NULL THEN 1 ELSE 0 END) as missing, COALESCE(SUM({$revenue}), 0) as revenue")
+            ->toBase()->first();
+        $top = $query()->with('variant')
+            ->orderByRaw("COALESCE({$revenue}, 0) DESC")->orderByDesc('forecasts.lost_units_30d')->orderBy('forecasts.id')
+            ->limit($limit)->get(['forecasts.*']);
+
+        return [
+            'units' => round((float) $sum->units, 1),
+            'revenue' => round((float) $sum->revenue, 2),
+            'count' => (int) $sum->n,
+            'missing_price' => (int) $sum->missing,
+            'top' => $top->map(fn (Forecast $f) => [
+                'variant_id' => $f->variant_id,
+                'name' => $f->variant->displayName(),
+                'sku' => $f->variant->sku,
+                'stock' => $f->current_stock,
+                'out_of_stock_days' => (int) ($f->explanation['lost_sales']['out_of_stock_days'] ?? 0),
+                'units' => (float) $f->lost_units_30d,
+                'revenue' => $f->variant->price !== null ? round((float) $f->lost_units_30d * (float) $f->variant->price, 2) : null,
+            ])->values()->all(),
+        ];
+    }
+
     public function planningRows(Shop $shop, array $filters): iterable
     {
         $query = $this->base($shop)->with('variant.supplier')
@@ -230,6 +258,7 @@ class EloquentForecastQueryRepository implements ForecastQueryRepositoryInterfac
                 'max_stock' => $v->max_stock,
                 'min_order_qty' => $v->effectiveMinOrderQty(),
                 'pack_size' => $v->effectivePackSize(),
+                'order_cycle_days' => $v->supplier?->order_cycle_days,
                 // The stored forecast itself (Flow triggers).
                 'reorder_date' => $f->reorder_date?->toDateString(),
                 'stockout_date' => $f->stockout_date?->toDateString(),

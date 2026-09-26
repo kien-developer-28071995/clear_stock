@@ -68,6 +68,18 @@
             "one": "Last year, sales fell ×{{factor}} over the next {{count}} day, so we adjusted to {{avg}}/day.",
             "other": "Last year, sales fell ×{{factor}} over the next {{count}} days, so we adjusted to {{avg}}/day."
         },
+        "spikes_capped": {
+            "one": "Counted {{count}} one-off spike at the usual level ({{top}} sold on {{top_date}}, usually {{usual}}/day).",
+            "other": "Counted {{count}} one-off spikes at the usual level (biggest: {{top}} sold on {{top_date}}, usually {{usual}}/day)."
+        },
+        "order_cycle_supplier": {
+            "one": "Orders cover {{count}} day of sales: the order cycle of {{supplier}}.",
+            "other": "Orders cover {{count}} days of sales: the order cycle of {{supplier}}."
+        },
+        "lost_sales": {
+            "one": "Out of stock {{count}} day in the last {{days}} days: about {{units}} sales missed.",
+            "other": "Out of stock {{count}} days in the last {{days}} days: about {{units}} sales missed."
+        },
         "bundle_contribution": {
             "one": "Includes {{avg}}/day sold inside \"{{bundle}}\" ({{count}} per bundle).",
             "other": "Includes {{avg}}/day sold inside \"{{bundle}}\" ({{count}} per bundle)."
