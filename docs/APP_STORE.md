@@ -45,8 +45,10 @@ Files: `backend/.env.production.example` (all of the above as env), `shopify.app
 - [ ] **Deploy the app config:** `npx @shopify/cli@latest app deploy --config production`.
 - [ ] **Request `read_all_orders`** (Partner Dashboard → API access): text below.
 - [ ] **Protected customer data:** Partner Dashboard → API access → Protected customer data: request access to orders at **Level 1** (no customer fields: name, email, phone, address are not needed). Answers below.
-- [ ] **Listing:** app icon 1200×1200 px, 3–6 screenshots 1600×900 px (desktop, no browser chrome, no personal data), texts below, pricing (Free, Starter $4/month or $38/year, 7-day trial).
-- [ ] **Screencast** (required): install → onboarding → sync → Home → product explanation → Plans (upgrade with the test charge). 2–4 minutes, English narration or captions.
+- [x] **Screenshots** 1600×900 of the v1 app (Starter, v1 switches, English): `docs/listing/screenshots/` (7). Regenerate after UI changes: `make listing-screenshots` (restores `.env` and the plan). The dev store's currency is shown as USD; its sample products have no unit cost, so cost figures show "—" (add costs in Shopify for richer shots).
+- [x] **Draft walkthrough video** (WebM, 1280×720, 75 s, captions): `docs/listing/walkthrough.webm`, `make listing-video`. It does not show installing the app in the Shopify admin.
+- [ ] **Listing:** your app icon, pick 3–6 of the screenshots, texts below, pricing (Free, Starter $4/month or $38/year, 7-day trial).
+- [ ] **Screencast** (required): record it yourself in the real Shopify admin, since the review needs the install and permission screens: install → onboarding → sync → Home → product explanation → Plans (upgrade with the test charge). 2–4 minutes, English narration or captions. Follow the draft video's order and captions; upload to YouTube/Vimeo (unlisted) and paste the link.
 - [ ] Install the production app on a fresh development store and run the reviewer steps below once yourself.
 - [ ] Submit.
 

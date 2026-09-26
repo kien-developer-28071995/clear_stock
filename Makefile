@@ -6,7 +6,7 @@ export UID := $(shell id -u)
 export GID := $(shell id -g)
 
 .DEFAULT_GOAL := help
-.PHONY: help setup up down restart build shell migrate fresh test e2e extensions logs tunnel tunnel-url tunnel-down e2e-features-off \
+.PHONY: help setup up down restart build shell migrate fresh test e2e extensions logs tunnel tunnel-url tunnel-down e2e-features-off listing-screenshots listing-video \
         app-url webhook artisan composer npm typecheck prod-build prod-up prod-down prod-migrate prod-logs
 
 help: ## List available commands
@@ -50,6 +50,22 @@ test: ## Run the backend test suite (Pest)
 e2e: ## End-to-end tests in Chromium on every plan + admin extensions (needs make up + a synced dev store)
 	npm run extensions:locales:check
 	cd frontend && npx playwright test
+
+listing-screenshots: ## App Store screenshots (1600x900) of the v1 app into docs/listing/screenshots (restores backend/.env and the plan)
+	@env='$(CURDIR)/backend/.env'; cp "$$env" "$$env.listing-backup"; \
+	plan=$$($(DC) exec -T app php artisan tinker --execute='echo App\Models\Shop::first()->plan->value;' | tail -1); \
+	trap 'mv "$$env.listing-backup" "$$env"; $(DC) exec -T app php artisan dev:set-plan "$$plan" >/dev/null' EXIT; \
+	printf '\nFEATURE_SUPPLIER_EMAILS=false\nFEATURE_LOCATIONS=false\nFEATURE_TRANSFERS=false\nFEATURE_REALTIME_ALERTS=false\nFEATURE_FLOW_TRIGGERS=false\nBILLING_GROWTH_OFFERED=false\n' >> "$$env"; \
+	$(DC) exec -T app php artisan dev:set-plan starter >/dev/null; \
+	(cd frontend && LISTING_SCREENSHOTS=1 npx playwright test e2e/listing-screenshots.spec.ts)
+
+listing-video: ## Draft App Store walkthrough video (WebM) of the v1 app into docs/listing (restores backend/.env and the plan)
+	@env='$(CURDIR)/backend/.env'; cp "$$env" "$$env.video-backup"; \
+	plan=$$($(DC) exec -T app php artisan tinker --execute='echo App\Models\Shop::first()->plan->value;' | tail -1); \
+	trap 'mv "$$env.video-backup" "$$env"; $(DC) exec -T app php artisan dev:set-plan "$$plan" >/dev/null' EXIT; \
+	printf '\nFEATURE_SUPPLIER_EMAILS=false\nFEATURE_LOCATIONS=false\nFEATURE_TRANSFERS=false\nFEATURE_REALTIME_ALERTS=false\nFEATURE_FLOW_TRIGGERS=false\nBILLING_GROWTH_OFFERED=false\n' >> "$$env"; \
+	$(DC) exec -T app php artisan dev:set-plan starter >/dev/null; \
+	(cd frontend && LISTING_VIDEO=1 npx playwright test e2e/listing-walkthrough.spec.ts)
 
 e2e-features-off: ## E2E check of the app with optional features switched off (restores backend/.env afterwards)
 	@env='$(CURDIR)/backend/.env'; cp "$$env" "$$env.e2e-backup"; \
