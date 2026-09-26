@@ -10,6 +10,9 @@ const NONE: Entitlements = {
     locations: false,
     purchase_orders: false,
     realtime_alerts: false,
+    what_if: false,
+    supplier_auto_email: false,
+    flow_triggers: false,
 };
 
 /** What the current plan allows (defaults to Free while loading). */

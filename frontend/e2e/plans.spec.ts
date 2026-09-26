@@ -8,13 +8,25 @@ import { api, expect, open, pickNext, saveBar, setPlan, settled, test, toasts, v
  */
 
 type Counts = Record<string, number>;
-type Entitlements = { plan: PlanKey; max_skus: number | null; bundles: boolean; alerts: boolean; locations: boolean; purchase_orders: boolean; realtime_alerts: boolean };
+type Entitlements = {
+    plan: PlanKey;
+    max_skus: number | null;
+    bundles: boolean;
+    alerts: boolean;
+    locations: boolean;
+    purchase_orders: boolean;
+    realtime_alerts: boolean;
+    what_if: boolean;
+    supplier_auto_email: boolean;
+    flow_triggers: boolean;
+};
 
 const PAGES: [string, string][] = [
     ['/', 'Clear Stock'],
     ['/reorder', 'Reorder'],
     ['/transfers', 'Transfers'],
     ['/insights', 'Insights'],
+    ['/what-if', 'What-if'],
     ['/products', 'Products'],
     ['/suppliers', 'Suppliers'],
     ['/suppliers/import', 'Import'],
@@ -25,9 +37,9 @@ const PAGES: [string, string][] = [
 ];
 
 const EXPECTED: Record<PlanKey, Omit<Entitlements, 'plan'>> = {
-    free: { max_skus: 50, bundles: false, alerts: false, locations: false, purchase_orders: false, realtime_alerts: false },
-    starter: { max_skus: null, bundles: true, alerts: true, locations: false, purchase_orders: false, realtime_alerts: false },
-    growth: { max_skus: null, bundles: true, alerts: true, locations: true, purchase_orders: true, realtime_alerts: true },
+    free: { max_skus: 50, bundles: false, alerts: false, locations: false, purchase_orders: false, realtime_alerts: false, what_if: false, supplier_auto_email: false, flow_triggers: false },
+    starter: { max_skus: null, bundles: true, alerts: true, locations: false, purchase_orders: true, realtime_alerts: false, what_if: true, supplier_auto_email: false, flow_triggers: false },
+    growth: { max_skus: null, bundles: true, alerts: true, locations: true, purchase_orders: true, realtime_alerts: true, what_if: true, supplier_auto_email: true, flow_triggers: true },
 };
 
 for (const plan of ['free', 'starter', 'growth'] as PlanKey[]) {
@@ -84,9 +96,69 @@ for (const plan of ['free', 'starter', 'growth'] as PlanKey[]) {
             const list = await api<{ data: Record<string, unknown>[]; meta: Record<string, number> }>(app, '/forecasts');
             expect(Object.keys(list.meta).sort()).toEqual(['current_page', 'last_page', 'per_page', 'total']);
             expect(Object.keys(list.data[0]).sort()).toEqual(
-                ['avg_daily_sales', 'current_stock', 'days_of_cover', 'excess_units', 'incoming_stock', 'name', 'reorder_date', 'sku', 'status', 'suggested_qty', 'variant_id', 'vendor'].sort(),
+                ['abc_class', 'avg_daily_sales', 'current_stock', 'days_of_cover', 'excess_units', 'incoming_stock', 'name', 'reorder_date', 'sku', 'status', 'suggested_qty', 'variant_id', 'vendor'].sort(),
             );
             await expect(app.locator('s-table-body s-table-row')).toHaveCount(Math.min(list.meta.total, list.meta.per_page));
+        });
+
+        test('ABC classes: filter, badge, explanation on the product and summary in insights', async ({ app }) => {
+            await open(app, '/products');
+            const dashboard = await api<{ data: { abc: { classes: Record<'A' | 'B' | 'C', { count: number }> } } }>(app, '/dashboard');
+            const countA = dashboard.data.abc.classes.A.count;
+            test.skip(countA === 0, 'dev store has no sales with a price yet (run a full sync)');
+
+            await app.getByRole('combobox', { name: 'ABC class' }).selectOption('A');
+            await expect(app).toHaveURL(/abc=A/);
+            await settled(app);
+            const rows = app.locator('s-table-body s-table-row');
+            await expect(rows).toHaveCount(Math.min(countA, 25));
+            await expect(rows.first().locator('s-badge', { hasText: 'Class A' })).toBeVisible();
+            await app.screenshot({ path: 'e2e-results/abc-products.png', fullPage: true });
+
+            await rows.first().locator('s-link').first().click();
+            await settled(app);
+            await expect(app.getByText(/^Class A: .*% of your revenue in the last 90 days/)).toBeVisible();
+            await app.screenshot({ path: 'e2e-results/abc-detail.png', fullPage: true });
+
+            await open(app, '/insights');
+            const section = app.locator('s-section[heading="ABC classes"]');
+            await expect(section).toBeVisible();
+            await expect(section.getByText('Never let these run out')).toBeVisible();
+            await app.screenshot({ path: 'e2e-results/abc-insights.png', fullPage: true });
+        });
+
+        test('what-if: no change matches the forecast, growth orders more and sooner', async ({ app }) => {
+            type Totals = { products: number; units: number };
+            type WhatIf = { data: { totals: { now: Totals; scenario: Totals }; items: { now: unknown; scenario: unknown }[] } };
+
+            await open(app, '/what-if?growth=0');
+            if (!has.what_if) {
+                await expect(app.locator('s-banner[heading="Included in Starter"]')).toBeVisible();
+                expect(await app.evaluate(async () => (await fetch('/api/what-if?growth=20', { headers: { Authorization: `Bearer ${await window.shopify.idToken()}` } })).status)).toBe(402);
+                return;
+            }
+            const same = await api<WhatIf>(app, '/what-if?growth=0');
+            expect(same.data.totals.scenario).toEqual(same.data.totals.now);
+            for (const item of same.data.items) expect(item.scenario).toEqual(item.now);
+
+            await app.locator('s-button', { hasText: '+50%' }).click();
+            await expect(app).toHaveURL(/growth=50/);
+            await settled(app);
+            await expect(app.getByText(/Sales \+50% \(current rate × 1\.5\)/)).toBeVisible();
+            const grown = await api<WhatIf>(app, '/what-if?growth=50');
+            expect(grown.data.totals.scenario.units).toBeGreaterThanOrEqual(grown.data.totals.now.units);
+            expect(grown.data.totals.scenario.products).toBeGreaterThanOrEqual(grown.data.totals.now.products);
+            await expect(app.locator('s-table-body s-table-row')).toHaveCount(grown.data.items.length);
+            await app.screenshot({ path: 'e2e-results/what-if.png', fullPage: true });
+        });
+
+        test('Shopify Flow section follows the plan', async ({ app }) => {
+            await open(app, '/settings');
+            const section = app.locator('s-section[heading="Shopify Flow"]');
+            await expect(section).toContainText('Product reorder date reached');
+            if (has.flow_triggers) await expect(section.locator('s-link', { hasText: 'Open Shopify Flow' })).toBeVisible();
+            else await expect(section.locator('s-banner[heading="Included in Growth"]')).toBeVisible();
+            await section.screenshot({ path: `e2e-results/flow-${plan}.png` }).catch(() => app.screenshot({ path: `e2e-results/flow-${plan}.png`, fullPage: true }));
         });
 
         test('product detail explains the number, and a temporary adjustment wins until reset', async ({ app }) => {
@@ -150,7 +222,7 @@ for (const plan of ['free', 'starter', 'growth'] as PlanKey[]) {
             await modal.locator('s-button[slot="primary-action"]').click();
             await expect(row).toContainText('11 days');
 
-            // Emailing a purchase order to a supplier (with an email address) is Growth only.
+            // Emailing a purchase order to a supplier (with an email address) is Starter and up.
             const email = row.locator('s-button', { hasText: /email/i });
             if (has.purchase_orders) await expect(email).not.toHaveAttribute('disabled');
             else await expect(email).toHaveAttribute('disabled');
@@ -184,7 +256,7 @@ for (const plan of ['free', 'starter', 'growth'] as PlanKey[]) {
                 await expect.poll(() => toasts(app)).toContainEqual(expect.stringContaining('Products › Purchase orders'));
             } else {
                 expect(res).toBe(402);
-                await expect(app.locator('s-button[disabled]', { hasText: 'Export purchase order (Growth)' })).toBeVisible();
+                await expect(app.locator('s-button[disabled]', { hasText: 'Export purchase order (Starter)' })).toBeVisible();
             }
         });
 

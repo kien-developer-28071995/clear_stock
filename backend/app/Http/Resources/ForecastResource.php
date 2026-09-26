@@ -30,6 +30,14 @@ class ForecastResource extends JsonResource
             'unit_cost' => $v->unit_cost !== null ? (float) $v->unit_cost : null,
             'supplier' => $v->relationLoaded('supplier') && $v->supplier ? ['id' => $v->supplier->id, 'name' => $v->supplier->name] : null,
             'is_bundle' => $v->is_bundle,
+            'price' => $v->price !== null ? (float) $v->price : null,
+            // A/B/C by share of the last N days' revenue (null without a price).
+            'abc' => [
+                'class' => $v->abc_class,
+                'revenue' => (float) $v->revenue_90d,
+                'share' => (float) $v->revenue_share,
+                'days' => (int) config('forecast.abc.days'),
+            ],
             'current_stock' => $this->current_stock,
             'incoming_stock' => $this->incoming_stock,     // on the way, already counted in suggested_qty
             'avg_daily_sales' => (float) $this->avg_daily_sales,

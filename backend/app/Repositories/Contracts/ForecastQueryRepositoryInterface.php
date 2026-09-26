@@ -59,4 +59,22 @@ interface ForecastQueryRepositoryInterface
      * @return array{value: float, units: int, count: int, missing_cost: int, top: array<int, array{variant_id: int, name: string, sku: ?string, stock: int, target: int, excess: int, value: float}>}
      */
     public function overstock(Shop $shop, string $today, int $limit): array;
+
+    /**
+     * Per ABC class (combined forecasts of active products): products, revenue and stock value.
+     *
+     * @return array{classes: array<string, array{count: int, revenue: float, revenue_share: float, stock_value: float}>, unclassified: int, missing_cost: int}
+     */
+    public function abcSummary(Shop $shop): array;
+
+    /**
+     * Combined forecasts with what the reorder maths needs (growth what-if) and the stored
+     * forecast (Flow triggers), read in chunks.
+     * Filters: supplier_id, vendor, abc.
+     *
+     * @return iterable<int, array{variant_id: int, name: string, sku: ?string, supplier: ?string, unit_cost: ?float, as_of: string,
+     *     avg: float, stock: int, incoming: int, lead_time_days: int, safety_days: int, min_stock: ?int, max_stock: ?int,
+     *     min_order_qty: ?int, pack_size: ?int}>
+     */
+    public function planningRows(Shop $shop, array $filters): iterable;
 }

@@ -15,6 +15,8 @@ export interface Settings {
         realtime_available: boolean;
         realtime: RealtimeAlertMode;
     };
+    /** Shopify Flow triggers (Growth); `active` = a workflow in Flow uses one of them. */
+    flow: { available: boolean; active: boolean };
 }
 
 export interface Supplier {

@@ -41,12 +41,13 @@ describe('Free plan', function () {
             ->assertJsonPath('data.computed_avg', 4);
     });
 
-    it('cannot create bundles, export purchase orders or see stock by location', function () {
+    it('cannot create bundles, export purchase orders, simulate growth or see stock by location', function () {
         $box = Variant::factory()->for($this->shop)->create();
 
         $this->postJson('/api/bundles', ['bundle' => $box->id, 'components' => [['variant' => $this->mug->id, 'quantity' => 1]]], $this->auth)
             ->assertStatus(402)->assertJsonPath('code', 'plan_required')->assertJsonPath('params.plan', 'starter');
-        $this->get('/api/purchase-orders/export', $this->auth)->assertStatus(402)->assertJsonPath('params.plan', 'growth')->assertJsonPath('params.feature', 'purchase_orders');
+        $this->get('/api/purchase-orders/export', $this->auth)->assertStatus(402)->assertJsonPath('params.plan', 'starter')->assertJsonPath('params.feature', 'purchase_orders');
+        $this->getJson('/api/what-if?growth=20', $this->auth)->assertStatus(402)->assertJsonPath('params.plan', 'starter')->assertJsonPath('params.feature', 'what_if');
         $this->getJson("/api/forecasts/{$this->mug->id}", $this->auth)->assertJsonPath('data.locations', null);
         $this->getJson("/api/forecasts?location_id={$this->location->id}", $this->auth)->assertStatus(402);
     });

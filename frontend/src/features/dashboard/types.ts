@@ -44,6 +44,15 @@ export interface SlowMover {
     days_of_cover: number | null;
 }
 
+export interface AbcClassSummary {
+    count: number;
+    revenue: number;
+    /** 0..1 of the shop's revenue in the window. */
+    revenue_share: number;
+    /** Stock on hand at unit cost. */
+    stock_value: number;
+}
+
 export interface Dashboard {
     today: string;
     currency: string | null;
@@ -56,4 +65,12 @@ export interface Dashboard {
     slow_movers: { value: number; count: number; missing_cost: number; days: number; top: SlowMover[] };
     /** Still selling, but holding clearly more than the order-up-to level. */
     overstock: { value: number; units: number; count: number; missing_cost: number; top: OverstockItem[] };
+    /** Products, revenue and stock value per ABC class. */
+    abc: {
+        classes: Record<'A' | 'B' | 'C', AbcClassSummary>;
+        unclassified: number;
+        missing_cost: number;
+        days: number;
+        thresholds: { a: number; b: number };
+    };
 }

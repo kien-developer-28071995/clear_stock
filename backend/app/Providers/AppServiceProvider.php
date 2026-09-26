@@ -2,12 +2,14 @@
 
 namespace App\Providers;
 
+use App\Events\ForecastsUpdated;
 use App\Events\PlanChanged;
 use App\Events\ShopInstalled;
 use App\Events\ShopUninstalled;
 use App\Listeners\LogEmails;
 use App\Listeners\ReportLongQueueWait;
 use App\Listeners\ReportShopEventsToSlack;
+use App\Listeners\SendFlowTriggersAfterForecast;
 use App\Monitoring\ReportErrorsToSlack;
 use App\Repositories\Contracts\ShopRepositoryInterface;
 use App\Services\Forecast\ForecastCalculator;
@@ -94,6 +96,9 @@ class AppServiceProvider extends ServiceProvider
         Event::listen(ShopInstalled::class, [ReportShopEventsToSlack::class, 'installed']);
         Event::listen(ShopUninstalled::class, [ReportShopEventsToSlack::class, 'uninstalled']);
         Event::listen(PlanChanged::class, [ReportShopEventsToSlack::class, 'planChanged']);
+
+        // Shopify Flow triggers (Growth) after every forecast run.
+        Event::listen(ForecastsUpdated::class, SendFlowTriggersAfterForecast::class);
 
         // Where an error happened, attached to its alert.
         Queue::before(fn (JobProcessing $e) => Context::add('job', $e->job->resolveName()));

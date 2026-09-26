@@ -11,10 +11,16 @@ enum Feature: string
     case Locations = 'locations';
     case PurchaseOrders = 'purchase_orders';
     case RealtimeAlerts = 'realtime_alerts';
+    /** Growth what-if: sales +/- X% -> what to order. */
+    case WhatIf = 'what_if';
+    /** Automatic weekly purchase orders to suppliers (sending one by hand is PurchaseOrders). */
+    case SupplierAutoEmail = 'supplier_auto_email';
+    /** Shopify Flow triggers based on the forecast. */
+    case FlowTriggers = 'flow_triggers';
 
     /** The cheapest plan that includes it (for upgrade prompts). */
     public function minimumPlan(): Plan
     {
-        return in_array($this, [self::Locations, self::PurchaseOrders, self::RealtimeAlerts], true) ? Plan::Growth : Plan::Starter;
+        return in_array($this, [self::Locations, self::RealtimeAlerts, self::SupplierAutoEmail, self::FlowTriggers], true) ? Plan::Growth : Plan::Starter;
     }
 }

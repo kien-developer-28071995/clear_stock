@@ -1,0 +1,8 @@
+# Shopify Flow calls this when a merchant turns a workflow using our triggers on or off,
+# so triggers are only sent to shops that use them (App\Http\Controllers\FlowLifecycleController).
+# The URL is rewritten by `make app-url` (docker/scripts/set-app-url.sh) like application_url.
+[[extensions]]
+name = "Clear Stock Flow lifecycle"
+type = "flow_trigger_lifecycle_callback"
+handle = "flow-lifecycle"
+url = "https://host-enlargement-systematic-instrumentation.trycloudflare.com/flow/lifecycle"

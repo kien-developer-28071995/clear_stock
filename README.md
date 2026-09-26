@@ -228,6 +228,20 @@ Two [admin UI extensions](https://shopify.dev/docs/api/admin-extensions) in `ext
 - **Layout:** the repo-root `package.json` is only the Shopify CLI workspace for the extensions (the CLI installs dependencies from the app root); backend and frontend keep their own.
 - **Tests:** `frontend/e2e/extensions.spec.ts` runs the real bundles against the API with Shopify's extension host stubbed. To see them in the admin, run `npx @shopify/cli@latest app dev` (or deploy) and open a product.
 
+## Shopify Flow triggers (Growth)
+
+Three `flow_trigger` extensions (`extensions/flow-*`) let merchants start their own Flow workflows from the forecast:
+
+| Trigger (handle) | Fires | Main fields |
+|---|---|---|
+| Product reorder date reached (`product-reorder-date-reached`) | once when a product's reorder date is today or past; again only after it stopped being due | product, SKU, suggested quantity, reorder date, days until stock-out, supplier, ABC class, app URL |
+| Product stockout threshold reached (`product-stockout-threshold-reached`) | once per threshold as days until stock-out crosses 30, 14, 7, 0; re-armed when stock is clearly back above (20% + 2 days) | same + `Threshold days` (use it in a Flow condition) |
+| Supplier reorder date reached (`supplier-reorder-date-reached`) | when a product of the supplier becomes due | supplier name/email, products due, new products due, total units and cost, order lines |
+
+- Sent after every forecast run (`ForecastsUpdated` → `SendFlowTriggers`, 1 min delay, unique per shop) with `flowTriggerReceive`. At most 250 per run; unsent ones and failures keep their old state and go out on the next run. What each trigger last saw is in `flow_trigger_states`.
+- Only for shops with an **active workflow**: the `flow-lifecycle` extension (`flow_trigger_lifecycle_callback`) posts to `/flow/lifecycle` (HMAC like webhooks) when a workflow is turned on/off; stored in `flow_subscriptions`, newest `timestamp` wins. Its URL is absolute and rewritten by `make app-url`.
+- **Test in a dev store:** Deploy with `npx @shopify/cli@latest app deploy` (or `app dev` for drafts), install Shopify Flow, create a workflow with a Clear Stock trigger (e.g. → "Send internal email"), turn it on (the lifecycle callback records it), then `php artisan sync:run` or change a product's lead time so its reorder date is today.
+
 ## Importing from Stocky (purchase order CSVs)
 
 Stocky can't export suppliers, only purchase orders. **Suppliers → Import from Stocky** (`/suppliers/import`) rebuilds them from one or more purchase order CSVs (Stocky, other apps, spreadsheets):
@@ -239,13 +253,16 @@ Stocky can't export suppliers, only purchase orders. **Suppliers → Import from
 
 ## Plans, billing and alerts
 
-| | Free | Starter $4/mo ($38/yr), 7-day trial | Growth $5/mo ($48/yr), 7-day trial |
+| | Free | Starter $4/mo ($38/yr), 7-day trial | Growth $6/mo ($58/yr), 7-day trial |
 |---|---|---|---|
 | Forecasts + reorder suggestions | 50 best sellers | Unlimited | Unlimited |
-| "Why this number?" explanations | ✓ | ✓ | ✓ |
+| "Why this number?" explanations, ABC classes | ✓ | ✓ | ✓ |
 | Bundles | – | ✓ | ✓ |
-| Email alerts | – | ✓ | ✓ |
-| Forecast per location, purchase order CSV (per supplier / location) | – | – | ✓ |
+| Email alerts (summary) | – | ✓ | ✓ |
+| Purchase order CSV, emailing an order to a supplier | – | ✓ | ✓ |
+| Sales what-if | – | ✓ | ✓ |
+| Forecast per location, transfer suggestions | – | – | ✓ |
+| Automatic weekly orders to suppliers, real-time alerts, Shopify Flow triggers | – | – | ✓ |
 
 - Plans and limits live in `config/billing.php`. `App\Support\Entitlements::for($shop)` is the only place that decides access. Locked API features answer `402` with `required_plan`.
 - **Billing API:** `appSubscriptionCreate` (`EVERY_30_DAYS` / `ANNUAL`, `replacementBehavior: STANDARD`). The merchant approves on Shopify's page and returns to `/plans?confirmed=1`, which re-reads `currentAppInstallation.activeSubscriptions`. `app_subscriptions/update` webhooks keep the plan in sync (e.g. a cancel from the Shopify admin). Downgrading to Free cancels the subscription. Plan and interval are derived from the subscription name (`"<App> Starter (monthly)"`).
@@ -290,7 +307,7 @@ Backend and frontend are separate projects; the repo root only holds infra.
 
 ---
 
-## Emailing purchase orders to suppliers (Growth)
+## Emailing purchase orders to suppliers (Starter by hand, Growth automatic)
 
 - **Merchant-sent:** Suppliers → *Email order*. The dialog lists the supplier's products due now with the suggested quantities; the merchant edits quantities, removes lines, adds a message and the reply-to address, then sends. `GET/POST /api/suppliers/{id}/email`.
 - **Automatic (opt-in per supplier):** tick *Email purchase orders automatically* on the supplier. `suppliers:send-orders` runs hourly; from 8am shop time, if the supplier has products due and the forecast is fresh, their purchase order goes out, at most once per `alerts.supplier_auto_interval_days` (7).

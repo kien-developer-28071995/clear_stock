@@ -22,6 +22,10 @@ class EloquentForecastQueryRepository implements ForecastQueryRepositoryInterfac
             $this->whereStatus($query, $status, $today);
         }
 
+        if (in_array($filters['abc'] ?? '', ['A', 'B', 'C'], true)) {
+            $query->where('variants.abc_class', $filters['abc']);
+        }
+
         foreach (['vendor', 'product_type'] as $field) {
             if (($filters[$field] ?? '') !== '') {
                 $query->where("variants.{$field}", $filters[$field]);
@@ -40,6 +44,7 @@ class EloquentForecastQueryRepository implements ForecastQueryRepositoryInterfac
             'cover' => $query->orderByRaw('forecasts.days_of_cover IS NULL')->orderBy('forecasts.days_of_cover'),
             'suggested' => $query->orderByDesc('forecasts.suggested_qty'),
             'value' => $query->orderByRaw('(forecasts.current_stock * COALESCE(variants.unit_cost, 0)) DESC'),
+            'revenue' => $query->orderByDesc('variants.revenue_90d'),
             default => $query->orderByRaw('forecasts.reorder_date IS NULL')->orderBy('forecasts.reorder_date')
                 ->orderByRaw('forecasts.stockout_date IS NULL')->orderBy('forecasts.stockout_date'),
         };
@@ -187,6 +192,77 @@ class EloquentForecastQueryRepository implements ForecastQueryRepositoryInterfac
                 'excess' => $f->excess_units,
                 'value' => $f->variant->unit_cost !== null ? round($f->excess_units * (float) $f->variant->unit_cost, 2) : null,
             ])->values()->all(),
+        ];
+    }
+
+    public function planningRows(Shop $shop, array $filters): iterable
+    {
+        $query = $this->base($shop)->with('variant.supplier')
+            ->when(($filters['supplier_id'] ?? null) !== null, fn ($q) => $q->where('variants.supplier_id', $filters['supplier_id']))
+            ->when(($filters['vendor'] ?? '') !== '', fn ($q) => $q->where('variants.vendor', $filters['vendor']))
+            ->when(in_array($filters['abc'] ?? '', ['A', 'B', 'C'], true), fn ($q) => $q->where('variants.abc_class', $filters['abc']))
+            ->select('forecasts.*')->orderBy('forecasts.id');
+
+        foreach ($query->lazy(500) as $f) {
+            /** @var Forecast $f */
+            $v = $f->variant;
+            $e = $f->explanation;
+
+            yield [
+                'variant_id' => $f->variant_id,
+                'shopify_product_id' => $v->shopify_product_id,
+                'shopify_variant_id' => $v->shopify_variant_id,
+                'name' => $v->displayName(),
+                'sku' => $v->sku,
+                'abc_class' => $v->abc_class,
+                'supplier_id' => $v->supplier_id,
+                'supplier' => $v->supplier?->name,
+                'supplier_email' => $v->supplier?->email,
+                'supplier_lead_time_days' => $v->supplier?->lead_time_days,
+                'unit_cost' => $v->unit_cost !== null ? (float) $v->unit_cost : null,
+                'as_of' => (string) ($e['as_of'] ?? $f->computed_at->toDateString()),
+                'avg' => (float) $f->avg_daily_sales,
+                'stock' => $f->current_stock,
+                'incoming' => $f->incoming_stock,
+                'lead_time_days' => (int) ($e['lead_time']['days'] ?? 0),
+                'safety_days' => (int) ($e['safety']['days'] ?? 0),
+                'min_stock' => $v->min_stock,
+                'max_stock' => $v->max_stock,
+                'min_order_qty' => $v->min_order_qty,
+                'pack_size' => $v->pack_size,
+                // The stored forecast itself (Flow triggers).
+                'reorder_date' => $f->reorder_date?->toDateString(),
+                'stockout_date' => $f->stockout_date?->toDateString(),
+                'suggested_qty' => $f->suggested_qty,
+                'confidence' => $f->confidence->value,
+            ];
+        }
+    }
+
+    public function abcSummary(Shop $shop): array
+    {
+        $rows = $this->base($shop)->groupBy('variants.abc_class')
+            ->selectRaw('variants.abc_class as abc, COUNT(*) as n, COALESCE(SUM(variants.revenue_90d), 0) as revenue, '
+                .'COALESCE(SUM(variants.revenue_share), 0) as share, '
+                .'COALESCE(SUM(CASE WHEN forecasts.current_stock > 0 THEN forecasts.current_stock * variants.unit_cost ELSE 0 END), 0) as stock_value, '
+                .'SUM(CASE WHEN variants.unit_cost IS NULL AND forecasts.current_stock > 0 THEN 1 ELSE 0 END) as missing')
+            ->toBase()->get()->keyBy(fn ($r) => $r->abc ?? '');
+
+        $classes = [];
+        foreach (['A', 'B', 'C'] as $class) {
+            $r = $rows->get($class);
+            $classes[$class] = [
+                'count' => (int) ($r->n ?? 0),
+                'revenue' => round((float) ($r->revenue ?? 0), 2),
+                'revenue_share' => round((float) ($r->share ?? 0), 4),
+                'stock_value' => round((float) ($r->stock_value ?? 0), 2),
+            ];
+        }
+
+        return [
+            'classes' => $classes,
+            'unclassified' => (int) ($rows->get('')->n ?? 0),
+            'missing_cost' => (int) $rows->sum(fn ($r) => (int) $r->missing),
         ];
     }
 

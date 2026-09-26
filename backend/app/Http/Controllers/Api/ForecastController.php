@@ -35,7 +35,7 @@ class ForecastController extends Controller
         // Resources read the container's base request, not this FormRequest copy.
         request()->attributes->set('today', $this->query->today($shop));
 
-        $filters = $request->safe()->only(['status', 'search', 'sort', 'vendor', 'product_type']);
+        $filters = $request->safe()->only(['status', 'search', 'sort', 'vendor', 'product_type', 'abc']);
         if ($request->filled('location_id')) {
             if (! Entitlements::for($shop)->has(Feature::Locations)) {
                 throw new PlanRequiredException(Feature::Locations);

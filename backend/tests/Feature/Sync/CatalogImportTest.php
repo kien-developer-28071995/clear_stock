@@ -21,6 +21,7 @@ function variantLine(int $id, array $overrides = []): array
         'id' => gid('ProductVariant', $id),
         'sku' => "SKU-{$id}",
         'title' => 'Default Title',
+        'price' => '19.90',
         'createdAt' => '2025-03-01T10:00:00Z',
         'requiresComponents' => false,
         'product' => ['id' => gid('Product', $id * 10), 'title' => "Product {$id}", 'status' => 'ACTIVE'],
@@ -35,6 +36,7 @@ it('imports variants and keeps merchant settings on re-import', function () {
     $v = Variant::forShop($this->shop)->where('shopify_variant_id', 1)->first();
     expect($v->sku)->toBe('SKU-1')
         ->and($v->unit_cost)->toBe('4.5000')
+        ->and($v->price)->toBe('19.90')
         ->and($v->inventory_item_id)->toBe(100)
         ->and($v->shopify_created_at->toDateString())->toBe('2025-03-01');
 

@@ -1,0 +1,75 @@
+# Shopify Flow trigger (Growth): days until a product runs out crossed 30, 14, 7 or 0.
+# Fires once per threshold, again only after stock recovered. Use "Threshold days" in a
+# condition to pick yours. Field keys match App\Services\Flow\FlowPayloads::productStockout().
+[[extensions]]
+name = "Product stockout threshold reached"
+type = "flow_trigger"
+handle = "product-stockout-threshold-reached"
+description = "A product will run out within 30, 14 or 7 days, or just ran out (0), according to its Clear Stock forecast."
+
+[settings]
+
+  [[settings.fields]]
+  type = "product_reference"
+
+  [[settings.fields]]
+  type = "single_line_text_field"
+  key = "Variant ID"
+
+  [[settings.fields]]
+  type = "single_line_text_field"
+  key = "Product name"
+
+  [[settings.fields]]
+  type = "single_line_text_field"
+  key = "SKU"
+
+  [[settings.fields]]
+  type = "number_decimal"
+  key = "Threshold days"
+  description = "The threshold crossed: 30, 14, 7 or 0 (out of stock)."
+
+  [[settings.fields]]
+  type = "number_decimal"
+  key = "Days until stockout"
+
+  [[settings.fields]]
+  type = "single_line_text_field"
+  key = "Stockout date"
+  description = "YYYY-MM-DD."
+
+  [[settings.fields]]
+  type = "number_decimal"
+  key = "Current stock"
+
+  [[settings.fields]]
+  type = "number_decimal"
+  key = "Incoming stock"
+
+  [[settings.fields]]
+  type = "number_decimal"
+  key = "Sales per day"
+
+  [[settings.fields]]
+  type = "number_decimal"
+  key = "Suggested quantity"
+
+  [[settings.fields]]
+  type = "single_line_text_field"
+  key = "Reorder date"
+
+  [[settings.fields]]
+  type = "single_line_text_field"
+  key = "Supplier name"
+
+  [[settings.fields]]
+  type = "single_line_text_field"
+  key = "Supplier email"
+
+  [[settings.fields]]
+  type = "single_line_text_field"
+  key = "ABC class"
+
+  [[settings.fields]]
+  type = "url"
+  key = "App URL"

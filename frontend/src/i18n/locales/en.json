@@ -28,7 +28,8 @@
     "settings": "Settings",
     "plans": "Plans",
     "reorder": "Reorder",
-    "insights": "Insights"
+    "insights": "Insights",
+    "whatIf": "What-if"
   },
   "notFound": {
     "heading": "Page not found",
@@ -358,6 +359,7 @@
       "cover": "Fewest days of stock",
       "suggested": "Largest order",
       "value": "Highest stock value",
+      "revenue": "Highest revenue",
       "name": "Name"
     },
     "noMatch": "No products match these filters.",
@@ -454,8 +456,11 @@
       "bundles": "Bundles and kits",
       "alerts": "Email alerts (daily or weekly summary)",
       "locations": "Stock by location",
-      "purchaseOrders": "Purchase order export (CSV)",
-      "realtimeAlerts": "Real-time stock alerts"
+      "purchaseOrders": "Purchase orders: CSV export and email to suppliers",
+      "realtimeAlerts": "Real-time stock alerts",
+      "whatIf": "Sales what-if (\"+20% sales?\")",
+      "supplierAutoEmail": "Automatic weekly orders to suppliers",
+      "flowTriggers": "Shopify Flow triggers"
     },
     "notApproved": "No plan change was approved",
     "nowOn": "You're on {{plan}}",
@@ -690,7 +695,10 @@
       "supplier_auto_emails_one": "{{count}} supplier stops receiving automatic purchase orders.",
       "supplier_auto_emails_other": "{{count}} suppliers stop receiving automatic purchase orders.",
       "realtime_alerts": "Real-time stock alerts are not available.",
-      "realtime_alerts_active": "Real-time stock alerts to {{email}} stop."
+      "realtime_alerts_active": "Real-time stock alerts to {{email}} stop.",
+      "what_if": "The sales what-if is not available.",
+      "flow_triggers": "Shopify Flow triggers stop.",
+      "flow_triggers_active": "Your Shopify Flow workflows using Clear Stock triggers stop running."
     }
   },
   "vendors": {
@@ -756,5 +764,92 @@
     "fromTo": "From → to",
     "units": "Units",
     "created_at": "Created"
+  },
+  "abc": {
+    "class": "Class {{abc}}",
+    "column": "ABC",
+    "filter": "ABC class",
+    "allClasses": "All classes",
+    "optionA": "Class A (top sellers)",
+    "optionB": "Class B",
+    "optionC": "Class C (small share)",
+    "heading": "ABC classes",
+    "intro_one": "Products ranked by revenue over the last day at today's prices. Class A makes up the first {{a}} of revenue, class B up to {{b}}, class C the rest.",
+    "intro_other": "Products ranked by revenue over the last {{count}} days at today's prices. Class A makes up the first {{a}} of revenue, class B up to {{b}}, class C the rest.",
+    "products": "Products",
+    "revenueShare": "Share of revenue",
+    "revenue": "Revenue",
+    "stockValue": "Stock value",
+    "adviceA": "Never let these run out",
+    "adviceB": "Review regularly",
+    "adviceC": "Keep stock lean",
+    "explainA_one": "Class A: {{share}}% of your revenue in the last day ({{revenue}} at the current price). Keep it in stock.",
+    "explainA_other": "Class A: {{share}}% of your revenue in the last {{count}} days ({{revenue}} at the current price). Keep it in stock.",
+    "explainB_one": "Class B: {{share}}% of your revenue in the last day ({{revenue}} at the current price).",
+    "explainB_other": "Class B: {{share}}% of your revenue in the last {{count}} days ({{revenue}} at the current price).",
+    "explainC_one": "Class C: {{share}}% of your revenue in the last day ({{revenue}} at the current price). Avoid tying up cash in extra stock.",
+    "explainC_other": "Class C: {{share}}% of your revenue in the last {{count}} days ({{revenue}} at the current price). Avoid tying up cash in extra stock.",
+    "noPrice": "No ABC class: this product has no price in Shopify.",
+    "unclassified_one": "{{count}} product has no price in Shopify and has no class.",
+    "unclassified_other": "{{count}} products have no price in Shopify and have no class."
+  },
+  "whatIf": {
+    "scenario": "Scenario",
+    "intro": "See what to order if sales change. Each product's current sales rate is multiplied by your change; lead time, safety stock, min/max, minimum order and pack size stay the same. Nothing is saved.",
+    "growth": "Sales change",
+    "horizon": "Orders due",
+    "horizons": {
+      "h0": "Today",
+      "h14": "In the next 14 days",
+      "h30": "In the next 30 days"
+    },
+    "allSuppliers": "All suppliers",
+    "resultHeading": "Sales {{growth}} (current rate × {{factor}})",
+    "productsToOrder": {
+      "h0": "Products to order today",
+      "h14": "Products to order in 14 days",
+      "h30": "Products to order in 30 days"
+    },
+    "units": "Units to order",
+    "cost": "Cost at unit cost",
+    "stockoutRisk": "Run out before a new order arrives",
+    "legend": "Grey: current forecast → bold: this scenario. Quantities are what you would order on the order date.",
+    "missingCost_one": "{{count}} product has no cost in Shopify and isn't included in the cost.",
+    "missingCost_other": "{{count}} products have no cost in Shopify and aren't included in the cost.",
+    "nothingDue": {
+      "h0": "Nothing needs ordering today in this scenario.",
+      "h14": "Nothing needs ordering in the next 14 days in this scenario.",
+      "h30": "Nothing needs ordering in the next 30 days in this scenario."
+    },
+    "orderQty": "Order quantity",
+    "lineCost": "Cost",
+    "notDue": "Not due",
+    "riskBadge_one": "Runs out before a {{count}}-day delivery",
+    "riskBadge_other": "Runs out before a {{count}}-day delivery",
+    "truncated_one": "Showing {{shown}} of {{count}} product (earliest orders first). Totals include all of them.",
+    "truncated_other": "Showing {{shown}} of {{count}} products (earliest orders first). Totals include all of them.",
+    "locked": "Try \"what if sales grow 20%?\" and see what to order, when, and what it costs, before committing."
+  },
+  "flow": {
+    "heading": "Shopify Flow",
+    "intro": "Start your own workflows from the forecast: post to Slack, tag products, create a task, email your team. Build them in the Shopify Flow app with these triggers. Each one fires once per change, never every night.",
+    "locked": "Start Shopify Flow workflows when a product needs reordering, is about to run out, or a supplier order is due.",
+    "triggers": {
+      "productReorder": {
+        "name": "Product reorder date reached",
+        "body": "a product needs ordering today, with the suggested quantity and supplier."
+      },
+      "productStockout": {
+        "name": "Product stockout threshold reached",
+        "body": "a product will run out within 30, 14 or 7 days, or just ran out. Pick the threshold in a condition."
+      },
+      "supplierReorder": {
+        "name": "Supplier reorder date reached",
+        "body": "products from a supplier are due, with the order lines, units and cost."
+      }
+    },
+    "active": "A workflow uses these triggers",
+    "inactive": "No workflow uses these triggers yet",
+    "open": "Open Shopify Flow"
   }
 }

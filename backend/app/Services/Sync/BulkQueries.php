@@ -8,7 +8,7 @@ namespace App\Services\Sync;
  */
 final class BulkQueries
 {
-    /** Variants with product, cost, tracking and native bundle components. */
+    /** Variants with product, price, cost, tracking and native bundle components. */
     public static function variants(?string $updatedSinceIso = null): string
     {
         $filter = $updatedSinceIso ? sprintf('(query: "updated_at:>=\'%s\'")', $updatedSinceIso) : '';
@@ -17,7 +17,7 @@ final class BulkQueries
             {
               productVariants{$filter} {
                 edges { node {
-                  id sku barcode title createdAt requiresComponents
+                  id sku barcode title price createdAt requiresComponents
                   product { id title status vendor productType }
                   inventoryItem { id tracked unitCost { amount } }
                   productVariantComponents { edges { node { quantity productVariant { id } } } }

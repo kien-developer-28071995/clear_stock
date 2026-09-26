@@ -60,12 +60,12 @@ it('announces upgrades and downgrades with the MRR change, once per change', fun
     app(BillingService::class)->refresh($this->shop->fresh()); // the webhook after the return page: no change
 
     expect(eventMessages())->toHaveCount(1)
-        ->and(eventMessages()[0])->toContain(':arrow_up: Upgrade')->toContain('Free')->toContain('Growth (monthly) · $5.00/mo')->toContain('+$5.00');
+        ->and(eventMessages()[0])->toContain(':arrow_up: Upgrade')->toContain('Free')->toContain('Growth (monthly) · $6.00/mo')->toContain('+$6.00');
 
     $this->subscriptions->exchangeArray([]);
     app(BillingService::class)->refresh($this->shop->fresh());
 
-    expect(eventMessages()[1])->toContain(':arrow_down: Downgrade')->toContain('-$5.00');
+    expect(eventMessages()[1])->toContain(':arrow_down: Downgrade')->toContain('-$6.00');
 });
 
 it('announces a switch to annual billing', function () {

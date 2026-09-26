@@ -21,8 +21,8 @@ export function SupplierModal({ modalRef, supplier, onDone }: Props) {
     const [email, setEmail] = useState('');
     const [lead, setLead] = useState('');
     const [autoEmail, setAutoEmail] = useState(false);
-    // Automatic purchase order emails are part of Growth (with purchase orders).
-    const canAutoEmail = useEntitlements().purchase_orders;
+    // Emailing an order by hand is Starter; automatic weekly orders are Growth.
+    const canAutoEmail = useEntitlements().supplier_auto_email;
 
     useEffect(() => {
         setName(supplier?.name ?? '');

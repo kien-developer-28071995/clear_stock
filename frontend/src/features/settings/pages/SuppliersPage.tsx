@@ -21,7 +21,7 @@ export function SuppliersPage() {
     const { confirm, modal: confirmModal } = useConfirm();
     const emailModal = useModal();
     const [emailing, setEmailing] = useState<Supplier | null>(null);
-    const { purchase_orders: canEmail } = useEntitlements();
+    const { purchase_orders: canEmail, supplier_auto_email: canAutoEmail } = useEntitlements();
     const openEmail = (s: Supplier) => {
         setEmailing(s);
         emailModal.open();
@@ -88,7 +88,7 @@ export function SuppliersPage() {
                                             <s-text type="strong">{s.name}</s-text>
                                             {s.email && <s-text color="subdued">{s.email}</s-text>}
                                             {s.last_emailed_at && <s-text color="subdued">{t('supplierEmail.lastSent', { when: timeAgo(s.last_emailed_at) })}</s-text>}
-                                            {s.auto_email && (canEmail ? <s-badge>{t('supplierEmail.autoBadge')}</s-badge> : <s-badge tone="warning">{t('supplierEmail.autoPaused')}</s-badge>)}
+                                            {s.auto_email && (canAutoEmail ? <s-badge>{t('supplierEmail.autoBadge')}</s-badge> : <s-badge tone="warning">{t('supplierEmail.autoPaused')}</s-badge>)}
                                         </s-stack>
                                     </s-table-cell>
                                     <s-table-cell>{s.lead_time_days == null ? t('suppliers.storeDefault') : t('common.dayCount', { count: s.lead_time_days })}</s-table-cell>

@@ -1,0 +1,85 @@
+# Shopify Flow trigger (Growth): a product reached its reorder date. Sent by the backend
+# (App\Services\Flow\FlowTriggerService) once per product until it stops being due.
+# Field keys must match App\Services\Flow\FlowPayloads::productReorder().
+[[extensions]]
+name = "Product reorder date reached"
+type = "flow_trigger"
+handle = "product-reorder-date-reached"
+description = "A product needs reordering today according to its Clear Stock forecast. Includes the suggested quantity, supplier and days until it runs out."
+
+[settings]
+
+  [[settings.fields]]
+  type = "product_reference"
+
+  [[settings.fields]]
+  type = "single_line_text_field"
+  key = "Variant ID"
+  description = "The product variant's ID."
+
+  [[settings.fields]]
+  type = "single_line_text_field"
+  key = "Product name"
+
+  [[settings.fields]]
+  type = "single_line_text_field"
+  key = "SKU"
+
+  [[settings.fields]]
+  type = "number_decimal"
+  key = "Suggested quantity"
+  description = "Units to order now (minimum order and pack size applied)."
+
+  [[settings.fields]]
+  type = "single_line_text_field"
+  key = "Reorder date"
+  description = "YYYY-MM-DD."
+
+  [[settings.fields]]
+  type = "number_decimal"
+  key = "Days until stockout"
+  description = "0 when out of stock, -1 when the product is not selling."
+
+  [[settings.fields]]
+  type = "single_line_text_field"
+  key = "Stockout date"
+
+  [[settings.fields]]
+  type = "number_decimal"
+  key = "Current stock"
+
+  [[settings.fields]]
+  type = "number_decimal"
+  key = "Incoming stock"
+  description = "Units on the way (purchase orders, transfers)."
+
+  [[settings.fields]]
+  type = "number_decimal"
+  key = "Sales per day"
+
+  [[settings.fields]]
+  type = "number_decimal"
+  key = "Lead time days"
+
+  [[settings.fields]]
+  type = "single_line_text_field"
+  key = "Supplier name"
+
+  [[settings.fields]]
+  type = "single_line_text_field"
+  key = "Supplier email"
+
+  [[settings.fields]]
+  type = "single_line_text_field"
+  key = "ABC class"
+  description = "A, B or C by share of revenue (empty without a price)."
+
+  [[settings.fields]]
+  type = "single_line_text_field"
+  key = "Confidence"
+  description = "low, medium or high."
+
+  [[settings.fields]]
+  type = "url"
+  key = "App URL"
+  description = "The product's forecast and explanation in Clear Stock."

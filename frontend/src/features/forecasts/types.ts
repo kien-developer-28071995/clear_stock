@@ -1,6 +1,9 @@
 import type { Coded } from '@/types/coded';
 import type { Confidence, ForecastStatus } from '@/types/forecast';
 
+/** A = the products making up the first 80% of recent revenue, B = up to 95%, C = the rest. */
+export type AbcClass = 'A' | 'B' | 'C';
+
 export interface ForecastRow {
     variant_id: number;
     name: string;
@@ -13,6 +16,10 @@ export interface ForecastRow {
     unit_cost: number | null;
     supplier: { id: number; name: string } | null;
     is_bundle: boolean;
+    /** Current selling price (shop currency). */
+    price: number | null;
+    /** ABC class from the last `days` of revenue at the current price; class null without a price. */
+    abc: { class: AbcClass | null; revenue: number; share: number; days: number };
     current_stock: number;
     /** On the way (Shopify incoming: purchase orders, transfers); already counted in suggested_qty. */
     incoming_stock: number;
@@ -45,7 +52,7 @@ export type ForecastListRow = Pick<
     | 'reorder_date'
     | 'suggested_qty'
     | 'excess_units'
->;
+> & { abc_class: AbcClass | null };
 
 export interface Paginated<T> {
     data: T[];
@@ -144,8 +151,9 @@ export interface ForecastFilters {
     status?: ForecastStatus | '';
     vendor?: string;
     product_type?: string;
+    abc?: AbcClass | '';
     search?: string;
-    sort?: 'urgency' | 'cover' | 'name' | 'suggested' | 'value';
+    sort?: 'urgency' | 'cover' | 'name' | 'suggested' | 'value' | 'revenue';
     page?: number;
 }
 

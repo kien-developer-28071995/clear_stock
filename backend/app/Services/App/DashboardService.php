@@ -60,6 +60,11 @@ class DashboardService
             'slow_movers' => $this->forecasts->slowMovers($shop, 5) + ['days' => (int) config('forecast.slow_mover_days')],
             // Still selling, but more stock than the forecast says to hold.
             'overstock' => $this->forecasts->overstock($shop, $todayYmd, 5),
+            // Products, revenue and stock value per ABC class (Insights).
+            'abc' => $this->forecasts->abcSummary($shop) + [
+                'days' => (int) config('forecast.abc.days'),
+                'thresholds' => ['a' => (float) config('forecast.abc.a'), 'b' => (float) config('forecast.abc.b')],
+            ],
             'explanations_locked' => ! $explain,
         ];
     }

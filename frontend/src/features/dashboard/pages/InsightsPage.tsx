@@ -3,6 +3,7 @@ import { DashboardGate } from '@/features/dashboard/components/DashboardGate';
 import { RunwayChart } from '@/features/dashboard/components/RunwayChart';
 import { Overstock } from '@/features/dashboard/components/Overstock';
 import { SlowMovers } from '@/features/dashboard/components/SlowMovers';
+import { AbcSummary } from '@/features/dashboard/components/AbcSummary';
 import { Tip } from '@/features/setup/components/Tip';
 
 /** The overview: days of stock left per product, and money tied up in slow stock. */
@@ -16,6 +17,7 @@ export function InsightsPage() {
                     <s-link slot="breadcrumb-actions" href="/">{t('nav.home')}</s-link>
                     <Tip id="home_runway">{t('tips.home_runway')}</Tip>
                     <RunwayChart items={data.runway} />
+                    <AbcSummary dashboard={data} />
                     <Overstock dashboard={data} />
                     <SlowMovers dashboard={data} />
                     {data.runway.length === 0 && data.slow_movers.count === 0 && data.overstock.count === 0 && (

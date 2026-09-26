@@ -52,7 +52,7 @@ export function ExportPurchaseOrderButton({ supplierId, locationId, variantIds, 
         return (
             <s-stack direction="inline" gap="small-200" alignItems="center">
                 <s-button disabled icon="lock" variant={variant}>
-                    {t('po.locked', { label: text, plan: t('plans.names.growth') })}
+                    {t('po.locked', { label: text, plan: t('plans.names.starter') })}
                 </s-button>
                 <s-link href="/plans">{t('upgrade.seePlans')}</s-link>
             </s-stack>

@@ -12,6 +12,10 @@ export interface Entitlements {
     locations: boolean;
     purchase_orders: boolean;
     realtime_alerts: boolean;
+    what_if: boolean;
+    /** Automatic weekly orders to suppliers (emailing one by hand is purchase_orders). */
+    supplier_auto_email: boolean;
+    flow_triggers: boolean;
 }
 
 export interface Shop {

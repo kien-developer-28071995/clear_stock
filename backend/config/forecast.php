@@ -41,6 +41,14 @@ return [
 
     'slow_mover_days' => 180,
 
+    // ABC classification by revenue (net units sold x current price) over the last `days`:
+    // A = products making up the first 80% of revenue, B = up to 95%, C = the rest.
+    'abc' => [
+        'days' => 90,
+        'a' => 0.8,
+        'b' => 0.95,
+    ],
+
     // Suggested order covers lead time + safety days + this many days of sales.
     'order_cycle_days' => 30,
 

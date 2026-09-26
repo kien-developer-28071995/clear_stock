@@ -27,7 +27,8 @@
     "settings": "Cài đặt",
     "plans": "Gói dịch vụ",
     "reorder": "Cần nhập hàng",
-    "insights": "Phân tích"
+    "insights": "Phân tích",
+    "whatIf": "Mô phỏng"
   },
   "notFound": {
     "heading": "Không tìm thấy trang",
@@ -340,6 +341,7 @@
       "cover": "Ít ngày còn hàng nhất",
       "suggested": "Cần nhập nhiều nhất",
       "value": "Giá trị tồn cao nhất",
+      "revenue": "Doanh thu cao nhất",
       "name": "Tên"
     },
     "noMatch": "Không có sản phẩm nào khớp bộ lọc.",
@@ -433,8 +435,11 @@
       "bundles": "Combo và bộ kit",
       "alerts": "Cảnh báo qua email (tóm tắt hằng ngày hoặc hằng tuần)",
       "locations": "Tồn kho theo chi nhánh",
-      "purchaseOrders": "Xuất đơn đặt hàng (CSV)",
-      "realtimeAlerts": "Cảnh báo tồn kho tức thời"
+      "purchaseOrders": "Đơn đặt hàng: xuất CSV và gửi email cho nhà cung cấp",
+      "realtimeAlerts": "Cảnh báo tồn kho tức thời",
+      "whatIf": "Mô phỏng tăng trưởng (\"doanh số +20%?\")",
+      "supplierAutoEmail": "Tự động gửi đơn hằng tuần cho nhà cung cấp",
+      "flowTriggers": "Trigger cho Shopify Flow"
     },
     "notApproved": "Chưa có thay đổi gói nào được chấp thuận",
     "nowOn": "Bạn đang dùng gói {{plan}}",
@@ -639,7 +644,10 @@
       "purchase_orders": "Xuất đơn đặt hàng và gửi đơn qua email cho nhà cung cấp sẽ dừng.",
       "supplier_auto_emails_other": "{{count}} nhà cung cấp sẽ không còn nhận đơn đặt hàng tự động.",
       "realtime_alerts": "Không dùng được cảnh báo tồn kho tức thì.",
-      "realtime_alerts_active": "Cảnh báo tồn kho tức thì gửi tới {{email}} sẽ dừng."
+      "realtime_alerts_active": "Cảnh báo tồn kho tức thì gửi tới {{email}} sẽ dừng.",
+      "what_if": "Không dùng được mô phỏng tăng trưởng.",
+      "flow_triggers": "Trigger cho Shopify Flow sẽ dừng.",
+      "flow_triggers_active": "Các quy trình Shopify Flow dùng trigger của Clear Stock sẽ ngừng chạy."
     }
   },
   "vendors": {
@@ -693,5 +701,84 @@
     "fromTo": "Từ → đến",
     "units": "Số lượng",
     "created_at": "Tạo lúc"
+  },
+  "abc": {
+    "class": "Nhóm {{abc}}",
+    "column": "ABC",
+    "filter": "Nhóm ABC",
+    "allClasses": "Mọi nhóm",
+    "optionA": "Nhóm A (bán chạy nhất)",
+    "optionB": "Nhóm B",
+    "optionC": "Nhóm C (đóng góp ít)",
+    "heading": "Phân loại ABC",
+    "intro_other": "Sản phẩm xếp theo doanh thu {{count}} ngày gần nhất, tính theo giá bán hiện tại. Nhóm A chiếm {{a}} doanh thu đầu tiên, nhóm B tới {{b}}, nhóm C là phần còn lại.",
+    "products": "Sản phẩm",
+    "revenueShare": "Tỷ trọng doanh thu",
+    "revenue": "Doanh thu",
+    "stockValue": "Giá trị tồn",
+    "adviceA": "Đừng để hết hàng",
+    "adviceB": "Xem lại định kỳ",
+    "adviceC": "Giữ tồn kho gọn",
+    "explainA_other": "Nhóm A: {{share}}% doanh thu {{count}} ngày gần nhất ({{revenue}} theo giá hiện tại). Nên luôn có hàng.",
+    "explainB_other": "Nhóm B: {{share}}% doanh thu {{count}} ngày gần nhất ({{revenue}} theo giá hiện tại).",
+    "explainC_other": "Nhóm C: {{share}}% doanh thu {{count}} ngày gần nhất ({{revenue}} theo giá hiện tại). Tránh để tiền nằm ở tồn kho dư.",
+    "noPrice": "Chưa phân nhóm ABC: sản phẩm chưa có giá bán trong Shopify.",
+    "unclassified_other": "{{count}} sản phẩm chưa có giá bán trong Shopify nên chưa được phân nhóm."
+  },
+  "whatIf": {
+    "scenario": "Kịch bản",
+    "intro": "Xem cần nhập bao nhiêu nếu doanh số thay đổi. Tốc độ bán hiện tại của từng sản phẩm được nhân với mức thay đổi; lead time, safety stock, Min/Max, đơn tối thiểu và quy cách thùng giữ nguyên. Không lưu gì.",
+    "growth": "Doanh số thay đổi",
+    "horizon": "Đơn cần đặt",
+    "horizons": {
+      "h0": "Hôm nay",
+      "h14": "Trong 14 ngày tới",
+      "h30": "Trong 30 ngày tới"
+    },
+    "allSuppliers": "Mọi nhà cung cấp",
+    "resultHeading": "Doanh số {{growth}} (tốc độ hiện tại × {{factor}})",
+    "productsToOrder": {
+      "h0": "Sản phẩm cần đặt hôm nay",
+      "h14": "Sản phẩm cần đặt trong 14 ngày",
+      "h30": "Sản phẩm cần đặt trong 30 ngày"
+    },
+    "units": "Số lượng cần nhập",
+    "cost": "Chi phí theo giá vốn",
+    "stockoutRisk": "Hết hàng trước khi hàng mới về",
+    "legend": "Chữ xám: dự báo hiện tại → chữ đậm: kịch bản này. Số lượng là số cần đặt vào ngày đặt hàng.",
+    "missingCost_other": "{{count}} sản phẩm chưa có giá vốn trong Shopify nên chưa được tính vào chi phí.",
+    "nothingDue": {
+      "h0": "Kịch bản này không có sản phẩm nào cần đặt hôm nay.",
+      "h14": "Kịch bản này không có sản phẩm nào cần đặt trong 14 ngày tới.",
+      "h30": "Kịch bản này không có sản phẩm nào cần đặt trong 30 ngày tới."
+    },
+    "orderQty": "Số lượng đặt",
+    "lineCost": "Chi phí",
+    "notDue": "Chưa cần",
+    "riskBadge_other": "Hết hàng trước khi kịp về ({{count}} ngày giao)",
+    "truncated_other": "Hiển thị {{shown}}/{{count}} sản phẩm (đơn cần đặt sớm nhất trước). Tổng tính trên tất cả.",
+    "locked": "Thử \"nếu doanh số tăng 20% thì sao?\" để xem cần nhập gì, khi nào và tốn bao nhiêu trước khi quyết định."
+  },
+  "flow": {
+    "heading": "Shopify Flow",
+    "intro": "Tự chạy quy trình của bạn từ dự báo: gửi Slack, gắn tag sản phẩm, tạo việc, email cho nhóm. Tạo quy trình trong ứng dụng Shopify Flow với các trigger dưới đây. Mỗi trigger chỉ chạy một lần mỗi khi có thay đổi, không lặp lại mỗi đêm.",
+    "locked": "Chạy quy trình Shopify Flow khi sản phẩm cần đặt hàng, sắp hết hàng hoặc tới hạn đặt hàng với nhà cung cấp.",
+    "triggers": {
+      "productReorder": {
+        "name": "Product reorder date reached",
+        "body": "sản phẩm cần đặt hàng hôm nay, kèm số lượng gợi ý và nhà cung cấp."
+      },
+      "productStockout": {
+        "name": "Product stockout threshold reached",
+        "body": "sản phẩm sẽ hết trong 30, 14 hoặc 7 ngày, hoặc vừa hết hàng. Chọn ngưỡng bằng điều kiện trong Flow."
+      },
+      "supplierReorder": {
+        "name": "Supplier reorder date reached",
+        "body": "có sản phẩm của một nhà cung cấp cần đặt, kèm danh sách, số lượng và chi phí."
+      }
+    },
+    "active": "Đã có quy trình dùng các trigger này",
+    "inactive": "Chưa có quy trình nào dùng các trigger này",
+    "open": "Mở Shopify Flow"
   }
 }

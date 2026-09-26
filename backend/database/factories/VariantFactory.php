@@ -22,6 +22,7 @@ class VariantFactory extends Factory
             'title' => fake()->randomElement(['Default Title', 'Small', 'Medium', 'Large']),
             'sku' => strtoupper(fake()->unique()->bothify('SKU-####-??')),
             'unit_cost' => fake()->randomFloat(2, 1, 80),
+            'price' => fake()->randomFloat(2, 90, 200),
             'tracked' => true,
             'is_active' => true,
             'is_bundle' => false,

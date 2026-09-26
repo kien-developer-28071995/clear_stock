@@ -38,12 +38,15 @@ it('lists what Growth to Free takes away, with the shop numbers', function () {
             ['code' => 'locations', 'params' => ['count' => 2]],
             ['code' => 'purchase_orders', 'params' => []],
             ['code' => 'supplier_auto_emails', 'params' => ['count' => 1]],
+            ['code' => 'flow_triggers', 'params' => []],
+            ['code' => 'what_if', 'params' => []],
         ]);
 });
 
 it('lists only the Growth features when moving to Starter', function () {
+    // Purchase order export, emailing an order by hand and the what-if stay on Starter.
     $this->getJson('/api/billing/impact?plan=starter', $this->auth)
-        ->assertJsonPath('data.lost.*.code', ['realtime_alerts_active', 'locations', 'purchase_orders', 'supplier_auto_emails']);
+        ->assertJsonPath('data.lost.*.code', ['realtime_alerts_active', 'locations', 'supplier_auto_emails', 'flow_triggers']);
 });
 
 it('has nothing to warn about on upgrades or the same plan', function () {

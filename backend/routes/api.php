@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\BundleController;
 use App\Http\Controllers\Api\ClientErrorController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\ForecastController;
+use App\Http\Controllers\Api\GrowthScenarioController;
 use App\Http\Controllers\Api\ImportController;
 use App\Http\Controllers\Api\OnboardingController;
 use App\Http\Controllers\Api\ProductExtensionController;
@@ -68,6 +69,9 @@ Route::middleware('shopify.session')->group(function () {
     Route::get('/billing', [BillingController::class, 'show']);
     Route::get('/billing/impact', [BillingController::class, 'impact']);
     Route::post('/billing', [BillingController::class, 'store'])->middleware('throttle:10,1');
+
+    // What-if: sales +/- X% -> what to order (nothing saved).
+    Route::get('/what-if', GrowthScenarioController::class);
 
     Route::get('/purchase-orders/export', [PurchaseOrderController::class, 'export']);
 

@@ -58,38 +58,12 @@ class ForecastCalculator
         $safety = $this->safetyDays($in);
 
         // --- 5. Reorder maths -----------------------------------------------------------
-        // Reordering looks at the stock position: on hand + already on the way. Shopify
-        // gives no arrival date for incoming stock, so the stock-out date and days of
-        // cover use what is on hand only.
-        $stock = $in->currentStock;
-        $incoming = max(0, $in->incomingStock);
-        $position = $stock + $incoming;
-        $cycle = (int) $this->config['order_cycle_days'];
-        $computedPoint = (int) ceil($avg * ($leadTime['days'] + $safety['days']) - 1e-9);
-        $computedTarget = $avg * ($leadTime['days'] + $safety['days'] + $cycle);
-        // Manual min/max (Stocky style) replace the computed reorder point / order-up-to level.
-        $min = $in->minStock;
-        $max = $in->maxStock !== null && $in->maxStock > 0 ? $in->maxStock : null;
-        $reorderPoint = $min ?? ($max !== null ? min($computedPoint, $max) : $computedPoint);
-        $target = $max ?? max($computedTarget, (float) $reorderPoint);
-        $needed = max(0, (int) ceil($target - $position - 1e-9));
-        // Overstock: what is held beyond the level the forecast (or the merchant's max) says to hold.
-        $targetStock = (int) ceil($target - 1e-9);
-        $excess = ($avg > 0 || $max !== null) ? max(0, $position - $targetStock) : 0;
-        $overstock = $avg > 0 && $targetStock > 0 && $excess > $targetStock * (float) ($this->config['overstock_ratio'] ?? 0.5);
-        $rounding = $this->roundOrder($needed, $in->minOrderQty, $in->packSize);
-        $suggested = $rounding['final'];
-
-        if ($avg <= 0) {
-            $daysOfCover = $stock <= 0 ? 0.0 : null;
-            $stockoutDate = null;
-            // Without sales only a manual minimum triggers a reorder.
-            $reorderDate = $min !== null && $position <= $min ? $in->asOf->toDateString() : null;
-        } else {
-            $daysOfCover = $stock <= 0 ? 0.0 : round($stock / $avg, 1);
-            $stockoutDate = $in->asOf->addDays($stock <= 0 ? 0 : (int) floor($stock / $avg))->toDateString();
-            $reorderDate = $in->asOf->addDays($position <= $reorderPoint ? 0 : (int) floor(($position - $reorderPoint) / $avg))->toDateString();
-        }
+        $plan = $this->reorderPlan($in->asOf, $avg, $in->currentStock, $in->incomingStock, $leadTime['days'], $safety['days'],
+            $in->minStock, $in->maxStock, $in->minOrderQty, $in->packSize);
+        ['stock' => $stock, 'incoming' => $incoming, 'position' => $position, 'cycle' => $cycle, 'computed_point' => $computedPoint,
+            'point' => $reorderPoint, 'target' => $targetStock, 'excess' => $excess, 'overstock' => $overstock, 'min' => $min, 'max' => $max,
+            'rounding' => $rounding, 'suggested' => $suggested, 'days_of_cover' => $daysOfCover, 'stockout_date' => $stockoutDate,
+            'reorder_date' => $reorderDate] = $plan;
 
         $confidence = $this->confidence($windows, $series, $end, $avgOverride !== null);
 
@@ -157,6 +131,57 @@ class ForecastCalculator
             confidence: Confidence::from($confidence['level']),
             explanation: $explanation,
         );
+    }
+
+    /**
+     * Step 5 on its own: reorder point, order-up-to level, suggested order and dates for a given
+     * daily average. Also used by the growth what-if, so a scenario runs the exact same maths.
+     *
+     * Reordering looks at the stock position: on hand + already on the way. Shopify gives no
+     * arrival date for incoming stock, so the stock-out date and days of cover use what is on hand only.
+     *
+     * @return array{stock: int, incoming: int, position: int, cycle: int, computed_point: int, point: int, target: int, excess: int,
+     *     overstock: bool, min: ?int, max: ?int, rounding: array, suggested: int, days_of_cover: ?float, stockout_date: ?string, reorder_date: ?string}
+     */
+    public function reorderPlan(
+        CarbonImmutable $asOf, float $avg, int $stock, int $incoming, int $leadTimeDays, int $safetyDays,
+        ?int $minStock = null, ?int $maxStock = null, ?int $minOrderQty = null, ?int $packSize = null,
+    ): array {
+        $incoming = max(0, $incoming);
+        $position = $stock + $incoming;
+        $cycle = (int) $this->config['order_cycle_days'];
+        $computedPoint = (int) ceil($avg * ($leadTimeDays + $safetyDays) - 1e-9);
+        $computedTarget = $avg * ($leadTimeDays + $safetyDays + $cycle);
+        // Manual min/max (Stocky style) replace the computed reorder point / order-up-to level.
+        $min = $minStock;
+        $max = $maxStock !== null && $maxStock > 0 ? $maxStock : null;
+        $reorderPoint = $min ?? ($max !== null ? min($computedPoint, $max) : $computedPoint);
+        $target = $max ?? max($computedTarget, (float) $reorderPoint);
+        $needed = max(0, (int) ceil($target - $position - 1e-9));
+        // Overstock: what is held beyond the level the forecast (or the merchant's max) says to hold.
+        $targetStock = (int) ceil($target - 1e-9);
+        $excess = ($avg > 0 || $max !== null) ? max(0, $position - $targetStock) : 0;
+        $overstock = $avg > 0 && $targetStock > 0 && $excess > $targetStock * (float) ($this->config['overstock_ratio'] ?? 0.5);
+        $rounding = $this->roundOrder($needed, $minOrderQty, $packSize);
+
+        if ($avg <= 0) {
+            $daysOfCover = $stock <= 0 ? 0.0 : null;
+            $stockoutDate = null;
+            // Without sales only a manual minimum triggers a reorder.
+            $reorderDate = $min !== null && $position <= $min ? $asOf->toDateString() : null;
+        } else {
+            $daysOfCover = $stock <= 0 ? 0.0 : round($stock / $avg, 1);
+            $stockoutDate = $asOf->addDays($stock <= 0 ? 0 : (int) floor($stock / $avg))->toDateString();
+            $reorderDate = $asOf->addDays($position <= $reorderPoint ? 0 : (int) floor(($position - $reorderPoint) / $avg))->toDateString();
+        }
+
+        return [
+            'stock' => $stock, 'incoming' => $incoming, 'position' => $position, 'cycle' => $cycle,
+            'computed_point' => $computedPoint, 'point' => $reorderPoint, 'target' => $targetStock,
+            'excess' => $excess, 'overstock' => $overstock, 'min' => $min, 'max' => $max,
+            'rounding' => $rounding, 'suggested' => $rounding['final'],
+            'days_of_cover' => $daysOfCover, 'stockout_date' => $stockoutDate, 'reorder_date' => $reorderDate,
+        ];
     }
 
     /**

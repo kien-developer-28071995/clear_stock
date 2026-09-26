@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Usage: docker/scripts/set-app-url.sh https://xyz.trycloudflare.com
-# Updates APP_URL in backend/.env and frontend/.env, and application_url / redirect_urls
-# in shopify.app.toml.
+# Updates APP_URL in backend/.env and frontend/.env, application_url / redirect_urls
+# in shopify.app.toml and the Flow lifecycle callback URL.
 # Afterwards push the toml to Shopify:  npx @shopify/cli@latest app deploy
 set -euo pipefail
 url="${1:?usage: $0 https://your-tunnel-host}"
@@ -22,6 +22,12 @@ if [ -f shopify.app.toml ]; then
     -e "s|^application_url = \".*\"|application_url = \"${url}\"|" \
     -e "s|^redirect_urls = \[.*\]|redirect_urls = [ \"${url}/auth/callback\" ]|" \
     shopify.app.toml && rm -f shopify.app.toml.bak
+fi
+
+# Flow lifecycle callback (absolute URL in the extension config).
+lifecycle=extensions/flow-lifecycle/shopify.extension.toml
+if [ -f "$lifecycle" ]; then
+  sed -i.bak -E "s|^url = \".*\"|url = \"${url}/flow/lifecycle\"|" "$lifecycle" && rm -f "$lifecycle.bak"
 fi
 
 echo "APP_URL -> ${url} (backend/.env, frontend/.env)"

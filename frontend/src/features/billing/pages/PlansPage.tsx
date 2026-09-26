@@ -22,9 +22,12 @@ const FEATURES: { key: string; label: (p: PlanInfo, t: TFunction) => string; inc
     { key: 'explanations', label: (_, t) => t('plans.features.explanations'), included: (p) => p.limits.explanations },
     { key: 'bundles', label: (_, t) => t('plans.features.bundles'), included: (p) => p.limits.bundles },
     { key: 'alerts', label: (_, t) => t('plans.features.alerts'), included: (p) => p.limits.alerts },
-    { key: 'locations', label: (_, t) => t('plans.features.locations'), included: (p) => p.limits.locations },
     { key: 'purchase_orders', label: (_, t) => t('plans.features.purchaseOrders'), included: (p) => p.limits.purchase_orders },
+    { key: 'what_if', label: (_, t) => t('plans.features.whatIf'), included: (p) => p.limits.what_if },
+    { key: 'locations', label: (_, t) => t('plans.features.locations'), included: (p) => p.limits.locations },
+    { key: 'supplier_auto_email', label: (_, t) => t('plans.features.supplierAutoEmail'), included: (p) => p.limits.supplier_auto_email },
     { key: 'realtime_alerts', label: (_, t) => t('plans.features.realtimeAlerts'), included: (p) => p.limits.realtime_alerts },
+    { key: 'flow_triggers', label: (_, t) => t('plans.features.flowTriggers'), included: (p) => p.limits.flow_triggers },
 ];
 
 /** Flat prices, no GMV share, no contract. Charges go through Shopify. */

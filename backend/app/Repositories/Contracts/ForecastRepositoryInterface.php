@@ -53,4 +53,20 @@ interface ForecastRepositoryInterface
 
     /** @param array<int, int> $keepVariantIds */
     public function deleteForecastsExcept(Shop $shop, array $keepVariantIds): int;
+
+    /**
+     * Revenue per variant since a date: (units sold - returned) x current price.
+     * Variants without a price are left out (they cannot be classified).
+     *
+     * @param  array<int, int>  $variantIds
+     * @return array<int, float>
+     */
+    public function revenueSince(Shop $shop, array $variantIds, string $fromDate): array;
+
+    /**
+     * Store the ABC classes; every other variant of the shop is reset to unclassified.
+     *
+     * @param  array<int, array{class: string, revenue: float, share: float}>  $classes  variant id => class
+     */
+    public function saveAbcClasses(Shop $shop, array $classes): void;
 }

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\EmbeddedAppController;
+use App\Http\Controllers\FlowLifecycleController;
 use App\Http\Controllers\PublicPageController;
 use App\Http\Controllers\WebhookController;
 use Illuminate\Support\Facades\Route;
@@ -10,6 +11,9 @@ Route::get('/support', [PublicPageController::class, 'support'])->name('support'
 
 // All webhook topics (incl. mandatory compliance topics), HMAC-verified. See shopify.app.toml.
 Route::post('/webhooks', WebhookController::class)->middleware('shopify.webhook')->name('webhooks');
+
+// Shopify Flow lifecycle callback (extensions/flow-lifecycle), same HMAC as webhooks.
+Route::post('/flow/lifecycle', FlowLifecycleController::class)->middleware('shopify.webhook')->name('flow.lifecycle');
 
 // Listed in shopify.app.toml [auth] redirect_urls; with Shopify-managed install it is
 // only hit by legacy links, so send the merchant into the embedded app.

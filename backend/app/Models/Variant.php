@@ -21,6 +21,10 @@ use Illuminate\Support\Carbon;
  * @property ?string $sku
  * @property ?string $barcode
  * @property ?string $unit_cost
+ * @property ?string $price current selling price (shop currency)
+ * @property ?string $abc_class A, B or C by share of recent revenue; null without a price
+ * @property string $revenue_90d net units sold in the ABC window x current price
+ * @property string $revenue_share share of the shop's revenue in that window (0..1)
  * @property bool $tracked
  * @property bool $is_active
  * @property ?int $supplier_id
@@ -42,7 +46,7 @@ class Variant extends Model
 
     protected $fillable = [
         'shop_id', 'shopify_variant_id', 'shopify_product_id', 'inventory_item_id',
-        'product_title', 'vendor', 'product_type', 'title', 'sku', 'barcode', 'unit_cost', 'tracked', 'is_active',
+        'product_title', 'vendor', 'product_type', 'title', 'sku', 'barcode', 'unit_cost', 'price', 'tracked', 'is_active',
         'supplier_id', 'lead_time_override', 'safety_days', 'min_order_qty', 'pack_size', 'min_stock', 'max_stock', 'alerts_muted', 'is_bundle', 'shopify_created_at',
     ];
 
@@ -53,6 +57,9 @@ class Variant extends Model
             'shopify_product_id' => 'integer',
             'inventory_item_id' => 'integer',
             'unit_cost' => 'decimal:4',
+            'price' => 'decimal:2',
+            'revenue_90d' => 'decimal:2',
+            'revenue_share' => 'decimal:6',
             'tracked' => 'boolean',
             'is_active' => 'boolean',
             'lead_time_override' => 'integer',

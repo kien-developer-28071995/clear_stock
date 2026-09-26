@@ -1,0 +1,54 @@
+# Shopify Flow trigger (Growth): a product of a supplier became due for reordering.
+# Lists every due product of the supplier. Field keys match FlowPayloads::supplierReorder().
+[[extensions]]
+name = "Supplier reorder date reached"
+type = "flow_trigger"
+handle = "supplier-reorder-date-reached"
+description = "Products from a supplier need reordering according to Clear Stock. Includes the order lines, total units and cost."
+
+[settings]
+
+  [[settings.fields]]
+  type = "single_line_text_field"
+  key = "Supplier name"
+
+  [[settings.fields]]
+  type = "single_line_text_field"
+  key = "Supplier email"
+
+  [[settings.fields]]
+  type = "number_decimal"
+  key = "Lead time days"
+
+  [[settings.fields]]
+  type = "number_decimal"
+  key = "Products due"
+  description = "Products of this supplier to reorder now."
+
+  [[settings.fields]]
+  type = "number_decimal"
+  key = "New products due"
+  description = "Of those, products that became due since the last time this fired."
+
+  [[settings.fields]]
+  type = "number_decimal"
+  key = "Total units"
+
+  [[settings.fields]]
+  type = "number_decimal"
+  key = "Total cost"
+  description = "At unit cost; products without a cost in Shopify are left out."
+
+  [[settings.fields]]
+  type = "single_line_text_field"
+  key = "Currency"
+
+  [[settings.fields]]
+  type = "single_line_text_field"
+  key = "Order lines"
+  description = "Every due product as \"SKU · name × quantity\", separated by semicolons."
+
+  [[settings.fields]]
+  type = "url"
+  key = "App URL"
+  description = "The reorder list in Clear Stock."

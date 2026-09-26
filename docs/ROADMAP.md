@@ -5,7 +5,7 @@ Nghiên cứu ngày 2026-09-26 (Shopify App Store, review 1–3 sao, bài viết
 ## Bối cảnh thị trường
 
 - **Stocky (app tồn kho của Shopify) đã đóng**: gỡ khỏi App Store 2026-02-02, tắt hẳn 2026-08-31. Merchant còn quyền xuất dữ liệu read-only khoảng 90 ngày (tới khoảng cuối 11/2026); danh sách nhà cung cấp không xuất được. Công cụ tồn kho có sẵn trong Shopify admin không có dự báo. → Cửa sổ thu hút người dùng Stocky đang mở, cần làm nhanh.
-- **Đối thủ trực tiếp cùng định vị**: Stockcast (ra mắt 2026-05, "clear, explainable math", Free 25 SKU, $19/$29/$59, có import CSV đơn đặt hàng Stocky). Giá của ta ($4/$5 từ 2026-09-26, trước đó $2/$3) vẫn rẻ hơn khoảng 5 lần.
+- **Đối thủ trực tiếp cùng định vị**: Stockcast (ra mắt 2026-05, "clear, explainable math", Free 25 SKU, $19/$29/$59, có import CSV đơn đặt hàng Stocky). Giá của ta ($4/$6 từ 2026-09-26, trước đó $2/$3 rồi $4/$5) vẫn rẻ hơn khoảng 5 lần.
 
 | App | Giá | Đánh giá | Điểm đáng chú ý |
 |---|---|---|---|
@@ -51,8 +51,8 @@ Nghiên cứu ngày 2026-09-26 (Shopify App Store, review 1–3 sao, bài viết
 ### Sau khi ra mắt
 
 5. ~~**Vòng đời đơn đặt hàng**~~ → **thay bằng mục 11** (dùng Purchase Order gốc của Shopify, xem bên dưới). Gửi email cho NCC đã xong (2026-09-26).
-6. **Phân loại ABC**: nhóm A/B/C theo đóng góp doanh thu. Chỉ cần thêm cột và bộ lọc trong danh sách sản phẩm, không cần AI.
-7. **Mô phỏng tăng trưởng (what-if)**: "doanh số +20% thì cần nhập bao nhiêu". Hợp với định vị minh bạch.
+6. ✅ **Phân loại ABC** (xong 2026-09-26): nhóm A/B/C theo doanh thu 90 ngày = (bán − trả) × giá bán hiện tại (đồng bộ `variants.price`, không lưu giá trong đơn). A = 80% doanh thu đầu, B tới 95%, C phần còn lại (`forecast.abc`). Tính lại ở mỗi lần chạy forecast đầy đủ, xếp hạng mọi sản phẩm được theo dõi (cả ngoài giới hạn gói Free). Cột + bộ lọc + sắp xếp theo doanh thu ở danh sách sản phẩm, dòng giải thích ở trang sản phẩm, bảng tóm tắt ở trang Phân tích. Mở cho mọi gói. Chưa làm: doanh thu combo chưa chia về thành phần.
+7. ✅ **Mô phỏng tăng trưởng (what-if)** (xong 2026-09-26): trang `/what-if` (menu "Mô phỏng"), nhập % thay đổi doanh số (−90…+500, nút nhanh −20/+10/+20/+50/+100), khoảng đơn cần đặt (hôm nay / 14 / 30 ngày), lọc NCC/Vendor/ABC. Tốc độ bán × (1 + %), chạy đúng phép tính đặt hàng của forecast (`ForecastCalculator::reorderPlan`, giữ lead time, safety, Min/Max, MOQ, thùng), không lưu gì. So sánh hiện tại → kịch bản: số sản phẩm cần đặt, số lượng, chi phí theo giá vốn, số sản phẩm hết trước khi hàng về. Mọi gói. Chưa làm: xuất PO theo kịch bản, áp kịch bản thành điều chỉnh tạm thời.
 8. **Gợi ý chuyển kho giữa location** (gói Growth): location thừa → location sắp hết.
 9. **Dự báo sản phẩm mới theo sản phẩm tương tự**: chọn một sản phẩm tham chiếu, dùng tốc độ bán của nó khi chưa đủ lịch sử.
 10. **Báo khi sync lỗi liên tục** (email một lần, không spam) + cam kết giữ giá cho khách cũ trên trang Plans / listing.
@@ -78,7 +78,7 @@ Nghiên cứu ngày 2026-09-26 (Shopify App Store, review 1–3 sao, bài viết
 13. **Block dự báo trên trang sản phẩm Shopify** (admin UI extension)
     - Hiện "Hết hàng khoảng 7/10 · nên nhập 153 · vì sao" ngay trong trang sản phẩm/biến thể của admin, link vào app. Merchant thấy giá trị mà không cần mở app; tăng cảm giác "native" (tốt cho Built for Shopify).
     - Kèm hành động hàng loạt trên danh sách sản phẩm Shopify: "Gán nhà cung cấp / lead time".
-14. **Shopify Flow triggers dựa trên dự báo**
+14. ✅ **Shopify Flow triggers dựa trên dự báo** (xong 2026-09-26, Growth: 3 trigger `product-reorder-date-reached`, `product-stockout-threshold-reached` (ngưỡng 30/14/7/0), `supplier-reorder-date-reached`; chỉ gửi cho shop có workflow đang bật (lifecycle callback), mỗi thay đổi một lần, tối đa 250/lần chạy. Chưa thử với Flow thật: cần `app deploy`)
     - "Sản phẩm cần đặt hàng", "Sản phẩm sẽ hết trong N ngày", "Đơn cho nhà cung cấp tới hạn" (biến: SKU, số lượng gợi ý, ngày, nhà cung cấp) → merchant tự nối Slack, tag, task… Không ép AI, không spam: merchant tự chọn.
 15. ✅ **Trạng thái Overstock rõ ràng** (xong 2026-09-26: `forecasts.target_stock`/`excess_units`, trạng thái "Tồn thừa" khi thừa > 50% mức cần giữ (`forecast.overstock_ratio`), lọc được, mục Tồn thừa + tiền kẹt ở trang Phân tích, ô "Tiền kẹt trong kho" trên Home, dòng giải thích) (Foreshelf có): ngoài "bán chậm", đánh dấu sản phẩm có tồn vượt mức Max / vượt N ngày bán, kèm số tiền kẹt; lọc được.
 16. **Nhận hàng / kiểm kho bằng barcode** (thấp, cho nhóm bán lẻ/POS cũ của Stocky): cân nhắc sau vì Shopify admin đã có nhận hàng qua transfer.
@@ -89,9 +89,9 @@ Nguồn lần 2: https://community.shopify.dev/t/feature-request-expose-the-exis
 
 1. ~~**#11 Tạo Purchase Order gốc của Shopify từ gợi ý**~~ — xong: nút xuất PO có thêm định dạng "Đơn đặt hàng Shopify" đúng mẫu `SKU,Barcode,Supplier SKU,Quantity,Cost,Tax` (không có API tạo PO), đồng bộ `variants.barcode`, bỏ qua sản phẩm không có SKU lẫn barcode và báo số lượng.
 2. ~~**#13 Block dự báo trên trang sản phẩm Shopify** + gán NCC/lead time hàng loạt~~ — xong: 2 admin UI extension (`extensions/`): block trên trang sản phẩm (dự báo từng biến thể + giải thích + link vào app), hành động "Đặt NCC & lead time" cho sản phẩm được chọn ở danh sách sản phẩm.
-3. **#14 Shopify Flow triggers dựa trên dự báo** ("cần đặt hàng", "sẽ hết trong N ngày", "đơn NCC tới hạn").
+3. ~~**#14 Shopify Flow triggers dựa trên dự báo**~~ (xong, Growth).
 5. **#10 Báo khi đồng bộ lỗi liên tục** (1 email, không spam) + cam kết giữ giá cho khách cũ trên trang Gói / listing.
-6. **#6 Phân loại ABC**, **#7 Mô phỏng tăng trưởng (what-if)**, ~~**#8 Gợi ý chuyển kho** (Growth)~~ (xong: trang Chuyển kho, tạo phiếu chuyển nháp trong Shopify qua scope tùy chọn `write_inventory_transfers`), **#9 Dự báo sản phẩm mới theo sản phẩm tham chiếu**.
+6. ~~**#6 Phân loại ABC**~~ (xong), ~~**#7 Mô phỏng tăng trưởng (what-if)**~~ (xong), ~~**#8 Gợi ý chuyển kho** (Growth)~~ (xong: trang Chuyển kho, tạo phiếu chuyển nháp trong Shopify qua scope tùy chọn `write_inventory_transfers`), **#9 Dự báo sản phẩm mới theo sản phẩm tham chiếu**.
 7. **#16 Nhận hàng / kiểm kho bằng barcode** (thấp).
 8. **Mặc định MOQ / quy cách thùng theo nhà cung cấp** (hiện chỉ theo từng sản phẩm).
 9. **Phase 7 — chuẩn bị nộp App Store**: gỡ scope `write_orders`, `SHOPIFY_BILLING_TEST=false`, listing có "Stocky alternative", ảnh/icon, hướng dẫn test cho reviewer, domain gửi mail có SPF/DKIM.

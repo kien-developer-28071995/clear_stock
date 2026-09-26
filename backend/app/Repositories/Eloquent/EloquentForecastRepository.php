@@ -134,6 +134,57 @@ class EloquentForecastRepository implements ForecastRepositoryInterface
         return $deleted;
     }
 
+    public function revenueSince(Shop $shop, array $variantIds, string $fromDate): array
+    {
+        $out = [];
+        foreach (array_chunk($variantIds, self::CHUNK) as $ids) {
+            $prices = DB::table('variants')->where('shop_id', $shop->id)->whereIn('id', $ids)->whereNotNull('price')
+                ->pluck('price', 'id')->all();
+            $units = DB::table('daily_sales')->where('shop_id', $shop->id)->whereIn('variant_id', array_keys($prices))
+                ->where('date', '>=', $fromDate)->groupBy('variant_id')
+                ->selectRaw('variant_id, SUM(units_sold) - SUM(units_returned) as net')
+                ->pluck('net', 'variant_id')->all();
+
+            foreach ($prices as $id => $price) {
+                $out[(int) $id] = max(0, (int) ($units[$id] ?? 0)) * (float) $price;
+            }
+        }
+
+        return $out;
+    }
+
+    public function saveAbcClasses(Shop $shop, array $classes): void
+    {
+        DB::transaction(function () use ($shop, $classes) {
+            DB::table('variants')->where('shop_id', $shop->id)
+                ->where(fn ($q) => $q->whereNotNull('abc_class')->orWhere('revenue_90d', '>', 0))
+                ->update(['abc_class' => null, 'revenue_90d' => 0, 'revenue_share' => 0]);
+
+            // One UPDATE per chunk with CASE per column (values differ per row).
+            foreach (array_chunk($classes, self::CHUNK, true) as $chunk) {
+                $cases = ['abc_class' => [], 'revenue_90d' => [], 'revenue_share' => []];
+                $bindings = ['abc_class' => [], 'revenue_90d' => [], 'revenue_share' => []];
+                foreach ($chunk as $id => $c) {
+                    foreach (['abc_class' => $c['class'], 'revenue_90d' => $c['revenue'], 'revenue_share' => $c['share']] as $col => $value) {
+                        $cases[$col][] = 'WHEN ? THEN ?';
+                        array_push($bindings[$col], (int) $id, $value);
+                    }
+                }
+                $set = [];
+                $params = [];
+                foreach ($cases as $col => $whens) {
+                    $set[] = "{$col} = CASE id ".implode(' ', $whens).' END';
+                    array_push($params, ...$bindings[$col]);
+                }
+                $ids = array_map('intval', array_keys($chunk));
+                DB::update(
+                    'UPDATE variants SET '.implode(', ', $set).' WHERE shop_id = ? AND id IN ('.implode(',', array_fill(0, count($ids), '?')).')',
+                    [...$params, $shop->id, ...$ids],
+                );
+            }
+        });
+    }
+
     private function bumpVersion(Shop $shop): void
     {
         $key = CacheKeys::forecastVersion($shop->id);

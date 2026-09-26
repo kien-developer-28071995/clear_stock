@@ -5,13 +5,15 @@ import { ErrorBanner } from '@/components/ui/ErrorBanner';
 import { ExportPurchaseOrderButton } from '@/features/forecasts/components/ExportPurchaseOrderButton';
 import { useShop } from '@/features/shop/hooks/useShop';
 import { StatusBadge } from '@/components/ui/StatusBadge';
+import { AbcBadge } from '@/features/forecasts/components/AbcBadge';
 import { useFacets, useForecastList, useLocations } from '@/features/forecasts/hooks/useForecasts';
 import type { ForecastFilters } from '@/features/forecasts/types';
 import { formatDate, formatNumber } from '@/utils/format';
 import { NO_VALUE, fromOption, optionValue } from '@/utils/select';
 
 const STATUS_OPTIONS = ['reorder_now', 'out_of_stock', 'overstock', 'slow', 'healthy'] as const;
-const SORT_OPTIONS = ['urgency', 'cover', 'suggested', 'value', 'name'] as const;
+const SORT_OPTIONS = ['urgency', 'cover', 'suggested', 'value', 'revenue', 'name'] as const;
+const ABC_OPTIONS = ['A', 'B', 'C'] as const;
 
 /** Every tracked product with its forecast. Filters live in the URL so dashboard cards can link here. */
 export function ProductsPage() {
@@ -23,6 +25,7 @@ export function ProductsPage() {
         status: (params.get('status') ?? '') as ForecastFilters['status'],
         vendor: params.get('vendor') ?? '',
         product_type: params.get('product_type') ?? '',
+        abc: (params.get('abc') ?? '') as ForecastFilters['abc'],
         search: params.get('search') ?? '',
         sort: (params.get('sort') ?? 'urgency') as ForecastFilters['sort'],
         page: Number(params.get('page') ?? 1),
@@ -36,7 +39,7 @@ export function ProductsPage() {
     const facets = useFacets().data;
     const showVendors = (facets?.vendors.length ?? 0) > 1;
     const showTypes = (facets?.product_types.length ?? 0) > 1;
-    const selects = 2 + [showLocations, showVendors, showTypes].filter(Boolean).length;
+    const selects = 3 + [showLocations, showVendors, showTypes].filter(Boolean).length;
 
     const update = (patch: Partial<ForecastFilters>) => {
         const next = { ...filters, page: 1, ...patch };
@@ -123,6 +126,17 @@ export function ProductsPage() {
                             </s-select>
                         )}
                         <s-select
+                            label={t('abc.filter')}
+                            labelAccessibilityVisibility="exclusive"
+                            value={optionValue(filters.abc)}
+                            onChange={(e) => update({ abc: fromOption(e.currentTarget.value) as ForecastFilters['abc'] })}
+                        >
+                            <s-option value={NO_VALUE}>{t('abc.allClasses')}</s-option>
+                            {ABC_OPTIONS.map((value) => (
+                                <s-option key={value} value={value}>{t(`abc.option${value}`)}</s-option>
+                            ))}
+                        </s-select>
+                        <s-select
                             label={t('products.status')}
                             labelAccessibilityVisibility="exclusive"
                             value={optionValue(filters.status)}
@@ -148,6 +162,7 @@ export function ProductsPage() {
                     <s-table-header-row>
                         <s-table-header listSlot="primary">{t('table.product')}</s-table-header>
                         <s-table-header listSlot="inline">{t('products.status')}</s-table-header>
+                        <s-table-header>{t('abc.column')}</s-table-header>
                         <s-table-header format="numeric">{t('table.inStock')}</s-table-header>
                         <s-table-header format="numeric">{t('table.perDay')}</s-table-header>
                         <s-table-header format="numeric">{t('table.daysLeft')}</s-table-header>
@@ -167,6 +182,9 @@ export function ProductsPage() {
                                 </s-table-cell>
                                 <s-table-cell>
                                     <StatusBadge status={row.status} />
+                                </s-table-cell>
+                                <s-table-cell>
+                                    {row.abc_class ? <AbcBadge abc={row.abc_class} /> : <s-text color="subdued">—</s-text>}
                                 </s-table-cell>
                                 <s-table-cell>
                                     <s-stack gap="small-100">

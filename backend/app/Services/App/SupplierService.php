@@ -58,8 +58,8 @@ class SupplierService
     {
         $email = array_key_exists('email', $data) ? $data['email'] : $supplier?->email;
         if (! empty($data['auto_email'])) {
-            if (! Entitlements::for($shop)->has(Feature::PurchaseOrders)) {
-                throw new PlanRequiredException(Feature::PurchaseOrders);
+            if (! Entitlements::for($shop)->has(Feature::SupplierAutoEmail)) {
+                throw new PlanRequiredException(Feature::SupplierAutoEmail);
             }
             if (! $email) {
                 throw ValidationException::withMessages(['auto_email' => 'auto_email_needs_email']);

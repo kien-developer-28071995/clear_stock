@@ -94,7 +94,7 @@ class SupplierEmailService
     public function sendDue(Shop $shop, ?CarbonImmutable $now = null): int
     {
         $now ??= CarbonImmutable::now();
-        if (! $shop->isInstalled() || ! Entitlements::for($shop)->has(Feature::PurchaseOrders)) {
+        if (! $shop->isInstalled() || ! Entitlements::for($shop)->has(Feature::SupplierAutoEmail)) {
             return 0;
         }
         if ($now->setTimezone($shop->timezone)->hour < (int) config('alerts.send_hour')) {

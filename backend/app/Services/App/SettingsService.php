@@ -9,6 +9,7 @@ use App\Jobs\Forecast\RecomputeForecasts;
 use App\Jobs\SyncRealtimeWebhook;
 use App\Models\Shop;
 use App\Repositories\Contracts\AlertSettingRepositoryInterface;
+use App\Repositories\Contracts\FlowRepositoryInterface;
 use App\Repositories\Contracts\ShopRepositoryInterface;
 use App\Support\Entitlements;
 
@@ -18,6 +19,7 @@ class SettingsService
     public function __construct(
         private readonly ShopRepositoryInterface $shops,
         private readonly AlertSettingRepositoryInterface $alerts,
+        private readonly FlowRepositoryInterface $flow,
     ) {}
 
     public function get(Shop $shop): array
@@ -37,6 +39,11 @@ class SettingsService
                 // Growth only; the inventory webhook exists only while this is on.
                 'realtime_available' => Entitlements::for($shop)->has(Feature::RealtimeAlerts),
                 'realtime' => ($alert?->realtime ?? RealtimeAlertMode::Off)->value,
+            ],
+            // Shopify Flow triggers (Growth): set up in the Flow app; `active` = a workflow uses one.
+            'flow' => [
+                'available' => Entitlements::for($shop)->has(Feature::FlowTriggers),
+                'active' => $this->flow->hasEnabledFlow($shop),
             ],
         ];
     }

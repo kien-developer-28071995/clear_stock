@@ -13,6 +13,7 @@ const page = <T extends Record<string, unknown>>(load: () => Promise<T>, name: k
 
 const ReorderPage = page(() => import('@/features/dashboard/pages/ReorderPage'), 'ReorderPage');
 const TransfersPage = page(() => import('@/features/transfers/pages/TransfersPage'), 'TransfersPage');
+const WhatIfPage = page(() => import('@/features/whatif/pages/WhatIfPage'), 'WhatIfPage');
 const InsightsPage = page(() => import('@/features/dashboard/pages/InsightsPage'), 'InsightsPage');
 const ProductsPage = page(() => import('@/features/forecasts/pages/ProductsPage'), 'ProductsPage');
 const ProductDetailPage = page(() => import('@/features/forecasts/pages/ProductDetailPage'), 'ProductDetailPage');
@@ -33,6 +34,7 @@ export function AppRouter() {
                 <Route path="/reorder" element={<ReorderPage />} />
                 <Route path="/transfers" element={<TransfersPage />} />
                 <Route path="/insights" element={<InsightsPage />} />
+                <Route path="/what-if" element={<WhatIfPage />} />
                 <Route path="/products" element={<ProductsPage />} />
                 <Route path="/products/:variantId" element={<ProductDetailPage />} />
                 <Route path="/suppliers" element={<SuppliersPage />} />

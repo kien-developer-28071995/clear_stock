@@ -12,6 +12,7 @@ use App\Models\InventoryLevel;
 use App\Models\Shop;
 use App\Models\Supplier;
 use App\Models\Variant;
+use App\Repositories\Contracts\FlowRepositoryInterface;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 
@@ -28,10 +29,12 @@ function seedShopData(Shop $shop): void
     ForecastOverride::factory()->create(['variant_id' => $variant->id]);
     AlertSetting::factory()->for($shop)->create();
     AlertLog::create(['shop_id' => $shop->id, 'variant_id' => $variant->id, 'type' => 'reorder_needed', 'sent_at' => now()]);
+    app(FlowRepositoryInterface::class)->recordLifecycle($shop, 'Product reorder date reached', true, now());
+    app(FlowRepositoryInterface::class)->saveStates($shop, 'variant', [$variant->id => ['reorder_due' => true]]);
 }
 
 const SHOP_TABLES = ['suppliers', 'variants', 'bundle_components', 'locations', 'inventory_levels', 'daily_sales',
-    'forecasts', 'forecast_overrides', 'alert_settings', 'alert_logs'];
+    'forecasts', 'forecast_overrides', 'alert_settings', 'alert_logs', 'flow_subscriptions', 'flow_trigger_states'];
 
 it('app/uninstalled drops tokens, resets the plan and keeps data for a quick reinstall', function () {
     Event::fake([ShopUninstalled::class]);

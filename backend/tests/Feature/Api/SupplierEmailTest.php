@@ -82,11 +82,15 @@ it('refuses double sends, empty orders, other shops products and suppliers witho
     Mail::assertQueuedCount(1);
 });
 
-it('is a Growth feature', function () {
+it('sends by hand from Starter, automatic emails are Growth only', function () {
     $this->shop->update(['plan' => 'starter']);
 
-    $this->getJson("/api/suppliers/{$this->acme->id}/email", $this->auth)->assertStatus(402)->assertJsonPath('params.plan', 'growth');
-    $this->putJson("/api/suppliers/{$this->acme->id}", ['name' => 'Acme', 'auto_email' => true], $this->auth)->assertStatus(402);
+    $this->getJson("/api/suppliers/{$this->acme->id}/email", $this->auth)->assertOk();
+    $this->putJson("/api/suppliers/{$this->acme->id}", ['name' => 'Acme', 'auto_email' => true], $this->auth)
+        ->assertStatus(402)->assertJsonPath('params.plan', 'growth')->assertJsonPath('params.feature', 'supplier_auto_email');
+
+    $this->shop->update(['plan' => 'free']);
+    $this->getJson("/api/suppliers/{$this->acme->id}/email", $this->auth)->assertStatus(402)->assertJsonPath('params.plan', 'starter');
 });
 
 it('turns automatic emails on only with a supplier email, and off when the email is removed', function () {

@@ -10,6 +10,7 @@ import { UpgradePrompt } from '@/components/ui/UpgradePrompt';
 import { useDismissSetupGuide, useSetupGuide } from '@/features/setup/hooks/useSetupGuide';
 import { SaveBar } from '@/components/ui/SaveBar';
 import { SyncStatusCard } from '@/features/sync/components/SyncStatusCard';
+import { FlowSection } from '@/features/settings/components/FlowSection';
 import { useSettings, useUpdateSettings } from '@/features/settings/hooks/useSettings';
 import type { RealtimeAlertMode, Settings } from '@/features/settings/types';
 import { NO_VALUE, fromOption, optionValue } from '@/utils/select';
@@ -157,6 +158,8 @@ export function SettingsPage() {
                     </s-select>
                 </s-stack>
             </s-section>
+
+            <FlowSection flow={form.flow} />
 
             {guide.data?.dismissed && guide.data.completed < guide.data.total && (
                 <s-section heading={t('settings.setupGuide')}>

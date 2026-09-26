@@ -50,7 +50,7 @@ it('lists plans with flat monthly and annual prices', function () {
         ->assertJsonPath('data.plan', 'free')
         ->assertJsonPath('data.plans.1.key', 'starter')
         ->assertJsonPath('data.plans.1.prices', ['monthly' => 4, 'annual' => 38])
-        ->assertJsonPath('data.plans.2.prices', ['monthly' => 5, 'annual' => 48]);
+        ->assertJsonPath('data.plans.2.prices', ['monthly' => 6, 'annual' => 58]);
 });
 
 it('creates a Shopify subscription and returns the approval URL', function (string $plan, string $interval, float $price, string $shopifyInterval) {
@@ -75,8 +75,8 @@ it('creates a Shopify subscription and returns the approval URL', function (stri
 })->with([
     'starter monthly' => ['starter', 'monthly', 4.0, 'EVERY_30_DAYS'],
     'starter annual' => ['starter', 'annual', 38.0, 'ANNUAL'],
-    'growth monthly' => ['growth', 'monthly', 5.0, 'EVERY_30_DAYS'],
-    'growth annual' => ['growth', 'annual', 48.0, 'ANNUAL'],
+    'growth monthly' => ['growth', 'monthly', 6.0, 'EVERY_30_DAYS'],
+    'growth annual' => ['growth', 'annual', 58.0, 'ANNUAL'],
 ]);
 
 it('activates the plan after approval by re-reading the subscription', function () {

@@ -11,6 +11,7 @@ use App\Models\Supplier;
 use App\Models\Variant;
 use App\Repositories\Contracts\AlertSettingRepositoryInterface;
 use App\Repositories\Contracts\CatalogRepositoryInterface;
+use App\Repositories\Contracts\FlowRepositoryInterface;
 use App\Repositories\Contracts\ForecastQueryRepositoryInterface;
 use App\Repositories\Contracts\SupplierRepositoryInterface;
 use App\Repositories\Contracts\VariantRepositoryInterface;
@@ -32,6 +33,7 @@ class DowngradeImpactService
         private readonly ForecastQueryRepositoryInterface $forecasts,
         private readonly AlertSettingRepositoryInterface $alerts,
         private readonly SupplierRepositoryInterface $suppliers,
+        private readonly FlowRepositoryInterface $flow,
     ) {}
 
     public static function isDowngrade(Plan $from, Plan $to): bool
@@ -81,10 +83,21 @@ class DowngradeImpactService
 
         if ($loses(Feature::PurchaseOrders)) {
             $out[] = $this->line('purchase_orders');
+        }
+
+        if ($loses(Feature::SupplierAutoEmail)) {
             $auto = $this->suppliers->allForShop($shop)->filter(fn (Supplier $s) => $s->auto_email && $s->email)->count();
             if ($auto > 0) {
                 $out[] = $this->line('supplier_auto_emails', ['count' => $auto]);
             }
+        }
+
+        if ($loses(Feature::FlowTriggers)) {
+            $out[] = $this->line($this->flow->hasEnabledFlow($shop) ? 'flow_triggers_active' : 'flow_triggers');
+        }
+
+        if ($loses(Feature::WhatIf)) {
+            $out[] = $this->line('what_if');
         }
 
         return $out;

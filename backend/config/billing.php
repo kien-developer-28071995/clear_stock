@@ -24,8 +24,11 @@ return [
                 'explanations' => true,
                 'alerts' => false,
                 'locations' => false,
-                'purchase_orders' => false,
+                'purchase_orders' => false,     // PO export (CSV) and emailing an order to a supplier
                 'realtime_alerts' => false,
+                'what_if' => false,
+                'supplier_auto_email' => false, // automatic weekly orders to suppliers
+                'flow_triggers' => false,       // Shopify Flow triggers
             ],
         ],
         'starter' => [
@@ -37,13 +40,16 @@ return [
                 'explanations' => true,
                 'alerts' => true,
                 'locations' => false,
-                'purchase_orders' => false,
+                'purchase_orders' => true,
                 'realtime_alerts' => false,
+                'what_if' => true,
+                'supplier_auto_email' => false,
+                'flow_triggers' => false,
             ],
         ],
         'growth' => [
             'name' => 'Growth',
-            'prices' => ['monthly' => 5.00, 'annual' => 48.00],
+            'prices' => ['monthly' => 6.00, 'annual' => 58.00],
             'limits' => [
                 'max_skus' => null,
                 'bundles' => true,
@@ -52,6 +58,9 @@ return [
                 'locations' => true,
                 'purchase_orders' => true,
                 'realtime_alerts' => true,
+                'what_if' => true,
+                'supplier_auto_email' => true,
+                'flow_triggers' => true,
             ],
         ],
     ],

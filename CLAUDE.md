@@ -88,9 +88,9 @@ Mỗi forecast lưu explanation gồm: các cửa sổ ngày đã dùng và tr�
 
 ## Gói giá (Billing API)
 - Free: dưới 50 SKU, có dự báo, gợi ý nhập hàng và giải thích dự báo đầy đủ (quyết định 2026-09-26: giải thích mở cho mọi gói vì là lời hứa "minh bạch")
-- Starter $4/tháng ($38/năm): không giới hạn SKU, bundle, cảnh báo email (dùng thử 7 ngày, một lần mỗi shop)
-- Growth $5/tháng ($48/năm): multi-location, xuất purchase order (dùng thử 7 ngày)
-- Giá hạ từ $9/$24 xuống $2/$3 rồi nâng lên $4/$5 ngày 2026-09-26 (quyết định của chủ app). Shop đang trả tiền giữ giá cũ tới khi tự đổi gói (subscription Shopify giữ nguyên giá)
+- Starter $4/tháng ($38/năm): không giới hạn SKU, bundle, cảnh báo email, xuất PO + gửi đơn cho NCC thủ công, mô phỏng tăng trưởng (dùng thử 7 ngày, một lần mỗi shop)
+- Growth $6/tháng ($58/năm): multi-location, chuyển kho, tự động gửi đơn NCC hằng tuần, cảnh báo tức thời, Flow triggers (dùng thử 7 ngày)
+- Giá hạ từ $9/$24 xuống $2/$3 rồi nâng lên $4/$5, sau đó Growth lên $6 ngày 2026-09-26 (quyết định của chủ app). Xuất PO, gửi đơn thủ công và mô phỏng chuyển từ Growth xuống Starter cùng ngày. Shop đang trả tiền giữ giá cũ tới khi tự đổi gói (subscription Shopify giữ nguyên giá)
 - Gói năm giảm ~20%
 
 Giá cố định, không tính theo GMV, không hợp đồng, hủy bất cứ lúc nào.
@@ -181,5 +181,9 @@ Yêu cầu chung:
 - [x] PO gốc Shopify (roadmap #11): xuất định dạng nhập PO của Shopify (menu Xuất đơn đặt hàng), đồng bộ barcode, header `X-Skipped-Rows`, 342 test
 - [x] Admin extensions (roadmap #13): `extensions/product-forecast-block` (block trang sản phẩm: dự báo từng biến thể, giải thích, link `app:`), `extensions/product-settings-action` (chọn nhiều sản phẩm → đặt NCC/lead time/safety); API `/api/extension/*` + CORS; locale extension chép từ app (`npm run extensions:locales`); `package.json` ở root chỉ là workspace Shopify CLI; 348 test + 43 E2E
 - [x] Gợi ý chuyển kho (roadmap #8, Growth): `TransferPlanner` (thuần, thiếu = vị thế ≤ điểm đặt lại → tới mức nhập tới; dư = tồn thực trên mức cần giữ; ưu tiên ngày hết sớm), trang `/transfers` theo tuyến A → B sửa được số lượng, tạo phiếu chuyển nháp trong Shopify (`inventoryTransferCreate` + `@idempotent`), scope tùy chọn `write_inventory_transfers` xin khi dùng lần đầu (`shopify.scopes.request`), phiếu nháp 7 ngày gần nhất tính là đã chuyển (`inventory_transfers`), banner ở trang Cần nhập hàng, 361 test + 47 E2E
+- [x] Phân loại ABC (roadmap #6): `variants.price` đồng bộ từ Shopify, `abc_class`/`revenue_90d`/`revenue_share` tính lại mỗi lần forecast đầy đủ (`AbcClassifier` thuần, ngưỡng 80/95% trong `forecast.abc`), lọc `abc` + sắp xếp `revenue` ở danh sách, giải thích ở trang sản phẩm, bảng tóm tắt ở Phân tích, mọi gói, 372 test + 50 E2E
+- [x] Mô phỏng tăng trưởng (roadmap #7): `/api/what-if` + trang `/what-if`, tách `ForecastCalculator::reorderPlan` dùng chung cho forecast và kịch bản, lượng đặt theo ngày đặt (hôm nay: từ vị thế tồn; sau: từ điểm đặt lại), mọi gói, 379 test + 53 E2E
+- [x] Phân gói lại + giá Growth $6 ($58/năm): xuất PO + gửi đơn NCC thủ công + mô phỏng xuống Starter; tự động gửi NCC (`supplier_auto_email`) và Flow ở Growth; feature mới `what_if`, `supplier_auto_email`, `flow_triggers`, hộp hạ gói cập nhật
+- [x] Shopify Flow triggers (roadmap #14, Growth): 3 extension `extensions/flow-*` + `flow-lifecycle` (callback `/flow/lifecycle`, HMAC), `FlowTriggerPlanner` thuần (mỗi thay đổi 1 lần, ngưỡng hết hàng 30/14/7/0 có hysteresis), `SendFlowTriggers` sau mỗi lần forecast, chỉ shop có workflow bật, thẻ Shopify Flow trong Settings, 392 test + 56 E2E. Chưa thử với Flow thật (cần `app deploy`)
 - [ ] Việc sắp tới: xem mục "Việc sắp tới" trong `docs/ROADMAP.md`
 - [ ] Phase 7: Chuẩn bị nộp App Store (nhớ: gỡ scope write_orders chỉ dùng cho dev:fake-orders khỏi shopify.app.toml và SHOPIFY_SCOPES; SHOPIFY_BILLING_TEST=false ở production)

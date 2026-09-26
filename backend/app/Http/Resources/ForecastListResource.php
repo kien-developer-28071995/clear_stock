@@ -24,6 +24,7 @@ class ForecastListResource extends JsonResource
             'name' => $v->displayName(),
             'sku' => $v->sku,
             'vendor' => $v->vendor,
+            'abc_class' => $v->abc_class,
             'status' => ForecastStatusResolver::for($this->resource, $request->attributes->get('today', now()->toDateString()))->value,
             'current_stock' => $this->current_stock,
             'incoming_stock' => $this->incoming_stock,

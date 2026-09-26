@@ -40,6 +40,12 @@ class ForecastService
         $ids = $this->forecasts->forecastableVariantIds($shop);
         $notForecasted = 0;
 
+        // ABC classes first: the forecast writes below bump the cache version, so no list is cached
+        // with the old classes. Every tracked product is ranked, also beyond the Free plan's limit.
+        if ($onlyVariantIds === null) {
+            $this->classifyAbc($shop, $ids, $asOf);
+        }
+
         // Free plan: the best-selling products up to the plan's SKU limit.
         $max = Entitlements::for($shop)->maxSkus();
         if ($max !== null && count($ids) > $max) {
@@ -95,6 +101,13 @@ class ForecastService
         ForecastsUpdated::dispatch($shop, $stats);
 
         return $stats;
+    }
+
+    /** @param array<int, int> $ids */
+    private function classifyAbc(Shop $shop, array $ids, CarbonImmutable $asOf): void
+    {
+        $from = $asOf->subDays((int) config('forecast.abc.days'))->toDateString();
+        $this->forecasts->saveAbcClasses($shop, AbcClassifier::fromConfig()->classify($this->forecasts->revenueSince($shop, $ids, $from)));
     }
 
     private function row(ForecastResult $r, \DateTimeInterface $computedAt): array

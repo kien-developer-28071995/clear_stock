@@ -1,7 +1,9 @@
 import type { ForecastDetail } from '@/features/forecasts/types';
 import { useTranslation } from 'react-i18next';
 import { ConfidenceBadge, StatusBadge } from '@/components/ui/StatusBadge';
-import { formatDate, formatNumber } from '@/utils/format';
+import { AbcBadge } from '@/features/forecasts/components/AbcBadge';
+import { useShop } from '@/features/shop/hooks/useShop';
+import { formatDate, formatMoney, formatNumber } from '@/utils/format';
 
 function Metric({ label, value }: { label: string; value: string }) {
     return (
@@ -15,6 +17,8 @@ function Metric({ label, value }: { label: string; value: string }) {
 export function ForecastSummary({ f }: { f: ForecastDetail }) {
     const { t } = useTranslation();
     const selling = f.avg_daily_sales > 0;
+    const currency = useShop().data?.currency ?? null;
+    const abc = f.abc;
 
     return (
         <s-section>
@@ -22,9 +26,20 @@ export function ForecastSummary({ f }: { f: ForecastDetail }) {
                 <s-stack direction="inline" gap="small-200">
                     <StatusBadge status={f.status} />
                     <ConfidenceBadge confidence={f.confidence} />
+                    <AbcBadge abc={abc.class} />
                     {f.overrides.avg_daily_sales && <s-badge tone="info">{t('product.adjustedByYou')}</s-badge>}
                     {f.sku && <s-text color="subdued">{t('product.sku', { sku: f.sku })}</s-text>}
                 </s-stack>
+                {/* Why this class: share of the shop's revenue, at the current price. */}
+                <s-text color="subdued">
+                    {abc.class
+                        ? t(`abc.explain${abc.class}`, {
+                              share: formatNumber(abc.share * 100, 1),
+                              revenue: formatMoney(abc.revenue, currency),
+                              count: abc.days,
+                          })
+                        : t('abc.noPrice')}
+                </s-text>
                 <s-grid gridTemplateColumns="@container (inline-size > 500px) 1fr 1fr 1fr 1fr, 1fr 1fr" gap="base">
                     <Metric label={t('table.inStock')} value={formatNumber(f.current_stock, 0)} />
                     {f.incoming_stock > 0 && <Metric label={t('product.onTheWay')} value={formatNumber(f.incoming_stock, 0)} />}
