@@ -37,6 +37,7 @@ it('lists what Growth to Free takes away, with the shop numbers', function () {
             ['code' => 'realtime_alerts_active', 'params' => ['email' => 'owner@demo.test']],
             ['code' => 'locations', 'params' => ['count' => 2]],
             ['code' => 'purchase_orders', 'params' => []],
+            ['code' => 'supplier_emails', 'params' => []],
             ['code' => 'supplier_auto_emails', 'params' => ['count' => 1]],
             ['code' => 'flow_triggers', 'params' => []],
             ['code' => 'what_if', 'params' => []],

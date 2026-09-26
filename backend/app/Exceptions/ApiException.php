@@ -30,6 +30,12 @@ class ApiException extends RuntimeException
         return new self("{$what}_not_found", 404);
     }
 
+    /** The feature is switched off app-wide (config/features.php): nothing to upgrade to. */
+    public static function featureDisabled(string $feature): self
+    {
+        return new self('feature_disabled', 404, ['feature' => $feature]);
+    }
+
     public function render(): JsonResponse
     {
         return ApiErrorResponse::make($this->errorCode, $this->status, $this->params, $this->headers);

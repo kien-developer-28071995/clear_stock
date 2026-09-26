@@ -2,7 +2,9 @@
 
 namespace App\Http\Resources;
 
+use App\Enums\Feature;
 use App\Models\Forecast;
+use App\Support\Features;
 use App\Support\ForecastStatusResolver;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -24,7 +26,7 @@ class ForecastListResource extends JsonResource
             'name' => $v->displayName(),
             'sku' => $v->sku,
             'vendor' => $v->vendor,
-            'abc_class' => $v->abc_class,
+            'abc_class' => Features::enabled(Feature::Abc) ? $v->abc_class : null,
             'status' => ForecastStatusResolver::for($this->resource, $request->attributes->get('today', now()->toDateString()))->value,
             'current_stock' => $this->current_stock,
             'incoming_stock' => $this->incoming_stock,

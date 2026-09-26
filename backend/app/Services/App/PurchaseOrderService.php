@@ -3,7 +3,6 @@
 namespace App\Services\App;
 
 use App\Enums\Feature;
-use App\Exceptions\PlanRequiredException;
 use App\Models\Forecast;
 use App\Models\Shop;
 use App\Repositories\Contracts\ForecastQueryRepositoryInterface;
@@ -32,9 +31,7 @@ class PurchaseOrderService
      */
     public function build(Shop $shop, ?int $supplierId, ?int $locationId = null, ?array $variantIds = null, string $format = self::FORMAT_STANDARD): array
     {
-        if (! Entitlements::for($shop)->has(Feature::PurchaseOrders)) {
-            throw new PlanRequiredException(Feature::PurchaseOrders);
-        }
+        Entitlements::for($shop)->require(Feature::PurchaseOrders);
 
         $today = CarbonImmutable::now($shop->timezone)->toDateString();
         $items = $this->forecasts->reorderList($shop, $today, $supplierId, $locationId, $variantIds);

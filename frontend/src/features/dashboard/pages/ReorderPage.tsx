@@ -5,7 +5,7 @@ import { ActionList } from '@/features/dashboard/components/ActionList';
 import type { ActionGroup, Dashboard } from '@/features/dashboard/types';
 import { Tip } from '@/features/setup/components/Tip';
 import { useTransfers } from '@/features/transfers/hooks/useTransfers';
-import { useEntitlements } from '@/hooks/useEntitlements';
+import { useEntitlements, useFeature } from '@/hooks/useEntitlements';
 import { NO_VALUE, fromOption, optionValue } from '@/utils/select';
 
 /** Only the products of one vendor, to order everything from the same maker at once. */
@@ -22,8 +22,9 @@ function forVendor(dashboard: Dashboard, vendor: string): Dashboard {
 export function ReorderPage() {
     const { t } = useTranslation();
     const [vendor, setVendor] = useState('');
+    const purchaseOrders = useFeature('purchase_orders');
     // Growth: stock that other locations can send, to move before ordering.
-    const transfers = useTransfers(useEntitlements().locations).data;
+    const transfers = useTransfers(useEntitlements().transfers).data;
     const transferUnits = transfers?.routes.reduce((sum, r) => sum + r.total_units, 0) ?? 0;
 
     return (
@@ -34,7 +35,7 @@ export function ReorderPage() {
                 return (
                     <s-page heading={t('nav.reorder')}>
                         <s-link slot="breadcrumb-actions" href="/">{t('nav.home')}</s-link>
-                        <Tip id="home_actions">{t('tips.home_actions')}</Tip>
+                        <Tip id="home_actions">{t(purchaseOrders ? 'tips.home_actions' : 'tips.home_actions_no_po')}</Tip>
                         {transferUnits > 0 && (
                             <s-banner tone="info" heading={t('transfers.beforeOrdering', { count: transferUnits, qty: transferUnits })}>
                                 <s-paragraph>{t('transfers.beforeOrderingBody')}</s-paragraph>

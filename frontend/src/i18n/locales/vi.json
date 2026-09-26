@@ -202,7 +202,8 @@
     "label": "Mẹo:",
     "home_actions": "Các sản phẩm cần nhập hôm nay đã được chọn sẵn. Nút Xuất đơn đặt hàng gộp chúng thành một file gửi nhà cung cấp.",
     "home_runway": "Mỗi cột là số ngày hàng còn đủ bán. Vạch đứt là lúc cần đặt hàng để hàng mới về kịp.",
-    "product_explanation": "Đây là chính xác các con số tạo nên dự báo. Nếu bạn biết điều chúng tôi chưa biết, hãy chỉnh tốc độ bán ở bên dưới."
+    "product_explanation": "Đây là chính xác các con số tạo nên dự báo. Nếu bạn biết điều chúng tôi chưa biết, hãy chỉnh tốc độ bán ở bên dưới.",
+    "home_actions_no_po": "Các sản phẩm cần đặt hôm nay đã được chọn sẵn, xếp theo mức độ gấp."
   },
   "setup": {
     "heading": "Tận dụng tối đa dự báo",
@@ -236,7 +237,8 @@
         "body": "Sản phẩm từ nhà cung cấp giao chậm sẽ được nhắc nhập sớm hơn. Bạn cũng có thể xuất đơn đặt hàng riêng cho từng nhà cung cấp. Chuyển từ Stocky sang? Nhập đơn đặt hàng cũ để thiết lập một lần là xong.",
         "action": "Thêm nhà cung cấp",
         "skip": "Tôi không dùng nhà cung cấp",
-        "fromVendors_other": "Tạo nhà cung cấp từ {{count}} vendor của bạn"
+        "fromVendors_other": "Tạo nhà cung cấp từ {{count}} vendor của bạn",
+        "bodyNoPo": "Sản phẩm của nhà cung cấp giao chậm sẽ được đặt sớm hơn. Chuyển từ Stocky? Import đơn đặt hàng để thiết lập một lần."
       },
       "alerts": {
         "title": "Bật cảnh báo tồn kho",
@@ -445,12 +447,15 @@
       "bundles": "Combo và bộ kit",
       "alerts": "Cảnh báo qua email (tóm tắt hằng ngày hoặc hằng tuần)",
       "locations": "Tồn kho theo chi nhánh",
-      "purchaseOrders": "Đơn đặt hàng: xuất CSV và gửi email cho nhà cung cấp",
+      "purchaseOrders": "Xuất đơn đặt hàng (CSV)",
       "realtimeAlerts": "Cảnh báo tồn kho tức thời",
       "whatIf": "Mô phỏng tăng trưởng (\"doanh số +20%?\")",
       "supplierAutoEmail": "Tự động gửi đơn hằng tuần cho nhà cung cấp",
       "flowTriggers": "Trigger cho Shopify Flow",
-      "referenceProducts": "Dự báo sản phẩm mới theo sản phẩm tương tự"
+      "referenceProducts": "Dự báo sản phẩm mới theo sản phẩm tương tự",
+      "supplierEmails": "Gửi đơn đặt hàng qua email cho nhà cung cấp",
+      "transfers": "Chuyển kho giữa các chi nhánh",
+      "abc": "Phân loại ABC theo doanh thu"
     },
     "notApproved": "Chưa có thay đổi gói nào được chấp thuận",
     "nowOn": "Bạn đang dùng gói {{plan}}",
@@ -495,7 +500,9 @@
     "server_error": "Hệ thống gặp lỗi. Vui lòng thử lại.",
     "unavailable": "App đang được cập nhật. Vui lòng thử lại sau một phút.",
     "supplier_has_no_email": "Nhà cung cấp này chưa có email.",
-    "supplier_email_too_soon": "Đơn này vừa được gửi. Vui lòng chờ một phút rồi gửi lại."
+    "supplier_email_too_soon": "Đơn này vừa được gửi. Vui lòng chờ một phút rồi gửi lại.",
+    "feature_disabled": "Tính năng này không khả dụng.",
+    "plan_unavailable": "Gói này hiện không khả dụng."
   },
   "validation": {
     "invalid": "Giá trị không hợp lệ.",
@@ -659,14 +666,15 @@
       "alerts": "Không dùng được email cảnh báo tồn kho.",
       "alerts_active": "Email cảnh báo tồn kho gửi tới {{email}} sẽ dừng.",
       "locations_other": "Dự báo theo từng chi nhánh sẽ dừng ({{count}} chi nhánh).",
-      "purchase_orders": "Xuất đơn đặt hàng và gửi đơn qua email cho nhà cung cấp sẽ dừng.",
+      "purchase_orders": "Xuất đơn đặt hàng sẽ dừng.",
       "supplier_auto_emails_other": "{{count}} nhà cung cấp sẽ không còn nhận đơn đặt hàng tự động.",
       "realtime_alerts": "Không dùng được cảnh báo tồn kho tức thì.",
       "realtime_alerts_active": "Cảnh báo tồn kho tức thì gửi tới {{email}} sẽ dừng.",
       "what_if": "Không dùng được mô phỏng tăng trưởng.",
       "flow_triggers": "Trigger cho Shopify Flow sẽ dừng.",
       "flow_triggers_active": "Các quy trình Shopify Flow dùng trigger của Clear Stock sẽ ngừng chạy.",
-      "reference_products_other": "{{count}} sản phẩm mới sẽ không còn mượn tốc độ bán của sản phẩm tương tự."
+      "reference_products_other": "{{count}} sản phẩm mới sẽ không còn mượn tốc độ bán của sản phẩm tương tự.",
+      "supplier_emails": "Gửi đơn đặt hàng qua email cho nhà cung cấp sẽ dừng."
     }
   },
   "vendors": {

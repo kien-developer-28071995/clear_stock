@@ -3,7 +3,6 @@
 namespace App\Services\App;
 
 use App\Enums\Feature;
-use App\Exceptions\PlanRequiredException;
 use App\Jobs\Forecast\RecomputeForecasts;
 use App\Models\Shop;
 use App\Models\Variant;
@@ -33,9 +32,7 @@ class BundleService
      */
     public function save(Shop $shop, int|string $bundle, array $components): Variant
     {
-        if (! Entitlements::for($shop)->has(Feature::Bundles)) {
-            throw new PlanRequiredException(Feature::Bundles);
-        }
+        Entitlements::for($shop)->require(Feature::Bundles);
 
         $refs = array_merge([$bundle], array_column($components, 'variant'));
         $resolved = $this->resolve($shop, $refs);

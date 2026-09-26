@@ -20,6 +20,8 @@ type Entitlements = {
     supplier_auto_email: boolean;
     flow_triggers: boolean;
     reference_products: boolean;
+    transfers: boolean;
+    supplier_emails: boolean;
 };
 
 const PAGES: [string, string][] = [
@@ -38,9 +40,9 @@ const PAGES: [string, string][] = [
 ];
 
 const EXPECTED: Record<PlanKey, Omit<Entitlements, 'plan'>> = {
-    free: { max_skus: 50, bundles: false, alerts: false, locations: false, purchase_orders: false, realtime_alerts: false, what_if: false, supplier_auto_email: false, flow_triggers: false, reference_products: false },
-    starter: { max_skus: null, bundles: true, alerts: true, locations: false, purchase_orders: true, realtime_alerts: false, what_if: true, supplier_auto_email: false, flow_triggers: false, reference_products: true },
-    growth: { max_skus: null, bundles: true, alerts: true, locations: true, purchase_orders: true, realtime_alerts: true, what_if: true, supplier_auto_email: true, flow_triggers: true, reference_products: true },
+    free: { max_skus: 50, bundles: false, alerts: false, locations: false, purchase_orders: false, realtime_alerts: false, what_if: false, supplier_auto_email: false, flow_triggers: false, reference_products: false, transfers: false, supplier_emails: false },
+    starter: { max_skus: null, bundles: true, alerts: true, locations: false, purchase_orders: true, realtime_alerts: false, what_if: true, supplier_auto_email: false, flow_triggers: false, reference_products: true, transfers: false, supplier_emails: true },
+    growth: { max_skus: null, bundles: true, alerts: true, locations: true, purchase_orders: true, realtime_alerts: true, what_if: true, supplier_auto_email: true, flow_triggers: true, reference_products: true, transfers: true, supplier_emails: true },
 };
 
 for (const plan of ['free', 'starter', 'growth'] as PlanKey[]) {
@@ -254,7 +256,7 @@ for (const plan of ['free', 'starter', 'growth'] as PlanKey[]) {
 
             // Emailing a purchase order to a supplier (with an email address) is Starter and up.
             const email = row.locator('s-button', { hasText: /email/i });
-            if (has.purchase_orders) await expect(email).not.toHaveAttribute('disabled');
+            if (has.supplier_emails) await expect(email).not.toHaveAttribute('disabled');
             else await expect(email).toHaveAttribute('disabled');
 
             await row.locator('s-button', { hasText: 'Delete' }).click();
@@ -345,7 +347,7 @@ for (const plan of ['free', 'starter', 'growth'] as PlanKey[]) {
         test('transfer suggestions follow the plan', async ({ app }) => {
             await open(app, '/transfers');
             const status = await app.evaluate(async () => (await fetch('/api/transfers', { headers: { Authorization: `Bearer ${await window.shopify.idToken()}`, Accept: 'application/json' } })).status);
-            if (!has.locations) {
+            if (!has.transfers) {
                 expect(status).toBe(402);
                 await expect(app.locator('s-banner', { hasText: 'Move stock between your locations' })).toBeVisible();
                 return;
@@ -357,7 +359,7 @@ for (const plan of ['free', 'starter', 'growth'] as PlanKey[]) {
         });
 
         test('a suggested transfer is created as a draft in Shopify, after asking for the permission', async ({ app }) => {
-            test.skip(!has.locations, 'Growth only');
+            test.skip(!has.transfers, 'Growth only');
             // A route the dev data doesn't have; creation itself is Shopify's (answered here).
             const route = {
                 origin: { id: 2, name: 'Warehouse' }, destination: { id: 1, name: 'Store' }, total_units: 35,

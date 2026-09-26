@@ -1,7 +1,7 @@
 import { useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { http, ApiError, errorMessage } from '@/lib/http';
-import { useEntitlements } from '@/hooks/useEntitlements';
+import { useEntitlements, useFeature } from '@/hooks/useEntitlements';
 
 /**
  * Growth plan: download a purchase order of everything to reorder now (optionally one
@@ -26,6 +26,7 @@ export function ExportPurchaseOrderButton({ supplierId, locationId, variantIds, 
     const text = label ?? t('po.export');
     const menuId = `po-menu-${useId().replace(/:/g, '')}`;
     const { purchase_orders: allowed } = useEntitlements();
+    const exists = useFeature('purchase_orders');
     const [busy, setBusy] = useState(false);
 
     const exportCsv = async (format: Format) => {
@@ -48,6 +49,7 @@ export function ExportPurchaseOrderButton({ supplierId, locationId, variantIds, 
         }
     };
 
+    if (!exists) return null;
     if (!allowed) {
         return (
             <s-stack direction="inline" gap="small-200" alignItems="center">

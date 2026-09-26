@@ -5,6 +5,7 @@ import { ErrorBanner } from '@/components/ui/ErrorBanner';
 import { ExportPurchaseOrderButton } from '@/features/forecasts/components/ExportPurchaseOrderButton';
 import { useShop } from '@/features/shop/hooks/useShop';
 import { StatusBadge } from '@/components/ui/StatusBadge';
+import { useFeature } from '@/hooks/useEntitlements';
 import { AbcBadge } from '@/features/forecasts/components/AbcBadge';
 import { useFacets, useForecastList, useLocations } from '@/features/forecasts/hooks/useForecasts';
 import type { ForecastFilters } from '@/features/forecasts/types';
@@ -39,7 +40,9 @@ export function ProductsPage() {
     const facets = useFacets().data;
     const showVendors = (facets?.vendors.length ?? 0) > 1;
     const showTypes = (facets?.product_types.length ?? 0) > 1;
-    const selects = 3 + [showLocations, showVendors, showTypes].filter(Boolean).length;
+    const abc = useFeature('abc');
+    const sortOptions = SORT_OPTIONS.filter((o) => abc || o !== 'revenue');
+    const selects = (abc ? 3 : 2) + [showLocations, showVendors, showTypes].filter(Boolean).length;
 
     const update = (patch: Partial<ForecastFilters>) => {
         const next = { ...filters, page: 1, ...patch };
@@ -125,7 +128,7 @@ export function ProductsPage() {
                                 ))}
                             </s-select>
                         )}
-                        <s-select
+                        {abc && (<s-select
                             label={t('abc.filter')}
                             labelAccessibilityVisibility="exclusive"
                             value={optionValue(filters.abc)}
@@ -135,7 +138,7 @@ export function ProductsPage() {
                             {ABC_OPTIONS.map((value) => (
                                 <s-option key={value} value={value}>{t(`abc.option${value}`)}</s-option>
                             ))}
-                        </s-select>
+                        </s-select>)}
                         <s-select
                             label={t('products.status')}
                             labelAccessibilityVisibility="exclusive"
@@ -153,7 +156,7 @@ export function ProductsPage() {
                             value={filters.sort ?? 'urgency'}
                             onChange={(e) => update({ sort: e.currentTarget.value as ForecastFilters['sort'] })}
                         >
-                            {SORT_OPTIONS.map((value) => (
+                            {sortOptions.map((value) => (
                                 <s-option key={value} value={value}>{t(`products.sorts.${value}`)}</s-option>
                             ))}
                         </s-select>
@@ -162,7 +165,7 @@ export function ProductsPage() {
                     <s-table-header-row>
                         <s-table-header listSlot="primary">{t('table.product')}</s-table-header>
                         <s-table-header listSlot="inline">{t('products.status')}</s-table-header>
-                        <s-table-header>{t('abc.column')}</s-table-header>
+                        {abc && <s-table-header>{t('abc.column')}</s-table-header>}
                         <s-table-header format="numeric">{t('table.inStock')}</s-table-header>
                         <s-table-header format="numeric">{t('table.perDay')}</s-table-header>
                         <s-table-header format="numeric">{t('table.daysLeft')}</s-table-header>
@@ -183,9 +186,11 @@ export function ProductsPage() {
                                 <s-table-cell>
                                     <StatusBadge status={row.status} />
                                 </s-table-cell>
-                                <s-table-cell>
-                                    {row.abc_class ? <AbcBadge abc={row.abc_class} /> : <s-text color="subdued">—</s-text>}
-                                </s-table-cell>
+                                {abc && (
+                                    <s-table-cell>
+                                        {row.abc_class ? <AbcBadge abc={row.abc_class} /> : <s-text color="subdued">—</s-text>}
+                                    </s-table-cell>
+                                )}
                                 <s-table-cell>
                                     <s-stack gap="small-100">
                                         <s-text>{formatNumber(row.current_stock, 0)}</s-text>

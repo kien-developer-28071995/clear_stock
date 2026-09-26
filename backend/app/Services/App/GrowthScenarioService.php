@@ -3,7 +3,6 @@
 namespace App\Services\App;
 
 use App\Enums\Feature;
-use App\Exceptions\PlanRequiredException;
 use App\Models\Shop;
 use App\Repositories\Contracts\ForecastQueryRepositoryInterface;
 use App\Services\Forecast\ForecastCalculator;
@@ -30,9 +29,7 @@ class GrowthScenarioService
      */
     public function simulate(Shop $shop, int $growthPercent, int $horizonDays, array $filters = []): array
     {
-        if (! Entitlements::for($shop)->has(Feature::WhatIf)) {
-            throw new PlanRequiredException(Feature::WhatIf);
-        }
+        Entitlements::for($shop)->require(Feature::WhatIf);
 
         $factor = 1 + $growthPercent / 100;
         $today = CarbonImmutable::now($shop->timezone)->toDateString();

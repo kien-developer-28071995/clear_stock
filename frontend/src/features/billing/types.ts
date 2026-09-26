@@ -7,7 +7,9 @@ export interface PlanInfo {
     name: string;
     prices: Record<Interval, number> | null;
     currency: string;
-    limits: Omit<Entitlements, 'plan'>;
+    limits: Omit<Entitlements, 'plan' | 'features'>;
+    /** false: no new subscriptions (shown only to shops already on it). */
+    offered: boolean;
 }
 
 export interface BillingState {

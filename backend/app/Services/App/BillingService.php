@@ -7,6 +7,7 @@ use App\Enums\Plan;
 use App\Enums\PlanInterval;
 use App\Enums\SyncType;
 use App\Events\PlanChanged;
+use App\Exceptions\ApiException;
 use App\Jobs\Forecast\RecomputeForecasts;
 use App\Jobs\SyncRealtimeWebhook;
 use App\Models\Shop;
@@ -15,6 +16,7 @@ use App\Repositories\Contracts\ShopRepositoryInterface;
 use App\Services\Shopify\BillingClient;
 use App\Services\Sync\SyncService;
 use App\Support\Entitlements;
+use App\Support\Features;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
 
@@ -39,7 +41,13 @@ class BillingService
             'name' => $p['name'],
             'prices' => $p['prices'],
             'currency' => config('billing.currency'),
-            'limits' => $p['limits'],
+            // Switched-off features (config/features.php) show as not included.
+            'limits' => array_merge($p['limits'], array_map(fn () => false, array_filter(
+                array_flip(array_keys($p['limits'])),
+                fn ($_, $key) => ($f = Feature::tryFrom($key)) !== null && ! Features::enabled($f),
+                ARRAY_FILTER_USE_BOTH,
+            ))),
+            'offered' => (bool) ($p['offered'] ?? true),
         ])->values()->all();
     }
 
@@ -77,6 +85,10 @@ class BillingService
 
         $interval ??= PlanInterval::Monthly;
         $config = config("billing.plans.{$plan->value}");
+        // A plan taken off the pricing page takes no new subscribers; its subscribers can still switch interval.
+        if (! ($config['offered'] ?? true) && $shop->plan !== $plan) {
+            throw new ApiException('plan_unavailable', 422, ['plan' => $plan->value]);
+        }
 
         $created = $this->billing->create(
             $shop,

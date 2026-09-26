@@ -19,10 +19,20 @@ enum Feature: string
     case FlowTriggers = 'flow_triggers';
     /** New products forecast from a similar product until they have their own history. */
     case ReferenceProducts = 'reference_products';
+    /** Stock transfer suggestions between locations (needs locations). */
+    case Transfers = 'transfers';
+    /** Emailing a purchase order to a supplier by hand (automatic sending is SupplierAutoEmail). */
+    case SupplierEmails = 'supplier_emails';
+    /** ABC classes by revenue (every plan; can be switched off app-wide). */
+    case Abc = 'abc';
 
     /** The cheapest plan that includes it (for upgrade prompts). */
     public function minimumPlan(): Plan
     {
-        return in_array($this, [self::Locations, self::RealtimeAlerts, self::SupplierAutoEmail, self::FlowTriggers], true) ? Plan::Growth : Plan::Starter;
+        return match ($this) {
+            self::Explanations, self::Abc => Plan::Free,
+            self::Locations, self::Transfers, self::RealtimeAlerts, self::SupplierAutoEmail, self::FlowTriggers => Plan::Growth,
+            default => Plan::Starter,
+        };
     }
 }

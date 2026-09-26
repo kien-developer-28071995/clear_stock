@@ -4,7 +4,6 @@ namespace App\Services\App;
 
 use App\Enums\Feature;
 use App\Enums\OverrideField;
-use App\Exceptions\PlanRequiredException;
 use App\Jobs\Forecast\RecomputeForecasts;
 use App\Models\Shop;
 use App\Models\Variant;
@@ -90,9 +89,7 @@ class ForecastAdjustmentService
         if ($ref === null) {
             return $out + ['reference_variant_id' => null, 'reference_percent' => null];
         }
-        if (! Entitlements::for($shop)->has(Feature::ReferenceProducts)) {
-            throw new PlanRequiredException(Feature::ReferenceProducts);
-        }
+        Entitlements::for($shop)->require(Feature::ReferenceProducts);
 
         $target = is_int($ref) ? $this->variants->find($shop, $ref) : $this->variants->findByShopifyIds($shop, [Gid::id($ref)])->first();
         if ($target === null || $target->id === $variant->id) {

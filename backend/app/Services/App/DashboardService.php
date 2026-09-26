@@ -8,6 +8,7 @@ use App\Models\Shop;
 use App\Repositories\Contracts\ForecastQueryRepositoryInterface;
 use App\Services\Forecast\ExplanationFormatter;
 use App\Support\Entitlements;
+use App\Support\Features;
 use Carbon\CarbonImmutable;
 
 /**
@@ -61,7 +62,7 @@ class DashboardService
             // Still selling, but more stock than the forecast says to hold.
             'overstock' => $this->forecasts->overstock($shop, $todayYmd, 5),
             // Products, revenue and stock value per ABC class (Insights).
-            'abc' => $this->forecasts->abcSummary($shop) + [
+            'abc' => ! Features::enabled(Feature::Abc) ? null : $this->forecasts->abcSummary($shop) + [
                 'days' => (int) config('forecast.abc.days'),
                 'thresholds' => ['a' => (float) config('forecast.abc.a'), 'b' => (float) config('forecast.abc.b')],
             ],

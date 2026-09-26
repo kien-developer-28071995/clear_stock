@@ -19,7 +19,8 @@ export interface ForecastRow {
     /** Current selling price (shop currency). */
     price: number | null;
     /** ABC class from the last `days` of revenue at the current price; class null without a price. */
-    abc: { class: AbcClass | null; revenue: number; share: number; days: number };
+    /** null when ABC classes are switched off app-wide. */
+    abc: { class: AbcClass | null; revenue: number; share: number; days: number } | null;
     current_stock: number;
     /** On the way (Shopify incoming: purchase orders, transfers); already counted in suggested_qty. */
     incoming_stock: number;

@@ -2,7 +2,9 @@
 
 namespace App\Services\Flow;
 
+use App\Enums\Feature;
 use App\Models\Shop;
+use App\Support\Features;
 use Carbon\CarbonImmutable;
 
 /**
@@ -72,7 +74,7 @@ final class FlowPayloads
             'Stockout date' => (string) ($row['stockout_date'] ?? ''),
             'Supplier name' => (string) ($row['supplier'] ?? ''),
             'Supplier email' => (string) ($row['supplier_email'] ?? ''),
-            'ABC class' => (string) ($row['abc_class'] ?? ''),
+            'ABC class' => Features::enabled(Feature::Abc) ? (string) ($row['abc_class'] ?? '') : '',
             'App URL' => $this->appUrl($shop, "/products/{$row['variant_id']}"),
         ];
     }

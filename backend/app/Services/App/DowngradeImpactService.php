@@ -85,6 +85,10 @@ class DowngradeImpactService
             $out[] = $this->line('purchase_orders');
         }
 
+        if ($loses(Feature::SupplierEmails)) {
+            $out[] = $this->line('supplier_emails');
+        }
+
         if ($loses(Feature::SupplierAutoEmail)) {
             $auto = $this->suppliers->allForShop($shop)->filter(fn (Supplier $s) => $s->auto_email && $s->email)->count();
             if ($auto > 0) {

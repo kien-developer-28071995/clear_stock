@@ -30,6 +30,9 @@ return [
                 'supplier_auto_email' => false, // automatic weekly orders to suppliers
                 'flow_triggers' => false,       // Shopify Flow triggers
                 'reference_products' => false,  // new products forecast from a similar product
+                'transfers' => false,           // stock transfer suggestions between locations
+                'supplier_emails' => false,     // emailing an order to a supplier by hand
+                'abc' => true,                  // ABC classes by revenue
             ],
         ],
         'starter' => [
@@ -47,10 +50,16 @@ return [
                 'supplier_auto_email' => false,
                 'flow_triggers' => false,
                 'reference_products' => true,
+                'transfers' => false,
+                'supplier_emails' => true,
+                'abc' => true,
             ],
         ],
         'growth' => [
             'name' => 'Growth',
+            // Offered on the pricing page. Off: no new Growth subscriptions (e.g. while every
+            // Growth-only feature is switched off in config/features.php); existing ones keep working.
+            'offered' => (bool) env('BILLING_GROWTH_OFFERED', true),
             'prices' => ['monthly' => 6.00, 'annual' => 58.00],
             'limits' => [
                 'max_skus' => null,
@@ -64,6 +73,9 @@ return [
                 'supplier_auto_email' => true,
                 'flow_triggers' => true,
                 'reference_products' => true,
+                'transfers' => true,
+                'supplier_emails' => true,
+                'abc' => true,
             ],
         ],
     ],

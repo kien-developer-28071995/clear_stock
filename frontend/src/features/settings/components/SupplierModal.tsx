@@ -2,7 +2,7 @@ import { useEffect, useState, type RefObject } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { ModalElement } from '@/hooks/useModal';
 import { fieldError } from '@/lib/http';
-import { useEntitlements } from '@/hooks/useEntitlements';
+import { useEntitlements, useFeature } from '@/hooks/useEntitlements';
 import { useCreateSupplier, useUpdateSupplier } from '@/features/settings/hooks/useSettings';
 import type { Supplier } from '@/features/settings/types';
 
@@ -25,6 +25,7 @@ export function SupplierModal({ modalRef, supplier, onDone }: Props) {
     const [autoEmail, setAutoEmail] = useState(false);
     // Emailing an order by hand is Starter; automatic weekly orders are Growth.
     const canAutoEmail = useEntitlements().supplier_auto_email;
+    const emailsExist = useFeature('supplier_emails');
 
     useEffect(() => {
         setName(supplier?.name ?? '');
@@ -91,14 +92,14 @@ export function SupplierModal({ modalRef, supplier, onDone }: Props) {
                     error={fieldError(mutation.error, 'email')}
                     onInput={(e) => setEmail(e.currentTarget.value)}
                 />
-                <s-checkbox
+                {emailsExist && (<s-checkbox
                     label={t('supplierEmail.auto')}
                     details={canAutoEmail ? t('supplierEmail.autoHelp') : t('plans.lockedHint', { plan: t('plans.names.growth') })}
                     checked={(autoEmail && email.trim() !== '') || undefined}
                     disabled={!canAutoEmail || email.trim() === '' || undefined}
                     error={fieldError(mutation.error, 'auto_email')}
                     onChange={(e) => setAutoEmail(e.currentTarget.checked)}
-                />
+                />)}
             </s-stack>
             <s-button slot="primary-action" variant="primary" onClick={submit} loading={mutation.isPending || undefined} disabled={!name.trim() || undefined}>
                 {t('common.save')}

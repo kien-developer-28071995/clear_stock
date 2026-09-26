@@ -229,6 +229,30 @@ Two [admin UI extensions](https://shopify.dev/docs/api/admin-extensions) in `ext
 - **Layout:** the repo-root `package.json` is only the Shopify CLI workspace for the extensions (the CLI installs dependencies from the app root); backend and frontend keep their own.
 - **Tests:** `frontend/e2e/extensions.spec.ts` runs the real bundles against the API with Shopify's extension host stubbed. To see them in the admin, run `npx @shopify/cli@latest app dev` (or deploy) and open a product.
 
+## Feature switches (app-wide)
+
+`backend/config/features.php` switches optional features on or off **for every shop**, whatever the plan (e.g. a trimmed first App Store submission). Env vars, all `true` by default:
+
+| Env | Feature | Notes |
+|---|---|---|
+| `FEATURE_WHAT_IF` | Sales what-if page | |
+| `FEATURE_REFERENCE_PRODUCTS` | New products forecast from a similar product | forecasts ignore saved references while off |
+| `FEATURE_ABC` | ABC classes (column, filter, sort, Insights) | still computed, just hidden |
+| `FEATURE_PURCHASE_ORDERS` | Purchase order CSV export | |
+| `FEATURE_SUPPLIER_EMAILS` | Emailing orders to suppliers (by hand and automatic) | |
+| `FEATURE_LOCATIONS` | Per-location forecasts | needs `read_*_fulfillment_orders`; when switched back on, run `sync:run --full` for Growth shops |
+| `FEATURE_TRANSFERS` | Transfer suggestions | needs locations; uses the optional `write_inventory_transfers` scope |
+| `FEATURE_REALTIME_ALERTS` | Real-time stock alerts | the per-shop inventory webhook is removed by the nightly `alerts:realtime-sync` |
+| `FEATURE_FLOW_TRIGGERS` | Shopify Flow triggers | also leave the `flow-*` extensions out of the deploy |
+| `BILLING_GROWTH_OFFERED` | Growth on the pricing page | off = no new Growth subscriptions; existing ones keep working |
+
+How it is safe:
+- **One gate.** `Entitlements::has()` = plan **and** switch, so every API, job, webhook, listener and scheduled command that already checked the plan also respects the switch. Locked APIs answer `404 feature_disabled` (not the `402` upgrade answer).
+- **Hidden, not upsold.** `/api/shop` returns `entitlements.features`; the app drops the menu entry, page (404), buttons, settings, upgrade prompts and pricing rows of a switched-off feature (`useFeature()`).
+- **Nothing is deleted.** Settings and data stay; switching back on restores the feature.
+- **Core features have no switch:** forecasts, explanations, bundles, alerts, suppliers.
+- Production caches config: restart after changing a switch. Check with `php artisan features:status` (fails on combinations that can't work: a missing scope for a switched-on feature, or Growth offered with nothing Growth-only left). `make e2e-features-off` runs an E2E check with switches off.
+
 ## Shopify Flow triggers (Growth)
 
 Three `flow_trigger` extensions (`extensions/flow-*`) let merchants start their own Flow workflows from the forecast:

@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import { useDismissSetupGuide, useSetupGuide, useSkipSetupStep } from '@/features/setup/hooks/useSetupGuide';
 import type { SetupGuideState, SetupStep, SetupStepKey } from '@/features/setup/types';
+import { useFeature } from '@/hooks/useEntitlements';
 
 interface StepCopy {
     title: string;
@@ -11,7 +12,7 @@ interface StepCopy {
     skipLabel?: string;
 }
 
-function copy(key: SetupStepKey, ctx: SetupGuideState['context'], t: TFunction): StepCopy {
+function copy(key: SetupStepKey, ctx: SetupGuideState['context'], t: TFunction, purchaseOrders: boolean): StepCopy {
     switch (key) {
         case 'import_data':
             return {
@@ -35,7 +36,7 @@ function copy(key: SetupStepKey, ctx: SetupGuideState['context'], t: TFunction):
         case 'suppliers':
             return {
                 title: t('setup.steps.suppliers.title'),
-                body: t('setup.steps.suppliers.body'),
+                body: t(purchaseOrders ? 'setup.steps.suppliers.body' : 'setup.steps.suppliers.bodyNoPo'),
                 // Shopify vendors can become suppliers in one step.
                 action: ctx.vendor_count > 0
                     ? { label: t('setup.steps.suppliers.fromVendors', { count: ctx.vendor_count }), href: '/suppliers/from-vendors' }
@@ -62,7 +63,7 @@ function copy(key: SetupStepKey, ctx: SetupGuideState['context'], t: TFunction):
 function StepRow({ step, state, open, onOpen }: { step: SetupStep; state: SetupGuideState; open: boolean; onOpen: () => void }) {
     const { t } = useTranslation();
     const skip = useSkipSetupStep();
-    const c = copy(step.key, state.context, t);
+    const c = copy(step.key, state.context, t, useFeature('purchase_orders'));
     const finished = step.done || step.skipped;
 
     return (

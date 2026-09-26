@@ -7,6 +7,7 @@ import { shopKeys } from '@/features/shop/hooks/useShop';
 import { LoadingPage } from '@/components/ui/LoadingPage';
 import { ErrorBanner } from '@/components/ui/ErrorBanner';
 import { UpgradePrompt } from '@/components/ui/UpgradePrompt';
+import { useFeature } from '@/hooks/useEntitlements';
 import { useDismissSetupGuide, useSetupGuide } from '@/features/setup/hooks/useSetupGuide';
 import { SaveBar } from '@/components/ui/SaveBar';
 import { SyncStatusCard } from '@/features/sync/components/SyncStatusCard';
@@ -28,6 +29,8 @@ export function SettingsPage() {
     const guide = useSetupGuide();
     const reopenGuide = useDismissSetupGuide();
     const [form, setForm] = useState<Settings | null>(null);
+    const realtimeExists = useFeature('realtime_alerts');
+    const flowExists = useFeature('flow_triggers');
 
     useEffect(() => {
         if (data) setForm(data);
@@ -142,10 +145,10 @@ export function SettingsPage() {
                             ))}
                         </s-select>
                     )}
-                    {form.alerts.available && !form.alerts.realtime_available && (
+                    {realtimeExists && form.alerts.available && !form.alerts.realtime_available && (
                         <UpgradePrompt id="realtime-alerts" plan="growth">{t('settings.realtimeLocked')}</UpgradePrompt>
                     )}
-                    <s-select
+                    {realtimeExists && (<s-select
                         label={t('settings.realtime')}
                         disabled={!form.alerts.realtime_available || undefined}
                         details={t('settings.realtimeHelp')}
@@ -155,11 +158,11 @@ export function SettingsPage() {
                         <s-option value="off">{t('settings.realtimeOff')}</s-option>
                         <s-option value="out_of_stock">{t('settings.realtimeOutOfStock')}</s-option>
                         <s-option value="all">{t('settings.realtimeAll')}</s-option>
-                    </s-select>
+                    </s-select>)}
                 </s-stack>
             </s-section>
 
-            <FlowSection flow={form.flow} />
+            {flowExists && <FlowSection flow={form.flow} />}
 
             {guide.data?.dismissed && guide.data.completed < guide.data.total && (
                 <s-section heading={t('settings.setupGuide')}>

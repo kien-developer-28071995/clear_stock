@@ -9,7 +9,7 @@ import { useSuppliers } from '@/features/settings/hooks/useSettings';
 import { NO_VALUE, fromOption, optionValue } from '@/utils/select';
 import { pickVariants } from '@/lib/resourcePicker';
 import { UpgradePrompt } from '@/components/ui/UpgradePrompt';
-import { useEntitlements } from '@/hooks/useEntitlements';
+import { useEntitlements, useFeature } from '@/hooks/useEntitlements';
 
 /** Days of own sales after which a new product stops borrowing (backend forecast.reference_full_after_days). */
 const REFERENCE_FULL_AFTER_DAYS = 30;
@@ -33,6 +33,7 @@ export function ProductSettingsForm({ f }: { f: ForecastDetail }) {
     const [reference, setReference] = useState<{ id: number | string; name: string } | null>(null);
     const [referencePercent, setReferencePercent] = useState('');
     const canReference = useEntitlements().reference_products;
+    const referenceExists = useFeature('reference_products');
 
     const saved = {
         supplierId: f.settings.supplier_id ? String(f.settings.supplier_id) : '',
@@ -167,7 +168,7 @@ export function ProductSettingsForm({ f }: { f: ForecastDetail }) {
                         onInput={(e) => setMaxStock(e.currentTarget.value)}
                     />
                 </s-grid>
-                <s-stack gap="small-200">
+                {referenceExists && (<s-stack gap="small-200">
                     <s-text type="strong">{t('productSettings.reference')}</s-text>
                     {!canReference && <UpgradePrompt id="reference-products" plan="starter">{t('productSettings.referenceLocked')}</UpgradePrompt>}
                     <s-stack direction="inline" gap="small-200" alignItems="center">
@@ -197,7 +198,7 @@ export function ProductSettingsForm({ f }: { f: ForecastDetail }) {
                     )}
                     {fieldError(update.error, 'reference_variant') && <s-text tone="critical">{fieldError(update.error, 'reference_variant')}</s-text>}
                     <s-text color="subdued">{t('productSettings.referenceHelp', { count: REFERENCE_FULL_AFTER_DAYS })}</s-text>
-                </s-stack>
+                </s-stack>)}
                 <s-checkbox
                     label={t('productSettings.muteAlerts')}
                     details={t('productSettings.muteAlertsHelp')}

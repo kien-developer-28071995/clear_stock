@@ -9,6 +9,7 @@ const CLASSES = ['A', 'B', 'C'] as const;
 export function AbcSummary({ dashboard }: { dashboard: Dashboard }) {
     const { t } = useTranslation();
     const abc = dashboard.abc;
+    if (!abc) return null;
     const classified = CLASSES.reduce((n, c) => n + abc.classes[c].count, 0);
     if (classified === 0) return null;
 

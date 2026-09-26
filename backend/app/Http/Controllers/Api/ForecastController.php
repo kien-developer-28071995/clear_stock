@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api;
 
 use App\Enums\Feature;
 use App\Exceptions\ApiException;
-use App\Exceptions\PlanRequiredException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ForecastIndexRequest;
 use App\Http\Requests\OverrideRequest;
@@ -16,6 +15,7 @@ use App\Repositories\Contracts\VariantRepositoryInterface;
 use App\Services\App\ForecastAdjustmentService;
 use App\Services\App\ForecastQueryService;
 use App\Support\Entitlements;
+use App\Support\Features;
 use App\Support\ShopContext;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -36,10 +36,14 @@ class ForecastController extends Controller
         request()->attributes->set('today', $this->query->today($shop));
 
         $filters = $request->safe()->only(['status', 'search', 'sort', 'vendor', 'product_type', 'abc']);
-        if ($request->filled('location_id')) {
-            if (! Entitlements::for($shop)->has(Feature::Locations)) {
-                throw new PlanRequiredException(Feature::Locations);
+        if (! Features::enabled(Feature::Abc)) {
+            unset($filters['abc']); // ABC switched off app-wide: ignore a stale filter / sort in a saved URL
+            if (($filters['sort'] ?? null) === 'revenue') {
+                unset($filters['sort']);
             }
+        }
+        if ($request->filled('location_id')) {
+            Entitlements::for($shop)->require(Feature::Locations);
             $filters['location_id'] = (int) $request->validated('location_id');
         }
 

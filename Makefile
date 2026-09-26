@@ -6,7 +6,7 @@ export UID := $(shell id -u)
 export GID := $(shell id -g)
 
 .DEFAULT_GOAL := help
-.PHONY: help setup up down restart build shell migrate fresh test e2e extensions logs tunnel tunnel-url tunnel-down \
+.PHONY: help setup up down restart build shell migrate fresh test e2e extensions logs tunnel tunnel-url tunnel-down e2e-features-off \
         app-url webhook artisan composer npm typecheck prod-build prod-up prod-down prod-migrate prod-logs
 
 help: ## List available commands
@@ -50,6 +50,12 @@ test: ## Run the backend test suite (Pest)
 e2e: ## End-to-end tests in Chromium on every plan + admin extensions (needs make up + a synced dev store)
 	npm run extensions:locales:check
 	cd frontend && npx playwright test
+
+e2e-features-off: ## E2E check of the app with optional features switched off (restores backend/.env afterwards)
+	@env='$(CURDIR)/backend/.env'; cp "$$env" "$$env.e2e-backup"; \
+	trap 'mv "$$env.e2e-backup" "$$env"' EXIT; \
+	printf '\nFEATURE_WHAT_IF=false\nFEATURE_TRANSFERS=false\nFEATURE_FLOW_TRIGGERS=false\nFEATURE_ABC=false\n' >> "$$env"; \
+	(cd frontend && E2E_FEATURES_OFF=1 npx playwright test e2e/features-off.spec.ts)
 
 extensions: ## Install admin extension deps, copy the app's forecast translations into them, type-check
 	npm install

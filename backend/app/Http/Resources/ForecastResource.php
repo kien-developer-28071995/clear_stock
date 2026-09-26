@@ -2,7 +2,9 @@
 
 namespace App\Http\Resources;
 
+use App\Enums\Feature;
 use App\Models\Forecast;
+use App\Support\Features;
 use App\Support\ForecastStatusResolver;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -32,7 +34,7 @@ class ForecastResource extends JsonResource
             'is_bundle' => $v->is_bundle,
             'price' => $v->price !== null ? (float) $v->price : null,
             // A/B/C by share of the last N days' revenue (null without a price).
-            'abc' => [
+            'abc' => ! Features::enabled(Feature::Abc) ? null : [
                 'class' => $v->abc_class,
                 'revenue' => (float) $v->revenue_90d,
                 'share' => (float) $v->revenue_share,

@@ -7,7 +7,7 @@ import { ErrorBanner } from '@/components/ui/ErrorBanner';
 import { ExportPurchaseOrderButton } from '@/features/forecasts/components/ExportPurchaseOrderButton';
 import { SupplierModal } from '@/features/settings/components/SupplierModal';
 import { SupplierEmailModal } from '@/features/settings/components/SupplierEmailModal';
-import { useEntitlements } from '@/hooks/useEntitlements';
+import { useEntitlements, useFeature } from '@/hooks/useEntitlements';
 import { timeAgo } from '@/utils/format';
 import { useAssignSupplier, useDeleteSupplier, useSuppliers } from '@/features/settings/hooks/useSettings';
 import type { Supplier } from '@/features/settings/types';
@@ -21,7 +21,8 @@ export function SuppliersPage() {
     const { confirm, modal: confirmModal } = useConfirm();
     const emailModal = useModal();
     const [emailing, setEmailing] = useState<Supplier | null>(null);
-    const { purchase_orders: canEmail, supplier_auto_email: canAutoEmail } = useEntitlements();
+    const { supplier_emails: canEmail, supplier_auto_email: canAutoEmail } = useEntitlements();
+    const emailsExist = useFeature('supplier_emails');
     const openEmail = (s: Supplier) => {
         setEmailing(s);
         emailModal.open();
@@ -88,7 +89,7 @@ export function SuppliersPage() {
                                             <s-text type="strong">{s.name}</s-text>
                                             {s.email && <s-text color="subdued">{s.email}</s-text>}
                                             {s.last_emailed_at && <s-text color="subdued">{t('supplierEmail.lastSent', { when: timeAgo(s.last_emailed_at) })}</s-text>}
-                                            {s.auto_email && (canAutoEmail ? <s-badge>{t('supplierEmail.autoBadge')}</s-badge> : <s-badge tone="warning">{t('supplierEmail.autoPaused')}</s-badge>)}
+                                            {emailsExist && s.auto_email && (canAutoEmail ? <s-badge>{t('supplierEmail.autoBadge')}</s-badge> : <s-badge tone="warning">{t('supplierEmail.autoPaused')}</s-badge>)}
                                         </s-stack>
                                     </s-table-cell>
                                     <s-table-cell>{s.lead_time_days == null ? t('suppliers.storeDefault') : t('common.dayCount', { count: s.lead_time_days })}</s-table-cell>
@@ -97,14 +98,16 @@ export function SuppliersPage() {
                                         <s-button-group>
                                             <s-button slot="secondary-actions" onClick={() => assignProducts(s)}>{t('suppliers.assign')}</s-button>
                                             <ExportPurchaseOrderButton supplierId={s.id} label={t('po.short')} />
-                                            <s-button
-                                                slot="secondary-actions"
-                                                icon={canEmail ? 'email' : 'lock'}
-                                                disabled={!canEmail || !s.email || undefined}
-                                                onClick={() => openEmail(s)}
-                                            >
-                                                {t('supplierEmail.button')}
-                                            </s-button>
+                                            {emailsExist && (
+                                                <s-button
+                                                    slot="secondary-actions"
+                                                    icon={canEmail ? 'email' : 'lock'}
+                                                    disabled={!canEmail || !s.email || undefined}
+                                                    onClick={() => openEmail(s)}
+                                                >
+                                                    {t('supplierEmail.button')}
+                                                </s-button>
+                                            )}
                                             <s-button slot="secondary-actions" onClick={() => openEdit(s)}>{t('common.edit')}</s-button>
                                             <s-button slot="secondary-actions" tone="critical" onClick={() => confirmDelete(s)}>{t('common.delete')}</s-button>
                                         </s-button-group>

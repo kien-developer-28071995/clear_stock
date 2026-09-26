@@ -4,7 +4,6 @@ namespace App\Services\Transfer;
 
 use App\Enums\Feature;
 use App\Exceptions\ApiException;
-use App\Exceptions\PlanRequiredException;
 use App\Exceptions\ShopifyApiException;
 use App\Models\InventoryTransfer;
 use App\Models\Location;
@@ -194,9 +193,7 @@ class TransferService
 
     private function authorize(Shop $shop): void
     {
-        if (! Entitlements::for($shop)->has(Feature::Locations)) {
-            throw new PlanRequiredException(Feature::Locations);
-        }
+        Entitlements::for($shop)->require(Feature::Transfers);
     }
 
     private function hasScope(Shop $shop): bool

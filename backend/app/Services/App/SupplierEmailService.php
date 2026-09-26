@@ -4,7 +4,6 @@ namespace App\Services\App;
 
 use App\Enums\Feature;
 use App\Exceptions\ApiException;
-use App\Exceptions\PlanRequiredException;
 use App\Mail\SupplierOrderMail;
 use App\Models\Forecast;
 use App\Models\Shop;
@@ -151,8 +150,6 @@ class SupplierEmailService
 
     private function assertAllowed(Shop $shop): void
     {
-        if (! Entitlements::for($shop)->has(Feature::PurchaseOrders)) {
-            throw new PlanRequiredException(Feature::PurchaseOrders);
-        }
+        Entitlements::for($shop)->require(Feature::SupplierEmails);
     }
 }

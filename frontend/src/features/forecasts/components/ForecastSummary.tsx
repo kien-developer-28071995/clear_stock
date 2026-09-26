@@ -26,12 +26,12 @@ export function ForecastSummary({ f }: { f: ForecastDetail }) {
                 <s-stack direction="inline" gap="small-200">
                     <StatusBadge status={f.status} />
                     <ConfidenceBadge confidence={f.confidence} />
-                    <AbcBadge abc={abc.class} />
+                    {abc && <AbcBadge abc={abc.class} />}
                     {f.overrides.avg_daily_sales && <s-badge tone="info">{t('product.adjustedByYou')}</s-badge>}
                     {f.sku && <s-text color="subdued">{t('product.sku', { sku: f.sku })}</s-text>}
                 </s-stack>
                 {/* Why this class: share of the shop's revenue, at the current price. */}
-                <s-text color="subdued">
+                {abc && (<s-text color="subdued">
                     {abc.class
                         ? t(`abc.explain${abc.class}`, {
                               share: formatNumber(abc.share * 100, 1),
@@ -39,7 +39,7 @@ export function ForecastSummary({ f }: { f: ForecastDetail }) {
                               count: abc.days,
                           })
                         : t('abc.noPrice')}
-                </s-text>
+                </s-text>)}
                 <s-grid gridTemplateColumns="@container (inline-size > 500px) 1fr 1fr 1fr 1fr, 1fr 1fr" gap="base">
                     <Metric label={t('table.inStock')} value={formatNumber(f.current_stock, 0)} />
                     {f.incoming_stock > 0 && <Metric label={t('product.onTheWay')} value={formatNumber(f.incoming_stock, 0)} />}

@@ -13,7 +13,7 @@ import { formatNumber, timeAgo } from '@/utils/format';
  */
 export function TransfersPage() {
     const { t } = useTranslation();
-    const { locations: allowed } = useEntitlements();
+    const { transfers: allowed } = useEntitlements();
     const { data, isPending, error, refetch } = useTransfers(allowed);
 
     if (!allowed) {

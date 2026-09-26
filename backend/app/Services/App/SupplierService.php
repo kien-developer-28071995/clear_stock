@@ -3,7 +3,6 @@
 namespace App\Services\App;
 
 use App\Enums\Feature;
-use App\Exceptions\PlanRequiredException;
 use App\Jobs\Forecast\RecomputeForecasts;
 use App\Models\Shop;
 use App\Models\Supplier;
@@ -60,9 +59,7 @@ class SupplierService
     {
         $email = array_key_exists('email', $data) ? $data['email'] : $supplier?->email;
         if (! empty($data['auto_email'])) {
-            if (! Entitlements::for($shop)->has(Feature::SupplierAutoEmail)) {
-                throw new PlanRequiredException(Feature::SupplierAutoEmail);
-            }
+            Entitlements::for($shop)->require(Feature::SupplierAutoEmail);
             if (! $email) {
                 throw ValidationException::withMessages(['auto_email' => 'auto_email_needs_email']);
             }

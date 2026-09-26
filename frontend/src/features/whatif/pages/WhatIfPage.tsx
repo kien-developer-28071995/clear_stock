@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router';
 import { ErrorBanner } from '@/components/ui/ErrorBanner';
 import { UpgradePrompt } from '@/components/ui/UpgradePrompt';
-import { useEntitlements } from '@/hooks/useEntitlements';
+import { useEntitlements, useFeature } from '@/hooks/useEntitlements';
 import { useFacets } from '@/features/forecasts/hooks/useForecasts';
 import { useSuppliers } from '@/features/settings/hooks/useSettings';
 import { useWhatIf } from '@/features/whatif/hooks/useWhatIf';
@@ -57,6 +57,7 @@ export function WhatIfPage() {
 
 function WhatIfView() {
     const { t } = useTranslation();
+    const abcExists = useFeature('abc');
     const [search, setSearch] = useSearchParams();
     const params: WhatIfParams = {
         growth: clamp(Number(search.get('growth') ?? 20) || 0),
@@ -144,7 +145,7 @@ function WhatIfView() {
                                 ))}
                             </s-select>
                         )}
-                        <s-select
+                        {abcExists && (<s-select
                             label={t('abc.filter')}
                             value={optionValue(params.abc)}
                             onChange={(e) => update({ abc: fromOption(e.currentTarget.value) as WhatIfParams['abc'] })}
@@ -153,7 +154,7 @@ function WhatIfView() {
                             {(['A', 'B', 'C'] as const).map((c) => (
                                 <s-option key={c} value={c}>{t(`abc.option${c}`)}</s-option>
                             ))}
-                        </s-select>
+                        </s-select>)}
                     </s-grid>
                 </s-stack>
             </s-section>

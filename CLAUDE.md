@@ -188,5 +188,6 @@ Yêu cầu chung:
 - [x] Báo sync lỗi liên tục + giữ giá (roadmap #10, mọi gói): `SyncFailureNotifier` sau mỗi lần sync lỗi, 1 email/chuỗi lỗi (≥ 2 lỗi liên tiếp + 24h không sync được), `shops.sync_failure_notified_at` reset khi sync thành công; badge "Giữ giá" trên trang Gói, 397 test
 - [x] MOQ / quy cách thùng mặc định theo NCC (mọi gói): `suppliers.min_order_qty`/`pack_size`, `Variant::effectiveMinOrderQty()/effectivePackSize()`, dòng giải thích `rounding_supplier_default`, 398 test
 - [x] Sản phẩm mới theo sản phẩm tương tự (roadmap #9, Starter+, feature `reference_products`): chọn bằng resource picker trong Cài đặt sản phẩm, trộn tốc độ bán theo số ngày còn hàng (30 ngày), 404 test + 59 E2E. #16 barcode: quyết định không làm
+- [x] Bật/tắt tính năng toàn app (`config/features.php`, `FEATURE_*`, `BILLING_GROWTH_OFFERED`): một cổng duy nhất `Entitlements::has()` = gói **và** công tắc, API 404 `feature_disabled`, frontend ẩn hẳn (`useFeature()`), không xóa dữ liệu, `php artisan features:status`, `make e2e-features-off`, 413 test
 - [ ] Việc sắp tới: xem mục "Việc sắp tới" trong `docs/ROADMAP.md`
 - [ ] Phase 7: Chuẩn bị nộp App Store (nhớ: gỡ scope write_orders chỉ dùng cho dev:fake-orders khỏi shopify.app.toml và SHOPIFY_SCOPES; SHOPIFY_BILLING_TEST=false ở production)

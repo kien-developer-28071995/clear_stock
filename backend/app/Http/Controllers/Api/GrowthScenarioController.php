@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\Feature;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\GrowthScenarioRequest;
 use App\Services\App\GrowthScenarioService;
+use App\Support\Features;
 use App\Support\ShopContext;
 use Illuminate\Http\JsonResponse;
 
@@ -18,7 +20,7 @@ class GrowthScenarioController extends Controller
         $filters = array_filter([
             'supplier_id' => $request->filled('supplier_id') ? (int) $request->validated('supplier_id') : null,
             'vendor' => $request->validated('vendor'),
-            'abc' => $request->validated('abc'),
+            'abc' => Features::enabled(Feature::Abc) ? $request->validated('abc') : null,
         ], fn ($v) => $v !== null && $v !== '');
 
         return response()->json(['data' => $this->scenarios->simulate(

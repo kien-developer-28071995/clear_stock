@@ -5,6 +5,8 @@ import { LoadingPage } from '@/components/ui/LoadingPage';
 import { NotFoundPage } from '@/components/layout/NotFoundPage';
 import { appConfig } from '@/lib/appConfig';
 import { useShopifyNavigation } from '@/hooks/useShopifyNavigation';
+import { useFeature } from '@/hooks/useEntitlements';
+import type { FeatureSwitch } from '@/features/shop/types';
 
 // Home ships in the main bundle (first paint, Built for Shopify LCP); every other page
 // loads on first visit.
@@ -24,6 +26,11 @@ const VendorSuppliersPage = page(() => import('@/features/settings/pages/VendorS
 const BundlesPage = page(() => import('@/features/settings/pages/BundlesPage'), 'BundlesPage');
 const PlansPage = page(() => import('@/features/billing/pages/PlansPage'), 'PlansPage');
 
+/** A page of a feature switched off app-wide is simply not there. */
+function FeatureRoute({ feature, children }: { feature: FeatureSwitch; children: React.ReactNode }) {
+    return useFeature(feature) ? children : <NotFoundPage />;
+}
+
 export function AppRouter() {
     useShopifyNavigation();
 
@@ -32,9 +39,9 @@ export function AppRouter() {
             <Routes>
                 <Route path="/" element={<HomeRoute />} />
                 <Route path="/reorder" element={<ReorderPage />} />
-                <Route path="/transfers" element={<TransfersPage />} />
+                <Route path="/transfers" element={<FeatureRoute feature="transfers"><TransfersPage /></FeatureRoute>} />
                 <Route path="/insights" element={<InsightsPage />} />
-                <Route path="/what-if" element={<WhatIfPage />} />
+                <Route path="/what-if" element={<FeatureRoute feature="what_if"><WhatIfPage /></FeatureRoute>} />
                 <Route path="/products" element={<ProductsPage />} />
                 <Route path="/products/:variantId" element={<ProductDetailPage />} />
                 <Route path="/suppliers" element={<SuppliersPage />} />

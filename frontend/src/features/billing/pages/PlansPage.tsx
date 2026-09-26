@@ -10,9 +10,11 @@ import { translateCode } from '@/i18n/codes';
 import { useConfirm } from '@/components/ui/ConfirmModal';
 import { useBilling, useChangePlan } from '@/features/billing/hooks/useBilling';
 import type { Interval, PlanInfo } from '@/features/billing/types';
+import type { FeatureSwitch } from '@/features/shop/types';
 import { formatMoney, formatNumber } from '@/utils/format';
 
-const FEATURES: { key: string; label: (p: PlanInfo, t: TFunction) => string; included: (p: PlanInfo) => boolean }[] = [
+/** Rows of the comparison; `feature` rows disappear when that feature is switched off app-wide. */
+const FEATURES: { key: string; feature?: FeatureSwitch; label: (p: PlanInfo, t: TFunction) => string; included: (p: PlanInfo) => boolean }[] = [
     {
         key: 'skus',
         label: (p, t) => (p.limits.max_skus ? t('plans.features.bestSellers', { count: p.limits.max_skus }) : t('plans.features.unlimited')),
@@ -20,15 +22,18 @@ const FEATURES: { key: string; label: (p: PlanInfo, t: TFunction) => string; inc
     },
     { key: 'forecasts', label: (_, t) => t('plans.features.forecasts'), included: () => true },
     { key: 'explanations', label: (_, t) => t('plans.features.explanations'), included: (p) => p.limits.explanations },
+    { key: 'abc', feature: 'abc', label: (_, t) => t('plans.features.abc'), included: (p) => p.limits.abc },
     { key: 'bundles', label: (_, t) => t('plans.features.bundles'), included: (p) => p.limits.bundles },
     { key: 'alerts', label: (_, t) => t('plans.features.alerts'), included: (p) => p.limits.alerts },
-    { key: 'purchase_orders', label: (_, t) => t('plans.features.purchaseOrders'), included: (p) => p.limits.purchase_orders },
-    { key: 'reference_products', label: (_, t) => t('plans.features.referenceProducts'), included: (p) => p.limits.reference_products },
-    { key: 'what_if', label: (_, t) => t('plans.features.whatIf'), included: (p) => p.limits.what_if },
-    { key: 'locations', label: (_, t) => t('plans.features.locations'), included: (p) => p.limits.locations },
-    { key: 'supplier_auto_email', label: (_, t) => t('plans.features.supplierAutoEmail'), included: (p) => p.limits.supplier_auto_email },
-    { key: 'realtime_alerts', label: (_, t) => t('plans.features.realtimeAlerts'), included: (p) => p.limits.realtime_alerts },
-    { key: 'flow_triggers', label: (_, t) => t('plans.features.flowTriggers'), included: (p) => p.limits.flow_triggers },
+    { key: 'purchase_orders', feature: 'purchase_orders', label: (_, t) => t('plans.features.purchaseOrders'), included: (p) => p.limits.purchase_orders },
+    { key: 'supplier_emails', feature: 'supplier_emails', label: (_, t) => t('plans.features.supplierEmails'), included: (p) => p.limits.supplier_emails },
+    { key: 'reference_products', feature: 'reference_products', label: (_, t) => t('plans.features.referenceProducts'), included: (p) => p.limits.reference_products },
+    { key: 'what_if', feature: 'what_if', label: (_, t) => t('plans.features.whatIf'), included: (p) => p.limits.what_if },
+    { key: 'locations', feature: 'locations', label: (_, t) => t('plans.features.locations'), included: (p) => p.limits.locations },
+    { key: 'transfers', feature: 'transfers', label: (_, t) => t('plans.features.transfers'), included: (p) => p.limits.transfers },
+    { key: 'supplier_auto_email', feature: 'supplier_emails', label: (_, t) => t('plans.features.supplierAutoEmail'), included: (p) => p.limits.supplier_auto_email },
+    { key: 'realtime_alerts', feature: 'realtime_alerts', label: (_, t) => t('plans.features.realtimeAlerts'), included: (p) => p.limits.realtime_alerts },
+    { key: 'flow_triggers', feature: 'flow_triggers', label: (_, t) => t('plans.features.flowTriggers'), included: (p) => p.limits.flow_triggers },
 ];
 
 /** Flat prices, no GMV share, no contract. Charges go through Shopify. */
@@ -103,7 +108,7 @@ export function PlansPage() {
                     </s-paragraph>
                     {/* Price lock: Shopify subscriptions keep their price; we never move a shop to a new price. */}
                     <s-stack direction="inline" gap="small-200" alignItems="center">
-                        <s-badge tone="success" icon="lock">{t('plans.priceLockBadge')}</s-badge>
+                        <s-badge tone="success">{t('plans.priceLockBadge')}</s-badge>
                         <s-text>{t('plans.priceLock')}</s-text>
                     </s-stack>
                 </s-stack>
@@ -115,7 +120,7 @@ export function PlansPage() {
                 {/* @container columns only work under a query container. */}
                 <s-query-container>
                     <s-grid gridTemplateColumns="@container (inline-size > 760px) 1fr 1fr 1fr, 1fr" gap="base">
-                        {data.plans.map((plan) => {
+                        {data.plans.filter((plan) => plan.offered || plan.key === data.plan).map((plan) => {
                             const current = plan.key === data.plan && (plan.key === 'free' || data.interval === interval);
                             const price = plan.prices?.[interval];
 
@@ -134,7 +139,7 @@ export function PlansPage() {
                                         )}
                                         {price && data.trial_days_left > 0 && data.plan === 'free' && <s-text color="subdued">{t('plans.trialNote', { count: data.trial_days_left })}</s-text>}
                                         <s-unordered-list>
-                                            {FEATURES.map((f) => (
+                                            {FEATURES.filter((f) => !f.feature || data.entitlements.features[f.feature]).map((f) => (
                                                 <s-list-item key={f.key}>
                                                     {f.included(plan) ? '✓ ' : '— '}
                                                     {f.label(plan, t)}

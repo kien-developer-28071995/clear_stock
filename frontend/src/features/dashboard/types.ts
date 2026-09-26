@@ -66,11 +66,12 @@ export interface Dashboard {
     /** Still selling, but holding clearly more than the order-up-to level. */
     overstock: { value: number; units: number; count: number; missing_cost: number; top: OverstockItem[] };
     /** Products, revenue and stock value per ABC class. */
+    /** null when ABC classes are switched off app-wide. */
     abc: {
         classes: Record<'A' | 'B' | 'C', AbcClassSummary>;
         unclassified: number;
         missing_cost: number;
         days: number;
         thresholds: { a: number; b: number };
-    };
+    } | null;
 }

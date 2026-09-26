@@ -215,7 +215,8 @@
     "label": "Tip:",
     "home_actions": "Today's products are already ticked. Export purchase order turns them into one file for your supplier.",
     "home_runway": "Each bar is how many days of stock are left. The dashed line is when to reorder so new stock arrives in time.",
-    "product_explanation": "These are the exact numbers behind the forecast. If you know something we don't, adjust the sales rate below."
+    "product_explanation": "These are the exact numbers behind the forecast. If you know something we don't, adjust the sales rate below.",
+    "home_actions_no_po": "Today's products are already ticked, grouped by how urgent they are."
   },
   "setup": {
     "heading": "Get the most out of your forecasts",
@@ -250,7 +251,8 @@
         "action": "Add suppliers",
         "skip": "I don't use suppliers",
         "fromVendors_one": "Create a supplier from your vendor",
-        "fromVendors_other": "Create suppliers from your {{count}} vendors"
+        "fromVendors_other": "Create suppliers from your {{count}} vendors",
+        "bodyNoPo": "Products from a slower supplier get reordered earlier. Coming from Stocky? Import your purchase orders to set this up in one go."
       },
       "alerts": {
         "title": "Turn on stock alerts",
@@ -466,12 +468,15 @@
       "bundles": "Bundles and kits",
       "alerts": "Email alerts (daily or weekly summary)",
       "locations": "Stock by location",
-      "purchaseOrders": "Purchase orders: CSV export and email to suppliers",
+      "purchaseOrders": "Purchase order export (CSV)",
       "realtimeAlerts": "Real-time stock alerts",
       "whatIf": "Sales what-if (\"+20% sales?\")",
       "supplierAutoEmail": "Automatic weekly orders to suppliers",
       "flowTriggers": "Shopify Flow triggers",
-      "referenceProducts": "New products forecast from a similar product"
+      "referenceProducts": "New products forecast from a similar product",
+      "supplierEmails": "Email orders to suppliers",
+      "transfers": "Stock transfers between locations",
+      "abc": "ABC classes by revenue"
     },
     "notApproved": "No plan change was approved",
     "nowOn": "You're on {{plan}}",
@@ -517,7 +522,9 @@
     "server_error": "Something went wrong on our side. Please try again.",
     "unavailable": "The app is being updated. Please try again in a minute.",
     "supplier_has_no_email": "This supplier has no email address.",
-    "supplier_email_too_soon": "This order was just sent. Wait a minute before sending again."
+    "supplier_email_too_soon": "This order was just sent. Wait a minute before sending again.",
+    "feature_disabled": "This feature isn't available.",
+    "plan_unavailable": "This plan isn't available right now."
   },
   "validation": {
     "invalid": "This value isn't valid.",
@@ -711,7 +718,7 @@
       "alerts_active": "Stock alert emails to {{email}} stop.",
       "locations_one": "Forecasts per location stop ({{count}} location).",
       "locations_other": "Forecasts per location stop ({{count}} locations).",
-      "purchase_orders": "Purchase order export and emailing orders to suppliers stop.",
+      "purchase_orders": "Purchase order export stops.",
       "supplier_auto_emails_one": "{{count}} supplier stops receiving automatic purchase orders.",
       "supplier_auto_emails_other": "{{count}} suppliers stop receiving automatic purchase orders.",
       "realtime_alerts": "Real-time stock alerts are not available.",
@@ -720,7 +727,8 @@
       "flow_triggers": "Shopify Flow triggers stop.",
       "flow_triggers_active": "Your Shopify Flow workflows using Clear Stock triggers stop running.",
       "reference_products_one": "{{count}} new product stops borrowing a similar product's sales rate.",
-      "reference_products_other": "{{count}} new products stop borrowing a similar product's sales rate."
+      "reference_products_other": "{{count}} new products stop borrowing a similar product's sales rate.",
+      "supplier_emails": "Emailing orders to suppliers stops."
     }
   },
   "vendors": {
