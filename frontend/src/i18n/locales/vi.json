@@ -326,7 +326,8 @@
     "muteAlerts": "Không gửi cảnh báo cho sản phẩm này",
     "muteAlertsHelp": "Bỏ sản phẩm khỏi email tóm tắt và email tức thời. Dự báo và danh sách cần nhập hàng vẫn có sản phẩm này.",
     "fromForecast": "Theo dự báo: {{qty}}",
-    "fromForecastShort": "Theo dự báo"
+    "fromForecastShort": "Theo dự báo",
+    "fromSupplierQty": "{{qty}} (nhà cung cấp)"
   },
   "products": {
     "freeLimit_other": "Gói Miễn phí dự báo {{count}} sản phẩm bán chạy nhất.",
@@ -396,7 +397,8 @@
     "name": "Tên",
     "leadTimeHelp": "Áp dụng cho mọi sản phẩm của nhà cung cấp này, trừ sản phẩm có lead time riêng.",
     "email": "Email (không bắt buộc)",
-    "emailHelp": "Dùng cho đơn đặt hàng."
+    "emailHelp": "Dùng cho đơn đặt hàng.",
+    "orderRulesHelp": "Đơn tối thiểu và quy cách thùng áp dụng cho mọi sản phẩm của nhà cung cấp này, trừ khi sản phẩm có cài đặt riêng."
   },
   "bundles": {
     "add": "Thêm combo",
@@ -556,6 +558,7 @@
     "rounded_min": "Cần {{needed}} cái; nhà cung cấp nhận tối thiểu {{min}} nên nhập {{count}}.",
     "rounded_pack": "Cần {{needed}} cái; làm tròn lên thùng {{pack}} cái → {{count}}.",
     "rounded_min_and_pack": "Cần {{needed}} cái; tối thiểu {{min}}, theo thùng {{pack}} cái → {{count}}.",
+    "rounding_supplier_default": "Đơn tối thiểu / quy cách thùng: mặc định của {{supplier}}.",
     "reorder_point_manual_other": "Điểm đặt hàng lại do bạn đặt: {{count}} cái.",
     "order_up_to_max_other": "Mỗi lần nhập bù tồn kho lên mức tối đa {{count}} cái bạn đặt.",
     "below_min_order_other": "Tồn {{stock}} cái (tính cả hàng đang về) đã chạm mức tối thiểu → nhập {{count}} cái ngay hôm nay.",

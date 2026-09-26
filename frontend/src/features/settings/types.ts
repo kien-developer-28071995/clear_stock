@@ -24,13 +24,16 @@ export interface Supplier {
     name: string;
     email: string | null;
     lead_time_days: number | null;
+    /** Defaults for this supplier's products (a product's own setting wins). */
+    min_order_qty: number | null;
+    pack_size: number | null;
     variants_count: number | null;
     /** Growth: purchase orders emailed automatically when this supplier's products are due. */
     auto_email: boolean;
     last_emailed_at: string | null;
 }
 
-export type SupplierInput = Pick<Supplier, 'name' | 'email' | 'lead_time_days'> & { auto_email?: boolean };
+export type SupplierInput = Pick<Supplier, 'name' | 'email' | 'lead_time_days' | 'min_order_qty' | 'pack_size'> & { auto_email?: boolean };
 
 /** A Shopify vendor that can become a supplier. */
 export interface VendorCandidate {

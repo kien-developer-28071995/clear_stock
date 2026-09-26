@@ -100,6 +100,7 @@
         "rounded_min": "Cần {{needed}} cái; nhà cung cấp nhận tối thiểu {{min}} nên nhập {{count}}.",
         "rounded_pack": "Cần {{needed}} cái; làm tròn lên thùng {{pack}} cái → {{count}}.",
         "rounded_min_and_pack": "Cần {{needed}} cái; tối thiểu {{min}}, theo thùng {{pack}} cái → {{count}}.",
+        "rounding_supplier_default": "Đơn tối thiểu / quy cách thùng: mặc định của {{supplier}}.",
         "reorder_point_manual": {
             "other": "Điểm đặt hàng lại do bạn đặt: {{count}} cái."
         },

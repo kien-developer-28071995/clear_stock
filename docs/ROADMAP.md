@@ -93,7 +93,7 @@ Nguồn lần 2: https://community.shopify.dev/t/feature-request-expose-the-exis
 5. ~~**#10 Báo khi đồng bộ lỗi liên tục** + cam kết giữ giá~~ (xong; câu giữ giá cho listing làm ở Phase 7).
 6. ~~**#6 Phân loại ABC**~~ (xong), ~~**#7 Mô phỏng tăng trưởng (what-if)**~~ (xong), ~~**#8 Gợi ý chuyển kho** (Growth)~~ (xong: trang Chuyển kho, tạo phiếu chuyển nháp trong Shopify qua scope tùy chọn `write_inventory_transfers`), **#9 Dự báo sản phẩm mới theo sản phẩm tham chiếu**.
 7. **#16 Nhận hàng / kiểm kho bằng barcode** (thấp).
-8. **Mặc định MOQ / quy cách thùng theo nhà cung cấp** (hiện chỉ theo từng sản phẩm).
+8. ~~**Mặc định MOQ / quy cách thùng theo nhà cung cấp**~~ (xong 2026-09-26, mọi gói: `suppliers.min_order_qty`/`pack_size`, cài đặt của sản phẩm thắng, giải thích ghi "mặc định của NCC").
 9. **Phase 7 — chuẩn bị nộp App Store**: gỡ scope `write_orders`, `SHOPIFY_BILLING_TEST=false`, listing có "Stocky alternative", ảnh/icon, hướng dẫn test cho reviewer, domain gửi mail có SPF/DKIM.
 
 ## Nguồn

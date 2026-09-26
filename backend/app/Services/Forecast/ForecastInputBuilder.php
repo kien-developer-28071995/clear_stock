@@ -76,6 +76,7 @@ class ForecastInputBuilder
                     incomingStock: $incoming[$id][$locationId] ?? 0,
                     minOrderQty: $base->minOrderQty,
                     packSize: $base->packSize,
+                    orderRulesSupplier: $base->orderRulesSupplier,
                 )];
             }
         }
@@ -138,8 +139,11 @@ class ForecastInputBuilder
                 bundles: $bundleInputs,
                 overrides: $overrides[$id] ?? [],
                 incomingStock: $incoming[$id] ?? 0,
-                minOrderQty: $variant->min_order_qty,
-                packSize: $variant->pack_size,
+                minOrderQty: $variant->effectiveMinOrderQty(),
+                packSize: $variant->effectivePackSize(),
+                // Named in the explanation when the rounding comes from the supplier's defaults.
+                orderRulesSupplier: ($variant->min_order_qty === null && $variant->supplier?->min_order_qty !== null)
+                    || ($variant->pack_size === null && $variant->supplier?->pack_size !== null) ? $variant->supplier->name : null,
                 minStock: $variant->min_stock,
                 maxStock: $variant->max_stock,
             );

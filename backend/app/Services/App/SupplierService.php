@@ -34,10 +34,12 @@ class SupplierService
     public function update(Shop $shop, Supplier $supplier, array $data): Supplier
     {
         $data = $this->withAutoEmail($shop, $data, $supplier);
-        $leadChanged = array_key_exists('lead_time_days', $data) && $data['lead_time_days'] !== $supplier->lead_time_days;
+        // Lead time and order rules feed the forecasts of the supplier's products.
+        $changed = collect(['lead_time_days', 'min_order_qty', 'pack_size'])
+            ->contains(fn ($field) => array_key_exists($field, $data) && $data[$field] !== $supplier->{$field});
         $supplier = $this->suppliers->update($supplier, $data);
 
-        if ($leadChanged) {
+        if ($changed) {
             RecomputeForecasts::dispatch($shop->id);
         }
 

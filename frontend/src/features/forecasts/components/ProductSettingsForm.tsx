@@ -110,7 +110,7 @@ export function ProductSettingsForm({ f }: { f: ForecastDetail }) {
                     <s-number-field
                         label={t('productSettings.minOrder')}
                         min={1}
-                        placeholder={t('productSettings.none')}
+                        placeholder={supplier?.min_order_qty != null ? t('productSettings.fromSupplierQty', { qty: supplier.min_order_qty }) : t('productSettings.none')}
                         details={t('productSettings.minOrderHelp')}
                         value={minOrder}
                         error={fieldError(update.error, 'min_order_qty')}
@@ -119,7 +119,7 @@ export function ProductSettingsForm({ f }: { f: ForecastDetail }) {
                     <s-number-field
                         label={t('productSettings.packSize')}
                         min={1}
-                        placeholder={t('productSettings.none')}
+                        placeholder={supplier?.pack_size != null ? t('productSettings.fromSupplierQty', { qty: supplier.pack_size }) : t('productSettings.none')}
                         details={t('productSettings.packSizeHelp')}
                         value={pack}
                         error={fieldError(update.error, 'pack_size')}

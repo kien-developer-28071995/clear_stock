@@ -74,6 +74,18 @@ class Variant extends Model
         ];
     }
 
+    /** Minimum order: the product's own, else its supplier's default (supplier must be loaded). */
+    public function effectiveMinOrderQty(): ?int
+    {
+        return $this->min_order_qty ?? $this->supplier?->min_order_qty;
+    }
+
+    /** Units per case: the product's own, else its supplier's default (supplier must be loaded). */
+    public function effectivePackSize(): ?int
+    {
+        return $this->pack_size ?? $this->supplier?->pack_size;
+    }
+
     /** "Product - Variant" for display; omits Shopify's "Default Title". */
     public function displayName(): string
     {

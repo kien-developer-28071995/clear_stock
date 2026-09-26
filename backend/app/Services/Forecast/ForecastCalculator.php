@@ -64,6 +64,9 @@ class ForecastCalculator
             'point' => $reorderPoint, 'target' => $targetStock, 'excess' => $excess, 'overstock' => $overstock, 'min' => $min, 'max' => $max,
             'rounding' => $rounding, 'suggested' => $suggested, 'days_of_cover' => $daysOfCover, 'stockout_date' => $stockoutDate,
             'reorder_date' => $reorderDate] = $plan;
+        if ($in->orderRulesSupplier !== null) {
+            $rounding['supplier'] = $in->orderRulesSupplier; // explained as the supplier's defaults
+        }
 
         $confidence = $this->confidence($windows, $series, $end, $avgOverride !== null);
 

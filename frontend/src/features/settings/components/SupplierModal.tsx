@@ -20,6 +20,8 @@ export function SupplierModal({ modalRef, supplier, onDone }: Props) {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [lead, setLead] = useState('');
+    const [minOrder, setMinOrder] = useState('');
+    const [pack, setPack] = useState('');
     const [autoEmail, setAutoEmail] = useState(false);
     // Emailing an order by hand is Starter; automatic weekly orders are Growth.
     const canAutoEmail = useEntitlements().supplier_auto_email;
@@ -28,6 +30,8 @@ export function SupplierModal({ modalRef, supplier, onDone }: Props) {
         setName(supplier?.name ?? '');
         setEmail(supplier?.email ?? '');
         setLead(supplier?.lead_time_days?.toString() ?? '');
+        setMinOrder(supplier?.min_order_qty?.toString() ?? '');
+        setPack(supplier?.pack_size?.toString() ?? '');
         setAutoEmail(supplier?.auto_email ?? false);
         create.reset();
         update.reset();
@@ -39,6 +43,8 @@ export function SupplierModal({ modalRef, supplier, onDone }: Props) {
             name: name.trim(),
             email: email.trim() || null,
             lead_time_days: lead === '' ? null : Number(lead),
+            min_order_qty: minOrder === '' ? null : Number(minOrder),
+            pack_size: pack === '' ? null : Number(pack),
             ...(canAutoEmail ? { auto_email: autoEmail && email.trim() !== '' } : {}),
         };
         const options = { onSuccess: () => { shopify.toast.show(supplier ? t('suppliers.updated') : t('suppliers.added')); onDone(); } };
@@ -59,6 +65,25 @@ export function SupplierModal({ modalRef, supplier, onDone }: Props) {
                     error={fieldError(mutation.error, 'lead_time_days')}
                     onInput={(e) => setLead(e.currentTarget.value)}
                 />
+                <s-grid gridTemplateColumns="1fr 1fr" gap="base">
+                    <s-number-field
+                        label={t('productSettings.minOrder')}
+                        min={1}
+                        placeholder={t('productSettings.none')}
+                        value={minOrder}
+                        error={fieldError(mutation.error, 'min_order_qty')}
+                        onInput={(e) => setMinOrder(e.currentTarget.value)}
+                    />
+                    <s-number-field
+                        label={t('productSettings.packSize')}
+                        min={1}
+                        placeholder={t('productSettings.none')}
+                        value={pack}
+                        error={fieldError(mutation.error, 'pack_size')}
+                        onInput={(e) => setPack(e.currentTarget.value)}
+                    />
+                </s-grid>
+                <s-text color="subdued">{t('suppliers.orderRulesHelp')}</s-text>
                 <s-email-field
                     label={t('suppliers.email')}
                     details={t('suppliers.emailHelp')}

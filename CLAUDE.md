@@ -186,5 +186,6 @@ Yêu cầu chung:
 - [x] Phân gói lại + giá Growth $6 ($58/năm): xuất PO + gửi đơn NCC thủ công + mô phỏng xuống Starter; tự động gửi NCC (`supplier_auto_email`) và Flow ở Growth; feature mới `what_if`, `supplier_auto_email`, `flow_triggers`, hộp hạ gói cập nhật
 - [x] Shopify Flow triggers (roadmap #14, Growth): 3 extension `extensions/flow-*` + `flow-lifecycle` (callback `/flow/lifecycle`, HMAC), `FlowTriggerPlanner` thuần (mỗi thay đổi 1 lần, ngưỡng hết hàng 30/14/7/0 có hysteresis), `SendFlowTriggers` sau mỗi lần forecast, chỉ shop có workflow bật, thẻ Shopify Flow trong Settings, 392 test + 56 E2E. Chưa thử với Flow thật (cần `app deploy`)
 - [x] Báo sync lỗi liên tục + giữ giá (roadmap #10, mọi gói): `SyncFailureNotifier` sau mỗi lần sync lỗi, 1 email/chuỗi lỗi (≥ 2 lỗi liên tiếp + 24h không sync được), `shops.sync_failure_notified_at` reset khi sync thành công; badge "Giữ giá" trên trang Gói, 397 test
+- [x] MOQ / quy cách thùng mặc định theo NCC (mọi gói): `suppliers.min_order_qty`/`pack_size`, `Variant::effectiveMinOrderQty()/effectivePackSize()`, dòng giải thích `rounding_supplier_default`, 398 test
 - [ ] Việc sắp tới: xem mục "Việc sắp tới" trong `docs/ROADMAP.md`
 - [ ] Phase 7: Chuẩn bị nộp App Store (nhớ: gỡ scope write_orders chỉ dùng cho dev:fake-orders khỏi shopify.app.toml và SHOPIFY_SCOPES; SHOPIFY_BILLING_TEST=false ở production)

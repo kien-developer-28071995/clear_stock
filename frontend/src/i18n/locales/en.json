@@ -343,7 +343,8 @@
     "muteAlerts": "Don't send alerts for this product",
     "muteAlertsHelp": "Leaves it out of summary and real-time emails. Forecasts and the reorder list still include it.",
     "fromForecast": "Forecast: {{qty}}",
-    "fromForecastShort": "From the forecast"
+    "fromForecastShort": "From the forecast",
+    "fromSupplierQty": "{{qty}} (supplier)"
   },
   "products": {
     "freeLimit_one": "The Free plan forecasts your best seller.",
@@ -416,7 +417,8 @@
     "name": "Name",
     "leadTimeHelp": "Used for all products from this supplier unless a product has its own lead time.",
     "email": "Email (optional)",
-    "emailHelp": "For purchase orders."
+    "emailHelp": "For purchase orders.",
+    "orderRulesHelp": "Minimum order and pack size apply to all products from this supplier unless a product has its own."
   },
   "bundles": {
     "add": "Add bundle",
@@ -591,6 +593,7 @@
     "rounded_min": "You need {{needed}}; the supplier minimum is {{min}}, so order {{count}}.",
     "rounded_pack": "You need {{needed}}; rounded up to whole packs of {{pack}} → {{count}}.",
     "rounded_min_and_pack": "You need {{needed}}; the supplier minimum is {{min}}, in packs of {{pack}} → {{count}}.",
+    "rounding_supplier_default": "Minimum order / pack size: {{supplier}}'s defaults.",
     "reorder_point_manual_one": "Reorder point set by you: {{count}} unit.",
     "reorder_point_manual_other": "Reorder point set by you: {{count}} units.",
     "order_up_to_max_one": "Orders fill up to your maximum of {{count}} unit.",

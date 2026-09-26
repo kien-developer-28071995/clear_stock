@@ -306,6 +306,27 @@ describe('order rounding', function () {
         $this->putJson("/api/variants/{$mug->id}/settings", ['pack_size' => 0], $this->auth)
             ->assertUnprocessable()->assertJsonPath('errors.pack_size.0', ['code' => 'min', 'params' => ['value' => 1]]);
     });
+    it('uses the supplier defaults for products without their own, and says so', function () {
+        $acme = Supplier::factory()->for($this->shop)->create(['name' => 'Acme', 'lead_time_days' => null]); // store default lead time
+        $mug = product($this->shop, $this->location, 'Mug', stock: 10, perDay: 4, attrs: ['supplier_id' => $acme->id]);
+        $cup = product($this->shop, $this->location, 'Cup', stock: 10, perDay: 4, attrs: ['supplier_id' => $acme->id, 'pack_size' => 10]);
+        forecastAll($this->shop);
+
+        $this->putJson("/api/suppliers/{$acme->id}", ['name' => 'Acme', 'min_order_qty' => 200, 'pack_size' => 24], $this->auth)
+            ->assertOk()->assertJsonPath('data.min_order_qty', 200)->assertJsonPath('data.pack_size', 24);
+        Queue::assertPushed(RecomputeForecasts::class);
+        forecastAll($this->shop);
+
+        $this->getJson("/api/forecasts/{$mug->id}", $this->auth)
+            ->assertJsonPath('data.suggested_qty', 216)          // same as the product's own settings above
+            ->assertJsonPath('data.settings.min_order_qty', null) // not copied onto the product
+            ->assertJsonFragment(['code' => 'rounding_supplier_default', 'params' => ['supplier' => 'Acme']]);
+        // The product's own pack size wins; the minimum still comes from the supplier: 200 -> 20 packs of 10.
+        $this->getJson("/api/forecasts/{$cup->id}", $this->auth)
+            ->assertJsonPath('data.explanation.reorder.rounding', ['needed' => 194, 'min_order_qty' => 200, 'pack_size' => 10, 'final' => 200, 'supplier' => 'Acme']);
+
+        $this->putJson("/api/suppliers/{$acme->id}", ['name' => 'Acme', 'pack_size' => 0], $this->auth)->assertUnprocessable();
+    });
 });
 
 describe('manual min / max', function () {

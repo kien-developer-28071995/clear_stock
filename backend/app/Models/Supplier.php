@@ -15,17 +15,19 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string $name
  * @property ?string $email
  * @property ?int $lead_time_days
+ * @property ?int $min_order_qty default minimum order (units) for the supplier's products
+ * @property ?int $pack_size default units per case for the supplier's products
  */
 #[ObservedBy(SupplierObserver::class)]
 class Supplier extends Model
 {
     use BelongsToShop, HasFactory;
 
-    protected $fillable = ['shop_id', 'name', 'email', 'lead_time_days', 'auto_email'];
+    protected $fillable = ['shop_id', 'name', 'email', 'lead_time_days', 'min_order_qty', 'pack_size', 'auto_email'];
 
     protected function casts(): array
     {
-        return ['lead_time_days' => 'integer', 'auto_email' => 'boolean'];
+        return ['lead_time_days' => 'integer', 'min_order_qty' => 'integer', 'pack_size' => 'integer', 'auto_email' => 'boolean'];
     }
 
     public function variants(): HasMany

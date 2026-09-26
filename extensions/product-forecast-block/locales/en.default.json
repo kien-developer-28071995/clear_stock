@@ -113,6 +113,7 @@
         "rounded_min": "You need {{needed}}; the supplier minimum is {{min}}, so order {{count}}.",
         "rounded_pack": "You need {{needed}}; rounded up to whole packs of {{pack}} → {{count}}.",
         "rounded_min_and_pack": "You need {{needed}}; the supplier minimum is {{min}}, in packs of {{pack}} → {{count}}.",
+        "rounding_supplier_default": "Minimum order / pack size: {{supplier}}'s defaults.",
         "reorder_point_manual": {
             "one": "Reorder point set by you: {{count}} unit.",
             "other": "Reorder point set by you: {{count}} units."

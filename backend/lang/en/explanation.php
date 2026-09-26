@@ -32,6 +32,7 @@ return [
     'runs_out_incoming_covers' => ':stock in stock runs out around :stockout_date; the stock on the way covers the next reorder, so no new order is needed.',
     'rounded_min' => 'You need :needed; the supplier minimum is :min, so order :count.',
     'rounded_pack' => 'You need :needed; rounded up to whole packs of :pack → :count.',
+    'rounding_supplier_default' => 'Minimum order / pack size: :supplier\'s defaults.',
     'rounded_min_and_pack' => 'You need :needed; the supplier minimum is :min, in packs of :pack → :count.',
     'order_today_out_of_stock' => 'Out of stock now → order :count unit today.|Out of stock now → order :count units today.',
     'runs_out' => ':stock in stock runs out around :stockout_date → order :count unit by :reorder_date.|:stock in stock runs out around :stockout_date → order :count units by :reorder_date.',

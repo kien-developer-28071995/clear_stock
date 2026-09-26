@@ -98,6 +98,9 @@ class ExplanationFormatter
             $r = $e['reorder']['rounding'] ?? null; // absent in explanations computed before it existed
             if ($r !== null && $r['final'] !== $r['needed']) {
                 $out[] = $this->roundingLine($r);
+                if (isset($r['supplier'])) {
+                    $out[] = $this->line('rounding_supplier_default', ['supplier' => $r['supplier']]);
+                }
             }
             $out[] = match (true) {
                 $stock <= 0 && $suggested > 0 => $this->line('order_today_out_of_stock', ['count' => $suggested]),

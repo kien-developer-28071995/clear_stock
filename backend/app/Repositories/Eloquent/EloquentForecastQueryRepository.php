@@ -228,8 +228,8 @@ class EloquentForecastQueryRepository implements ForecastQueryRepositoryInterfac
                 'safety_days' => (int) ($e['safety']['days'] ?? 0),
                 'min_stock' => $v->min_stock,
                 'max_stock' => $v->max_stock,
-                'min_order_qty' => $v->min_order_qty,
-                'pack_size' => $v->pack_size,
+                'min_order_qty' => $v->effectiveMinOrderQty(),
+                'pack_size' => $v->effectivePackSize(),
                 // The stored forecast itself (Flow triggers).
                 'reorder_date' => $f->reorder_date?->toDateString(),
                 'stockout_date' => $f->stockout_date?->toDateString(),

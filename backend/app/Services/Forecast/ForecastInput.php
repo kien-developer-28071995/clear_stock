@@ -35,6 +35,7 @@ final readonly class ForecastInput
         public ?int $packSize = null,           // units per case: orders are whole cases
         public ?int $minStock = null,           // manual reorder point (min)
         public ?int $maxStock = null,           // manual order-up-to level (max)
+        public ?string $orderRulesSupplier = null, // minimum order / pack size (partly) from this supplier's defaults
     ) {}
 
     public function override(OverrideField $field): ?array
