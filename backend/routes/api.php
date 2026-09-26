@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\ForecastController;
 use App\Http\Controllers\Api\ImportController;
 use App\Http\Controllers\Api\OnboardingController;
+use App\Http\Controllers\Api\ProductExtensionController;
 use App\Http\Controllers\Api\PurchaseOrderController;
 use App\Http\Controllers\Api\SettingsController;
 use App\Http\Controllers\Api\SetupGuideController;
@@ -72,6 +73,10 @@ Route::middleware('shopify.session')->group(function () {
     // Purchase order CSVs (Stocky and others) -> suppliers, product assignments, lead times.
     Route::post('/imports/purchase-orders/preview', [ImportController::class, 'preview'])->middleware('throttle:30,1');
     Route::post('/imports/purchase-orders/apply', [ImportController::class, 'apply'])->middleware('throttle:10,1');
+
+    // Shopify admin extensions: forecast block on the product page, bulk settings on the product list.
+    Route::get('/extension/products/{product}', [ProductExtensionController::class, 'show'])->whereNumber('product');
+    Route::post('/extension/product-settings', [ProductExtensionController::class, 'updateSettings'])->middleware('throttle:30,1');
 
     Route::get('/bundles', [BundleController::class, 'index']);
     Route::post('/bundles', [BundleController::class, 'store']);

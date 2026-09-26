@@ -22,6 +22,14 @@ interface VariantRepositoryInterface
      */
     public function findByShopifyIds(Shop $shop, array $shopifyVariantIds): Collection;
 
+    /**
+     * Variants of these Shopify products, with their overall forecast and supplier.
+     *
+     * @param  array<int, int>  $shopifyProductIds
+     * @return Collection<int, Variant>
+     */
+    public function findByShopifyProductIds(Shop $shop, array $shopifyProductIds): Collection;
+
     public function updateSettings(Variant $variant, array $settings): Variant;
 
     /** @param array<int, int> $ids @return int rows updated */

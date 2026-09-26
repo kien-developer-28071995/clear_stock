@@ -1,0 +1,27 @@
+{
+    "name": "Đặt NCC & lead time",
+    "intro": {
+        "other": "Áp dụng cho mọi biến thể của {{count}} sản phẩm đã chọn trong Clear Stock. Ô để trống sẽ giữ nguyên."
+    },
+    "supplier": "Nhà cung cấp",
+    "keep": "Giữ nguyên",
+    "noSupplier": "Không có nhà cung cấp",
+    "noSuppliers": "Chưa có nhà cung cấp: thêm trong Clear Stock › Nhà cung cấp.",
+    "leadTime": "Lead time (ngày)",
+    "leadTimeHelp": "Số ngày từ lúc đặt đến lúc nhận hàng. Ưu tiên hơn lead time của nhà cung cấp.",
+    "safety": "Tồn kho an toàn (ngày)",
+    "safetyHelp": "Số ngày hàng dự phòng khi bán chạy hơn hoặc hàng về trễ.",
+    "apply": "Áp dụng",
+    "cancel": "Hủy",
+    "close": "Đóng",
+    "nothing": "Hãy chọn nhà cung cấp hoặc nhập một con số trước.",
+    "done": {
+        "other": "Đã cập nhật {{count}} biến thể. Dự báo đang được tính lại."
+    },
+    "noneKnown": "Các sản phẩm này chưa có trong Clear Stock. Chúng sẽ xuất hiện sau lần đồng bộ tới.",
+    "errors": {
+        "generic": "Không lưu được. Hãy thử lại sau giây lát.",
+        "network": "Không kết nối được tới Clear Stock. Kiểm tra kết nối rồi thử lại.",
+        "invalid": "Kiểm tra lại: lead time và tồn kho an toàn phải là số nguyên từ 0 đến 365."
+    }
+}

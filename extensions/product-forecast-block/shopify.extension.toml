@@ -1,0 +1,13 @@
+api_version = "2026-07"
+
+# Forecast of the product (each variant) on the Shopify product page, with the
+# plain-language "why" and a link into the app. Data: GET /api/extension/products/{id}.
+[[extensions]]
+type = "ui_extension"
+name = "t:name"
+handle = "product-forecast-block"
+uid = "1b921fad-089f-4edb-ba09-d3c6280a2a82"
+
+  [[extensions.targeting]]
+  target = "admin.product-details.block.render"
+  module = "./src/ProductForecastBlock.tsx"

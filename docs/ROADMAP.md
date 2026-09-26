@@ -88,7 +88,7 @@ Nguồn lần 2: https://community.shopify.dev/t/feature-request-expose-the-exis
 ## Việc sắp tới (tổng hợp, theo thứ tự đề xuất)
 
 1. ~~**#11 Tạo Purchase Order gốc của Shopify từ gợi ý**~~ — xong: nút xuất PO có thêm định dạng "Đơn đặt hàng Shopify" đúng mẫu `SKU,Barcode,Supplier SKU,Quantity,Cost,Tax` (không có API tạo PO), đồng bộ `variants.barcode`, bỏ qua sản phẩm không có SKU lẫn barcode và báo số lượng.
-2. **#13 Block dự báo trên trang sản phẩm Shopify** + gán NCC/lead time hàng loạt từ danh sách sản phẩm Shopify (admin UI extension).
+2. ~~**#13 Block dự báo trên trang sản phẩm Shopify** + gán NCC/lead time hàng loạt~~ — xong: 2 admin UI extension (`extensions/`): block trên trang sản phẩm (dự báo từng biến thể + giải thích + link vào app), hành động "Đặt NCC & lead time" cho sản phẩm được chọn ở danh sách sản phẩm.
 3. **#14 Shopify Flow triggers dựa trên dự báo** ("cần đặt hàng", "sẽ hết trong N ngày", "đơn NCC tới hạn").
 5. **#10 Báo khi đồng bộ lỗi liên tục** (1 email, không spam) + cam kết giữ giá cho khách cũ trên trang Gói / listing.
 6. **#6 Phân loại ABC**, **#7 Mô phỏng tăng trưởng (what-if)**, **#8 Gợi ý chuyển kho** (Growth), **#9 Dự báo sản phẩm mới theo sản phẩm tham chiếu**.

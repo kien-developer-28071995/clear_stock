@@ -41,7 +41,8 @@ Vite's dev server and HMR websocket are proxied through nginx on the same HTTPS 
 
 ### 5. Push the config to Shopify and install (2 min)
 ```bash
-npx @shopify/cli@latest app deploy
+make extensions                     # admin extension deps (npm workspace at the repo root)
+npx @shopify/cli@latest app deploy  # app config + the two admin extensions
 ```
 (First run asks you to log in and link the app.) Then in the Dev Dashboard open the app → **Test your app / Install** on your dev store. The app opens embedded in the admin and shows “Hello, <store name>”.
 
@@ -64,6 +65,8 @@ npx @shopify/cli@latest app deploy
 | `make typecheck` | Type-check the frontend |
 | `make logs` (`s=horizon`) | Tail logs (all or one service) |
 | `make tunnel` | Start HTTPS tunnel + write URL to both env files and `shopify.app.toml` |
+| `make extensions` | Install admin extension deps, copy the forecast translations into them, type-check |
+| `make e2e` | Playwright end-to-end tests (every plan + admin extensions) |
 | `make restart` | Restart Horizon + scheduler (they keep code in memory) |
 | `make artisan c="route:list"` | Run an artisan command |
 | `make prod-build` / `prod-up` / `prod-migrate` | Production image build / start / migrate |
@@ -196,6 +199,20 @@ The app is translated into English and Vietnamese (react-i18next). It follows th
 - **Add a language:** copy `en.json` to e.g. `fr.json`, translate, add `'fr'` to `supported_locales` in `backend/config/app.php`. `npm run i18n:check` (also part of `npm run build`) fails on missing keys or plural forms.
 - Alert emails are English only.
 
+## Admin extensions (Shopify product pages)
+
+Two [admin UI extensions](https://shopify.dev/docs/api/admin-extensions) in `extensions/` (Preact, API 2026-07), deployed with `app deploy`:
+
+| Extension | Where | What |
+|---|---|---|
+| `product-forecast-block` | Product page (`admin.product-details.block.render`) | Each variant's status, stock, sales/day, stock-out date, order-by date and suggested order; the plain-language "why" of the most urgent variant; link into the app (`app:products/{id}`). |
+| `product-settings-action` | Product list → select → **More actions** (`admin.product-index.selection-action.render`) | Set supplier, lead time and safety days on every variant of the selected products. |
+
+- **Backend:** `GET /api/extension/products/{shopifyProductId}` and `POST /api/extension/product-settings` (`ProductExtensionController` → `ProductExtensionService`). Extensions call relative `api/...` URLs; Shopify resolves them against `application_url` and adds the ID token, verified by the same middleware as the app. They run on Shopify's extension domain, so `config/cors.php` allows cross-origin calls to `api/*` (bearer tokens only, no cookies).
+- **Translations:** extension locale files hold their own strings; the `status`, `confidence` and `explanation` sections are copied from `frontend/src/i18n/locales` by `npm run extensions:locales` (i18next plurals → Shopify plural objects). `make e2e` fails if they are out of date.
+- **Layout:** the repo-root `package.json` is only the Shopify CLI workspace for the extensions (the CLI installs dependencies from the app root); backend and frontend keep their own.
+- **Tests:** `frontend/e2e/extensions.spec.ts` runs the real bundles against the API with Shopify's extension host stubbed. To see them in the admin, run `npx @shopify/cli@latest app dev` (or deploy) and open a product.
+
 ## Importing from Stocky (purchase order CSVs)
 
 Stocky can't export suppliers, only purchase orders. **Suppliers → Import from Stocky** (`/suppliers/import`) rebuilds them from one or more purchase order CSVs (Stocky, other apps, spreadsheets):
@@ -231,6 +248,7 @@ Backend and frontend are separate projects; the repo root only holds infra.
 ```
 /                         docker-compose.yml, docker-compose.prod.yml, Dockerfile, Makefile,
 │                         shopify.app.toml, docker/ (nginx, php, scripts)
+├── extensions/           Shopify admin UI extensions (product page block, product list action) + shared/ helpers
 ├── backend/              Laravel 13 — API, webhooks, embedded page shell (composer.json, artisan, tests/, .env)
 │   ├── app/
 │   │   ├── Http/Controllers/Api, Http/Middleware, Http/Resources

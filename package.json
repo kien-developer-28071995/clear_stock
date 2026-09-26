@@ -1,0 +1,20 @@
+{
+    "name": "clear-stock",
+    "private": true,
+    "license": "UNLICENSED",
+    "description": "Shopify CLI workspace: admin extensions only (backend/ and frontend/ manage their own dependencies).",
+    "workspaces": [
+        "extensions/product-forecast-block",
+        "extensions/product-settings-action"
+    ],
+    "scripts": {
+        "extensions:locales": "node extensions/scripts/sync-locales.mjs",
+        "extensions:locales:check": "node extensions/scripts/sync-locales.mjs --check",
+        "extensions:typecheck": "tsc -p extensions/product-forecast-block && tsc -p extensions/product-settings-action",
+        "extensions:bundle": "esbuild extensions/product-forecast-block/src/ProductForecastBlock.tsx extensions/product-settings-action/src/ProductSettingsAction.tsx --bundle --minify --format=esm --jsx=automatic --jsx-import-source=preact --outdir=extensions/dist"
+    },
+    "devDependencies": {
+        "esbuild": "^0.25.12",
+        "typescript": "^7.0.2"
+    }
+}

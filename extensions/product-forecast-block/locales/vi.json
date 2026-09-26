@@ -1,0 +1,118 @@
+{
+    "name": "Dự báo tồn kho",
+    "locale": "vi",
+    "variant": "Biến thể",
+    "state": "Trạng thái",
+    "inStock": "Tồn kho",
+    "perDay": "Bán / ngày",
+    "runsOut": "Hết hàng",
+    "orderBy": "Đặt trước",
+    "suggested": "Nên đặt",
+    "incoming": "+{{qty}} đang về",
+    "never": "—",
+    "why": "Vì sao có những con số này",
+    "whyFor": "Vì sao có những con số này ({{name}})",
+    "open": "Mở trong Clear Stock",
+    "seePlans": "Xem các gói",
+    "summary": "{{status}} · đặt {{qty}} trước {{date}}",
+    "summaryNoOrder": "{{status}}",
+    "notSynced": "Sản phẩm này chưa có trong Clear Stock. Nó sẽ xuất hiện sau lần đồng bộ tới (mỗi đêm, hoặc Cài đặt › Đồng bộ ngay trong app).",
+    "reasons": {
+        "not_tracked": "Shopify không theo dõi tồn kho sản phẩm này",
+        "plan_limit": "Gói Miễn phí chỉ dự báo các sản phẩm bán chạy nhất",
+        "no_forecast": "Chưa có dự báo"
+    },
+    "errors": {
+        "generic": "Không tải được dự báo. Hãy thử lại sau giây lát.",
+        "network": "Không kết nối được tới Clear Stock. Kiểm tra kết nối rồi thử lại."
+    },
+    "status": {
+        "out_of_stock": "Hết hàng",
+        "reorder_now": "Cần đặt ngay",
+        "slow": "Bán chậm",
+        "healthy": "Ổn",
+        "overstock": "Tồn thừa"
+    },
+    "confidence": {
+        "low": "Độ tin cậy thấp",
+        "medium": "Độ tin cậy trung bình",
+        "high": "Độ tin cậy cao"
+    },
+    "explanation": {
+        "unknown": "—",
+        "avg_override": "Bạn đặt tốc độ bán {{avg}}/ngày; ước tính của chúng tôi là {{computed}}/ngày.",
+        "avg_override_note": "Bạn đặt tốc độ bán {{avg}}/ngày ({{note}}); ước tính của chúng tôi là {{computed}}/ngày.",
+        "no_rate_yet": "Chưa đủ ngày còn hàng để đo tốc độ bán.",
+        "no_sales_while_in_stock": {
+            "other": "Không bán được trong {{count}} ngày gần nhất dù còn hàng."
+        },
+        "sells_over_window": {
+            "other": "Bán {{avg}}/ngày trong {{count}} ngày gần nhất."
+        },
+        "sells_over_window_excluded": {
+            "other": "Bán {{avg}}/ngày trong {{days}} ngày gần nhất (đã bỏ {{count}} ngày hết hàng)."
+        },
+        "blended_rate": "Tốc độ tổng hợp {{avg}}/ngày ({{parts}}).",
+        "window_part": {
+            "other": "{{count}} ngày {{avg}}/ngày × {{weight}}%"
+        },
+        "seasonality_rose": {
+            "other": "Cùng kỳ năm trước, doanh số tăng ×{{factor}} trong {{count}} ngày tiếp theo, nên chúng tôi điều chỉnh thành {{avg}}/ngày."
+        },
+        "seasonality_fell": {
+            "other": "Cùng kỳ năm trước, doanh số giảm ×{{factor}} trong {{count}} ngày tiếp theo, nên chúng tôi điều chỉnh thành {{avg}}/ngày."
+        },
+        "bundle_contribution": {
+            "other": "Gồm {{avg}}/ngày bán trong combo \"{{bundle}}\" ({{count}} cái mỗi combo)."
+        },
+        "reorder_point": {
+            "other": "Lead time {{lead_days}} ngày ({{lead_source}}) + {{safety_days}} ngày dự phòng → điểm đặt hàng lại {{count}} cái."
+        },
+        "lead_source_override": "bạn đặt cho dự báo này",
+        "lead_source_variant": "đặt riêng cho SKU này",
+        "lead_source_supplier": "nhà cung cấp {{supplier}}",
+        "lead_source_shop_default": "mặc định cửa hàng",
+        "order_today_out_of_stock": {
+            "other": "Đang hết hàng → nhập {{count}} cái ngay hôm nay."
+        },
+        "runs_out": {
+            "other": "Còn {{stock}} cái, sẽ hết khoảng {{stockout_date}} → nhập {{count}} cái trước {{reorder_date}}."
+        },
+        "confidence": "Độ tin cậy: {{level}}.",
+        "confidence_with_reasons": "Độ tin cậy: {{level}} ({{reasons}}).",
+        "confidence_high": "cao",
+        "confidence_medium": "trung bình",
+        "confidence_low": "thấp",
+        "reason_little_history": {
+            "other": "chỉ có {{count}} ngày lịch sử còn hàng"
+        },
+        "reason_few_sales": {
+            "other": "bán ít ({{count}} cái trong 90 ngày)"
+        },
+        "reason_no_sales": "không bán được trong 90 ngày",
+        "reason_volatile": "doanh số dao động mạnh giữa các tuần",
+        "reason_average_overridden": "tốc độ bán do bạn đặt",
+        "incoming_stock": {
+            "other": "Đã có {{count}} cái đang về (đơn nhập hàng hoặc chuyển kho trong Shopify), đã được trừ vào số cần nhập."
+        },
+        "out_of_stock_incoming_covers": "Đang hết hàng; số hàng đang về đủ cho lần nhập tới nên chưa cần đặt thêm.",
+        "runs_out_incoming_covers": "Còn {{stock}} cái, sẽ hết khoảng {{stockout_date}}; số hàng đang về đủ cho lần nhập tới nên chưa cần đặt thêm.",
+        "rounded_min": "Cần {{needed}} cái; nhà cung cấp nhận tối thiểu {{min}} nên nhập {{count}}.",
+        "rounded_pack": "Cần {{needed}} cái; làm tròn lên thùng {{pack}} cái → {{count}}.",
+        "rounded_min_and_pack": "Cần {{needed}} cái; tối thiểu {{min}}, theo thùng {{pack}} cái → {{count}}.",
+        "reorder_point_manual": {
+            "other": "Điểm đặt hàng lại do bạn đặt: {{count}} cái."
+        },
+        "order_up_to_max": {
+            "other": "Mỗi lần nhập bù tồn kho lên mức tối đa {{count}} cái bạn đặt."
+        },
+        "below_min_order": {
+            "other": "Tồn {{stock}} cái (tính cả hàng đang về) đã chạm mức tối thiểu → nhập {{count}} cái ngay hôm nay."
+        },
+        "above_min": "Tồn {{stock}} cái (tính cả hàng đang về) vẫn trên mức tối thiểu; chưa có doanh số nên chưa cần nhập.",
+        "no_order_needed": "Hiện chưa cần nhập thêm.",
+        "overstock": {
+            "other": "Thừa {{count}} cái so với mức cần giữ {{target}} (lead time, dự phòng và chu kỳ nhập tới): tạm dừng nhập thêm, hoặc chạy khuyến mãi."
+        }
+    }
+}

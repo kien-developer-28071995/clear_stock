@@ -69,6 +69,12 @@ class CachedVariantRepository implements VariantRepositoryInterface
         return $this->inner->findByShopifyIds($shop, $shopifyVariantIds);
     }
 
+    public function findByShopifyProductIds(Shop $shop, array $shopifyProductIds): Collection
+    {
+        // Forecasts change nightly and after every edit: always read fresh.
+        return $this->inner->findByShopifyProductIds($shop, $shopifyProductIds);
+    }
+
     public function forImport(Shop $shop): Collection
     {
         return $this->inner->forImport($shop);

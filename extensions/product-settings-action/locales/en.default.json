@@ -1,0 +1,29 @@
+{
+    "name": "Set supplier & lead time",
+    "intro": {
+        "one": "Applies to every variant of the selected product in Clear Stock. Empty fields are left as they are.",
+        "other": "Applies to every variant of the {{count}} selected products in Clear Stock. Empty fields are left as they are."
+    },
+    "supplier": "Supplier",
+    "keep": "Keep current",
+    "noSupplier": "No supplier",
+    "noSuppliers": "No suppliers yet: add them in Clear Stock › Suppliers.",
+    "leadTime": "Lead time (days)",
+    "leadTimeHelp": "Days from ordering to receiving. Overrides the supplier's lead time.",
+    "safety": "Safety stock (days)",
+    "safetyHelp": "Extra days of stock kept in case sales pick up or a delivery is late.",
+    "apply": "Apply",
+    "cancel": "Cancel",
+    "close": "Close",
+    "nothing": "Choose a supplier or enter a number first.",
+    "done": {
+        "one": "Updated {{count}} variant. Forecasts are being recalculated.",
+        "other": "Updated {{count}} variants. Forecasts are being recalculated."
+    },
+    "noneKnown": "None of these products are in Clear Stock yet. They appear after the next sync.",
+    "errors": {
+        "generic": "Couldn't save. Try again in a moment.",
+        "network": "Couldn't reach Clear Stock. Check your connection and try again.",
+        "invalid": "Check the values: lead time and safety stock must be whole numbers from 0 to 365."
+    }
+}

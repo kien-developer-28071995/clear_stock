@@ -21,3 +21,7 @@ docker-compose*.yml
 Makefile
 README.md
 CLAUDE.md
+node_modules
+extensions
+package.json
+package-lock.json

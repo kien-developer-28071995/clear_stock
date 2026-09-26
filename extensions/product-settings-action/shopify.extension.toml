@@ -1,0 +1,13 @@
+api_version = "2026-07"
+
+# "More actions" on the Shopify product list: set supplier, lead time and safety days for
+# every variant of the selected products at once. POST /api/extension/product-settings.
+[[extensions]]
+type = "ui_extension"
+name = "t:name"
+handle = "product-settings-action"
+uid = "15e4bae7-69c2-4981-874e-0df929f1e2f5"
+
+  [[extensions.targeting]]
+  target = "admin.product-index.selection-action.render"
+  module = "./src/ProductSettingsAction.tsx"

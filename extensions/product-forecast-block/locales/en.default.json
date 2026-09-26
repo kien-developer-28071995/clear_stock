@@ -1,0 +1,135 @@
+{
+    "name": "Stock forecast",
+    "locale": "en",
+    "variant": "Variant",
+    "state": "Status",
+    "inStock": "In stock",
+    "perDay": "Sells / day",
+    "runsOut": "Runs out",
+    "orderBy": "Order by",
+    "suggested": "Suggested order",
+    "incoming": "+{{qty}} on the way",
+    "never": "—",
+    "why": "Why these numbers",
+    "whyFor": "Why these numbers ({{name}})",
+    "open": "Open in Clear Stock",
+    "seePlans": "See plans",
+    "summary": "{{status}} · order {{qty}} by {{date}}",
+    "summaryNoOrder": "{{status}}",
+    "notSynced": "This product isn't in Clear Stock yet. It appears after the next sync (every night, or Settings › Sync now in the app).",
+    "reasons": {
+        "not_tracked": "Inventory isn't tracked in Shopify",
+        "plan_limit": "Not forecast on the Free plan (best sellers only)",
+        "no_forecast": "No forecast yet"
+    },
+    "errors": {
+        "generic": "Couldn't load the forecast. Try again in a moment.",
+        "network": "Couldn't reach Clear Stock. Check your connection and try again."
+    },
+    "status": {
+        "out_of_stock": "Out of stock",
+        "reorder_now": "Reorder now",
+        "slow": "Slow-moving",
+        "healthy": "OK",
+        "overstock": "Overstock"
+    },
+    "confidence": {
+        "low": "Low confidence",
+        "medium": "Medium confidence",
+        "high": "High confidence"
+    },
+    "explanation": {
+        "unknown": "—",
+        "avg_override": "You set sales to {{avg}}/day; our estimate was {{computed}}/day.",
+        "avg_override_note": "You set sales to {{avg}}/day ({{note}}); our estimate was {{computed}}/day.",
+        "no_rate_yet": "Not enough in-stock days yet to measure a sales rate.",
+        "no_sales_while_in_stock": {
+            "one": "No sales in the last {{count}} day while in stock.",
+            "other": "No sales in the last {{count}} days while in stock."
+        },
+        "sells_over_window": {
+            "one": "Sells {{avg}}/day over the last {{count}} day.",
+            "other": "Sells {{avg}}/day over the last {{count}} days."
+        },
+        "sells_over_window_excluded": {
+            "one": "Sells {{avg}}/day over the last {{days}} days ({{count}} out-of-stock day left out).",
+            "other": "Sells {{avg}}/day over the last {{days}} days ({{count}} out-of-stock days left out)."
+        },
+        "blended_rate": "Blended rate {{avg}}/day ({{parts}}).",
+        "window_part": {
+            "one": "{{count}} day {{avg}}/day × {{weight}}%",
+            "other": "{{count}} days {{avg}}/day × {{weight}}%"
+        },
+        "seasonality_rose": {
+            "one": "Last year, sales rose ×{{factor}} over the next {{count}} day, so we adjusted to {{avg}}/day.",
+            "other": "Last year, sales rose ×{{factor}} over the next {{count}} days, so we adjusted to {{avg}}/day."
+        },
+        "seasonality_fell": {
+            "one": "Last year, sales fell ×{{factor}} over the next {{count}} day, so we adjusted to {{avg}}/day.",
+            "other": "Last year, sales fell ×{{factor}} over the next {{count}} days, so we adjusted to {{avg}}/day."
+        },
+        "bundle_contribution": {
+            "one": "Includes {{avg}}/day sold inside \"{{bundle}}\" ({{count}} per bundle).",
+            "other": "Includes {{avg}}/day sold inside \"{{bundle}}\" ({{count}} per bundle)."
+        },
+        "reorder_point": {
+            "one": "Lead time {{lead_days}} days ({{lead_source}}) + {{safety_days}} safety days → reorder point {{count}} unit.",
+            "other": "Lead time {{lead_days}} days ({{lead_source}}) + {{safety_days}} safety days → reorder point {{count}} units."
+        },
+        "lead_source_override": "set by you for this forecast",
+        "lead_source_variant": "set for this SKU",
+        "lead_source_supplier": "supplier {{supplier}}",
+        "lead_source_shop_default": "store default",
+        "order_today_out_of_stock": {
+            "one": "Out of stock now → order {{count}} unit today.",
+            "other": "Out of stock now → order {{count}} units today."
+        },
+        "runs_out": {
+            "one": "{{stock}} in stock runs out around {{stockout_date}} → order {{count}} unit by {{reorder_date}}.",
+            "other": "{{stock}} in stock runs out around {{stockout_date}} → order {{count}} units by {{reorder_date}}."
+        },
+        "confidence": "Confidence: {{level}}.",
+        "confidence_with_reasons": "Confidence: {{level}} ({{reasons}}).",
+        "confidence_high": "high",
+        "confidence_medium": "medium",
+        "confidence_low": "low",
+        "reason_little_history": {
+            "one": "only {{count}} day of in-stock history",
+            "other": "only {{count}} days of in-stock history"
+        },
+        "reason_few_sales": {
+            "one": "few sales ({{count}} in 90 days)",
+            "other": "few sales ({{count}} in 90 days)"
+        },
+        "reason_no_sales": "no sales in 90 days",
+        "reason_volatile": "sales vary a lot week to week",
+        "reason_average_overridden": "rate set manually",
+        "incoming_stock": {
+            "one": "{{count}} unit is already on the way (purchase orders or transfers in Shopify) and counts toward this order.",
+            "other": "{{count}} units are already on the way (purchase orders or transfers in Shopify) and count toward this order."
+        },
+        "out_of_stock_incoming_covers": "Out of stock now; the stock on the way covers the next reorder, so no new order is needed.",
+        "runs_out_incoming_covers": "{{stock}} in stock runs out around {{stockout_date}}; the stock on the way covers the next reorder, so no new order is needed.",
+        "rounded_min": "You need {{needed}}; the supplier minimum is {{min}}, so order {{count}}.",
+        "rounded_pack": "You need {{needed}}; rounded up to whole packs of {{pack}} → {{count}}.",
+        "rounded_min_and_pack": "You need {{needed}}; the supplier minimum is {{min}}, in packs of {{pack}} → {{count}}.",
+        "reorder_point_manual": {
+            "one": "Reorder point set by you: {{count}} unit.",
+            "other": "Reorder point set by you: {{count}} units."
+        },
+        "order_up_to_max": {
+            "one": "Orders fill up to your maximum of {{count}} unit.",
+            "other": "Orders fill up to your maximum of {{count}} units."
+        },
+        "below_min_order": {
+            "one": "{{stock}} in stock (with stock on the way) is at or below your minimum → order {{count}} unit today.",
+            "other": "{{stock}} in stock (with stock on the way) is at or below your minimum → order {{count}} units today."
+        },
+        "above_min": "{{stock}} in stock (with stock on the way) is above your minimum; no sales yet, so nothing to order.",
+        "no_order_needed": "Nothing to order right now.",
+        "overstock": {
+            "one": "{{count}} unit more than the {{target}} to hold (lead time, safety and the next order cycle): hold off reordering, or run a promotion.",
+            "other": "{{count}} units more than the {{target}} to hold (lead time, safety and the next order cycle): hold off reordering, or run a promotion."
+        }
+    }
+}

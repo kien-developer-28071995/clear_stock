@@ -6,3 +6,9 @@ Thumbs.db
 /.zed
 /.cursor/
 *.log
+
+# Shopify CLI workspace (extensions)
+/node_modules/
+/extensions/dist/
+/extensions/*/dist/
+/extensions/*/manifest.json

@@ -35,6 +35,12 @@ class EloquentVariantRepository implements VariantRepositoryInterface
         return Variant::query()->forShop($shop)->whereIn('shopify_variant_id', $shopifyVariantIds)->get()->keyBy('shopify_variant_id');
     }
 
+    public function findByShopifyProductIds(Shop $shop, array $shopifyProductIds): Collection
+    {
+        return Variant::query()->forShop($shop)->whereIn('shopify_product_id', $shopifyProductIds)
+            ->with(['forecast', 'supplier'])->orderBy('id')->get();
+    }
+
     public function updateSettings(Variant $variant, array $settings): Variant
     {
         $variant->fill($settings)->save();
