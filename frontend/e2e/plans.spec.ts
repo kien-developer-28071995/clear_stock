@@ -22,6 +22,7 @@ type Entitlements = {
     reference_products: boolean;
     transfers: boolean;
     supplier_emails: boolean;
+    purchase_plan: boolean;
 };
 
 const PAGES: [string, string][] = [
@@ -30,6 +31,7 @@ const PAGES: [string, string][] = [
     ['/transfers', 'Transfers'],
     ['/insights', 'Insights'],
     ['/what-if', 'What-if'],
+    ['/purchase-plan', 'Purchase plan'],
     ['/products', 'Products'],
     ['/suppliers', 'Suppliers'],
     ['/suppliers/import', 'Import'],
@@ -40,9 +42,9 @@ const PAGES: [string, string][] = [
 ];
 
 const EXPECTED: Record<PlanKey, Omit<Entitlements, 'plan'>> = {
-    free: { max_skus: 50, bundles: false, alerts: false, locations: false, purchase_orders: false, realtime_alerts: false, what_if: false, supplier_auto_email: false, flow_triggers: false, reference_products: false, transfers: false, supplier_emails: false },
-    starter: { max_skus: null, bundles: true, alerts: true, locations: false, purchase_orders: true, realtime_alerts: false, what_if: true, supplier_auto_email: false, flow_triggers: false, reference_products: true, transfers: false, supplier_emails: true },
-    growth: { max_skus: null, bundles: true, alerts: true, locations: true, purchase_orders: true, realtime_alerts: true, what_if: true, supplier_auto_email: true, flow_triggers: true, reference_products: true, transfers: true, supplier_emails: true },
+    free: { max_skus: 50, bundles: false, alerts: false, locations: false, purchase_orders: false, realtime_alerts: false, what_if: false, supplier_auto_email: false, flow_triggers: false, reference_products: false, transfers: false, supplier_emails: false, purchase_plan: false },
+    starter: { max_skus: null, bundles: true, alerts: true, locations: false, purchase_orders: true, realtime_alerts: false, what_if: true, supplier_auto_email: false, flow_triggers: false, reference_products: true, transfers: false, supplier_emails: true, purchase_plan: true },
+    growth: { max_skus: null, bundles: true, alerts: true, locations: true, purchase_orders: true, realtime_alerts: true, what_if: true, supplier_auto_email: true, flow_triggers: true, reference_products: true, transfers: true, supplier_emails: true, purchase_plan: true },
 };
 
 for (const plan of ['free', 'starter', 'growth'] as PlanKey[]) {
@@ -155,6 +157,39 @@ for (const plan of ['free', 'starter', 'growth'] as PlanKey[]) {
             await app.screenshot({ path: 'e2e-results/what-if.png', fullPage: true });
         });
 
+        test('purchase plan: weekly orders and spend follow the forecast', async ({ app }) => {
+            type Plan = { data: { totals: { orders: number; units: number }; by_week: { units: number }[]; items: unknown[] } };
+
+            await open(app, '/purchase-plan');
+            if (!has.purchase_plan) {
+                await expect(app.locator('s-banner[heading="Included in Starter"]')).toBeVisible();
+                expect(await app.evaluate(async () => (await fetch('/api/purchase-plan', { headers: { Authorization: `Bearer ${await window.shopify.idToken()}` } })).status)).toBe(402);
+                return;
+            }
+            const plan12 = await api<Plan>(app, '/purchase-plan');
+            expect(plan12.data.by_week).toHaveLength(12);
+            expect(plan12.data.by_week.reduce((sum, w) => sum + w.units, 0)).toBe(plan12.data.totals.units);
+            if (plan12.data.totals.orders > 0) {
+                await expect(app.locator('[aria-label="Spend per week"] [role="listitem"]')).toHaveCount(12);
+                await expect(app.locator('s-section[heading="By product"] s-table-body s-table-row')).toHaveCount(plan12.data.items.length);
+            }
+            const plan4 = await api<Plan>(app, '/purchase-plan?weeks=4');
+            expect(plan4.data.totals.units).toBeLessThanOrEqual(plan12.data.totals.units);
+            await app.screenshot({ path: `e2e-results/purchase-plan-${plan}.png`, fullPage: true });
+        });
+
+        test('insights show sales lost to stock-outs', async ({ app }) => {
+            type Lost = { data: { lost_sales: { count: number; top: { name: string }[] } | null } };
+            await open(app, '/insights');
+            const lost = (await api<Lost>(app, '/dashboard')).data.lost_sales;
+            expect(lost).not.toBeNull();
+            if (lost && lost.count > 0) {
+                const section = app.locator('s-section[heading="Sales lost to stock-outs"]');
+                await expect(section).toBeVisible();
+                await expect(section.getByText(lost.top[0].name).first()).toBeVisible();
+            }
+        });
+
         test('Shopify Flow section follows the plan', async ({ app }) => {
             await open(app, '/settings');
             const section = app.locator('s-section[heading="Shopify Flow"]');
@@ -240,7 +275,9 @@ for (const plan of ['free', 'starter', 'growth'] as PlanKey[]) {
         test('suppliers can be added, edited and deleted', async ({ app }) => {
             const name = `E2E Supplier ${plan}`;
             await open(app, '/suppliers');
-            await app.locator('s-button', { hasText: 'Add supplier' }).locator('visible=true').first().click();
+            // The empty state shows the button; with suppliers it is the page's primary action,
+            // which the admin renders in its title bar (not drawn outside the admin): click it directly.
+            await app.locator('s-button', { hasText: 'Add supplier' }).first().evaluate((el: HTMLElement) => el.click());
             const modal = app.locator('s-modal#supplier-modal');
             await modal.getByRole('textbox', { name: 'Name' }).fill(name);
             await modal.getByRole('spinbutton', { name: /lead time/i }).fill('9');

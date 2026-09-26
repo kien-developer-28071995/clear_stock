@@ -83,7 +83,7 @@ class GrowthScenarioService
     private function side(array $row, float $avg, string $today, string $until): array
     {
         $asOf = CarbonImmutable::parse($row['as_of']);
-        $args = [$row['lead_time_days'], $row['safety_days'], $row['min_stock'], $row['max_stock'], $row['min_order_qty'], $row['pack_size']];
+        $args = [$row['lead_time_days'], $row['safety_days'], $row['min_stock'], $row['max_stock'], $row['min_order_qty'], $row['pack_size'], $row['order_cycle_days'] ?? null];
         $plan = $this->calculator->reorderPlan($asOf, $avg, $row['stock'], $row['incoming'], ...$args);
 
         $date = $plan['reorder_date'];

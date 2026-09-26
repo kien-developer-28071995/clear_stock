@@ -28,7 +28,8 @@
     "plans": "Gói dịch vụ",
     "reorder": "Cần nhập hàng",
     "insights": "Phân tích",
-    "whatIf": "Mô phỏng"
+    "whatIf": "Mô phỏng",
+    "purchasePlan": "Kế hoạch nhập"
   },
   "notFound": {
     "heading": "Không tìm thấy trang",
@@ -365,6 +366,8 @@
   "settings": {
     "defaultsHeading": "Mặc định cho dự báo",
     "defaultsIntro": "Dùng cho các sản phẩm chưa có lead time hoặc nhà cung cấp riêng.",
+    "filterSpikes": "Bỏ qua ngày bán đột biến",
+    "filterSpikesHelp": "Ngày bán hơn 5 lần bình thường (đơn sỉ, bài viết lan truyền) được tính theo mức thường ngày, để một đơn lớn không đẩy gợi ý nhập lên cao. Dự báo ghi rõ ngày nào bị điều chỉnh.",
     "leadTime": "Lead time mặc định",
     "leadTimeHelp": "Thời gian thường cần để một đơn nhập hàng về tới kho.",
     "safety": "Tồn kho dự phòng mặc định",
@@ -408,7 +411,10 @@
     "leadTimeHelp": "Áp dụng cho mọi sản phẩm của nhà cung cấp này, trừ sản phẩm có lead time riêng.",
     "email": "Email (không bắt buộc)",
     "emailHelp": "Dùng cho đơn đặt hàng.",
-    "orderRulesHelp": "Đơn tối thiểu và quy cách thùng áp dụng cho mọi sản phẩm của nhà cung cấp này, trừ khi sản phẩm có cài đặt riêng."
+    "orderRulesHelp": "Đơn tối thiểu và quy cách thùng áp dụng cho mọi sản phẩm của nhà cung cấp này, trừ khi sản phẩm có cài đặt riêng.",
+    "orderCycle": "Đặt hàng mỗi",
+    "orderCycleDefault_other": "Mặc định: {{count}} ngày",
+    "orderCycleHelp": "Bao lâu bạn đặt hàng NCC này một lần. Mỗi đơn gợi ý đủ bán ngần ấy ngày, cộng thêm lead time và tồn an toàn."
   },
   "bundles": {
     "add": "Thêm combo",
@@ -450,12 +456,15 @@
       "purchaseOrders": "Xuất đơn đặt hàng (CSV)",
       "realtimeAlerts": "Cảnh báo tồn kho tức thời",
       "whatIf": "Mô phỏng tăng trưởng (\"doanh số +20%?\")",
+      "purchasePlan": "Kế hoạch nhập hàng và chi tiền 12 tuần",
       "supplierAutoEmail": "Tự động gửi đơn hằng tuần cho nhà cung cấp",
       "flowTriggers": "Trigger cho Shopify Flow",
       "referenceProducts": "Dự báo sản phẩm mới theo sản phẩm tương tự",
       "supplierEmails": "Gửi đơn đặt hàng qua email cho nhà cung cấp",
       "transfers": "Chuyển kho giữa các chi nhánh",
-      "abc": "Phân loại ABC theo doanh thu"
+      "abc": "Phân loại ABC theo doanh thu",
+      "spikeFilter": "Bỏ qua ngày bán đột biến",
+      "lostSales": "Doanh thu mất do hết hàng"
     },
     "notApproved": "Chưa có thay đổi gói nào được chấp thuận",
     "nowOn": "Bạn đang dùng gói {{plan}}",
@@ -550,6 +559,9 @@
     "window_part_other": "{{count}} ngày {{avg}}/ngày × {{weight}}%",
     "seasonality_rose_other": "Cùng kỳ năm trước, doanh số tăng ×{{factor}} trong {{count}} ngày tiếp theo, nên chúng tôi điều chỉnh thành {{avg}}/ngày.",
     "seasonality_fell_other": "Cùng kỳ năm trước, doanh số giảm ×{{factor}} trong {{count}} ngày tiếp theo, nên chúng tôi điều chỉnh thành {{avg}}/ngày.",
+    "spikes_capped_other": "Đã tính {{count}} ngày bán đột biến theo mức thường ngày (lớn nhất: {{top}} cái ngày {{top_date}}, thường {{usual}}/ngày).",
+    "order_cycle_supplier_other": "Mỗi đơn đủ bán {{count}} ngày: chu kỳ đặt hàng của {{supplier}}.",
+    "lost_sales_other": "Hết hàng {{count}} ngày trong {{days}} ngày qua: mất khoảng {{units}} lượt bán.",
     "bundle_contribution_other": "Gồm {{avg}}/ngày bán trong combo \"{{bundle}}\" ({{count}} cái mỗi combo).",
     "reorder_point_other": "Lead time {{lead_days}} ngày ({{lead_source}}) + {{safety_days}} ngày dự phòng → điểm đặt hàng lại {{count}} cái.",
     "lead_source_override": "bạn đặt cho dự báo này",
@@ -671,6 +683,7 @@
       "realtime_alerts": "Không dùng được cảnh báo tồn kho tức thì.",
       "realtime_alerts_active": "Cảnh báo tồn kho tức thì gửi tới {{email}} sẽ dừng.",
       "what_if": "Không dùng được mô phỏng tăng trưởng.",
+      "purchase_plan": "Kế hoạch nhập hàng không còn dùng được.",
       "flow_triggers": "Trigger cho Shopify Flow sẽ dừng.",
       "flow_triggers_active": "Các quy trình Shopify Flow dùng trigger của Clear Stock sẽ ngừng chạy.",
       "reference_products_other": "{{count}} sản phẩm mới sẽ không còn mượn tốc độ bán của sản phẩm tương tự.",
@@ -885,5 +898,40 @@
         }
       }
     }
+  },
+  "lostSales": {
+    "heading": "Doanh thu mất do hết hàng",
+    "summaryWithRevenue_other": "Mất khoảng {{revenue}} ({{units}} cái) trong {{days}} ngày qua vì {{count}} sản phẩm hết hàng.",
+    "summary_other": "Mất khoảng {{units}} cái trong {{days}} ngày qua vì {{count}} sản phẩm hết hàng.",
+    "how": "Ước tính: tốc độ bán của từng sản phẩm × số ngày hết hàng, theo giá bán hiện tại.",
+    "missingPrice_other": "{{count}} sản phẩm chưa có giá bán nên không được tính vào tổng.",
+    "daysOut": "Ngày hết hàng",
+    "units": "Số cái mất",
+    "revenue": "Doanh thu mất"
+  },
+  "purchasePlan": {
+    "intro": "Mọi đơn bạn cần đặt trong các tuần tới nếu doanh số giữ tốc độ hiện tại, và số tiền tương ứng, để chủ động dòng tiền nhập hàng. Cùng cách tính với gợi ý nhập hàng: lead time, tồn an toàn, min/max, đơn tối thiểu, quy cách thùng và chu kỳ đặt hàng của từng NCC. Không lưu gì.",
+    "locked": "Lên kế hoạch đặt hàng và chi tiền nhập hàng theo từng tuần.",
+    "period": "Khoảng thời gian",
+    "weeks_other": "{{count}} tuần tới",
+    "nothing_other": "Không cần đặt hàng trong {{count}} tuần tới với tốc độ bán hiện tại.",
+    "summaryHeading": "{{from}} – {{to}}",
+    "totalCost": "Chi phí theo giá vốn",
+    "orders": "Số đơn",
+    "units": "Số lượng",
+    "products": "Sản phẩm",
+    "cost": "Chi phí",
+    "chartCost": "Chi phí mỗi tuần",
+    "chartUnits": "Số lượng mỗi tuần (nhập giá vốn để xem chi phí)",
+    "chartLabel": "Chi phí mỗi tuần",
+    "barTitle_other": "Tuần từ {{week}}: {{value}}, {{count}} đơn",
+    "unitsValue_other": "{{units}} cái",
+    "how": "Mỗi sản phẩm bán theo tốc độ dự báo; khi tồn (kể cả hàng đang về) chạm điểm đặt hàng lại thì đặt đúng số lượng gợi ý, và đơn đó được tính là hàng đang về.",
+    "bySupplier": "Theo nhà cung cấp",
+    "byProduct": "Theo sản phẩm",
+    "firstOrder": "Đơn đầu tiên",
+    "noSupplier": "Chưa có NCC",
+    "orderDates": "Các đơn",
+    "orderOn": "{{date}}: {{qty}}"
   }
 }

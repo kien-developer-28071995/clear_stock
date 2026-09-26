@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\ImportController;
 use App\Http\Controllers\Api\OnboardingController;
 use App\Http\Controllers\Api\ProductExtensionController;
 use App\Http\Controllers\Api\PurchaseOrderController;
+use App\Http\Controllers\Api\PurchasePlanController;
 use App\Http\Controllers\Api\SettingsController;
 use App\Http\Controllers\Api\SetupGuideController;
 use App\Http\Controllers\Api\ShopController;
@@ -72,6 +73,9 @@ Route::middleware('shopify.session')->group(function () {
 
     // What-if: sales +/- X% -> what to order (nothing saved).
     Route::get('/what-if', GrowthScenarioController::class);
+
+    // Purchase plan: orders and spend week by week at the current sales rates (nothing saved).
+    Route::get('/purchase-plan', PurchasePlanController::class);
 
     Route::get('/purchase-orders/export', [PurchaseOrderController::class, 'export']);
 

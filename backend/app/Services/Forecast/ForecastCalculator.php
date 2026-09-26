@@ -11,12 +11,14 @@ use Carbon\CarbonImmutable;
  * produces is also written to the explanation, so the merchant can check it.
  *
  *  1. Daily demand = units sold - units returned (+ units sold through manual bundles).
+ *     One-off spikes in the last 90 days (a wholesale order, a viral day) are capped to the usual level.
  *  2. Average per window (7/30/90 days) over IN-STOCK days only; weighted mix.
  *  3. Seasonality: last year's "next 28 days vs previous 28 days" ratio, when there is enough history
  *     and the change is bigger than ±10%.
  *  4. Merchant overrides win over computed values (average, lead time, safety days).
  *  5. Reorder point = average x (lead time + safety days).
  *     Suggested qty = average x (lead time + safety days + order cycle) - stock.
+ *  6. Lost sales: the average x out-of-stock days of the last 30 days.
  */
 class ForecastCalculator
 {
@@ -31,6 +33,7 @@ class ForecastCalculator
     {
         $end = $in->asOf->subDay();                    // last complete day
         $series = $this->series($in, $end);
+        $spikes = $this->capSpikes($series, $end, $in->filterSpikes);
 
         // --- 2. Windowed averages -------------------------------------------------
         $windows = [];
@@ -63,7 +66,7 @@ class ForecastCalculator
 
         // --- 5. Reorder maths -----------------------------------------------------------
         $plan = $this->reorderPlan($in->asOf, $avg, $in->currentStock, $in->incomingStock, $leadTime['days'], $safety['days'],
-            $in->minStock, $in->maxStock, $in->minOrderQty, $in->packSize);
+            $in->minStock, $in->maxStock, $in->minOrderQty, $in->packSize, $in->orderCycleDays);
         ['stock' => $stock, 'incoming' => $incoming, 'position' => $position, 'cycle' => $cycle, 'computed_point' => $computedPoint,
             'point' => $reorderPoint, 'target' => $targetStock, 'excess' => $excess, 'overstock' => $overstock, 'min' => $min, 'max' => $max,
             'rounding' => $rounding, 'suggested' => $suggested, 'days_of_cover' => $daysOfCover, 'stockout_date' => $stockoutDate,
@@ -71,6 +74,10 @@ class ForecastCalculator
         if ($in->orderRulesSupplier !== null) {
             $rounding['supplier'] = $in->orderRulesSupplier; // explained as the supplier's defaults
         }
+
+        $window30 = collect($windows)->firstWhere('days', 30);
+        $lostDays = (int) ($window30['oos_days'] ?? 0);
+        $lostUnits = round($lostDays * $avg, 2);
 
         $confidence = $this->confidence($windows, $series, $end, $avgOverride !== null);
         if (($reference['applied'] ?? false) && $avgOverride === null) {
@@ -92,6 +99,7 @@ class ForecastCalculator
                 'avg' => $w['avg'] !== null ? round($w['avg'], 2) : null,
                 'weight' => $w['weight_applied'],
             ], $windows),
+            'spikes' => $spikes,
             'base_avg' => round($baseAvg, 2),
             'seasonality' => $seasonality,
             'bundles' => $this->bundleContributions($in, $series, $end),
@@ -108,6 +116,8 @@ class ForecastCalculator
                 'point' => $reorderPoint,
                 'date' => $reorderDate,
                 'order_cycle_days' => $cycle,
+                'order_cycle_source' => $in->orderCycleDays !== null ? 'supplier' : 'default',
+                'order_cycle_supplier' => $in->orderCycleDays !== null ? $in->supplierName : null,
                 'suggested_qty' => $suggested,
                 'computed_point' => $computedPoint,
                 'target' => $targetStock,
@@ -120,6 +130,8 @@ class ForecastCalculator
             ],
             'days_of_cover' => $daysOfCover,
             'stockout_date' => $stockoutDate,
+            // Sales missed while out of stock (estimate: current average x out-of-stock days).
+            'lost_sales' => ['days' => 30, 'out_of_stock_days' => $lostDays, 'units' => $lostUnits],
             'overrides' => array_map(
                 fn ($field, $o) => ['field' => $field, 'value' => (float) $o['value'], 'note' => $o['note'] ?? null, 'expires_at' => $o['expires_at'] ?? null],
                 array_keys($in->overrides),
@@ -140,6 +152,7 @@ class ForecastCalculator
             suggestedQty: $suggested,
             targetStock: $targetStock,
             excessUnits: $excess,
+            lostUnits30d: $lostUnits,
             confidence: Confidence::from($confidence['level']),
             explanation: $explanation,
         );
@@ -192,11 +205,11 @@ class ForecastCalculator
      */
     public function reorderPlan(
         CarbonImmutable $asOf, float $avg, int $stock, int $incoming, int $leadTimeDays, int $safetyDays,
-        ?int $minStock = null, ?int $maxStock = null, ?int $minOrderQty = null, ?int $packSize = null,
+        ?int $minStock = null, ?int $maxStock = null, ?int $minOrderQty = null, ?int $packSize = null, ?int $orderCycleDays = null,
     ): array {
         $incoming = max(0, $incoming);
         $position = $stock + $incoming;
-        $cycle = (int) $this->config['order_cycle_days'];
+        $cycle = $orderCycleDays ?? (int) $this->config['order_cycle_days'];
         $computedPoint = (int) ceil($avg * ($leadTimeDays + $safetyDays) - 1e-9);
         $computedTarget = $avg * ($leadTimeDays + $safetyDays + $cycle);
         // Manual min/max (Stocky style) replace the computed reorder point / order-up-to level.
@@ -253,6 +266,54 @@ class ForecastCalculator
         }
 
         return $series;
+    }
+
+    /**
+     * Caps one-off spikes in the last `spikes.days` days: an in-stock day selling at least `min_units`
+     * and more than `factor` x the average of the other in-stock days counts as that average instead.
+     * Needs enough in-stock days with sales, so a product that rarely sells is left alone. When big
+     * days come back often (a weekly wholesale customer) they are real demand: nothing is capped.
+     *
+     * @return ?array{applied: bool, factor: float, days: array<int, array{date: string, units: float, usual: float}>, units_removed: float}
+     */
+    private function capSpikes(array &$series, CarbonImmutable $end, bool $enabled): ?array
+    {
+        if (! $enabled) {
+            return null;
+        }
+        $cfg = $this->config['spikes'];
+        $from = $end->subDays((int) $cfg['days'] - 1)->toDateString();
+        $days = array_filter($series, fn ($d, $date) => $date >= $from && $d['in_stock'], ARRAY_FILTER_USE_BOTH);
+        $out = ['applied' => false, 'factor' => (float) $cfg['factor'], 'days' => [], 'units_removed' => 0.0];
+        $selling = count(array_filter($days, fn ($d) => $d['demand'] > 0));
+        if (count($days) < (int) $cfg['min_in_stock_days'] || $selling < (int) $cfg['min_selling_days']) {
+            return $out;
+        }
+
+        $total = array_sum(array_column($days, 'demand'));
+        $n = count($days);
+        $found = [];
+        foreach ($days as $date => $d) {
+            $usual = ($total - $d['demand']) / ($n - 1);
+            if ($d['demand'] >= $cfg['min_units'] && $usual > 0 && $d['demand'] > $cfg['factor'] * $usual) {
+                $found[$date] = ['date' => $date, 'units' => $d['demand'], 'usual' => round($usual, 2)];
+            }
+        }
+        if (count($found) > (int) $cfg['max_days']) {
+            return array_merge($out, ['reason' => 'recurring', 'big_days' => count($found)]);
+        }
+        foreach ($found as $date => $spike) {
+            $out['days'][] = $spike;
+            $out['units_removed'] += $spike['units'] - $spike['usual'];
+            $series[$date]['demand'] = $spike['usual'];
+        }
+        $out['applied'] = $out['days'] !== [];
+        $out['units_removed'] = round($out['units_removed'], 1);
+        // The biggest few are enough to explain it.
+        usort($out['days'], fn ($a, $b) => $b['units'] <=> $a['units']);
+        $out['days'] = array_slice($out['days'], 0, 5);
+
+        return $out;
     }
 
     private function window(array $series, CarbonImmutable $end, int $days, array $cfg): array

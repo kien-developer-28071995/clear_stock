@@ -240,6 +240,9 @@ Two [admin UI extensions](https://shopify.dev/docs/api/admin-extensions) in `ext
 | `FEATURE_WHAT_IF` | Sales what-if page | |
 | `FEATURE_REFERENCE_PRODUCTS` | New products forecast from a similar product | forecasts ignore saved references while off |
 | `FEATURE_ABC` | ABC classes (column, filter, sort, Insights) | still computed, just hidden |
+| `FEATURE_PURCHASE_PLAN` | Purchase plan page (12 weeks of orders and spend, Starter) | |
+| `FEATURE_SPIKE_FILTER` | One-off sales spikes capped before averaging (every plan; merchants can also turn it off in Settings) | forecasts use raw sales while off |
+| `FEATURE_LOST_SALES` | Sales lost to stock-outs (Insights, explanation line) | still computed, just hidden |
 | `FEATURE_PURCHASE_ORDERS` | Purchase order CSV export | |
 | `FEATURE_SUPPLIER_EMAILS` | Emailing orders to suppliers (by hand and automatic) | |
 | `FEATURE_LOCATIONS` | Per-location forecasts | needs `read_*_fulfillment_orders`; when switched back on, run `sync:run --full` for Growth shops |

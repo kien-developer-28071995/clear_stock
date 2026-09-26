@@ -34,6 +34,9 @@ return [
                 'transfers' => false,           // stock transfer suggestions between locations
                 'supplier_emails' => false,     // emailing an order to a supplier by hand
                 'abc' => true,                  // ABC classes by revenue
+                'spike_filter' => true,         // one-off sales spikes capped before averaging
+                'lost_sales' => true,           // sales lost while out of stock
+                'purchase_plan' => false,       // 12-week order + spend plan
             ],
         ],
         'starter' => [
@@ -54,6 +57,9 @@ return [
                 'transfers' => false,
                 'supplier_emails' => true,
                 'abc' => true,
+                'spike_filter' => true,
+                'lost_sales' => true,
+                'purchase_plan' => true,
             ],
         ],
         'growth' => [
@@ -77,6 +83,9 @@ return [
                 'transfers' => true,
                 'supplier_emails' => true,
                 'abc' => true,
+                'spike_filter' => true,
+                'lost_sales' => true,
+                'purchase_plan' => true,
             ],
         ],
     ],

@@ -35,6 +35,17 @@ export interface OverstockItem {
     value: number | null;
 }
 
+export interface LostSaleItem {
+    variant_id: number;
+    name: string;
+    sku: string | null;
+    stock: number;
+    out_of_stock_days: number;
+    units: number;
+    /** At the current selling price; null without a price. */
+    revenue: number | null;
+}
+
 export interface SlowMover {
     variant_id: number;
     name: string;
@@ -65,6 +76,8 @@ export interface Dashboard {
     slow_movers: { value: number; count: number; missing_cost: number; days: number; top: SlowMover[] };
     /** Still selling, but holding clearly more than the order-up-to level. */
     overstock: { value: number; units: number; count: number; missing_cost: number; top: OverstockItem[] };
+    /** Sales missed on out-of-stock days of the last 30 days; null when switched off app-wide. */
+    lost_sales: { units: number; revenue: number; count: number; missing_price: number; days: number; top: LostSaleItem[] } | null;
     /** Products, revenue and stock value per ABC class. */
     /** null when ABC classes are switched off app-wide. */
     abc: {

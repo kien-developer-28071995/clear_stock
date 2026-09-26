@@ -62,6 +62,15 @@
         "seasonality_fell": {
             "other": "Cùng kỳ năm trước, doanh số giảm ×{{factor}} trong {{count}} ngày tiếp theo, nên chúng tôi điều chỉnh thành {{avg}}/ngày."
         },
+        "spikes_capped": {
+            "other": "Đã tính {{count}} ngày bán đột biến theo mức thường ngày (lớn nhất: {{top}} cái ngày {{top_date}}, thường {{usual}}/ngày)."
+        },
+        "order_cycle_supplier": {
+            "other": "Mỗi đơn đủ bán {{count}} ngày: chu kỳ đặt hàng của {{supplier}}."
+        },
+        "lost_sales": {
+            "other": "Hết hàng {{count}} ngày trong {{days}} ngày qua: mất khoảng {{units}} lượt bán."
+        },
         "bundle_contribution": {
             "other": "Gồm {{avg}}/ngày bán trong combo \"{{bundle}}\" ({{count}} cái mỗi combo)."
         },

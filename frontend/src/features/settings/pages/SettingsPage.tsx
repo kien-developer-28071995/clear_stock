@@ -87,6 +87,14 @@ export function SettingsPage() {
                         error={fieldError(update.error, 'default_safety_days')}
                         onInput={(e) => setForm({ ...form, default_safety_days: Number(e.currentTarget.value) })}
                     />
+                    {form.filter_sales_spikes !== null && (
+                        <s-switch
+                            label={t('settings.filterSpikes')}
+                            details={t('settings.filterSpikesHelp')}
+                            checked={form.filter_sales_spikes || undefined}
+                            onChange={(e) => setForm({ ...form, filter_sales_spikes: e.currentTarget.checked })}
+                        />
+                    )}
                 </s-stack>
             </s-section>
 

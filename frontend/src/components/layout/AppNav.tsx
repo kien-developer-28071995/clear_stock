@@ -11,6 +11,7 @@ export function AppNav() {
     const { t } = useTranslation();
     const transfers = useFeature('transfers');
     const whatIf = useFeature('what_if');
+    const purchasePlan = useFeature('purchase_plan');
 
     return (
         <AppNavEl>
@@ -21,6 +22,7 @@ export function AppNav() {
             {transfers && <NavLink href="/transfers">{t('nav.transfers')}</NavLink>}
             <NavLink href="/products">{t('nav.products')}</NavLink>
             <NavLink href="/insights">{t('nav.insights')}</NavLink>
+            {purchasePlan && <NavLink href="/purchase-plan">{t('nav.purchasePlan')}</NavLink>}
             {whatIf && <NavLink href="/what-if">{t('nav.whatIf')}</NavLink>}
             <NavLink href="/suppliers">{t('nav.suppliers')}</NavLink>
             <NavLink href="/bundles">{t('nav.bundles')}</NavLink>

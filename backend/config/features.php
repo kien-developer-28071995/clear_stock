@@ -18,6 +18,11 @@ return [
     'what_if' => (bool) env('FEATURE_WHAT_IF', true),
     'reference_products' => (bool) env('FEATURE_REFERENCE_PRODUCTS', true),
     'abc' => (bool) env('FEATURE_ABC', true),
+    'purchase_plan' => (bool) env('FEATURE_PURCHASE_PLAN', true),     // 12-week order + spend plan (Starter+)
+
+    // Forecast quality and insight (every plan)
+    'spike_filter' => (bool) env('FEATURE_SPIKE_FILTER', true),       // cap one-off sales spikes
+    'lost_sales' => (bool) env('FEATURE_LOST_SALES', true),           // sales lost while out of stock
 
     // Ordering
     'purchase_orders' => (bool) env('FEATURE_PURCHASE_ORDERS', true),   // PO export (CSV)

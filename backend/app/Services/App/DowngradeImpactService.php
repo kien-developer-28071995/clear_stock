@@ -111,6 +111,10 @@ class DowngradeImpactService
             $out[] = $this->line('what_if');
         }
 
+        if ($loses(Feature::PurchasePlan)) {
+            $out[] = $this->line('purchase_plan');
+        }
+
         return $out;
     }
 

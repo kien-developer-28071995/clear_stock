@@ -478,3 +478,64 @@ describe('reference product (new products)', function () {
             ->and($r->explanation['reference']['reason'])->toBe('no_forecast');
     });
 });
+
+it('caps a one-off spike to the usual level when asked', function () {
+    // A wholesale order of 80 among days of 2/day.
+    $days = history(120, fn ($ago) => $ago === 10 ? 80 : 2);
+
+    $plain = calc(input($days));
+    $capped = calc(input($days, extra: ['filterSpikes' => true]));
+
+    expect($plain->avgDailySales)->toBeGreaterThan(2.5)
+        ->and($capped->avgDailySales)->toBe(2.0)
+        ->and($capped->explanation['spikes']['applied'])->toBeTrue()
+        ->and($capped->explanation['spikes']['days'][0])->toMatchArray(['date' => '2026-09-10', 'units' => 80.0])
+        ->and($capped->explanation['spikes']['units_removed'])->toBeGreaterThan(77.0)
+        ->and($plain->explanation['spikes'])->toBeNull();
+});
+
+it('leaves spikes of rarely selling products alone', function () {
+    // Sells on 3 days only: not enough to know what is usual.
+    $days = history(120, fn ($ago) => match ($ago) {
+        5 => 30, 40, 70 => 1, default => 0
+    });
+
+    $r = calc(input($days, extra: ['filterSpikes' => true]));
+
+    expect($r->explanation['spikes']['applied'])->toBeFalse();
+});
+
+it('keeps big days that come back every week: that is real demand', function () {
+    // A wholesale customer buys 48 every Wednesday on top of 2/day.
+    $days = history(120, fn ($ago) => $ago % 7 === 3 ? 50 : 2);
+
+    $r = calc(input($days, extra: ['filterSpikes' => true]));
+
+    expect($r->explanation['spikes'])->toMatchArray(['applied' => false, 'reason' => 'recurring'])
+        ->and($r->avgDailySales)->toBeGreaterThan(8.0);
+});
+
+it('does not treat a steady busy day pattern as a spike', function () {
+    // Weekends sell 3x weekdays: below the 5x factor.
+    $days = history(120, fn ($ago) => $ago % 7 < 2 ? 12 : 4);
+
+    expect(calc(input($days, extra: ['filterSpikes' => true]))->explanation['spikes']['applied'])->toBeFalse();
+});
+
+it('estimates sales lost on out-of-stock days of the last 30 days', function () {
+    $days = history(120, fn ($ago) => $ago <= 5 ? ['sold' => 0, 'in_stock' => false] : 4);
+
+    $r = calc(input($days, stock: 0));
+
+    expect($r->lostUnits30d)->toBe(20.0)   // 5 days x 4/day
+        ->and($r->explanation['lost_sales'])->toBe(['days' => 30, 'out_of_stock_days' => 5, 'units' => 20.0]);
+});
+
+it('uses the supplier order cycle for the suggested order', function () {
+    $r = calc(input(history(120, 4), stock: 100, extra: ['orderCycleDays' => 7, 'supplierName' => 'Acme']));
+
+    expect($r->suggestedQty)->toBe(12)                 // 4 x (14 + 7 + 7) - 100
+        ->and($r->explanation['reorder']['order_cycle_days'])->toBe(7)
+        ->and($r->explanation['reorder']['order_cycle_source'])->toBe('supplier')
+        ->and($r->explanation['reorder']['order_cycle_supplier'])->toBe('Acme');
+});
