@@ -96,14 +96,22 @@ class EloquentForecastQueryRepository implements ForecastQueryRepositoryInterfac
 
     public function counts(Shop $shop, string $today): array
     {
+        // One query: every status is a conditional count over the same rows.
+        $selects = ['COUNT(*) as total'];
+        $bindings = [];
+        foreach (ForecastStatus::cases() as $status) {
+            [$sql, $params] = $this->statusSql($status, $today);
+            $selects[] = "SUM(CASE WHEN {$sql} THEN 1 ELSE 0 END) as {$status->value}";
+            array_push($bindings, ...$params);
+        }
+        $row = $this->base($shop)->selectRaw(implode(', ', $selects), $bindings)->toBase()->first();
+
         $out = [
-            'total' => $this->base($shop)->count(),
+            'total' => (int) $row->total,
             'tracked' => Variant::query()->forShop($shop)->where('is_active', true)->where('tracked', true)->count(),
         ];
         foreach (ForecastStatus::cases() as $status) {
-            $query = $this->base($shop);
-            $this->whereStatus($query, $status, $today);
-            $out[$status->value] = $query->count();
+            $out[$status->value] = (int) ($row->{$status->value} ?? 0);
         }
 
         return $out;
@@ -132,23 +140,24 @@ class EloquentForecastQueryRepository implements ForecastQueryRepositoryInterfac
 
     public function slowMovers(Shop $shop, int $limit): array
     {
-        $query = $this->base($shop);
-        $this->whereStatus($query, ForecastStatus::Slow, '');
-        $rows = $query->with('variant')->get(['forecasts.*']);
-
-        $withCost = $rows->filter(fn (Forecast $f) => $f->variant->unit_cost !== null);
-        $value = fn (Forecast $f) => round($f->current_stock * (float) $f->variant->unit_cost, 2);
+        // Totals in SQL: a shop can have thousands of slow products.
+        $value = 'forecasts.current_stock * variants.unit_cost';
+        $sum = $this->statusQuery($shop, ForecastStatus::Slow, '')
+            ->selectRaw("COUNT(*) as n, SUM(CASE WHEN variants.unit_cost IS NULL THEN 1 ELSE 0 END) as missing, COALESCE(SUM({$value}), 0) as value")
+            ->toBase()->first();
+        $top = $this->statusQuery($shop, ForecastStatus::Slow, '')->whereNotNull('variants.unit_cost')
+            ->with('variant')->orderByRaw("{$value} DESC")->orderBy('forecasts.id')->limit($limit)->get(['forecasts.*']);
 
         return [
-            'value' => round($withCost->sum($value), 2),
-            'count' => $rows->count(),
-            'missing_cost' => $rows->count() - $withCost->count(),
-            'top' => $withCost->sortByDesc($value)->take($limit)->map(fn (Forecast $f) => [
+            'value' => round((float) $sum->value, 2),
+            'count' => (int) $sum->n,
+            'missing_cost' => (int) $sum->missing,
+            'top' => $top->map(fn (Forecast $f) => [
                 'variant_id' => $f->variant_id,
                 'name' => $f->variant->displayName(),
                 'sku' => $f->variant->sku,
                 'stock' => $f->current_stock,
-                'value' => $value($f),
+                'value' => round($f->current_stock * (float) $f->variant->unit_cost, 2),
                 'days_of_cover' => $f->days_of_cover !== null ? (float) $f->days_of_cover : null,
             ])->values()->all(),
         ];
@@ -156,26 +165,27 @@ class EloquentForecastQueryRepository implements ForecastQueryRepositoryInterfac
 
     public function overstock(Shop $shop, string $today, int $limit): array
     {
-        $query = $this->base($shop);
-        $this->whereStatus($query, ForecastStatus::Overstock, $today);
-        $rows = $query->with('variant')->get(['forecasts.*']);
-
-        $withCost = $rows->filter(fn (Forecast $f) => $f->variant->unit_cost !== null);
-        $value = fn (Forecast $f) => round($f->excess_units * (float) $f->variant->unit_cost, 2);
+        $value = 'forecasts.excess_units * variants.unit_cost';
+        $sum = $this->statusQuery($shop, ForecastStatus::Overstock, $today)
+            ->selectRaw("COUNT(*) as n, COALESCE(SUM(forecasts.excess_units), 0) as units, SUM(CASE WHEN variants.unit_cost IS NULL THEN 1 ELSE 0 END) as missing, COALESCE(SUM({$value}), 0) as value")
+            ->toBase()->first();
+        $top = $this->statusQuery($shop, ForecastStatus::Overstock, $today)->with('variant')
+            ->orderByRaw("COALESCE({$value}, 0) DESC")->orderByDesc('forecasts.excess_units')->orderBy('forecasts.id')
+            ->limit($limit)->get(['forecasts.*']);
 
         return [
-            'value' => round($withCost->sum($value), 2),
-            'units' => (int) $rows->sum('excess_units'),
-            'count' => $rows->count(),
-            'missing_cost' => $rows->count() - $withCost->count(),
-            'top' => $rows->sortByDesc(fn (Forecast $f) => [$value($f), $f->excess_units])->take($limit)->map(fn (Forecast $f) => [
+            'value' => round((float) $sum->value, 2),
+            'units' => (int) $sum->units,
+            'count' => (int) $sum->n,
+            'missing_cost' => (int) $sum->missing,
+            'top' => $top->map(fn (Forecast $f) => [
                 'variant_id' => $f->variant_id,
                 'name' => $f->variant->displayName(),
                 'sku' => $f->variant->sku,
                 'stock' => $f->current_stock,
                 'target' => $f->target_stock,
                 'excess' => $f->excess_units,
-                'value' => $f->variant->unit_cost !== null ? $value($f) : null,
+                'value' => $f->variant->unit_cost !== null ? round($f->excess_units * (float) $f->variant->unit_cost, 2) : null,
             ])->values()->all(),
         ];
     }
@@ -195,21 +205,35 @@ class EloquentForecastQueryRepository implements ForecastQueryRepositoryInterfac
 
     private function whereStatus(Builder $query, ForecastStatus $status, string $today): void
     {
+        [$sql, $bindings] = $this->statusSql($status, $today);
+        $query->whereRaw($sql, $bindings);
+    }
+
+    private function statusQuery(Shop $shop, ForecastStatus $status, string $today): Builder
+    {
+        $query = $this->base($shop);
+        $this->whereStatus($query, $status, $today);
+
+        return $query;
+    }
+
+    /**
+     * The status rules as one SQL condition, used for filters and counts alike (same rules
+     * as ForecastStatusResolver for a single row). @return array{0: string, 1: array<int, mixed>}
+     */
+    private function statusSql(ForecastStatus $status, string $today): array
+    {
         $slowDays = (int) config('forecast.slow_mover_days');
         $ratio = (float) config('forecast.overstock_ratio');
-        // Same rules as ForecastStatusResolver.
-        $overstock = fn ($q) => $q->where('forecasts.avg_daily_sales', '>', 0)->where('forecasts.target_stock', '>', 0)
-            ->whereRaw('forecasts.excess_units > forecasts.target_stock * ?', [$ratio]);
+        $overstock = '(forecasts.avg_daily_sales > 0 AND forecasts.target_stock > 0 AND forecasts.excess_units > forecasts.target_stock * ?)';
+        $upcoming = 'forecasts.reorder_date > ? AND forecasts.days_of_cover <= ?';
 
-        match ($status) {
-            ForecastStatus::ReorderNow => $query->where('forecasts.reorder_date', '<=', $today),
-            ForecastStatus::OutOfStock => $query->where('forecasts.current_stock', '<=', 0)->where('forecasts.avg_daily_sales', '>', 0),
-            ForecastStatus::Slow => $query->where('forecasts.current_stock', '>', 0)
-                ->where(fn ($q) => $q->where('forecasts.avg_daily_sales', '=', 0)->orWhere('forecasts.days_of_cover', '>', $slowDays)),
-            ForecastStatus::Overstock => $query->where('forecasts.reorder_date', '>', $today)->where('forecasts.days_of_cover', '<=', $slowDays)
-                ->where('forecasts.current_stock', '>', 0)->where($overstock),
-            ForecastStatus::Healthy => $query->where('forecasts.reorder_date', '>', $today)->where('forecasts.days_of_cover', '<=', $slowDays)
-                ->whereNot($overstock),
+        return match ($status) {
+            ForecastStatus::ReorderNow => ['forecasts.reorder_date <= ?', [$today]],
+            ForecastStatus::OutOfStock => ['(forecasts.current_stock <= 0 AND forecasts.avg_daily_sales > 0)', []],
+            ForecastStatus::Slow => ['(forecasts.current_stock > 0 AND (forecasts.avg_daily_sales = 0 OR forecasts.days_of_cover > ?))', [$slowDays]],
+            ForecastStatus::Overstock => ["({$upcoming} AND forecasts.current_stock > 0 AND {$overstock})", [$today, $slowDays, $ratio]],
+            ForecastStatus::Healthy => ["({$upcoming} AND NOT {$overstock})", [$today, $slowDays, $ratio]],
         };
     }
 }

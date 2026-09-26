@@ -30,6 +30,23 @@ export interface ForecastRow {
     computed_at: string;
 }
 
+/** One row of the product list: only what the table shows (the detail page loads the rest). */
+export type ForecastListRow = Pick<
+    ForecastRow,
+    | 'variant_id'
+    | 'name'
+    | 'sku'
+    | 'vendor'
+    | 'status'
+    | 'current_stock'
+    | 'incoming_stock'
+    | 'avg_daily_sales'
+    | 'days_of_cover'
+    | 'reorder_date'
+    | 'suggested_qty'
+    | 'excess_units'
+>;
+
 export interface Paginated<T> {
     data: T[];
     meta: { current_page: number; last_page: number; total: number; per_page: number };

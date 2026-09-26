@@ -1,21 +1,16 @@
 import type { Coded } from '@/types/coded';
-import type { Confidence } from '@/types/forecast';
 
 export interface ActionItem {
     variant_id: number;
     name: string;
-    sku: string | null;
     vendor: string | null;
     current_stock: number;
     avg_daily_sales: number;
-    days_of_cover: number | null;
     stockout_date: string | null;
     reorder_date: string | null;
     suggested_qty: number;
-    confidence: Confidence;
-    /** First explanation line (null when explanations are not included in the plan). */
+    /** First explanation line, or null when there is none. */
     reason: Coded | null;
-    explanation_lines: Coded[];
 }
 
 export type ActionGroup = 'out_of_stock' | 'order_today' | 'this_week';

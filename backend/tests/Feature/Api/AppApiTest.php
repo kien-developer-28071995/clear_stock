@@ -349,3 +349,23 @@ describe('overstock', function () {
             ->assertJsonPath('data.overstock.top.0', ['variant_id' => $mug->id, 'name' => 'Mug', 'sku' => $mug->sku, 'stock' => 400, 'target' => 204, 'excess' => 196, 'value' => 490]);
     });
 });
+
+it('counts, filters and badges agree on every status', function () {
+    product($this->shop, $this->location, 'Out', stock: 0, perDay: 4);
+    product($this->shop, $this->location, 'Due', stock: 10, perDay: 4);
+    product($this->shop, $this->location, 'Over', stock: 400, perDay: 4);
+    product($this->shop, $this->location, 'Fine', stock: 250, perDay: 4);
+    product($this->shop, $this->location, 'Slow', stock: 9000, perDay: 4);
+    product($this->shop, $this->location, 'Dead', stock: 30, perDay: 0);
+    forecastAll($this->shop);
+
+    $counts = $this->getJson('/api/dashboard', $this->auth)->json('data.counts');
+    foreach (['reorder_now', 'out_of_stock', 'slow', 'overstock', 'healthy'] as $status) {
+        $rows = $this->getJson("/api/forecasts?status={$status}", $this->auth)->json();
+        expect($rows['meta']['total'])->toBe($counts[$status], "count of {$status}");
+        // reorder_now also lists out-of-stock products, whose badge says "out of stock".
+        $badges = array_values(array_unique(array_column($rows['data'], 'status')));
+        expect(array_values($status === 'reorder_now' ? array_diff($badges, ['out_of_stock']) : $badges))->toBe($rows['data'] === [] ? [] : [$status]);
+    }
+    expect($counts)->toMatchArray(['out_of_stock' => 1, 'reorder_now' => 2, 'overstock' => 1, 'healthy' => 1, 'slow' => 2]);
+});

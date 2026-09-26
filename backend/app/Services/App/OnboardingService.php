@@ -54,14 +54,22 @@ class OnboardingService
     /** Store contact email from Shopify (cached a day), for pre-filling email fields. */
     public function contactEmail(Shop $shop): ?string
     {
-        return $this->cache->remember(CacheKeys::shopContactEmail($shop->id), 86400, function () use ($shop) {
-            try {
-                return $this->admin->query($shop, '{ shop { contactEmail } }')['shop']['contactEmail'] ?? null;
-            } catch (ShopifyApiException|ShopifyReauthorizeException $e) {
-                Monitor::expected($e, 'onboarding contact email', ['shop' => $shop->domain]);
+        // A missing email is cached too (as ''), or every request would call Shopify again.
+        $key = CacheKeys::shopContactEmail($shop->id);
+        $cached = $this->cache->get($key);
+        if ($cached !== null) {
+            return $cached === '' ? null : $cached;
+        }
 
-                return null;
-            }
-        });
+        try {
+            $email = (string) ($this->admin->query($shop, '{ shop { contactEmail } }')['shop']['contactEmail'] ?? '');
+            $this->cache->put($key, $email, 86400);
+        } catch (ShopifyApiException|ShopifyReauthorizeException $e) {
+            Monitor::expected($e, 'onboarding contact email', ['shop' => $shop->domain]);
+            $email = '';
+            $this->cache->put($key, $email, 600); // Shopify unreachable: retry in a few minutes
+        }
+
+        return $email === '' ? null : $email;
     }
 }

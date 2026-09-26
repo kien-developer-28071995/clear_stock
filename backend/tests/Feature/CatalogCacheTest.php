@@ -2,7 +2,6 @@
 
 use App\Models\Location;
 use App\Models\Shop;
-use App\Models\Supplier;
 use App\Models\Variant;
 use App\Repositories\Contracts\CatalogRepositoryInterface;
 use App\Services\Forecast\ForecastService;
@@ -36,18 +35,20 @@ function queriesOn(string $table, callable $fn): int
     return $count;
 }
 
-it('caches the product list and refreshes it when forecasts or suppliers change', function () {
+it('caches the product list and refreshes it when forecasts or products change', function () {
     $list = fn () => $this->getJson('/api/forecasts?status=reorder_now', $this->auth)->assertOk();
 
     expect(queriesOn('forecasts', $list))->toBeGreaterThan(0)
         ->and(queriesOn('forecasts', $list))->toBe(0); // second time: cache
 
-    // A supplier assigned then renamed shows at once.
-    $acme = Supplier::factory()->for($this->shop)->create(['name' => 'Acme']);
-    $this->putJson("/api/variants/{$this->mug->id}/settings", ['supplier_id' => $acme->id], $this->auth)->assertOk();
-    $list()->assertJsonPath('data.0.supplier.name', 'Acme');
-    $acme->update(['name' => 'Acme Ceramics']);
-    $list()->assertJsonPath('data.0.supplier.name', 'Acme Ceramics');
+    // A sync that changes the product (here its vendor) shows at once.
+    $mug = $this->mug->fresh();
+    app(CatalogRepositoryInterface::class)->upsertVariants($this->shop, [[
+        'shopify_variant_id' => $mug->shopify_variant_id, 'shopify_product_id' => $mug->shopify_product_id, 'inventory_item_id' => $mug->inventory_item_id,
+        'product_title' => 'Mug', 'title' => 'Default Title', 'vendor' => 'Acme Ceramics', 'product_type' => null, 'sku' => $mug->sku,
+        'unit_cost' => null, 'tracked' => true, 'is_active' => true, 'shopify_created_at' => '2025-01-01 00:00:00',
+    ]]);
+    $list()->assertJsonPath('data.0.vendor', 'Acme Ceramics');
 
     // New forecasts show at once.
     DB::table('inventory_levels')->update(['available' => 0]);

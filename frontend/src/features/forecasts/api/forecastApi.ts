@@ -2,7 +2,7 @@ import { http } from '@/lib/http';
 import type {
     ForecastDetail,
     ForecastFilters,
-    ForecastRow,
+    ForecastListRow,
     OverridesInput,
     Paginated,
     VariantSettingsInput,
@@ -12,7 +12,7 @@ export const forecastApi = {
     list: (filters: ForecastFilters) => {
         const params = new URLSearchParams();
         Object.entries(filters).forEach(([k, v]) => v !== undefined && v !== '' && params.set(k, String(v)));
-        return http.get<Paginated<ForecastRow>>(`/forecasts?${params}`);
+        return http.get<Paginated<ForecastListRow>>(`/forecasts?${params}`);
     },
     facets: async () => (await http.get<{ data: { vendors: string[]; product_types: string[] } }>('/facets')).data,
     locations: async () => (await http.get<{ data: { id: number; name: string }[] }>('/locations')).data,

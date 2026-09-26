@@ -9,7 +9,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\ForecastIndexRequest;
 use App\Http\Requests\OverrideRequest;
 use App\Http\Resources\ForecastDetailResource;
-use App\Http\Resources\ForecastResource;
+use App\Http\Resources\ForecastListResource;
 use App\Models\Shop;
 use App\Repositories\Contracts\CatalogRepositoryInterface;
 use App\Repositories\Contracts\VariantRepositoryInterface;
@@ -19,7 +19,6 @@ use App\Support\Entitlements;
 use App\Support\ShopContext;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class ForecastController extends Controller
 {
@@ -30,7 +29,7 @@ class ForecastController extends Controller
         private readonly CatalogRepositoryInterface $catalog,
     ) {}
 
-    public function index(ForecastIndexRequest $request, ShopContext $context): AnonymousResourceCollection
+    public function index(ForecastIndexRequest $request, ShopContext $context): JsonResponse
     {
         $shop = $context->shop();
         // Resources read the container's base request, not this FormRequest copy.
@@ -44,7 +43,18 @@ class ForecastController extends Controller
             $filters['location_id'] = (int) $request->validated('location_id');
         }
 
-        return ForecastResource::collection($this->query->list($shop, $filters, (int) $request->validated('page', 1)));
+        $page = $this->query->list($shop, $filters, (int) $request->validated('page', 1));
+
+        // Slim envelope: the app only pages by number (no per-page URLs / links).
+        return response()->json([
+            'data' => ForecastListResource::collection($page->getCollection())->resolve(),
+            'meta' => [
+                'current_page' => $page->currentPage(),
+                'last_page' => $page->lastPage(),
+                'per_page' => $page->perPage(),
+                'total' => $page->total(),
+            ],
+        ]);
     }
 
     /** Vendors and product types of tracked products, for the list filters. */

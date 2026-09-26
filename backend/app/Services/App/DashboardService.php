@@ -66,23 +66,18 @@ class DashboardService
 
     private function item(Forecast $f, bool $explain): array
     {
-        $lines = $explain ? $this->formatter->lines($f->explanation) : [];
-
+        // Only what the to-do rows show; the full explanation is on the product page.
         return [
             'variant_id' => $f->variant_id,
             'name' => $f->variant->displayName(),
-            'sku' => $f->variant->sku,
             'vendor' => $f->variant->vendor,
             'current_stock' => $f->current_stock,
             'avg_daily_sales' => (float) $f->avg_daily_sales,
-            'days_of_cover' => $f->days_of_cover !== null ? (float) $f->days_of_cover : null,
             'stockout_date' => $f->stockout_date?->toDateString(),
             'reorder_date' => $f->reorder_date?->toDateString(),
             'suggested_qty' => $f->suggested_qty,
-            'confidence' => $f->confidence->value,
-            // Explanation lines as {code, params}; the app translates them.
-            'reason' => $lines[0] ?? null,
-            'explanation_lines' => $lines,
+            // First explanation line as {code, params}; the app translates it.
+            'reason' => $explain ? ($this->formatter->lines($f->explanation)[0] ?? null) : null,
         ];
     }
 }

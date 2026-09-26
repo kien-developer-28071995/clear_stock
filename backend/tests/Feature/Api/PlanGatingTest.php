@@ -29,7 +29,7 @@ describe('Free plan', function () {
 
         $this->getJson('/api/dashboard', $this->auth)
             ->assertJsonPath('data.explanations_locked', false)
-            ->assertJsonPath('data.actions.order_today.0.explanation_lines.0.code', 'sells_over_window');
+            ->assertJsonPath('data.actions.order_today.0.reason.code', 'sells_over_window');
     });
 
     it('still hides explanations if a plan is configured without them', function () {
