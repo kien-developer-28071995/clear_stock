@@ -27,10 +27,10 @@ class InventoryImporter
 
         foreach ($path ? JsonlReader::read($path) : [] as $line) {
             if (isset($line['__parentId'])) {
-                $available = collect($line['quantities'] ?? [])->firstWhere('name', 'available')['quantity'] ?? null;
+                $quantities = collect($line['quantities'] ?? [])->pluck('quantity', 'name');
                 $location = Gid::id($line['location']['id'] ?? null);
-                if ($available !== null && isset($locationIds[$location])) {
-                    $levelsByItem[Gid::id($line['__parentId'])][] = [$locationIds[$location], (int) $available];
+                if ($quantities->has('available') && isset($locationIds[$location])) {
+                    $levelsByItem[Gid::id($line['__parentId'])][] = [$locationIds[$location], (int) $quantities['available'], max(0, (int) ($quantities['incoming'] ?? 0))];
                 }
 
                 continue;
@@ -48,8 +48,8 @@ class InventoryImporter
             if (! isset($itemToVariant[$item])) {
                 continue;
             }
-            foreach ($levels as [$locationId, $available]) {
-                $rows[] = ['variant_id' => $itemToVariant[$item], 'location_id' => $locationId, 'available' => $available];
+            foreach ($levels as [$locationId, $available, $incoming]) {
+                $rows[] = ['variant_id' => $itemToVariant[$item], 'location_id' => $locationId, 'available' => $available, 'incoming' => $incoming];
             }
         }
 

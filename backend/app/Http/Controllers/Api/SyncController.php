@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Enums\SyncType;
+use App\Exceptions\ApiException;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\SyncStatusResource;
 use App\Services\Sync\SyncService;
@@ -28,7 +29,7 @@ class SyncController extends Controller
 
         $cooldown = (int) config('sync.manual_cooldown_minutes');
         if ($latest && ! $latest->isRunning() && $latest->started_at->gt(now()->subMinutes($cooldown))) {
-            return response()->json(['message' => 'A sync just finished. You can sync again in a few minutes.'], 429);
+            throw new ApiException('sync_cooldown', 429, ['minutes' => $cooldown]);
         }
 
         $run = $this->sync->start($shop, SyncType::Manual);

@@ -10,6 +10,7 @@ use App\Repositories\Contracts\ForecastRepositoryInterface;
 use App\Repositories\Contracts\VariantRepositoryInterface;
 use App\Services\Forecast\ForecastService;
 use App\Support\Gid;
+use Illuminate\Validation\ValidationException;
 
 /**
  * Merchant changes to forecast inputs: overrides and per-SKU settings.
@@ -43,9 +44,10 @@ class ForecastAdjustmentService
         $this->engine->runForShop($shop, [$variant->id]);
     }
 
-    /** @param array{supplier_id?: ?int, lead_time_override?: ?int, safety_days?: ?int} $settings */
+    /** @param array{supplier_id?: ?int, lead_time_override?: ?int, safety_days?: ?int, min_order_qty?: ?int, pack_size?: ?int, min_stock?: ?int, max_stock?: ?int} $settings */
     public function updateVariantSettings(Shop $shop, Variant $variant, array $settings): Variant
     {
+        $this->assertMinBelowMax($settings + $variant->only(['min_stock', 'max_stock']));
         $variant = $this->variants->updateSettings($variant, $settings);
         $this->engine->runForShop($shop, [$variant->id]);
 
@@ -61,9 +63,20 @@ class ForecastAdjustmentService
             $this->variants->findByShopifyIds($shop, array_map(fn ($g) => Gid::id($g), $gids))->pluck('id')->all(),
         )));
 
+        $this->assertMinBelowMax($settings);
         $updated = $this->variants->bulkUpdateSettings($shop, $variantIds, $settings);
         RecomputeForecasts::dispatch($shop->id, $variantIds);
 
         return $updated;
+    }
+
+    /** A manual maximum below the minimum would never order enough. */
+    private function assertMinBelowMax(array $settings): void
+    {
+        $min = $settings['min_stock'] ?? null;
+        $max = $settings['max_stock'] ?? null;
+        if ($min !== null && $max !== null && $max < $min) {
+            throw ValidationException::withMessages(['max_stock' => 'max_below_min']);
+        }
     }
 }

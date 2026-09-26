@@ -1,6 +1,7 @@
 <?php
 
 use App\Enums\Confidence;
+use App\Services\Forecast\ExplanationFormatter;
 use App\Services\Forecast\ForecastCalculator;
 use App\Services\Forecast\ForecastInput;
 use Carbon\CarbonImmutable;
@@ -285,4 +286,128 @@ it('ignores history before the coverage start', function () {
 
     expect($r->avgDailySales)->toBe(2.0)
         ->and($r->explanation['history']['days_available'])->toBe(20);
+});
+
+describe('stock on the way (Shopify incoming)', function () {
+    it('orders only what is still missing after incoming stock arrives', function () {
+        $days = history(120, 4);
+
+        $without = calc(input($days, stock: 20));
+        $with = calc(input($days, stock: 20, extra: ['incomingStock' => 50]));
+
+        expect($with->suggestedQty)->toBe($without->suggestedQty - 50)
+            ->and($with->incomingStock)->toBe(50)
+            ->and($with->explanation['stock'])->toBe(['current' => 20, 'incoming' => 50, 'position' => 70]);
+    });
+
+    it('moves the reorder date by the stock position but keeps the stock-out date on hand only', function () {
+        $days = history(120, 4); // reorder point 84 at 14 + 7 days
+        $r = calc(input($days, stock: 20, extra: ['incomingStock' => 200]));
+
+        expect($r->stockoutDate)->toBe('2026-09-25')            // 20 on hand / 4 per day
+            ->and($r->reorderDate)->toBe('2026-10-24')           // (220 - 84) / 4 = 34 days
+            ->and($r->daysOfCover)->toBe(5.0);
+    });
+
+    it('needs no order when incoming stock covers the next cycle, and says why', function () {
+        $r = calc(input(history(120, 4), stock: 0, extra: ['incomingStock' => 1000]));
+
+        expect($r->suggestedQty)->toBe(0)
+            ->and(array_column((new ExplanationFormatter)->lines($r->explanation), 'code'))
+            ->toContain('incoming_stock')->toContain('out_of_stock_incoming_covers')->not->toContain('order_today_out_of_stock');
+    });
+});
+
+describe('order rounding (MOQ and pack size)', function () {
+    // A steady 4/day seller with 100 in stock needs 104 (see "forecasts a steady seller").
+    it('rounds the suggestion to what the supplier accepts', function (?int $moq, ?int $pack, int $expected) {
+        $r = calc(input(history(120, 4), stock: 100, extra: ['minOrderQty' => $moq, 'packSize' => $pack]));
+
+        expect($r->suggestedQty)->toBe($expected)
+            ->and($r->explanation['reorder']['rounding']['needed'])->toBe(104)
+            ->and($r->reorderPoint)->toBe(84); // rounding never changes when to order
+    })->with([
+        'no rules' => [null, null, 104],
+        'whole packs of 12' => [null, 12, 108],
+        'already a whole pack' => [null, 8, 104],
+        'minimum 150' => [150, null, 150],
+        'minimum below the need' => [50, null, 104],
+        'minimum then packs' => [150, 12, 156],
+        'pack of 1 is no rule' => [null, 1, 104],
+    ]);
+
+    it('never turns "nothing to order" into an order', function () {
+        $r = calc(input(history(120, 4), stock: 5000, extra: ['minOrderQty' => 100, 'packSize' => 12]));
+
+        expect($r->suggestedQty)->toBe(0);
+    });
+
+    it('explains the rounding', function (?int $moq, ?int $pack, string $code) {
+        $r = calc(input(history(120, 4), stock: 100, extra: ['minOrderQty' => $moq, 'packSize' => $pack]));
+        $lines = collect((new ExplanationFormatter)->lines($r->explanation));
+
+        expect($lines->firstWhere('code', $code))->not->toBeNull()
+            ->and((new ExplanationFormatter)->sentences($r->explanation, 'en'))->toContain(match ($code) {
+                'rounded_pack' => 'You need 104; rounded up to whole packs of 12 → 108.',
+                'rounded_min' => 'You need 104; the supplier minimum is 150, so order 150.',
+                'rounded_min_and_pack' => 'You need 104; the supplier minimum is 150, in packs of 12 → 156.',
+            });
+    })->with([
+        [null, 12, 'rounded_pack'],
+        [150, null, 'rounded_min'],
+        [150, 12, 'rounded_min_and_pack'],
+    ]);
+});
+
+describe('manual min / max (Stocky style)', function () {
+    // Steady 4/day, lead 14 + safety 7: computed reorder point 84, order-up-to 204.
+    it('reorders at the minimum and fills up to the maximum', function () {
+        $r = calc(input(history(120, 4), stock: 100, extra: ['minStock' => 120, 'maxStock' => 300]));
+
+        expect($r->reorderPoint)->toBe(120)
+            ->and($r->reorderDate)->toBe('2026-09-20')  // 100 <= 120: today
+            ->and($r->suggestedQty)->toBe(200)          // 300 - 100
+            ->and($r->explanation['reorder'])->toMatchArray(['computed_point' => 84, 'min_stock' => 120, 'max_stock' => 300]);
+    });
+
+    it('uses a manual minimum alone, and a maximum alone', function () {
+        $minOnly = calc(input(history(120, 4), stock: 100, extra: ['minStock' => 40]));
+        expect($minOnly->reorderPoint)->toBe(40)
+            ->and($minOnly->reorderDate)->toBe('2026-10-05') // (100 - 40) / 4 = 15 days
+            ->and($minOnly->suggestedQty)->toBe(104);        // order-up-to still from the forecast
+
+        $maxOnly = calc(input(history(120, 4), stock: 100, extra: ['maxStock' => 150]));
+        expect($maxOnly->reorderPoint)->toBe(84)
+            ->and($maxOnly->suggestedQty)->toBe(50);          // 150 - 100
+    });
+
+    it('counts stock on the way against the minimum', function () {
+        $r = calc(input(history(120, 4), stock: 100, extra: ['minStock' => 120, 'maxStock' => 300, 'incomingStock' => 50]));
+
+        expect($r->reorderDate)->not->toBe('2026-09-20') // 150 > 120
+            ->and($r->suggestedQty)->toBe(150);            // 300 - 150
+    });
+
+    it('reorders products without sales only through the minimum', function () {
+        $none = history(120, 0);
+        $below = calc(input($none, stock: 3, extra: ['minStock' => 5, 'maxStock' => 20]));
+        $above = calc(input($none, stock: 10, extra: ['minStock' => 5, 'maxStock' => 20]));
+        $f = new ExplanationFormatter;
+
+        expect($below->reorderDate)->toBe('2026-09-20')
+            ->and($below->suggestedQty)->toBe(17)
+            ->and($f->sentences($below->explanation, 'en'))->toContain('Reorder point set by you: 5 units.')
+            ->toContain('Orders fill up to your maximum of 20 units.')
+            ->toContain('3 in stock (with stock on the way) is at or below your minimum → order 17 units today.')
+            ->and($above->reorderDate)->toBeNull()
+            ->and($above->suggestedQty)->toBe(10)
+            ->and(array_column($f->lines($above->explanation), 'code'))->toContain('above_min')
+            ->and(calc(input($none, stock: 3))->reorderDate)->toBeNull(); // no minimum: no reorder
+    });
+
+    it('still rounds a min/max order to packs', function () {
+        $r = calc(input(history(120, 4), stock: 100, extra: ['minStock' => 120, 'maxStock' => 300, 'packSize' => 24]));
+
+        expect($r->suggestedQty)->toBe(216); // 200 -> 9 packs of 24
+    });
 });

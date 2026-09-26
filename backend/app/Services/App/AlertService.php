@@ -111,7 +111,8 @@ class AlertService
             'stockout_date' => $f->stockout_date?->format('M j'),
             'order_qty' => $f->suggested_qty,
             'order_by' => $f->reorder_date?->format('M j'),
-            'why' => $this->formatter->sentences($f->explanation)[0] ?? null,
+            // Emails are English: render the first explanation line with lang/en/explanation.php.
+            'why' => $this->formatter->sentences($f->explanation, 'en')[0] ?? null,
         ];
     }
 }

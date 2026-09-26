@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Enums\Feature;
+use App\Exceptions\ApiException;
 use App\Exceptions\PlanRequiredException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ForecastIndexRequest;
@@ -60,7 +61,7 @@ class ForecastController extends Controller
     public function updateOverrides(OverrideRequest $request, ShopContext $context, int $variant): JsonResponse
     {
         $shop = $context->shop();
-        $model = $this->variants->find($shop, $variant) ?? abort(404, 'Product not found.');
+        $model = $this->variants->find($shop, $variant) ?? throw ApiException::notFound('product');
 
         $this->adjust->setOverrides($shop, $model, $request->validated());
 
@@ -69,7 +70,7 @@ class ForecastController extends Controller
 
     private function detail(Request $request, Shop $shop, int $variantId): JsonResponse
     {
-        $forecast = $this->query->detail($shop, $variantId) ?? abort(404, 'No forecast for this product yet.');
+        $forecast = $this->query->detail($shop, $variantId) ?? throw ApiException::notFound('forecast');
         // Resources read the container's base request (not a FormRequest copy).
         $request = request();
         $request->attributes->set('today', $this->query->today($shop));

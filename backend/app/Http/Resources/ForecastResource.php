@@ -29,6 +29,7 @@ class ForecastResource extends JsonResource
             'supplier' => $v->relationLoaded('supplier') && $v->supplier ? ['id' => $v->supplier->id, 'name' => $v->supplier->name] : null,
             'is_bundle' => $v->is_bundle,
             'current_stock' => $this->current_stock,
+            'incoming_stock' => $this->incoming_stock,     // on the way, already counted in suggested_qty
             'avg_daily_sales' => (float) $this->avg_daily_sales,
             'days_of_cover' => $this->days_of_cover !== null ? (float) $this->days_of_cover : null,
             'stockout_date' => $this->stockout_date?->toDateString(),

@@ -43,7 +43,7 @@ class BillingService
 
     public function state(Shop $shop): array
     {
-        $tracked = count(array_filter($this->catalog->activeVariantInfo($shop), fn ($v) => $v['tracked']));
+        $tracked = $this->catalog->countTrackedVariants($shop);
 
         return [
             'plan' => $shop->plan->value,

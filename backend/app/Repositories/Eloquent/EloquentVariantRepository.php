@@ -42,6 +42,12 @@ class EloquentVariantRepository implements VariantRepositoryInterface
         return Variant::query()->forShop($shop)->whereIn('id', $ids)->update($settings);
     }
 
+    public function forImport(Shop $shop): Collection
+    {
+        return Variant::query()->forShop($shop)->where('is_active', true)
+            ->get(['id', 'shopify_variant_id', 'sku', 'product_title', 'title', 'supplier_id']);
+    }
+
     public function bundles(Shop $shop): Collection
     {
         return Variant::query()->forShop($shop)->where('is_bundle', true)

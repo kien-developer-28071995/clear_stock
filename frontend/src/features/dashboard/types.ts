@@ -1,3 +1,4 @@
+import type { Coded } from '@/types/coded';
 import type { Confidence } from '@/types/forecast';
 
 export interface ActionItem {
@@ -11,9 +12,9 @@ export interface ActionItem {
     reorder_date: string | null;
     suggested_qty: number;
     confidence: Confidence;
-    /** First explanation sentence (null when explanations are not included in the plan). */
-    reason: string | null;
-    explanation: string[];
+    /** First explanation line (null when explanations are not included in the plan). */
+    reason: Coded | null;
+    explanation_lines: Coded[];
 }
 
 export type ActionGroup = 'out_of_stock' | 'order_today' | 'this_week';

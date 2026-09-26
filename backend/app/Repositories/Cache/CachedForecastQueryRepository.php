@@ -6,14 +6,16 @@ use App\Models\Forecast;
 use App\Models\Shop;
 use App\Repositories\Contracts\ForecastQueryRepositoryInterface;
 use App\Support\CacheKeys;
+use App\Support\CacheVersion;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 
 /**
- * Caches the dashboard queries. Keys contain the shop's forecast version (bumped
- * on every forecast write) and the local date, so they never serve stale data.
- * The paginated list and detail are cheap indexed queries and are not cached.
+ * Caches the dashboard queries, the product list (without a search term) and the
+ * location list. Keys contain the shop's forecast version (bumped on every forecast
+ * write), catalog version (products, settings, suppliers) and local date, so they
+ * never serve stale data. Detail and exports read fresh.
  */
 class CachedForecastQueryRepository implements ForecastQueryRepositoryInterface
 {
@@ -24,7 +26,15 @@ class CachedForecastQueryRepository implements ForecastQueryRepositoryInterface
 
     public function paginate(Shop $shop, array $filters, string $today, int $perPage, int $page): LengthAwarePaginator
     {
-        return $this->inner->paginate($shop, $filters, $today, $perPage, $page);
+        // Searches are one-off and would fill the cache with single-use keys.
+        if (trim((string) ($filters['search'] ?? '')) !== '') {
+            return $this->inner->paginate($shop, $filters, $today, $perPage, $page);
+        }
+
+        $hash = md5(json_encode([$filters['status'] ?? null, $filters['sort'] ?? null, $filters['location_id'] ?? null, $perPage, $page]));
+        $key = CacheKeys::forecastPage($shop->id, $this->forecastVersion($shop), CacheVersion::catalog($shop->id), $today, $hash);
+
+        return $this->cache->remember($key, CacheKeys::TTL_DASHBOARD, fn () => $this->inner->paginate($shop, $filters, $today, $perPage, $page));
     }
 
     public function findForVariant(Shop $shop, int $variantId): ?Forecast
@@ -39,7 +49,11 @@ class CachedForecastQueryRepository implements ForecastQueryRepositoryInterface
 
     public function activeLocations(Shop $shop): array
     {
-        return $this->inner->activeLocations($shop);
+        return $this->cache->remember(
+            CacheKeys::catalog($shop->id, CacheVersion::catalog($shop->id), 'locations'),
+            CacheKeys::TTL_CATALOG,
+            fn () => $this->inner->activeLocations($shop),
+        );
     }
 
     public function reorderList(Shop $shop, string $today, ?int $supplierId, ?int $locationId = null, ?array $variantIds = null): Collection
@@ -69,8 +83,11 @@ class CachedForecastQueryRepository implements ForecastQueryRepositoryInterface
 
     private function remember(Shop $shop, string $today, string $part, callable $resolve): mixed
     {
-        $version = (int) $this->cache->get(CacheKeys::forecastVersion($shop->id), 0);
+        return $this->cache->remember(CacheKeys::dashboard($shop->id, $this->forecastVersion($shop), $today).':'.$part, CacheKeys::TTL_DASHBOARD, $resolve);
+    }
 
-        return $this->cache->remember(CacheKeys::dashboard($shop->id, $version, $today).':'.$part, CacheKeys::TTL_DASHBOARD, $resolve);
+    private function forecastVersion(Shop $shop): int
+    {
+        return (int) $this->cache->get(CacheKeys::forecastVersion($shop->id), 0);
     }
 }

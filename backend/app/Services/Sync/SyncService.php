@@ -21,6 +21,7 @@ use App\Services\Shopify\AdminApiClient;
 use App\Services\Shopify\BulkOperation;
 use App\Services\Shopify\BulkOperationClient;
 use App\Support\CacheKeys;
+use App\Support\Monitor;
 use Carbon\CarbonImmutable;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Support\Facades\Log;
@@ -154,10 +155,10 @@ class SyncService
                 // Partner Dashboard (API access requests), even on development stores.
                 if ($status->errorCode === 'ACCESS_DENIED') {
                     Log::warning('Bulk operation access denied (protected customer data not approved?)', ['shop' => $shop->domain, 'query' => $key]);
-                    throw new SyncFailedException("Shopify hasn't allowed this app to read your {$key} yet. Please try again later; if this keeps happening, contact support.");
+                    throw new SyncFailedException('export_access_denied', ['data' => $key], "Bulk {$key}: ACCESS_DENIED");
                 }
 
-                throw new SyncFailedException("Shopify could not export your {$key} ({$status->status}".($status->errorCode ? ", {$status->errorCode}" : '').').');
+                throw new SyncFailedException('export_failed', array_filter(['data' => $key, 'status' => $status->status, 'error' => $status->errorCode]), "Bulk {$key}: {$status->status} {$status->errorCode}");
             }
         }
 
@@ -246,7 +247,7 @@ class SyncService
         }
     }
 
-    /** Mark a run failed and surface a merchant-friendly message. */
+    /** Mark a run failed and store an error code the app shows to the merchant. */
     public function fail(int $runId, Throwable $e): void
     {
         [$run, $shop] = $this->load($runId);
@@ -254,11 +255,11 @@ class SyncService
             return;
         }
 
-        $message = match (true) {
-            $e instanceof SyncFailedException => $e->getMessage(),
-            $e instanceof ShopifyReauthorizeException => 'We lost access to your store. Please open the app again to reconnect.',
-            $e instanceof ShopifyApiException => 'Shopify did not respond as expected. We will retry automatically tonight, or you can retry now.',
-            default => 'Something went wrong while syncing. We will retry automatically tonight, or you can retry now.',
+        $error = match (true) {
+            $e instanceof SyncFailedException => ['code' => $e->errorCode, 'params' => $e->params],
+            $e instanceof ShopifyReauthorizeException => ['code' => 'reauthorize', 'params' => []],
+            $e instanceof ShopifyApiException => ['code' => 'shopify_error', 'params' => []],
+            default => ['code' => 'unknown', 'params' => []],
         };
 
         $this->runs->update($run, [
@@ -267,9 +268,9 @@ class SyncService
             'error' => mb_substr(get_class($e).': '.$e->getMessage(), 0, 2000),
             'finished_at' => now(),
         ]);
-        $this->shops->update($shop, ['sync_status' => SyncRunStatus::Failed->value, 'sync_error' => $message]);
+        $this->shops->update($shop, ['sync_status' => SyncRunStatus::Failed->value, 'sync_error' => $error]);
 
-        Log::error('Sync failed', ['shop' => $shop->domain, 'run' => $runId, 'error' => $e->getMessage()]);
+        Log::error('Sync failed', ['shop' => $shop->domain, 'run' => $runId, 'exception' => $e]);
     }
 
     /** @return array{0: ?SyncRun, 1: ?Shop} */
@@ -347,7 +348,7 @@ class SyncService
 
             return $orders * 3 + $variants * (2 + $locations);
         } catch (ShopifyApiException $e) {
-            Log::info('Sync estimate unavailable', ['shop' => $shop->domain, 'error' => $e->getMessage()]);
+            Monitor::expected($e, 'sync estimate', ['shop' => $shop->domain]);
 
             return 0;
         }

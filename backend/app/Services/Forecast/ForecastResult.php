@@ -9,6 +9,7 @@ final readonly class ForecastResult
     public function __construct(
         public int $variantId,
         public int $currentStock,
+        public int $incomingStock,
         public float $avgDailySales,
         public ?float $daysOfCover,   // null = no sales, stock lasts indefinitely
         public ?string $stockoutDate,

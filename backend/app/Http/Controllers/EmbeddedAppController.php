@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Exceptions\InvalidSessionTokenException;
 use App\Exceptions\ShopifyApiException;
 use App\Services\ShopAuthService;
+use App\Support\Monitor;
 use App\Support\ShopDomain;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -35,8 +36,11 @@ class EmbeddedAppController extends Controller
         if ($request->filled('id_token')) {
             try {
                 $this->auth->authenticate($request->query('id_token'));
-            } catch (InvalidSessionTokenException|ShopifyApiException $e) {
+            } catch (InvalidSessionTokenException $e) {
                 Log::info('Initial token exchange deferred to API call', ['shop' => $shop, 'error' => $e->getMessage()]);
+            } catch (ShopifyApiException $e) {
+                // The SPA retries, but Shopify failing a token exchange is worth a look.
+                Monitor::caught($e, 'initial token exchange', ['shop' => $shop]);
             }
         }
 

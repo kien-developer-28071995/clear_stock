@@ -11,15 +11,14 @@ class PlanRequiredException extends RuntimeException
 {
     public function __construct(public readonly Feature $feature)
     {
-        parent::__construct("This feature is included in the {$feature->minimumPlan()->name} plan.");
+        parent::__construct("plan_required: {$feature->value}");
     }
 
     public function render(): JsonResponse
     {
-        return response()->json([
-            'message' => $this->getMessage(),
+        return ApiErrorResponse::make('plan_required', 402, [
             'feature' => $this->feature->value,
-            'required_plan' => $this->feature->minimumPlan()->value,
-        ], 402);
+            'plan' => $this->feature->minimumPlan()->value,
+        ]);
     }
 }

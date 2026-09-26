@@ -21,7 +21,7 @@ class VerifyShopifyWebhook
         $expected = base64_encode(hash_hmac('sha256', $request->getContent(), $secret, true));
 
         if ($secret === '' || $header === '' || ! hash_equals($expected, $header)) {
-            return response()->json(['message' => 'Invalid webhook signature.'], 401);
+            return response()->json(['code' => 'invalid_signature'], 401);
         }
 
         return $next($request);

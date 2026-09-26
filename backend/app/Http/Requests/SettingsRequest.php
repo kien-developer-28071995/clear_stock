@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Enums\AlertFrequency;
+use App\Support\Locales;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -13,6 +14,8 @@ class SettingsRequest extends FormRequest
         return [
             'default_lead_time_days' => ['sometimes', 'integer', 'min:1', 'max:365'],
             'default_safety_days' => ['sometimes', 'integer', 'min:0', 'max:365'],
+            // null = follow the Shopify admin language
+            'locale' => ['sometimes', 'nullable', Rule::in(Locales::supported())],
             'alerts' => ['sometimes', 'array'],
             'alerts.email' => ['nullable', 'email:rfc', 'max:255'],
             'alerts.enabled' => ['sometimes', 'boolean'],

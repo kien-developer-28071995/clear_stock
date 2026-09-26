@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Exceptions\ApiException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\BundleRequest;
 use App\Http\Resources\BundleResource;
@@ -34,7 +35,7 @@ class BundleController extends Controller
     public function destroy(ShopContext $context, int $variant): Response
     {
         $shop = $context->shop();
-        $bundle = $this->variants->find($shop, $variant) ?? abort(404, 'Bundle not found.');
+        $bundle = $this->variants->find($shop, $variant) ?? throw ApiException::notFound('bundle');
         $this->bundles->delete($shop, $bundle);
 
         return response()->noContent();

@@ -27,7 +27,7 @@ final class BulkQueries
             GQL;
     }
 
-    /** Current available quantity per inventory item and location (full snapshot). */
+    /** Current available and incoming (on the way) quantities per inventory item and location (full snapshot). */
     public static function inventory(): string
     {
         return <<<'GQL'
@@ -38,7 +38,7 @@ final class BulkQueries
                   variant { id }
                   inventoryLevels { edges { node {
                     location { id }
-                    quantities(names: ["available"]) { name quantity }
+                    quantities(names: ["available", "incoming"]) { name quantity }
                   } } }
                 } }
               }

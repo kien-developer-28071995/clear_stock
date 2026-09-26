@@ -1,3 +1,4 @@
+import type { Coded } from '@/types/coded';
 import type { Confidence, ForecastStatus } from '@/types/forecast';
 
 export interface ForecastRow {
@@ -10,6 +11,8 @@ export interface ForecastRow {
     supplier: { id: number; name: string } | null;
     is_bundle: boolean;
     current_stock: number;
+    /** On the way (Shopify incoming: purchase orders, transfers); already counted in suggested_qty. */
+    incoming_stock: number;
     avg_daily_sales: number;
     days_of_cover: number | null;
     stockout_date: string | null;
@@ -54,20 +57,43 @@ export interface Explanation {
     computed_avg: number;
     lead_time: { days: number; source: string; supplier?: string };
     safety: { days: number; source: string; units: number };
-    reorder: { point: number; date: string | null; suggested_qty: number; order_cycle_days: number; lead_time_demand: number };
+    reorder: {
+        point: number;
+        date: string | null;
+        suggested_qty: number;
+        order_cycle_days: number;
+        lead_time_demand: number;
+        /** Reorder point from the forecast, before a manual minimum. */
+        computed_point?: number;
+        min_stock?: number | null;
+        max_stock?: number | null;
+    };
     confidence: { level: Confidence; reasons: { code: string }[] };
 }
 
 export interface ForecastDetail extends ForecastRow {
     /** null on plans without explanations */
     explanation: Explanation | null;
-    explanation_sentences: string[];
+    /** Explanation as {code, params} lines, translated by the app. */
+    explanation_lines: Coded[];
     explanation_locked: boolean;
     computed_avg: number;
     /** Growth plan only: stock and (when computed) the forecast per location. */
     locations: LocationForecast[] | null;
     overrides: Partial<Record<OverrideField, Override>>;
-    settings: { supplier_id: number | null; lead_time_override: number | null; safety_days: number | null };
+    settings: {
+        supplier_id: number | null;
+        lead_time_override: number | null;
+        safety_days: number | null;
+        /** Supplier minimum order (units); suggestions are raised to it. */
+        min_order_qty: number | null;
+        /** Units per case; suggestions are rounded up to whole cases. */
+        pack_size: number | null;
+        /** Manual reorder point (stock + on the way); null = from the forecast. */
+        min_stock: number | null;
+        /** Manual order-up-to level; null = from the forecast. */
+        max_stock: number | null;
+    };
     defaults: { lead_time_days: number; safety_days: number };
 }
 
@@ -76,6 +102,7 @@ export interface LocationForecast {
     location: string;
     available: number;
     forecast: {
+        incoming_stock: number;
         avg_daily_sales: number;
         days_of_cover: number | null;
         stockout_date: string | null;
@@ -83,7 +110,7 @@ export interface LocationForecast {
         reorder_point: number;
         suggested_qty: number;
         confidence: Confidence;
-        explanation_sentences: string[];
+        explanation_lines: Coded[];
     } | null;
 }
 
@@ -102,4 +129,8 @@ export interface VariantSettingsInput {
     supplier_id?: number | null;
     lead_time_override?: number | null;
     safety_days?: number | null;
+    min_order_qty?: number | null;
+    pack_size?: number | null;
+    min_stock?: number | null;
+    max_stock?: number | null;
 }

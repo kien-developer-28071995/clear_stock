@@ -7,7 +7,7 @@ use App\Exceptions\ShopifyReauthorizeException;
 use App\Models\Shop;
 use App\Repositories\Contracts\ShopRepositoryInterface;
 use App\Services\Shopify\AdminApiClient;
-use Illuminate\Support\Facades\Log;
+use App\Support\Monitor;
 
 class ShopService
 {
@@ -28,7 +28,7 @@ class ShopService
         try {
             $data = $this->admin->query($shop, self::SHOP_DETAILS_QUERY)['shop'] ?? [];
         } catch (ShopifyApiException|ShopifyReauthorizeException $e) {
-            Log::warning('Could not load shop details', ['shop' => $shop->domain, 'error' => $e->getMessage()]);
+            Monitor::caught($e, 'loading shop details', ['shop' => $shop->domain]);
 
             return $shop;
         }

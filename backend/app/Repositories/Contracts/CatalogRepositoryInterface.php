@@ -45,6 +45,15 @@ interface CatalogRepositoryInterface
     /** @return array<int, array<int, int>> variants.id => locations.id => available (active locations) */
     public function stockByVariantAndLocation(Shop $shop): array;
 
+    /** @return array<int, int> variants.id => total incoming (on the way) across active locations; zeros omitted */
+    public function incomingByVariant(Shop $shop): array;
+
+    /** @return array<int, array<int, int>> variants.id => locations.id => incoming (active locations); zeros omitted */
+    public function incomingByVariantAndLocation(Shop $shop): array;
+
     /** @return array<int, array{tracked: bool, created: ?string}> variants.id => info (active variants) */
     public function activeVariantInfo(Shop $shop): array;
+
+    /** Number of active variants with tracked inventory (what the plan limit counts). */
+    public function countTrackedVariants(Shop $shop): int;
 }

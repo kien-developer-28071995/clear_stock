@@ -28,9 +28,10 @@ class ForecastInputBuilder
      * @param  array<int, int>  $variantIds
      * @param  array<int, array<int, int>>  $stock  variant => location => available
      * @param  array<int, ForecastInput>  $combined  the combined inputs of these variants (settings reused)
+     * @param  array<int, array<int, int>>  $incoming  variant => location => on the way
      * @return array<int, array{location_id: int, input: ForecastInput}>
      */
-    public function buildForLocations(Shop $shop, array $variantIds, array $stock, CarbonImmutable $asOf, array $combined): array
+    public function buildForLocations(Shop $shop, array $variantIds, array $stock, CarbonImmutable $asOf, array $combined, array $incoming = []): array
     {
         $historyStart = $asOf->subDays((int) config('forecast.history_days'))->toDateString();
         $bundles = Entitlements::for($shop)->has(Feature::Bundles)
@@ -45,7 +46,7 @@ class ForecastInputBuilder
             if ($base === null) {
                 continue;
             }
-            $locations = array_unique([...array_keys($stock[$id] ?? []), ...array_keys($rows[$id] ?? [])]);
+            $locations = array_unique([...array_keys($stock[$id] ?? []), ...array_keys($rows[$id] ?? []), ...array_keys($incoming[$id] ?? [])]);
             sort($locations);
 
             foreach ($locations as $locationId) {
@@ -72,6 +73,9 @@ class ForecastInputBuilder
                     supplierLeadTimeDays: $base->supplierLeadTimeDays,
                     bundles: $bundleInputs,
                     overrides: array_diff_key($base->overrides, [OverrideField::AvgDailySales->value => true]),
+                    incomingStock: $incoming[$id][$locationId] ?? 0,
+                    minOrderQty: $base->minOrderQty,
+                    packSize: $base->packSize,
                 )];
             }
         }
@@ -82,9 +86,10 @@ class ForecastInputBuilder
     /**
      * @param  array<int, int>  $variantIds
      * @param  array<int, int>  $stock  variant id => current stock (all active locations)
+     * @param  array<int, int>  $incoming  variant id => on the way (all active locations)
      * @return array<int, ForecastInput>
      */
-    public function build(Shop $shop, array $variantIds, array $stock, CarbonImmutable $asOf): array
+    public function build(Shop $shop, array $variantIds, array $stock, CarbonImmutable $asOf, array $incoming = []): array
     {
         $historyStart = $asOf->subDays((int) config('forecast.history_days'))->toDateString();
         $yesterday = $asOf->subDay()->toDateString();
@@ -132,6 +137,11 @@ class ForecastInputBuilder
                 supplierLeadTimeDays: $variant->supplier?->lead_time_days,
                 bundles: $bundleInputs,
                 overrides: $overrides[$id] ?? [],
+                incomingStock: $incoming[$id] ?? 0,
+                minOrderQty: $variant->min_order_qty,
+                packSize: $variant->pack_size,
+                minStock: $variant->min_stock,
+                maxStock: $variant->max_stock,
             );
         }
 

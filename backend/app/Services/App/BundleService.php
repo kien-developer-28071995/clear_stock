@@ -40,13 +40,13 @@ class BundleService
         $refs = array_merge([$bundle], array_column($components, 'variant'));
         $resolved = $this->resolve($shop, $refs);
 
-        $bundleVariant = $resolved[(string) $bundle] ?? throw ValidationException::withMessages(['bundle' => 'This product is not synced yet. Try again after the next sync.']);
+        $bundleVariant = $resolved[(string) $bundle] ?? throw ValidationException::withMessages(['bundle' => 'product_not_synced']);
 
         $rows = [];
         foreach ($components as $i => $c) {
-            $component = $resolved[(string) $c['variant']] ?? throw ValidationException::withMessages(["components.{$i}.variant" => 'This product is not synced yet.']);
+            $component = $resolved[(string) $c['variant']] ?? throw ValidationException::withMessages(["components.{$i}.variant" => 'product_not_synced']);
             if ($component->id === $bundleVariant->id) {
-                throw ValidationException::withMessages(["components.{$i}.variant" => 'A bundle cannot contain itself.']);
+                throw ValidationException::withMessages(["components.{$i}.variant" => 'bundle_contains_itself']);
             }
             $rows[$component->id] = ['component_variant_id' => $component->id, 'quantity' => (int) $c['quantity']];
         }

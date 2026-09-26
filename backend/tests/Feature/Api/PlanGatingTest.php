@@ -25,11 +25,11 @@ describe('Free plan', function () {
             ->assertOk()
             ->assertJsonPath('data.suggested_qty', 194)
             ->assertJsonPath('data.explanation_locked', false)
-            ->assertJsonPath('data.explanation_sentences.0', 'Sells 4/day over the last 30 days.');
+            ->assertJsonPath('data.explanation_lines.0.code', 'sells_over_window');
 
         $this->getJson('/api/dashboard', $this->auth)
             ->assertJsonPath('data.explanations_locked', false)
-            ->assertJsonPath('data.actions.order_today.0.explanation.0', 'Sells 4/day over the last 30 days.');
+            ->assertJsonPath('data.actions.order_today.0.explanation_lines.0.code', 'sells_over_window');
     });
 
     it('still hides explanations if a plan is configured without them', function () {
@@ -45,8 +45,8 @@ describe('Free plan', function () {
         $box = Variant::factory()->for($this->shop)->create();
 
         $this->postJson('/api/bundles', ['bundle' => $box->id, 'components' => [['variant' => $this->mug->id, 'quantity' => 1]]], $this->auth)
-            ->assertStatus(402)->assertJsonPath('required_plan', 'starter');
-        $this->get('/api/purchase-orders/export', $this->auth)->assertStatus(402)->assertJsonPath('required_plan', 'growth');
+            ->assertStatus(402)->assertJsonPath('code', 'plan_required')->assertJsonPath('params.plan', 'starter');
+        $this->get('/api/purchase-orders/export', $this->auth)->assertStatus(402)->assertJsonPath('params.plan', 'growth')->assertJsonPath('params.feature', 'purchase_orders');
         $this->getJson("/api/forecasts/{$this->mug->id}", $this->auth)->assertJsonPath('data.locations', null);
         $this->getJson("/api/forecasts?location_id={$this->location->id}", $this->auth)->assertStatus(402);
     });

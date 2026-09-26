@@ -17,7 +17,7 @@ class SyncMaintenance extends Command
     {
         $stuck = $runs->runningStartedBefore(now()->subHours(config('sync.stuck_after_hours')));
         foreach ($stuck as $run) {
-            $sync->fail($run->id, new SyncFailedException('The sync took too long and was stopped. We will retry automatically tonight, or you can retry now.'));
+            $sync->fail($run->id, new SyncFailedException('timeout'));
         }
 
         $pruned = $runs->pruneFinishedBefore(now()->subDays(config('sync.keep_runs_days')));

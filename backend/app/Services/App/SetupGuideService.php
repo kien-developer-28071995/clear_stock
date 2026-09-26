@@ -84,7 +84,7 @@ class SetupGuideService
     public function skip(Shop $shop, SetupStep $step): array
     {
         if (! $step->skippable()) {
-            throw ValidationException::withMessages(['step' => 'This step can’t be skipped.']);
+            throw ValidationException::withMessages(['step' => 'step_not_skippable']);
         }
 
         return $this->update($shop, function (array $g) use ($step) {
@@ -135,7 +135,7 @@ class SetupGuideService
     private function assertIn(string $value, array $allowed, string $field): void
     {
         if (! in_array($value, $allowed, true)) {
-            throw ValidationException::withMessages([$field => 'Unknown value.']);
+            throw ValidationException::withMessages([$field => 'unknown_value']);
         }
     }
 }

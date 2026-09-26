@@ -17,17 +17,21 @@ class VariantSettingsRequest extends FormRequest
             // Local ids or Shopify variant gids (App Bridge resource picker).
             'variant_ids.*' => ['required', function (string $attr, mixed $value, \Closure $fail) {
                 if (! is_int($value) && ! (is_string($value) && preg_match('#^gid://shopify/ProductVariant/\d+$#', $value))) {
-                    $fail('Invalid product.');
+                    $fail('invalid_product');
                 }
             }],
             'supplier_id' => ['sometimes', 'nullable', 'integer', Rule::exists('suppliers', 'id')->where('shop_id', $shopId)],
             'lead_time_override' => ['sometimes', 'nullable', 'integer', 'min:0', 'max:365'],
             'safety_days' => ['sometimes', 'nullable', 'integer', 'min:0', 'max:365'],
+            'min_order_qty' => ['sometimes', 'nullable', 'integer', 'min:1', 'max:1000000'],
+            'pack_size' => ['sometimes', 'nullable', 'integer', 'min:1', 'max:100000'],
+            'min_stock' => ['sometimes', 'nullable', 'integer', 'min:0', 'max:1000000'],
+            'max_stock' => ['sometimes', 'nullable', 'integer', 'min:1', 'max:1000000'],
         ];
     }
 
     public function settings(): array
     {
-        return $this->safe()->only(['supplier_id', 'lead_time_override', 'safety_days']);
+        return $this->safe()->only(['supplier_id', 'lead_time_override', 'safety_days', 'min_order_qty', 'pack_size', 'min_stock', 'max_stock']);
     }
 }

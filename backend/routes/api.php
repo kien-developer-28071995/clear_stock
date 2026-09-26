@@ -2,8 +2,10 @@
 
 use App\Http\Controllers\Api\BillingController;
 use App\Http\Controllers\Api\BundleController;
+use App\Http\Controllers\Api\ClientErrorController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\ForecastController;
+use App\Http\Controllers\Api\ImportController;
 use App\Http\Controllers\Api\OnboardingController;
 use App\Http\Controllers\Api\PurchaseOrderController;
 use App\Http\Controllers\Api\SettingsController;
@@ -19,6 +21,9 @@ use Illuminate\Support\Facades\Route;
 // (no implicit route-model binding: it would run before the shop is known).
 Route::middleware('shopify.session')->group(function () {
     Route::get('/shop', [ShopController::class, 'show']);
+
+    // Errors from the embedded app, reported to Slack like server errors.
+    Route::post('/client-errors', [ClientErrorController::class, 'store'])->middleware('throttle:20,1');
 
     Route::get('/sync', [SyncController::class, 'show']);
     Route::post('/sync', [SyncController::class, 'store'])->middleware('throttle:10,1');
@@ -55,6 +60,10 @@ Route::middleware('shopify.session')->group(function () {
     Route::post('/billing', [BillingController::class, 'store'])->middleware('throttle:10,1');
 
     Route::get('/purchase-orders/export', [PurchaseOrderController::class, 'export']);
+
+    // Purchase order CSVs (Stocky and others) -> suppliers, product assignments, lead times.
+    Route::post('/imports/purchase-orders/preview', [ImportController::class, 'preview'])->middleware('throttle:30,1');
+    Route::post('/imports/purchase-orders/apply', [ImportController::class, 'apply'])->middleware('throttle:10,1');
 
     Route::get('/bundles', [BundleController::class, 'index']);
     Route::post('/bundles', [BundleController::class, 'store']);

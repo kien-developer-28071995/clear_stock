@@ -43,7 +43,7 @@ class ForecastShow extends Command
             $this->line(sprintf('  stock %d · %s/day · cover %s days · stock-out %s · reorder %s · order %d · %s',
                 $f->current_stock, $f->avg_daily_sales, $f->days_of_cover ?? '∞', $f->stockout_date?->toDateString() ?? '–',
                 $f->reorder_date?->toDateString() ?? '–', $f->suggested_qty, $f->confidence->value));
-            foreach ($formatter->sentences($f->explanation) as $sentence) {
+            foreach ($formatter->sentences($f->explanation, 'en') as $sentence) {
                 $this->line("  • {$sentence}");
             }
         }

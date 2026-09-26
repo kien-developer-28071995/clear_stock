@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { ActionGroup, ActionItem, Dashboard } from '@/features/dashboard/types';
 import { ExportPurchaseOrderButton } from '@/features/forecasts/components/ExportPurchaseOrderButton';
+import { translateCode } from '@/i18n/codes';
 import { daysUntil, formatDate, formatNumber } from '@/utils/format';
 
 const GROUPS: { key: ActionGroup; tone: 'critical' | 'warning' | 'neutral' }[] = [
@@ -24,19 +25,24 @@ function Row({ item, today, checked, onToggle }: { item: ActionItem; today: stri
 
     return (
         <s-box padding="small-200 base" borderWidth="small none none none" borderColor="base">
-            <s-grid gridTemplateColumns="auto minmax(0, 1fr) auto auto" gap="base" alignItems="center">
+            <s-grid gridTemplateColumns="auto minmax(0, 1fr)" gap="base" alignItems="center">
                 <s-checkbox label={t('actions.select')} labelAccessibilityVisibility="exclusive" checked={checked || undefined} onChange={onToggle} />
-                <s-stack gap="small-100">
-                    <s-link href={`/products/${item.variant_id}`}>{item.name}</s-link>
-                    <s-text color="subdued">{item.reason ?? t('actions.sellsPerDay', { rate: formatNumber(item.avg_daily_sales, 1) })}</s-text>
-                </s-stack>
-                <s-text tone={item.current_stock <= 0 ? 'critical' : undefined}>{stock}</s-text>
-                <s-stack gap="small-100" alignItems="end">
-                    <s-text type="strong">{t('actions.order', { qty: formatNumber(item.suggested_qty, 0) })}</s-text>
-                    {item.reorder_date && item.reorder_date > today && (
-                        <s-text color="subdued">{t('actions.orderBy', { date: formatDate(item.reorder_date) })}</s-text>
-                    )}
-                </s-stack>
+                {/* Narrow screens: stock and order quantity move under the product name. */}
+                <s-grid gridTemplateColumns="@container (inline-size > 460px) minmax(0, 1fr) auto, 1fr" gap="small-200" alignItems="center">
+                    <s-stack gap="small-100">
+                        <s-link href={`/products/${item.variant_id}`}>{item.name}</s-link>
+                        <s-text color="subdued">{item.reason ? translateCode('explanation', item.reason) : t('actions.sellsPerDay', { rate: formatNumber(item.avg_daily_sales, 1) })}</s-text>
+                    </s-stack>
+                    <s-stack direction="inline" gap="base" alignItems="center">
+                        <s-text tone={item.current_stock <= 0 ? 'critical' : undefined}>{stock}</s-text>
+                        <s-stack gap="small-100">
+                            <s-text type="strong">{t('actions.order', { qty: formatNumber(item.suggested_qty, 0) })}</s-text>
+                            {item.reorder_date && item.reorder_date > today && (
+                                <s-text color="subdued">{t('actions.orderBy', { date: formatDate(item.reorder_date) })}</s-text>
+                            )}
+                        </s-stack>
+                    </s-stack>
+                </s-grid>
             </s-grid>
         </s-box>
     );

@@ -178,7 +178,8 @@ it('fails the run with a clear message when Shopify cannot export', function () 
 
     expect($run->fresh()->status)->toBe(SyncRunStatus::Failed)
         ->and($this->shop->fresh()->sync_status->value)->toBe('failed')
-        ->and($this->shop->fresh()->sync_error)->toContain('could not export your orders');
+        ->and($this->shop->fresh()->sync_error)->toMatchArray(['code' => 'export_failed'])
+        ->and($this->shop->fresh()->sync_error['params'])->toMatchArray(['data' => 'orders', 'status' => 'FAILED']);
 });
 
 it('explains an access-denied export (protected customer data not approved)', function () {
@@ -191,7 +192,7 @@ it('explains an access-denied export (protected customer data not approved)', fu
 
     (new CheckSyncRun($run->id))->handle($this->sync);
 
-    expect($this->shop->fresh()->sync_error)->toContain("hasn't allowed this app to read your orders");
+    expect($this->shop->fresh()->sync_error)->toBe(['code' => 'export_access_denied', 'params' => ['data' => 'orders']]);
 });
 
 it('imports everything once all operations complete', function () {

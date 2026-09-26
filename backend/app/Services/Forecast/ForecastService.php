@@ -51,14 +51,16 @@ class ForecastService
             $ids = array_values(array_intersect($ids, $onlyVariantIds));
         }
         $stock = $this->catalog->stockByVariant($shop);
+        $incoming = $this->catalog->incomingByVariant($shop);
         $byLocation = $this->locationSupport->enabled($shop);
         $locationStock = $byLocation ? $this->catalog->stockByVariantAndLocation($shop) : [];
+        $locationIncoming = $byLocation ? $this->catalog->incomingByVariantAndLocation($shop) : [];
 
         $stats = ['variants' => 0, 'reorder_now' => 0, 'low_confidence' => 0, 'removed' => 0, 'not_forecasted' => $notForecasted, 'location_forecasts' => 0];
 
         foreach (array_chunk($ids, self::BATCH) as $batch) {
             $rows = [];
-            $inputs = $this->inputs->build($shop, $batch, $stock, $asOf);
+            $inputs = $this->inputs->build($shop, $batch, $stock, $asOf, $incoming);
             foreach ($inputs as $input) {
                 $r = $this->calculator->calculate($input);
                 $rows[] = $this->row($r, $computedAt);
@@ -71,7 +73,7 @@ class ForecastService
             // Growth: the same forecast per fulfilling location.
             if ($byLocation) {
                 $locationRows = [];
-                foreach ($this->inputs->buildForLocations($shop, $batch, $locationStock, $asOf, $inputs) as $item) {
+                foreach ($this->inputs->buildForLocations($shop, $batch, $locationStock, $asOf, $inputs, $locationIncoming) as $item) {
                     $locationRows[] = $this->row($this->calculator->calculate($item['input']), $computedAt) + ['location_id' => $item['location_id']];
                 }
                 $this->forecasts->replaceLocationForecasts($shop, $batch, $locationRows);
@@ -100,6 +102,7 @@ class ForecastService
         return [
             'variant_id' => $r->variantId,
             'current_stock' => $r->currentStock,
+            'incoming_stock' => $r->incomingStock,
             'avg_daily_sales' => $r->avgDailySales,
             'days_of_cover' => $r->daysOfCover,
             'stockout_date' => $r->stockoutDate,

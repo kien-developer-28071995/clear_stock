@@ -20,6 +20,7 @@ class ShopResource extends JsonResource
             'entitlements' => Entitlements::for($this->resource)->toArray(),
             'currency' => $this->currency,
             'timezone' => $this->timezone,
+            'locale' => $this->locale,                  // null = follow the Shopify admin language
             'sync_status' => $this->sync_status->value,
             'sync_error' => $this->sync_error,
             'last_synced_at' => $this->last_synced_at?->toIso8601String(),

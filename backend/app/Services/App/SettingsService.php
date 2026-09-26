@@ -25,6 +25,7 @@ class SettingsService
         return [
             'default_lead_time_days' => $shop->default_lead_time_days,
             'default_safety_days' => $shop->default_safety_days,
+            'locale' => $shop->locale,
             'alerts' => [
                 'available' => Entitlements::for($shop)->has(Feature::Alerts),
                 'email' => $alert?->email,
@@ -44,6 +45,10 @@ class SettingsService
             if ($changed) {
                 RecomputeForecasts::dispatch($shop->id);
             }
+        }
+
+        if (array_key_exists('locale', $data)) {
+            $shop = $this->shops->update($shop, ['locale' => $data['locale']]);
         }
 
         if (isset($data['alerts'])) {

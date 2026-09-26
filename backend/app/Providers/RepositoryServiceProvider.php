@@ -3,10 +3,12 @@
 namespace App\Providers;
 
 use App\Repositories\Cache\CachedAlertSettingRepository;
+use App\Repositories\Cache\CachedCatalogRepository;
 use App\Repositories\Cache\CachedForecastQueryRepository;
 use App\Repositories\Cache\CachedShopRepository;
 use App\Repositories\Cache\CachedSupplierRepository;
 use App\Repositories\Cache\CachedSyncRunRepository;
+use App\Repositories\Cache\CachedVariantRepository;
 use App\Repositories\Contracts\AlertLogRepositoryInterface;
 use App\Repositories\Contracts\AlertSettingRepositoryInterface;
 use App\Repositories\Contracts\CatalogRepositoryInterface;
@@ -49,12 +51,19 @@ class RepositoryServiceProvider extends ServiceProvider
             $app->make(Cache::class),
         ));
 
-        // Write-heavy bulk import paths: no read cache to decorate.
-        $this->app->singleton(CatalogRepositoryInterface::class, EloquentCatalogRepository::class);
+        $this->app->singleton(CatalogRepositoryInterface::class, fn ($app) => new CachedCatalogRepository(
+            new EloquentCatalogRepository,
+            $app->make(Cache::class),
+        ));
+        $this->app->singleton(VariantRepositoryInterface::class, fn ($app) => new CachedVariantRepository(
+            new EloquentVariantRepository,
+            $app->make(Cache::class),
+        ));
+
+        // Write-heavy bulk paths: no read cache to decorate.
         $this->app->singleton(DailySalesRepositoryInterface::class, EloquentDailySalesRepository::class);
         $this->app->singleton(ForecastRepositoryInterface::class, EloquentForecastRepository::class);
         $this->app->singleton(LocationSalesRepositoryInterface::class, EloquentLocationSalesRepository::class);
-        $this->app->singleton(VariantRepositoryInterface::class, EloquentVariantRepository::class);
         $this->app->singleton(AlertLogRepositoryInterface::class, EloquentAlertLogRepository::class);
 
         $this->app->singleton(ForecastQueryRepositoryInterface::class, fn ($app) => new CachedForecastQueryRepository(

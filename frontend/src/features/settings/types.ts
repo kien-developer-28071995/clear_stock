@@ -1,6 +1,8 @@
 export interface Settings {
     default_lead_time_days: number;
     default_safety_days: number;
+    /** null = follow the Shopify admin language */
+    locale: string | null;
     alerts: { available: boolean; email: string | null; enabled: boolean; frequency: 'daily' | 'weekly'; weekly_day: number };
 }
 

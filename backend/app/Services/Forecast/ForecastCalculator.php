@@ -58,19 +58,33 @@ class ForecastCalculator
         $safety = $this->safetyDays($in);
 
         // --- 5. Reorder maths -----------------------------------------------------------
+        // Reordering looks at the stock position: on hand + already on the way. Shopify
+        // gives no arrival date for incoming stock, so the stock-out date and days of
+        // cover use what is on hand only.
         $stock = $in->currentStock;
+        $incoming = max(0, $in->incomingStock);
+        $position = $stock + $incoming;
         $cycle = (int) $this->config['order_cycle_days'];
-        $reorderPoint = (int) ceil($avg * ($leadTime['days'] + $safety['days']) - 1e-9);
-        $suggested = max(0, (int) ceil($avg * ($leadTime['days'] + $safety['days'] + $cycle) - $stock - 1e-9));
+        $computedPoint = (int) ceil($avg * ($leadTime['days'] + $safety['days']) - 1e-9);
+        $computedTarget = $avg * ($leadTime['days'] + $safety['days'] + $cycle);
+        // Manual min/max (Stocky style) replace the computed reorder point / order-up-to level.
+        $min = $in->minStock;
+        $max = $in->maxStock !== null && $in->maxStock > 0 ? $in->maxStock : null;
+        $reorderPoint = $min ?? ($max !== null ? min($computedPoint, $max) : $computedPoint);
+        $target = $max ?? max($computedTarget, (float) $reorderPoint);
+        $needed = max(0, (int) ceil($target - $position - 1e-9));
+        $rounding = $this->roundOrder($needed, $in->minOrderQty, $in->packSize);
+        $suggested = $rounding['final'];
 
         if ($avg <= 0) {
             $daysOfCover = $stock <= 0 ? 0.0 : null;
             $stockoutDate = null;
-            $reorderDate = null;
+            // Without sales only a manual minimum triggers a reorder.
+            $reorderDate = $min !== null && $position <= $min ? $in->asOf->toDateString() : null;
         } else {
             $daysOfCover = $stock <= 0 ? 0.0 : round($stock / $avg, 1);
             $stockoutDate = $in->asOf->addDays($stock <= 0 ? 0 : (int) floor($stock / $avg))->toDateString();
-            $reorderDate = $in->asOf->addDays($stock <= $reorderPoint ? 0 : (int) floor(($stock - $reorderPoint) / $avg))->toDateString();
+            $reorderDate = $in->asOf->addDays($position <= $reorderPoint ? 0 : (int) floor(($position - $reorderPoint) / $avg))->toDateString();
         }
 
         $confidence = $this->confidence($windows, $series, $end, $avgOverride !== null);
@@ -98,13 +112,18 @@ class ForecastCalculator
             'computed_avg' => round($computedAvg, 2),
             'lead_time' => $leadTime,
             'safety' => $safety + ['units' => round($avg * $safety['days'], 1)],
-            'stock' => ['current' => $stock],
+            'stock' => ['current' => $stock, 'incoming' => $incoming, 'position' => $position],
             'reorder' => [
                 'lead_time_demand' => round($avg * $leadTime['days'], 1),
                 'point' => $reorderPoint,
                 'date' => $reorderDate,
                 'order_cycle_days' => $cycle,
                 'suggested_qty' => $suggested,
+                'computed_point' => $computedPoint,
+                'min_stock' => $min,
+                'max_stock' => $max,
+                // What the supplier accepts: minimum order and whole packs (only when ordering).
+                'rounding' => $rounding,
             ],
             'days_of_cover' => $daysOfCover,
             'stockout_date' => $stockoutDate,
@@ -119,6 +138,7 @@ class ForecastCalculator
         return new ForecastResult(
             variantId: $in->variantId,
             currentStock: $stock,
+            incomingStock: $incoming,
             avgDailySales: $avg,
             daysOfCover: $daysOfCover,
             stockoutDate: $stockoutDate,
@@ -368,5 +388,27 @@ class ForecastCalculator
         $variance = array_sum(array_map(fn ($r) => ($r - $mean) ** 2, $rates)) / count($rates);
 
         return round(sqrt($variance) / $mean, 2);
+    }
+
+    /**
+     * Raise an order to the minimum order quantity, then round up to whole packs.
+     * Nothing to order stays nothing.
+     *
+     * @return array{needed: int, min_order_qty: ?int, pack_size: ?int, final: int}
+     */
+    private function roundOrder(int $needed, ?int $minOrderQty, ?int $packSize): array
+    {
+        $minOrderQty = $minOrderQty !== null && $minOrderQty > 1 ? $minOrderQty : null;
+        $packSize = $packSize !== null && $packSize > 1 ? $packSize : null;
+
+        $final = $needed;
+        if ($final > 0 && $minOrderQty !== null) {
+            $final = max($final, $minOrderQty);
+        }
+        if ($final > 0 && $packSize !== null) {
+            $final = (int) (ceil($final / $packSize) * $packSize);
+        }
+
+        return ['needed' => $needed, 'min_order_qty' => $minOrderQty, 'pack_size' => $packSize, 'final' => $final];
     }
 }

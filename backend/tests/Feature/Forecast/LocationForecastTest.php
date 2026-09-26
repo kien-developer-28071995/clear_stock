@@ -166,7 +166,7 @@ describe('API', function () {
             ->assertJsonPath('data.locations.0.available', 40)
             ->assertJsonPath('data.locations.0.forecast.avg_daily_sales', 3)
             ->assertJsonPath('data.locations.1.location', 'Saigon')
-            ->assertJsonPath('data.locations.1.forecast.explanation_sentences.0', 'Sells 1/day over the last 30 days.');
+            ->assertJsonPath('data.locations.1.forecast.explanation_lines.0', ['code' => 'sells_over_window', 'params' => ['avg' => 1, 'count' => 30]]);
     });
 
     it('filters the product list by location and lists locations', function () {

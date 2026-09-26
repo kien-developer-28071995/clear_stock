@@ -18,11 +18,11 @@ class InventoryLevel extends Model
 {
     use BelongsToShop, HasFactory;
 
-    protected $fillable = ['shop_id', 'variant_id', 'location_id', 'available'];
+    protected $fillable = ['shop_id', 'variant_id', 'location_id', 'available', 'incoming'];
 
     protected function casts(): array
     {
-        return ['available' => 'integer'];
+        return ['available' => 'integer', 'incoming' => 'integer'];
     }
 
     public function variant(): BelongsTo

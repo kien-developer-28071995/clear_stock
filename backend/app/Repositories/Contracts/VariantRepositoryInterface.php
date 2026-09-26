@@ -24,6 +24,9 @@ interface VariantRepositoryInterface
     /** @param array<int, int> $ids @return int rows updated */
     public function bulkUpdateSettings(Shop $shop, array $ids, array $settings): int;
 
+    /** Active variants with the fields used to match rows of an imported file (SKU, Shopify id, names). */
+    public function forImport(Shop $shop): Collection;
+
     /** @return Collection<int, Variant> bundles with their components (+ component variant) */
     public function bundles(Shop $shop): Collection;
 

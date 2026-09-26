@@ -82,6 +82,12 @@ return [
 
     'fallback_locale' => env('APP_FALLBACK_LOCALE', 'en'),
 
+    /*
+    | Languages the embedded app is translated into (frontend/src/i18n/locales/*.json).
+    | The frontend owns all UI text; the backend only validates the saved choice.
+    */
+    'supported_locales' => ['en', 'vi'],
+
     'faker_locale' => env('APP_FAKER_LOCALE', 'en_US'),
 
     /*

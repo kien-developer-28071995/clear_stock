@@ -78,7 +78,7 @@ class EloquentCatalogRepository implements CatalogRepositoryInterface
         $rows = array_map(fn ($r) => $r + ['shop_id' => $shop->id, 'created_at' => $now, 'updated_at' => $now], $rows);
 
         foreach (array_chunk($rows, self::CHUNK) as $chunk) {
-            DB::table('inventory_levels')->upsert($chunk, ['variant_id', 'location_id'], ['available', 'updated_at']);
+            DB::table('inventory_levels')->upsert($chunk, ['variant_id', 'location_id'], ['available', 'incoming', 'updated_at']);
         }
     }
 
@@ -112,24 +112,46 @@ class EloquentCatalogRepository implements CatalogRepositoryInterface
 
     public function stockByVariant(Shop $shop): array
     {
+        return $this->sumByVariant($shop, 'available');
+    }
+
+    public function stockByVariantAndLocation(Shop $shop): array
+    {
+        return $this->byVariantAndLocation($shop, 'available');
+    }
+
+    public function incomingByVariant(Shop $shop): array
+    {
+        return array_filter($this->sumByVariant($shop, 'incoming'));
+    }
+
+    public function incomingByVariantAndLocation(Shop $shop): array
+    {
+        return array_filter(array_map('array_filter', $this->byVariantAndLocation($shop, 'incoming')));
+    }
+
+    /** @return array<int, int> */
+    private function sumByVariant(Shop $shop, string $column): array
+    {
         return DB::table('inventory_levels')
             ->join('locations', 'locations.id', '=', 'inventory_levels.location_id')
             ->where('inventory_levels.shop_id', $shop->id)
             ->where('locations.is_active', true)
             ->groupBy('inventory_levels.variant_id')
-            ->selectRaw('inventory_levels.variant_id as variant_id, SUM(inventory_levels.available) as stock')
-            ->pluck('stock', 'variant_id')->mapWithKeys(fn ($s, $id) => [(int) $id => (int) $s])->all();
+            ->selectRaw("inventory_levels.variant_id as variant_id, SUM(inventory_levels.{$column}) as qty")
+            ->pluck('qty', 'variant_id')->mapWithKeys(fn ($s, $id) => [(int) $id => (int) $s])->all();
     }
 
-    public function stockByVariantAndLocation(Shop $shop): array
+    /** @return array<int, array<int, int>> */
+    private function byVariantAndLocation(Shop $shop, string $column): array
     {
         $out = [];
         DB::table('inventory_levels')
             ->join('locations', 'locations.id', '=', 'inventory_levels.location_id')
             ->where('inventory_levels.shop_id', $shop->id)->where('locations.is_active', true)
             ->orderBy('inventory_levels.id')
-            ->each(function ($r) use (&$out) {
-                $out[(int) $r->variant_id][(int) $r->location_id] = (int) $r->available;
+            ->each(function ($r) use (&$out, $column) {
+                $out[(int) $r->variant_id][(int) $r->location_id] = (int) $r->{$column};
             }, 5000);
 
         return $out;
@@ -141,5 +163,10 @@ class EloquentCatalogRepository implements CatalogRepositoryInterface
             ->get(['id', 'tracked', 'shopify_created_at'])
             ->mapWithKeys(fn ($v) => [(int) $v->id => ['tracked' => (bool) $v->tracked, 'created' => $v->shopify_created_at]])
             ->all();
+    }
+
+    public function countTrackedVariants(Shop $shop): int
+    {
+        return DB::table('variants')->where('shop_id', $shop->id)->where('is_active', true)->where('tracked', true)->count();
     }
 }

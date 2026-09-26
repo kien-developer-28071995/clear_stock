@@ -1,0 +1,48 @@
+<?php
+
+// English rendering of forecast explanation lines (codes from ExplanationFormatter::lines())
+// for the alert email and the CLI. The app UI translates the same codes itself in
+// frontend/src/i18n/locales/*.json.
+return [
+    'date_format' => 'MMM D',
+
+    'avg_override' => 'You set sales to :avg/day; our estimate was :computed/day.',
+    'avg_override_note' => 'You set sales to :avg/day (:note); our estimate was :computed/day.',
+    'no_rate_yet' => 'Not enough in-stock days yet to measure a sales rate.',
+    'no_sales_while_in_stock' => 'No sales in the last :count day while in stock.|No sales in the last :count days while in stock.',
+    'sells_over_window' => 'Sells :avg/day over the last :count day.|Sells :avg/day over the last :count days.',
+    'sells_over_window_excluded' => 'Sells :avg/day over the last :days days (:count out-of-stock day left out).|Sells :avg/day over the last :days days (:count out-of-stock days left out).',
+    'blended_rate' => 'Blended rate :avg/day (:parts).',
+    'window_part' => ':count day :avg/day × :weight%|:count days :avg/day × :weight%',
+    'seasonality_rose' => 'Last year, sales rose ×:factor over the next :count day, so we adjusted to :avg/day.|Last year, sales rose ×:factor over the next :count days, so we adjusted to :avg/day.',
+    'seasonality_fell' => 'Last year, sales fell ×:factor over the next :count day, so we adjusted to :avg/day.|Last year, sales fell ×:factor over the next :count days, so we adjusted to :avg/day.',
+    'bundle_contribution' => 'Includes :avg/day sold inside ":bundle" (:count per bundle).',
+    'reorder_point' => 'Lead time :lead_days days (:lead_source) + :safety_days safety days → reorder point :count unit.|Lead time :lead_days days (:lead_source) + :safety_days safety days → reorder point :count units.',
+    'reorder_point_manual' => 'Reorder point set by you: :count unit.|Reorder point set by you: :count units.',
+    'order_up_to_max' => 'Orders fill up to your maximum of :count unit.|Orders fill up to your maximum of :count units.',
+    'below_min_order' => ':stock in stock (with stock on the way) is at or below your minimum → order :count unit today.|:stock in stock (with stock on the way) is at or below your minimum → order :count units today.',
+    'above_min' => ':stock in stock (with stock on the way) is above your minimum; no sales yet, so nothing to order.',
+    'no_order_needed' => 'Nothing to order right now.',
+    'lead_source_override' => 'set by you for this forecast',
+    'lead_source_variant' => 'set for this SKU',
+    'lead_source_supplier' => 'supplier :supplier',
+    'lead_source_shop_default' => 'store default',
+    'incoming_stock' => ':count unit is already on the way (purchase orders or transfers in Shopify) and counts toward this order.|:count units are already on the way (purchase orders or transfers in Shopify) and count toward this order.',
+    'out_of_stock_incoming_covers' => 'Out of stock now; the stock on the way covers the next reorder, so no new order is needed.',
+    'runs_out_incoming_covers' => ':stock in stock runs out around :stockout_date; the stock on the way covers the next reorder, so no new order is needed.',
+    'rounded_min' => 'You need :needed; the supplier minimum is :min, so order :count.',
+    'rounded_pack' => 'You need :needed; rounded up to whole packs of :pack → :count.',
+    'rounded_min_and_pack' => 'You need :needed; the supplier minimum is :min, in packs of :pack → :count.',
+    'order_today_out_of_stock' => 'Out of stock now → order :count unit today.|Out of stock now → order :count units today.',
+    'runs_out' => ':stock in stock runs out around :stockout_date → order :count unit by :reorder_date.|:stock in stock runs out around :stockout_date → order :count units by :reorder_date.',
+    'confidence' => 'Confidence: :level.',
+    'confidence_with_reasons' => 'Confidence: :level (:reasons).',
+    'confidence_high' => 'high',
+    'confidence_medium' => 'medium',
+    'confidence_low' => 'low',
+    'reason_little_history' => 'only :count day of in-stock history|only :count days of in-stock history',
+    'reason_few_sales' => 'few sales (:count in 90 days)',
+    'reason_no_sales' => 'no sales in 90 days',
+    'reason_volatile' => 'sales vary a lot week to week',
+    'reason_average_overridden' => 'rate set manually',
+];

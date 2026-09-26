@@ -1,7 +1,15 @@
 import { useTranslation } from 'react-i18next';
-import { ApiError } from '@/lib/http';
+import { ApiError, errorMessage } from '@/lib/http';
+import { translateCode } from '@/i18n/codes';
+import type { Coded } from '@/types/coded';
 import { useStartSync, useSyncStatus } from '@/features/sync/hooks/useSync';
 import { timeAgo } from '@/utils/format';
+
+/** `data` names what Shopify failed to export (orders, variants, inventory). */
+function syncErrorMessage(error: Coded): string {
+    const data = typeof error.params.data === 'string' ? { code: `data_${error.params.data}`, params: {} } : undefined;
+    return translateCode('sync.errors', { code: error.code, params: { ...error.params, ...(data && { data }) } });
+}
 
 /** Sync progress, last sync time and errors, with a "Sync now" action. */
 export function SyncStatusCard() {
@@ -27,7 +35,7 @@ export function SyncStatusCard() {
 
     const running = sync.status === 'running';
     const run = sync.run;
-    const startError = start.error instanceof ApiError ? start.error.message : null;
+    const startError = start.error instanceof ApiError ? errorMessage(start.error) : null;
 
     return (
         <s-section heading={t('sync.heading')}>
@@ -37,14 +45,14 @@ export function SyncStatusCard() {
                         <s-text>{run.type === 'initial' ? t('sync.importingInitial') : t('sync.updating')}</s-text>
                         <s-progress value={run.progress} max={100} accessibilityLabel={t('sync.progressLabel')} />
                         <s-text color="subdued">
-                            {run.stage_label} · {run.progress}%
+                            {translateCode('sync.stages', { code: run.stage, params: {} })} · {run.progress}%
                         </s-text>
                     </s-stack>
                 )}
 
                 {sync.status === 'failed' && sync.error && (
                     <s-banner tone="critical" heading={t('sync.failed')}>
-                        <s-paragraph>{sync.error}</s-paragraph>
+                        <s-paragraph>{syncErrorMessage(sync.error)}</s-paragraph>
                     </s-banner>
                 )}
 

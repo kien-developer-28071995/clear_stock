@@ -32,7 +32,7 @@ it('returns the sync status for the progress bar', function () {
         ->assertOk()
         ->assertJsonPath('data.run.stage', 'fetching')
         ->assertJsonPath('data.run.progress', 30)
-        ->assertJsonPath('data.run.stage_label', 'Downloading products, inventory and orders from Shopify');
+        ->assertJsonMissingPath('data.run.stage_label'); // the app translates the stage code
 });
 
 it('shows fresh progress immediately (cache invalidated on update)', function () {
@@ -95,5 +95,5 @@ it('fails stuck runs and prunes old ones', function () {
 
     expect($stuck->fresh()->status)->toBe(SyncRunStatus::Failed)
         ->and(SyncRun::find($old->id))->toBeNull()
-        ->and($this->shop->fresh()->sync_error)->toContain('took too long');
+        ->and($this->shop->fresh()->sync_error)->toBe(['code' => 'timeout', 'params' => []]);
 });

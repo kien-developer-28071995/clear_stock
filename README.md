@@ -154,7 +154,8 @@ Pure calculator (`app/Services/Forecast/ForecastCalculator.php`, no DB access) p
 2. **Sales rate:** averages over the last 7 / 30 / 90 days counting **in-stock days only** (out-of-stock days are excluded and reported). A window needs 4 / 10 / 20 in-stock days to be used. Weights are 20% / 50% / 30%, re-normalised over the usable windows.
 3. **Seasonality:** last year, next 28 days vs previous 28 days (4 full weeks, so weekly order patterns don't look seasonal). It is applied only with ≥ 70% in-stock days and ≥ 10 units last year, and only when the change exceeds ±10%. It is clamped to ×0.5 – ×2.5.
 4. **Overrides:** a merchant override of the sales rate replaces the computed rate. Lead time resolves as override → SKU → supplier → store default (14 days). Safety days resolve as override → SKU → store default (7 days). Expired overrides are ignored.
-5. **Reorder maths:** reorder point = rate × (lead time + safety days). Suggested qty = rate × (lead time + safety + 30-day order cycle) − stock. Days of cover = stock ÷ rate. The stock-out and reorder dates follow from these.
+5. **Reorder maths:** reorder point = rate × (lead time + safety days). Reordering uses the **stock position** = on hand + on the way (Shopify's `incoming` quantity: purchase orders and transfers created in Shopify). Suggested qty = rate × (lead time + safety + 30-day order cycle) − stock position, and the reorder date is when the stock position reaches the reorder point. Shopify gives no arrival date for incoming stock, so days of cover (= on hand ÷ rate) and the stock-out date use on-hand stock only.
+   Per product, merchants can also set a **minimum order quantity** and **pack size** (the order is raised to the minimum, then rounded up to whole packs; never changes when to order), and a manual **min / max** as in Stocky (min replaces the reorder point, max the order-up-to level; products without sales reorder only through min). Min/max apply to the store-wide forecast, not per location.
 6. **Confidence:** *low* with fewer than 14 in-stock days or fewer than 5 units in 90 days, or when the weekly coefficient of variation is above 1.0. *high* with ≥ 60 in-stock days, ≥ 30 units and weekly CV ≤ 0.5. Anything else is *medium*.
 
 Every intermediate number is stored in `forecasts.explanation` (JSON). `ExplanationFormatter` turns it into sentences, for example: *"Sells 4/day over the last 30 days (3 out-of-stock days left out). Lead time 14 days (store default) + 7 safety days → reorder point 84 units. 100 in stock runs out around Oct 15 → order 104 units by Sep 24. Confidence: high."*
@@ -170,7 +171,9 @@ Every intermediate number is stored in `forecasts.explanation` (JSON). `Explanat
 | Screen | What it shows |
 |---|---|
 | **Onboarding** (first open) | Import progress + two questions: default lead time (pre-filled 14 days) and alert email (pre-filled with the store's contact email). |
-| **Home** ("aha") | A to-do list first: products grouped into *Out of stock*, *Order today* and *Order this week*, each with a one-line reason and the quantity to order. Today's rows start selected, so "Export purchase order" produces today's order in one click (Growth). Below that: a stock runway chart (days of stock left vs each product's lead time + safety line), cash tied up in slow stock, and sync status. |
+| **Home** ("aha") | Only what needs attention: four numbers (out of stock, reorder now, order this week, slow-moving stock), the five most urgent products with a one-line reason, the setup guide for new shops, and the sync card while a sync runs or failed. |
+| **Reorder** | Everything to reorder in the next 7 days, grouped into *Out of stock*, *Order today* and *Order this week*. Today's rows start selected, so "Export purchase order" produces today's order in one click (Growth). |
+| **Insights** | Stock runway chart (days of stock left vs each product's lead time + safety line) and cash tied up in slow stock. |
 | **Setup guide + tips** | A 5-step guide on Home (Shopify onboarding guidance: ≤ 5 steps, auto-completed, progress, dismissible): import data, default lead time, see why a product needs reordering, suppliers (skippable), alerts (skippable; points to Plans on Free). Steps complete from real data or recorded events (`shops.setup_guide` JSON). Three one-time contextual tips (home actions, runway, product explanation) are dismissible and remembered per shop. A dismissed guide can be brought back from Settings. |
 | **Products** | Every tracked variant: status, stock, sales/day, days left, order-by date, suggested quantity. Search, status filter and sort live in the URL. |
 | **Product detail** | Summary, "Why these numbers?" (sentences + per-window table + seasonality), a temporary sales-rate adjustment (optional end date), per-product supplier / lead time / safety days. |
@@ -184,9 +187,26 @@ API (session-token authenticated): `GET /api/dashboard`, `GET|POST /api/onboardi
 
 ---
 
+## Languages
+
+The app is translated into English and Vietnamese (react-i18next). It follows the Shopify admin language; merchants can override it in **Settings → Language** (saved on the shop).
+
+- All UI text lives in the frontend: `frontend/src/i18n/locales/<lang>.json`. The API never returns sentences; it returns snake_case codes with raw params (errors `{code, params}`, validation `errors.<field>[{code, params}]`, forecast `explanation_lines`, sync `stage` and `error`), which the app translates.
+- **Add a language:** copy `en.json` to e.g. `fr.json`, translate, add `'fr'` to `supported_locales` in `backend/config/app.php`. `npm run i18n:check` (also part of `npm run build`) fails on missing keys or plural forms.
+- Alert emails are English only.
+
+## Importing from Stocky (purchase order CSVs)
+
+Stocky can't export suppliers, only purchase orders. **Suppliers → Import from Stocky** (`/suppliers/import`) rebuilds them from one or more purchase order CSVs (Stocky, other apps, spreadsheets):
+
+- Columns are detected from header aliases (`app/Services/Import/PurchaseOrderCsv.php`); date columns must contain dates. The merchant can re-map any column in the app. Comma, semicolon and tab delimiters and a UTF-8 BOM are handled.
+- Suppliers: one per supplier name (reusing existing ones, case-insensitive). Lead time: median days from order date to received date (or expected date when not received), per purchase order.
+- Products are matched by Shopify variant ID, then SKU, then product/variant name. Each product is linked to the supplier it was ordered from most recently. Products that already have a supplier are kept unless the merchant ticks "replace".
+- Two stateless endpoints (the app sends the files twice): `POST /api/imports/purchase-orders/preview` and `/apply`. Nothing is stored before apply. Forecasts are recomputed afterwards.
+
 ## Plans, billing and alerts
 
-| | Free | Starter $2/mo ($19/yr), 7-day trial | Growth $3/mo ($29/yr), 7-day trial |
+| | Free | Starter $4/mo ($38/yr), 7-day trial | Growth $5/mo ($48/yr), 7-day trial |
 |---|---|---|---|
 | Forecasts + reorder suggestions | 50 best sellers | Unlimited | Unlimited |
 | "Why this number?" explanations | ✓ | ✓ | ✓ |
@@ -235,6 +255,15 @@ Backend and frontend are separate projects; the repo root only holds infra.
 - Running tools outside Docker: `cd backend && composer install && php artisan test`, `cd frontend && npm install && npm run dev`.
 
 ---
+
+## Error monitoring (Slack)
+
+Errors are posted to one Slack channel through an incoming webhook (`MONITORING_SLACK_WEBHOOK_URL`; empty = off). Test it with `make artisan c="monitoring:test"`.
+
+- **What is sent:** every log record at `error` or above, whatever the log channel (listener on Laravel's `MessageLogged`): unhandled exceptions in requests, jobs and commands, jobs that failed permanently, failed syncs, errors caught in `try/catch` via `App\Support\Monitor::caught()`, and frontend crashes (JavaScript errors and React render errors, posted by the app to `POST /api/client-errors`).
+- **What is not:** expected outcomes (`ApiException` 4xx, validation, plan limits, invalid session tokens) and handled, expected conditions logged with `Monitor::expected()` (warnings; set `MONITORING_SLACK_LEVEL=warning` to include them).
+- **Each alert shows** the environment, message, exception class, file:line, app stack frames, and where it happened (shop domain, `METHOD /path` without query string, job or command). Only whitelisted context keys are included, and tokens/secrets are masked. No customer data.
+- **No spam:** the same error (class + place, or message shape) is posted at most once per `MONITORING_THROTTLE_SECONDS` (10 min); the next alert says how many repeats were suppressed. Posting happens after the HTTP response is sent and never throws.
 
 ## Production
 

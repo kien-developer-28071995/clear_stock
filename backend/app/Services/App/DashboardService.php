@@ -64,7 +64,7 @@ class DashboardService
 
     private function item(Forecast $f, bool $explain): array
     {
-        $sentences = $explain ? $this->formatter->sentences($f->explanation) : [];
+        $lines = $explain ? $this->formatter->lines($f->explanation) : [];
 
         return [
             'variant_id' => $f->variant_id,
@@ -77,8 +77,9 @@ class DashboardService
             'reorder_date' => $f->reorder_date?->toDateString(),
             'suggested_qty' => $f->suggested_qty,
             'confidence' => $f->confidence->value,
-            'reason' => $sentences[0] ?? null,
-            'explanation' => $sentences,
+            // Explanation lines as {code, params}; the app translates them.
+            'reason' => $lines[0] ?? null,
+            'explanation_lines' => $lines,
         ];
     }
 }

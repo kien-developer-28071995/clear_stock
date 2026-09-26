@@ -25,12 +25,11 @@ class SyncStatusResource extends JsonResource
         return [
             'status' => $shop->sync_status->value,     // pending | running | completed | failed
             'last_synced_at' => $shop->last_synced_at?->toIso8601String(),
-            'error' => $shop->sync_error,
+            'error' => $shop->sync_error,               // {code, params} or null
             'run' => $run ? [
                 'id' => $run->id,
                 'type' => $run->type->value,
                 'stage' => $run->stage->value,
-                'stage_label' => $run->stage->label(),
                 'progress' => $run->progress,
                 'started_at' => $run->started_at->toIso8601String(),
                 'finished_at' => $run->finished_at?->toIso8601String(),

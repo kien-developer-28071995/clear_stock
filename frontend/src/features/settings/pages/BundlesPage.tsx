@@ -1,4 +1,5 @@
 import { useModal } from '@/hooks/useModal';
+import { useConfirm } from '@/components/ui/ConfirmModal';
 import { useTranslation } from 'react-i18next';
 import { ErrorBanner } from '@/components/ui/ErrorBanner';
 import { UpgradePrompt } from '@/components/ui/UpgradePrompt';
@@ -13,11 +14,11 @@ export function BundlesPage() {
     const { data, isPending, error, refetch } = useBundles();
     const remove = useDeleteBundle();
     const modal = useModal();
+    const { confirm, modal: confirmModal } = useConfirm();
 
-    const confirmDelete = (b: Bundle) => {
-        if (window.confirm(t('bundles.confirmRemove', { name: b.name }))) {
-            remove.mutate(b.variant_id, { onSuccess: () => shopify.toast.show(t('bundles.removed')) });
-        }
+    const confirmDelete = async (b: Bundle) => {
+        const ok = await confirm({ heading: t('confirm.removeBundle'), body: t('bundles.confirmRemove', { name: b.name }), confirmLabel: t('common.remove'), destructive: true });
+        if (ok) remove.mutate(b.variant_id, { onSuccess: () => shopify.toast.show(t('bundles.removed')) });
     };
 
     return (
@@ -69,6 +70,7 @@ export function BundlesPage() {
             )}
 
             <BundleModal modalRef={modal.ref} onDone={modal.close} />
+            {confirmModal}
         </s-page>
     );
 }

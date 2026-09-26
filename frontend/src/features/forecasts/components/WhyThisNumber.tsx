@@ -23,7 +23,7 @@ export function WhyThisNumber({ f }: { f: ForecastDetail }) {
     return (
         <s-section heading={t('why.heading')}>
             <s-stack gap="base">
-                <Explanation sentences={f.explanation_sentences} />
+                <Explanation lines={f.explanation_lines} />
 
                 <s-table>
                     <s-table-header-row>

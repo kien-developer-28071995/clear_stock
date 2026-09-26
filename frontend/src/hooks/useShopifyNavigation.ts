@@ -12,7 +12,9 @@ export function useShopifyNavigation() {
     useEffect(() => {
         const handler = (event: Event) => {
             const href = (event.target as HTMLElement | null)?.getAttribute('href');
-            if (href && href.startsWith('/')) navigate(href);
+            if (!href || !href.startsWith('/')) return;
+            // Unsaved changes in a save bar: ask before leaving (resolves at once when there are none).
+            void (shopify.saveBar?.leaveConfirmation?.() ?? Promise.resolve()).then(() => navigate(href));
         };
         document.addEventListener('shopify:navigate', handler);
         return () => document.removeEventListener('shopify:navigate', handler);

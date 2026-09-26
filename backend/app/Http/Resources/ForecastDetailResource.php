@@ -18,7 +18,8 @@ class ForecastDetailResource extends ForecastResource
         return parent::toArray($request) + [
             // The reasoning is a paid feature; the numbers themselves are always shown.
             'explanation' => $explain ? $this->explanation : null,
-            'explanation_sentences' => $explain ? app(ExplanationFormatter::class)->sentences($this->explanation) : [],
+            // {code, params} lines; the app turns them into sentences in its language.
+            'explanation_lines' => $explain ? app(ExplanationFormatter::class)->lines($this->explanation) : [],
             'explanation_locked' => ! $explain,
             'computed_avg' => (float) ($this->explanation['computed_avg'] ?? $this->avg_daily_sales),
             // Growth: stock and forecast per location (forecast null when not computed there).
@@ -32,6 +33,10 @@ class ForecastDetailResource extends ForecastResource
                 'supplier_id' => $v->supplier_id,
                 'lead_time_override' => $v->lead_time_override,
                 'safety_days' => $v->safety_days,
+                'min_order_qty' => $v->min_order_qty,
+                'pack_size' => $v->pack_size,
+                'min_stock' => $v->min_stock,
+                'max_stock' => $v->max_stock,
             ],
             'defaults' => $shop,
         ];
@@ -51,6 +56,7 @@ class ForecastDetailResource extends ForecastResource
             'location' => $l['location'],
             'available' => $l['available'],
             'forecast' => $l['forecast'] === null ? null : [
+                'incoming_stock' => $l['forecast']->incoming_stock,
                 'avg_daily_sales' => (float) $l['forecast']->avg_daily_sales,
                 'days_of_cover' => $l['forecast']->days_of_cover !== null ? (float) $l['forecast']->days_of_cover : null,
                 'stockout_date' => $l['forecast']->stockout_date?->toDateString(),
@@ -58,7 +64,7 @@ class ForecastDetailResource extends ForecastResource
                 'reorder_point' => $l['forecast']->reorder_point,
                 'suggested_qty' => $l['forecast']->suggested_qty,
                 'confidence' => $l['forecast']->confidence->value,
-                'explanation_sentences' => $explain ? $formatter->sentences($l['forecast']->explanation) : [],
+                'explanation_lines' => $explain ? $formatter->lines($l['forecast']->explanation) : [],
             ],
         ], $locations);
     }

@@ -27,19 +27,4 @@ enum SyncStage: string
             self::Failed => 0,
         };
     }
-
-    /** Merchant-facing label. */
-    public function label(): string
-    {
-        return match ($this) {
-            self::Queued => 'Starting sync',
-            self::Fetching => 'Downloading products, inventory and orders from Shopify',
-            self::ImportingCatalog => 'Importing products and variants',
-            self::ImportingInventory => 'Importing inventory levels',
-            self::ImportingOrders => 'Calculating daily sales',
-            self::RebuildingStock => 'Detecting out-of-stock days',
-            self::Completed => 'Sync complete',
-            self::Failed => 'Sync failed',
-        };
-    }
 }

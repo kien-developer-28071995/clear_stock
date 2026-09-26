@@ -88,13 +88,13 @@ Mỗi forecast lưu explanation gồm: các cửa sổ ngày đã dùng và tr�
 
 ## Gói giá (Billing API)
 - Free: dưới 50 SKU, có dự báo, gợi ý nhập hàng và giải thích dự báo đầy đủ (quyết định 2026-09-26: giải thích mở cho mọi gói vì là lời hứa "minh bạch")
-- Starter $2/tháng ($19/năm): không giới hạn SKU, bundle, cảnh báo email (dùng thử 7 ngày, một lần mỗi shop)
-- Growth $3/tháng ($29/năm): multi-location, xuất purchase order (dùng thử 7 ngày)
-- Giá hạ từ $9/$24 xuống $2/$3 ngày 2026-09-26 (quyết định của chủ app)
+- Starter $4/tháng ($38/năm): không giới hạn SKU, bundle, cảnh báo email (dùng thử 7 ngày, một lần mỗi shop)
+- Growth $5/tháng ($48/năm): multi-location, xuất purchase order (dùng thử 7 ngày)
+- Giá hạ từ $9/$24 xuống $2/$3 rồi nâng lên $4/$5 ngày 2026-09-26 (quyết định của chủ app). Shop đang trả tiền giữ giá cũ tới khi tự đổi gói (subscription Shopify giữ nguyên giá)
 - Gói năm giảm ~20%
 
 Giá cố định, không tính theo GMV, không hợp đồng, hủy bất cứ lúc nào.
-Tối ưu chi phí hạ tầng mỗi shop để gói $2 vẫn có lãi: job gộp theo lô, chỉ đồng bộ phần thay đổi sau lần sync đầu, không lưu dữ liệu thừa.
+Tối ưu chi phí hạ tầng mỗi shop để gói $4 vẫn có lãi: job gộp theo lô, chỉ đồng bộ phần thay đổi sau lần sync đầu, không lưu dữ liệu thừa.
 
 ## Độ tin cậy đồng bộ
 Hiển thị trạng thái đồng bộ cho merchant (lần sync cuối, lỗi nếu có). Job lỗi phải retry có backoff và được ghi log để theo dõi.
@@ -160,4 +160,9 @@ Yêu cầu chung:
 - [x] Phase 6: Billing + alert (Free/Starter/Growth tháng+năm qua Billing API, webhook app_subscriptions/update, Entitlements + 402, giới hạn 50 SKU bán chạy, khóa giải thích/bundle/alert/location/PO theo gói, digest email chống spam, export PO CSV, 201 test pass, đã thử billing + email thật)
 - [x] Bổ sung sau Phase 6: dùng thử 7 ngày (1 lần/shop), giải thích dự báo mở cho Free, dự báo riêng từng location cho Growth (fulfillment orders → location_daily_sales, engine chạy theo location, lọc + PO theo location, resync khi lên Growth; thêm 2 scope read_*_fulfillment_orders), 218 test pass
 - [x] Giao diện: Home phương án D (danh sách việc + đường băng tồn kho), setup guide 5 bước + mẹo ngữ cảnh, 228 test pass
+- [x] Đa ngôn ngữ: EN + VI (react-i18next, file `frontend/src/i18n/locales/*.json`, thêm ngôn ngữ = thêm 1 file, `npm run i18n:check` kiểm tra key/số nhiều). Backend không trả text lên frontend: lỗi `{code, params}`, validation `errors.field[{code, params}]`, explanation `explanation_lines`, sync `stage` + `sync_error {code, params}`. Chọn ngôn ngữ trong Settings (`shops.locale`, null = theo Shopify admin). Email vẫn tiếng Anh. 233 test pass
+- [ ] Tính năng mới từ nghiên cứu đối thủ: xem `docs/ROADMAP.md` (ưu tiên trước Phase 7: ~~import từ Stocky~~ (xong: `/suppliers/import`, CSV đơn đặt hàng → suppliers + gán sản phẩm + lead time trung vị, tự nhận cột + sửa tay, preview/apply stateless, 243 test; listing "Stocky alternative" để Phase 7), ~~trừ hàng đang về~~ (xong: Shopify `incoming` → stock position = tồn + đang về cho reorder date/suggested_qty, ngày hết hàng vẫn theo tồn thực, 238 test), ~~làm tròn MOQ/thùng~~ (xong: `variants.min_order_qty` + `pack_size`, nâng lên MOQ rồi làm tròn thùng, ghi trong explanation `reorder.rounding`, 255 test), ~~min/max thủ công~~ (xong: `variants.min_stock`/`max_stock`, min = điểm đặt lại, max = mức nhập tới, chỉ áp dụng dự báo tổng, 261 test). Tất cả mục ưu tiên trước Phase 7 đã xong)
+- [x] Giao diện gọn lại: Home chỉ còn 4 chỉ số + 5 sản phẩm gấp nhất (+ setup guide, thẻ sync khi đang chạy/lỗi); trang con mới trong menu: Cần nhập hàng (`/reorder`, danh sách đầy đủ + xuất PO), Phân tích (`/insights`, đường băng tồn kho + hàng bán chậm); thẻ đồng bộ chuyển vào Settings; responsive điện thoại (390px) đã kiểm tra bằng ảnh chụp
+- [x] Giám sát lỗi → Slack: listener `MessageLogged` (mọi log ≥ error), `Monitor::caught()/expected()` cho try/catch, lỗi frontend qua `/api/client-errors` + ErrorBoundary, throttle theo fingerprint, che token, `monitoring:test`, 271 test
+- [x] Cache thêm: danh sách sản phẩm (không search, key theo forecast version + catalog version), chi nhánh, combo, số SKU theo dõi (COUNT). `catalog:version` tăng ở mọi ghi catalog (CachedCatalogRepository, CachedVariantRepository, SupplierObserver), 276 test
 - [ ] Phase 7: Chuẩn bị nộp App Store (nhớ: gỡ scope write_orders chỉ dùng cho dev:fake-orders khỏi shopify.app.toml và SHOPIFY_SCOPES; SHOPIFY_BILLING_TEST=false ở production)

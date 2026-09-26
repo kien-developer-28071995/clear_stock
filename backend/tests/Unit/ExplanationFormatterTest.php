@@ -72,3 +72,22 @@ it('only explains the blend when the displayed rates differ', function () {
 
     expect(collect(explain($d, 500))->contains(fn ($s) => str_starts_with($s, 'Blended rate')))->toBeFalse();
 });
+
+it('gives the app codes and raw params, never text', function () {
+    $d = days(10, fn () => ['sold' => 1, 'returned' => 0, 'in_stock' => true]);
+    $asOf = CarbonImmutable::parse('2026-09-20');
+    $result = (new ForecastCalculator(require __DIR__.'/../../config/forecast.php'))->calculate(new ForecastInput(
+        variantId: 1, asOf: $asOf, coverageStart: min(array_keys($d)), currentStock: 0, days: $d,
+        shopLeadTimeDays: 14, shopSafetyDays: 7, supplierName: 'Acme', supplierLeadTimeDays: 30,
+    ));
+
+    $lines = (new ExplanationFormatter)->lines($result->explanation);
+
+    expect(collect($lines)->pluck('code')->all())->toBe(['sells_over_window', 'reorder_point', 'order_today_out_of_stock', 'confidence_with_reasons'])
+        ->and($lines[1]['params'])->toMatchArray([
+            'lead_days' => 30, 'safety_days' => 7,
+            'lead_source' => ['code' => 'lead_source_supplier', 'params' => ['supplier' => 'Acme']],
+        ])
+        ->and($lines[3]['params']['level'])->toBe(['code' => 'confidence_low', 'params' => []])
+        ->and($lines[3]['params']['reasons'][0])->toBe(['code' => 'reason_little_history', 'params' => ['count' => 10]]);
+});

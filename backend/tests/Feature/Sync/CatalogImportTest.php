@@ -6,6 +6,7 @@ use App\Models\Location;
 use App\Models\Shop;
 use App\Models\Supplier;
 use App\Models\Variant;
+use App\Repositories\Contracts\CatalogRepositoryInterface;
 use App\Services\Sync\InventoryImporter;
 use App\Services\Sync\VariantImporter;
 use Illuminate\Support\Carbon;
@@ -102,4 +103,23 @@ it('imports inventory, drops stale levels and deactivates deleted variants', fun
         ->and($v2->fresh()->is_active)->toBeFalse()
         ->and($v1->fresh()->is_active)->toBeTrue()
         ->and($stats)->toBe(['levels' => 1, 'deactivated' => 1]);
+});
+
+it('imports stock on the way (Shopify incoming)', function () {
+    app(VariantImporter::class)->import($this->shop, jsonlFile([variantLine(1)]));
+    $main = Location::factory()->for($this->shop)->create(['shopify_location_id' => 11]);
+    $v1 = Variant::forShop($this->shop)->where('shopify_variant_id', 1)->first();
+
+    app(InventoryImporter::class)->import($this->shop, jsonlFile([
+        ['id' => gid('InventoryItem', 100), 'tracked' => true, 'variant' => ['id' => gid('ProductVariant', 1)]],
+        [
+            'location' => ['id' => gid('Location', 11)],
+            'quantities' => [['name' => 'available', 'quantity' => 7], ['name' => 'incoming', 'quantity' => 40]],
+            '__parentId' => gid('InventoryItem', 100),
+        ],
+    ]), Carbon::now());
+
+    expect(InventoryLevel::where('variant_id', $v1->id)->first()->only(['location_id', 'available', 'incoming']))
+        ->toBe(['location_id' => $main->id, 'available' => 7, 'incoming' => 40])
+        ->and(app(CatalogRepositoryInterface::class)->incomingByVariant($this->shop))->toBe([$v1->id => 40]);
 });

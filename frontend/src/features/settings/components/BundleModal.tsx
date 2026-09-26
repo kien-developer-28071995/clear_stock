@@ -1,7 +1,7 @@
 import { useState, type RefObject } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { ModalElement } from '@/hooks/useModal';
-import { ApiError, fieldError } from '@/lib/http';
+import { ApiError, errorMessage, fieldError } from '@/lib/http';
 import { pickVariants, type PickedVariant } from '@/lib/resourcePicker';
 import { useSaveBundle } from '@/features/settings/hooks/useSettings';
 
@@ -40,7 +40,7 @@ export function BundleModal({ modalRef, onDone }: Props) {
             },
         );
 
-    const generalError = save.error instanceof ApiError && save.error.status !== 422 ? save.error.message : null;
+    const generalError = save.error instanceof ApiError && save.error.status !== 422 ? errorMessage(save.error) : null;
 
     return (
         <s-modal ref={modalRef} id="bundle-modal" heading={t('bundles.add')}>

@@ -2,14 +2,15 @@
 
 namespace App\Http\Middleware;
 
+use App\Exceptions\ApiErrorResponse;
 use App\Exceptions\InvalidSessionTokenException;
 use App\Exceptions\ShopifyApiException;
 use App\Services\ShopAuthService;
+use App\Support\Monitor;
 use App\Support\ShopContext;
 use Closure;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Context;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -29,16 +30,17 @@ class VerifyShopifySessionToken
             $shop = $this->auth->authenticate($request->bearerToken());
         } catch (InvalidSessionTokenException $e) {
             // Tells App Bridge to fetch a fresh session token and retry once.
-            return new JsonResponse(['message' => 'Your session expired. Please reload the app.'], 401, [
+            return ApiErrorResponse::make('session_expired', 401, [], [
                 'X-Shopify-Retry-Invalid-Session-Request' => '1',
             ]);
         } catch (ShopifyApiException $e) {
-            Log::error('Shopify authentication failed', ['error' => $e->getMessage()]);
+            Monitor::caught($e, 'session authentication');
 
-            return new JsonResponse(['message' => 'Could not connect to Shopify. Please try again in a moment.'], 502);
+            return ApiErrorResponse::make('shopify_unavailable', 502);
         }
 
         $this->context->set($shop);
+        Context::add('shop', $shop->domain); // shown on error alerts
 
         return $next($request);
     }

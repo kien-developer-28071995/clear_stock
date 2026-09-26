@@ -1,12 +1,14 @@
 <?php
 
 use App\Models\AlertSetting;
+use App\Models\BundleComponent;
 use App\Models\Forecast;
 use App\Models\Shop;
 use App\Models\Supplier;
 use App\Models\SyncRun;
 use App\Models\Variant;
 use Carbon\CarbonImmutable;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
@@ -150,6 +152,8 @@ return [
         Forecast::class,
         Variant::class,
         Illuminate\Database\Eloquent\Collection::class,
+        LengthAwarePaginator::class, // product list pages
+        BundleComponent::class,                // bundle list
         Collection::class,
         Illuminate\Support\Carbon::class,
         Carbon\Carbon::class,

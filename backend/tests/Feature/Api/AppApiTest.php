@@ -66,7 +66,7 @@ describe('dashboard', function () {
             ->assertJsonPath('data.counts.reorder_now', 1)
             ->assertJsonPath('data.counts.slow', 1)
             ->assertJsonPath('data.actions.order_today.0.name', 'Mug')
-            ->assertJsonPath('data.actions.order_today.0.reason', 'Sells 4/day over the last 30 days.')
+            ->assertJsonPath('data.actions.order_today.0.reason', ['code' => 'sells_over_window', 'params' => ['avg' => 4, 'count' => 30]])
             ->assertJsonPath('data.actions.out_of_stock', [])
             ->assertJsonPath('data.runway.0.name', 'Mug')
             ->assertJsonPath('data.runway.0.reorder_days', 21)
@@ -135,10 +135,10 @@ describe('SKU list and detail', function () {
         $this->getJson('/api/forecasts?status=bogus', $this->auth)->assertUnprocessable();
     });
 
-    it('returns the detail with explanation sentences, overrides and settings', function () {
+    it('returns the detail with explanation lines, overrides and settings', function () {
         $this->getJson("/api/forecasts/{$this->mug->id}", $this->auth)
             ->assertOk()
-            ->assertJsonPath('data.explanation_sentences.0', 'Sells 4/day over the last 30 days.')
+            ->assertJsonPath('data.explanation_lines.0', ['code' => 'sells_over_window', 'params' => ['avg' => 4, 'count' => 30]])
             ->assertJsonPath('data.explanation.lead_time.source', 'shop_default')
             ->assertJsonPath('data.defaults.lead_time_days', 14)
             ->assertJsonPath('data.settings.supplier_id', null);
@@ -272,5 +272,57 @@ describe('settings, suppliers and bundles', function () {
         Variant::factory()->for($this->shop)->create(['product_title' => 'Blue mug', 'sku' => 'BM']);
 
         $this->getJson('/api/variants?search=blue', $this->auth)->assertJsonCount(1, 'data')->assertJsonPath('data.0.sku', 'BM');
+    });
+});
+
+describe('stock on the way', function () {
+    it('counts Shopify incoming stock in the suggestion and explains it', function () {
+        $mug = product($this->shop, $this->location, 'Mug', stock: 10, perDay: 4);
+        InventoryLevel::where('variant_id', $mug->id)->update(['incoming' => 60]);
+        forecastAll($this->shop);
+
+        $this->getJson("/api/forecasts/{$mug->id}", $this->auth)
+            ->assertOk()
+            ->assertJsonPath('data.current_stock', 10)
+            ->assertJsonPath('data.incoming_stock', 60)
+            ->assertJsonPath('data.suggested_qty', 134) // 4 x (14 + 7 + 30) - (10 + 60)
+            ->assertJsonPath('data.explanation_lines.2', ['code' => 'incoming_stock', 'params' => ['count' => 60]]);
+    });
+});
+
+describe('order rounding', function () {
+    it('saves minimum order and pack size and recomputes the suggestion at once', function () {
+        $mug = product($this->shop, $this->location, 'Mug', stock: 10, perDay: 4);
+        forecastAll($this->shop);
+
+        $this->putJson("/api/variants/{$mug->id}/settings", ['min_order_qty' => 200, 'pack_size' => 24], $this->auth)->assertOk();
+
+        $this->getJson("/api/forecasts/{$mug->id}", $this->auth)
+            ->assertJsonPath('data.settings.min_order_qty', 200)
+            ->assertJsonPath('data.settings.pack_size', 24)
+            ->assertJsonPath('data.suggested_qty', 216) // needs 194 -> minimum 200 -> 9 packs of 24
+            ->assertJsonPath('data.explanation.reorder.rounding', ['needed' => 194, 'min_order_qty' => 200, 'pack_size' => 24, 'final' => 216]);
+
+        $this->putJson("/api/variants/{$mug->id}/settings", ['pack_size' => 0], $this->auth)
+            ->assertUnprocessable()->assertJsonPath('errors.pack_size.0', ['code' => 'min', 'params' => ['value' => 1]]);
+    });
+});
+
+describe('manual min / max', function () {
+    it('saves min and max, and rejects a max below the min', function () {
+        $mug = product($this->shop, $this->location, 'Mug', stock: 10, perDay: 4);
+        forecastAll($this->shop);
+
+        $this->putJson("/api/variants/{$mug->id}/settings", ['min_stock' => 50, 'max_stock' => 400], $this->auth)->assertOk();
+        $this->getJson("/api/forecasts/{$mug->id}", $this->auth)
+            ->assertJsonPath('data.settings.min_stock', 50)
+            ->assertJsonPath('data.settings.max_stock', 400)
+            ->assertJsonPath('data.reorder_point', 50)
+            ->assertJsonPath('data.suggested_qty', 390)
+            ->assertJsonPath('data.explanation_lines.1', ['code' => 'reorder_point_manual', 'params' => ['count' => 50]]);
+
+        // Only max sent: checked against the saved min.
+        $this->putJson("/api/variants/{$mug->id}/settings", ['max_stock' => 20], $this->auth)
+            ->assertUnprocessable()->assertJsonPath('errors.max_stock.0.code', 'max_below_min');
     });
 });

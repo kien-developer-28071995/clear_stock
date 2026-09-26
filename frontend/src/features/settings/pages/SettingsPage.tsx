@@ -1,11 +1,15 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { fieldError } from '@/lib/http';
-import { currentLocale } from '@/i18n';
+import { adminLanguage, applyLanguagePreference, currentLocale, languageName, SUPPORTED_LOCALES } from '@/i18n';
+import { useQueryClient } from '@tanstack/react-query';
+import { shopKeys } from '@/features/shop/hooks/useShop';
 import { LoadingPage } from '@/components/ui/LoadingPage';
 import { ErrorBanner } from '@/components/ui/ErrorBanner';
 import { UpgradePrompt } from '@/components/ui/UpgradePrompt';
 import { useDismissSetupGuide, useSetupGuide } from '@/features/setup/hooks/useSetupGuide';
+import { SaveBar } from '@/components/ui/SaveBar';
+import { SyncStatusCard } from '@/features/sync/components/SyncStatusCard';
 import { useSettings, useUpdateSettings } from '@/features/settings/hooks/useSettings';
 import type { Settings } from '@/features/settings/types';
 
@@ -18,6 +22,7 @@ export function SettingsPage() {
     const { t } = useTranslation();
     const { data, isPending, error, refetch } = useSettings();
     const update = useUpdateSettings();
+    const qc = useQueryClient();
     const guide = useSetupGuide();
     const reopenGuide = useDismissSetupGuide();
     const [form, setForm] = useState<Settings | null>(null);
@@ -36,16 +41,24 @@ export function SettingsPage() {
         );
     }
 
+    const dirty = JSON.stringify(form) !== JSON.stringify(data);
     const setAlerts = (patch: Partial<Settings['alerts']>) => setForm({ ...form, alerts: { ...form.alerts, ...patch } });
     const { available: _available, ...alerts } = form.alerts;
     const save = () =>
         update.mutate(
             { ...form, alerts: { ...alerts, email: alerts.email?.trim() || null } as Settings['alerts'] },
-            { onSuccess: () => shopify.toast.show(t('common.saved')) },
+            {
+                onSuccess: async (saved) => {
+                    await applyLanguagePreference(saved.locale);
+                    qc.invalidateQueries({ queryKey: shopKeys.all });
+                    shopify.toast.show(t('common.saved'));
+                },
+            },
         );
 
     return (
         <s-page heading={t('nav.settings')} inlineSize="small">
+            <SaveBar id="settings-save-bar" dirty={dirty} saving={update.isPending} onSave={save} onDiscard={() => setForm(data ?? null)} />
             <s-section heading={t('settings.defaultsHeading')}>
                 <s-stack gap="base">
                     <s-paragraph>{t('settings.defaultsIntro')}</s-paragraph>
@@ -72,6 +85,21 @@ export function SettingsPage() {
                 </s-stack>
             </s-section>
 
+            <s-section heading={t('settings.languageHeading')}>
+                <s-select
+                    label={t('settings.language')}
+                    details={t('settings.languageHelp')}
+                    value={form.locale ?? ''}
+                    error={fieldError(update.error, 'locale')}
+                    onChange={(e) => setForm({ ...form, locale: e.currentTarget.value || null })}
+                >
+                    <s-option value="">{t('settings.languageAuto', { language: languageName(adminLanguage()) })}</s-option>
+                    {SUPPORTED_LOCALES.map((locale) => (
+                        <s-option key={locale} value={locale}>{languageName(locale)}</s-option>
+                    ))}
+                </s-select>
+            </s-section>
+
             <s-section heading={t('settings.alertsHeading')}>
                 <s-stack gap="base">
                     {!form.alerts.available && (
@@ -79,17 +107,20 @@ export function SettingsPage() {
                     )}
                     <s-switch
                         label={t('settings.alertsEnabled')}
+                        disabled={!form.alerts.available || undefined}
                         checked={form.alerts.enabled || undefined}
                         onChange={(e) => setAlerts({ enabled: e.currentTarget.checked })}
                     />
                     <s-email-field
                         label={t('settings.alertsEmail')}
+                        disabled={!form.alerts.available || undefined}
                         value={form.alerts.email ?? ''}
                         error={fieldError(update.error, 'alerts.email')}
                         onInput={(e) => setAlerts({ email: e.currentTarget.value })}
                     />
                     <s-select
                         label={t('settings.frequency')}
+                        disabled={!form.alerts.available || undefined}
                         details={t('settings.frequencyHelp')}
                         value={form.alerts.frequency}
                         onChange={(e) => setAlerts({ frequency: e.currentTarget.value as Settings['alerts']['frequency'] })}
@@ -100,6 +131,7 @@ export function SettingsPage() {
                     {form.alerts.frequency === 'weekly' && (
                         <s-select
                             label={t('settings.sendOn')}
+                        disabled={!form.alerts.available || undefined}
                             value={String(form.alerts.weekly_day)}
                             onChange={(e) => setAlerts({ weekly_day: Number(e.currentTarget.value) })}
                         >
@@ -110,12 +142,6 @@ export function SettingsPage() {
                     )}
                 </s-stack>
             </s-section>
-
-            <s-stack direction="inline">
-                <s-button variant="primary" onClick={save} loading={update.isPending || undefined}>
-                    {t('common.save')}
-                </s-button>
-            </s-stack>
 
             {guide.data?.dismissed && guide.data.completed < guide.data.total && (
                 <s-section heading={t('settings.setupGuide')}>
@@ -132,6 +158,7 @@ export function SettingsPage() {
                     </s-stack>
                 </s-section>
             )}
+            <SyncStatusCard />
         </s-page>
     );
 }

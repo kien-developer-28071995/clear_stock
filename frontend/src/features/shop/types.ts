@@ -1,3 +1,5 @@
+import type { Coded } from '@/types/coded';
+
 export type Plan = 'free' | 'starter' | 'growth';
 export type SyncStatus = 'pending' | 'running' | 'completed' | 'failed';
 
@@ -19,8 +21,10 @@ export interface Shop {
     entitlements: Entitlements;
     currency: string | null;
     timezone: string;
+    /** Language chosen in Settings; null = follow the Shopify admin language. */
+    locale: string | null;
     sync_status: SyncStatus;
-    sync_error: string | null;
+    sync_error: Coded | null;
     last_synced_at: string | null;
     installed_at: string | null;
     onboarded: boolean;

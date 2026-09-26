@@ -29,7 +29,7 @@ return [
         ],
         'starter' => [
             'name' => 'Starter',
-            'prices' => ['monthly' => 2.00, 'annual' => 19.00],
+            'prices' => ['monthly' => 4.00, 'annual' => 38.00],
             'limits' => [
                 'max_skus' => null,
                 'bundles' => true,
@@ -41,7 +41,7 @@ return [
         ],
         'growth' => [
             'name' => 'Growth',
-            'prices' => ['monthly' => 3.00, 'annual' => 29.00],
+            'prices' => ['monthly' => 5.00, 'annual' => 48.00],
             'limits' => [
                 'max_skus' => null,
                 'bundles' => true,

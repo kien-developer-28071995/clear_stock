@@ -3,52 +3,54 @@
 namespace App\Services\Forecast;
 
 use Carbon\CarbonImmutable;
+use Illuminate\Support\Number;
 
 /**
- * Turns a forecast explanation (JSON stored on forecasts.explanation) into plain
- * sentences. Used by the CLI and alert emails; the React UI renders the same
- * data with its own components.
+ * Turns a forecast explanation (JSON stored on forecasts.explanation) into lines of
+ * the form {code, params}. The API returns these lines as-is and the React UI
+ * translates them; emails and the CLI render them with `sentences()`.
+ *
+ * Params are raw values (numbers, Y-m-d dates, names). A param can itself be a line
+ * ({code, params}) or a list of lines, e.g. the lead-time source or confidence reasons.
+ * `count` is the value that picks the plural form.
  */
 class ExplanationFormatter
 {
-    private const LEAD_SOURCES = [
-        'override' => 'set by you for this forecast',
-        'variant' => 'set for this SKU',
-        'supplier' => 'supplier %s',
-        'shop_default' => 'store default',
-    ];
-
-    /** @return array<int, string> */
-    public function sentences(array $e): array
+    /** @return array<int, array{code: string, params: array<string, mixed>}> */
+    public function lines(array $e): array
     {
         $out = [];
-        $avg = $this->num($e['avg_daily_sales']);
 
         // Average
         if ($e['avg_source'] === 'override') {
             $note = collect($e['overrides'])->firstWhere('field', 'avg_daily_sales')['note'] ?? null;
-            $out[] = "You set sales to {$avg}/day".($note ? " ({$note})" : '').'; our estimate was '.$this->num($e['computed_avg']).'/day.';
+            $out[] = $note
+                ? $this->line('avg_override_note', ['avg' => $this->round($e['avg_daily_sales']), 'computed' => $this->round($e['computed_avg']), 'note' => $note])
+                : $this->line('avg_override', ['avg' => $this->round($e['avg_daily_sales']), 'computed' => $this->round($e['computed_avg'])]);
         } else {
             $main = collect($e['windows'])->firstWhere('days', 30);
             $main = ($main['avg'] ?? null) !== null ? $main : collect($e['windows'])->first(fn ($w) => $w['avg'] !== null);
             $longest = collect($e['windows'])->filter(fn ($w) => $w['in_stock_days'] > 0)->last();
             if ($main === null && $longest === null) {
-                $out[] = 'Not enough in-stock days yet to measure a sales rate.';
+                $out[] = $this->line('no_rate_yet');
             } elseif ((float) $e['base_avg'] === 0.0) {
-                $out[] = "No sales in the last {$longest['days']} days while in stock.";
+                $out[] = $this->line('no_sales_while_in_stock', ['count' => $longest['days']]);
             } elseif ($main === null) {
-                $out[] = 'Not enough in-stock days yet to measure a sales rate.';
+                $out[] = $this->line('no_rate_yet');
             } else {
-                $excluded = $main['excluded_out_of_stock_days'] > 0
-                    ? " ({$main['excluded_out_of_stock_days']} out-of-stock ".($main['excluded_out_of_stock_days'] === 1 ? 'day' : 'days').' left out)'
-                    : '';
-                $out[] = 'Sells '.$this->num($main['avg'])."/day over the last {$main['days']} days{$excluded}.";
+                $out[] = $main['excluded_out_of_stock_days'] > 0
+                    ? $this->line('sells_over_window_excluded', ['avg' => $this->round($main['avg']), 'days' => $main['days'], 'count' => $main['excluded_out_of_stock_days']])
+                    : $this->line('sells_over_window', ['avg' => $this->round($main['avg']), 'count' => $main['days']]);
 
-                $usable = collect($e['windows'])->filter(fn ($w) => $w['avg'] !== null);
-                $parts = $usable->map(fn ($w) => "{$w['days']} days ".$this->num($w['avg']).'/day × '.round($w['weight'] * 100).'%')->values();
-                // Only worth a sentence when the windows visibly disagree.
-                if ($parts->count() > 1 && $usable->map(fn ($w) => $this->num($w['avg']))->unique()->count() > 1) {
-                    $out[] = 'Blended rate '.$this->num($e['base_avg']).'/day ('.$parts->implode(', ').').';
+                $usable = collect($e['windows'])->filter(fn ($w) => $w['avg'] !== null)->values();
+                // Only worth a line when the windows visibly disagree.
+                if ($usable->count() > 1 && $usable->map(fn ($w) => $this->round($w['avg']))->unique()->count() > 1) {
+                    $out[] = $this->line('blended_rate', [
+                        'avg' => $this->round($e['base_avg']),
+                        'parts' => $usable->map(fn ($w) => $this->line('window_part', [
+                            'count' => $w['days'], 'avg' => $this->round($w['avg']), 'weight' => (int) round($w['weight'] * 100),
+                        ]))->all(),
+                    ]);
                 }
             }
         }
@@ -56,53 +58,147 @@ class ExplanationFormatter
         // Seasonality
         $s = $e['seasonality'];
         if ($s['applied']) {
-            $dir = $s['factor'] >= 1 ? 'rose' : 'fell';
-            $out[] = "Last year, sales {$dir} ×{$this->num($s['factor'])} over the next {$s['horizon_days']} days, so we adjusted to ".$this->num($e['computed_avg']).'/day.';
+            $out[] = $this->line($s['factor'] >= 1 ? 'seasonality_rose' : 'seasonality_fell', [
+                'factor' => $this->round($s['factor'], 2), 'count' => $s['horizon_days'], 'avg' => $this->round($e['computed_avg']),
+            ]);
         }
 
         // Bundles
         foreach ($e['bundles'] as $b) {
             if ($b['units_per_day'] > 0) {
-                $out[] = 'Includes '.$this->num($b['units_per_day'])."/day sold inside \"{$b['name']}\" ({$b['quantity_per_bundle']} per bundle).";
+                $out[] = $this->line('bundle_contribution', ['avg' => $this->round($b['units_per_day']), 'bundle' => $b['name'], 'count' => $b['quantity_per_bundle']]);
             }
         }
 
         // Reorder
-        $lead = $e['lead_time'];
-        $source = sprintf(self::LEAD_SOURCES[$lead['source']] ?? $lead['source'], $lead['supplier'] ?? '');
-        if ($e['avg_daily_sales'] > 0) {
-            $out[] = "Lead time {$lead['days']} days ({$source}) + {$e['safety']['days']} safety days → reorder point {$e['reorder']['point']} units.";
+        $min = $e['reorder']['min_stock'] ?? null; // absent in explanations computed before min/max existed
+        $max = $e['reorder']['max_stock'] ?? null;
+        if ($e['avg_daily_sales'] > 0 || $min !== null) {
+            if ($min !== null) {
+                $out[] = $this->line('reorder_point_manual', ['count' => $min]);
+            } else {
+                $lead = $e['lead_time'];
+                $out[] = $this->line('reorder_point', [
+                    'lead_days' => $lead['days'],
+                    'lead_source' => $this->line('lead_source_'.$lead['source'], array_filter(['supplier' => $lead['supplier'] ?? null])),
+                    'safety_days' => $e['safety']['days'],
+                    'count' => $e['reorder']['point'],
+                ]);
+            }
+            if ($max !== null) {
+                $out[] = $this->line('order_up_to_max', ['count' => $max]);
+            }
 
             $stock = $e['stock']['current'];
-            if ($stock <= 0) {
-                $out[] = "Out of stock now → order {$e['reorder']['suggested_qty']} units today.";
-            } else {
-                $out[] = "{$stock} in stock runs out around ".$this->date($e['stockout_date'])
-                    .' → order '.$e['reorder']['suggested_qty'].' units by '.$this->date($e['reorder']['date']).'.';
+            $incoming = $e['stock']['incoming'] ?? 0; // absent in explanations computed before it existed
+            $suggested = $e['reorder']['suggested_qty'];
+            if ($incoming > 0) {
+                $out[] = $this->line('incoming_stock', ['count' => $incoming]);
             }
+            $r = $e['reorder']['rounding'] ?? null; // absent in explanations computed before it existed
+            if ($r !== null && $r['final'] !== $r['needed']) {
+                $out[] = $this->roundingLine($r);
+            }
+            $out[] = match (true) {
+                $stock <= 0 && $suggested > 0 => $this->line('order_today_out_of_stock', ['count' => $suggested]),
+                $stock <= 0 && $incoming > 0 => $this->line('out_of_stock_incoming_covers'),
+                // No sales: only the manual minimum decides.
+                $e['stockout_date'] === null => match (true) {
+                    $e['reorder']['date'] === null => $this->line('above_min', ['stock' => $e['stock']['position'] ?? $stock]),
+                    $suggested > 0 => $this->line('below_min_order', ['stock' => $e['stock']['position'] ?? $stock, 'count' => $suggested]),
+                    default => $this->line('no_order_needed'),
+                },
+                $incoming > 0 && $suggested === 0 => $this->line('runs_out_incoming_covers', ['stock' => $stock, 'stockout_date' => $e['stockout_date']]),
+                default => $this->line('runs_out', [
+                    'stock' => $stock, 'stockout_date' => $e['stockout_date'],
+                    'count' => $suggested, 'reorder_date' => $e['reorder']['date'],
+                ]),
+            };
         }
 
         // Confidence
         $c = $e['confidence'];
-        $why = collect($c['reasons'])->map(fn ($r) => match ($r['code']) {
-            'little_history' => "only {$r['in_stock_days']} days of in-stock history",
-            'few_sales' => $r['units'] > 0 ? 'few sales ('.$this->num($r['units']).' in 90 days)' : 'no sales in 90 days',
-            'volatile' => 'sales vary a lot week to week',
-            'average_overridden' => 'rate set manually',
-            default => $r['code'],
-        })->implode(', ');
-        $out[] = 'Confidence: '.$c['level'].($why !== '' ? " ({$why})" : '').'.';
+        $reasons = collect($c['reasons'])->map(fn ($r) => match ($r['code']) {
+            'little_history' => $this->line('reason_little_history', ['count' => $r['in_stock_days']]),
+            'few_sales' => $r['units'] > 0 ? $this->line('reason_few_sales', ['count' => $this->round($r['units'])]) : $this->line('reason_no_sales'),
+            default => $this->line('reason_'.$r['code']),
+        })->all();
+        $level = $this->line('confidence_'.$c['level']);
+        $out[] = $reasons === []
+            ? $this->line('confidence', ['level' => $level])
+            : $this->line('confidence_with_reasons', ['level' => $level, 'reasons' => $reasons]);
 
         return $out;
     }
 
-    private function num(float|int|null $n): string
+    /**
+     * Plain sentences in a language, from lang/{locale}/explanation.php.
+     * For emails and the CLI; the API returns `lines()`.
+     *
+     * @return array<int, string>
+     */
+    public function sentences(array $e, ?string $locale = null): array
     {
-        return $n === null ? '–' : rtrim(rtrim(number_format((float) $n, 1, '.', ''), '0'), '.');
+        $locale ??= app()->getLocale();
+
+        return array_map(fn (array $line) => $this->render($line, $locale), $this->lines($e));
     }
 
-    private function date(?string $date): string
+    /** @param array{code: string, params: array<string, mixed>} $line */
+    public function render(array $line, string $locale): string
     {
-        return $date ? CarbonImmutable::parse($date)->format('M j') : '–';
+        $params = [];
+        foreach ($line['params'] as $key => $value) {
+            $params[$key] = match (true) {
+                is_array($value) && isset($value['code']) => $this->render($value, $locale),
+                is_array($value) => implode(', ', array_map(fn ($l) => $this->render($l, $locale), $value)),
+                is_int($value) || is_float($value) => $this->number($value, $locale),
+                is_string($value) && str_ends_with($key, '_date') => $this->formatDate($value, $locale),
+                default => (string) $value,
+            };
+        }
+
+        $key = "explanation.{$line['code']}";
+
+        return isset($line['params']['count'])
+            ? trans_choice($key, $line['params']['count'], $params, $locale)
+            : __($key, $params, $locale);
+    }
+
+    /** @return array{code: string, params: array<string, mixed>} */
+    private function roundingLine(array $r): array
+    {
+        $raisedToMinimum = $r['min_order_qty'] !== null && $r['needed'] < $r['min_order_qty'];
+        $params = ['needed' => $r['needed'], 'count' => $r['final']];
+
+        return match (true) {
+            $raisedToMinimum && $r['pack_size'] !== null => $this->line('rounded_min_and_pack', $params + ['min' => $r['min_order_qty'], 'pack' => $r['pack_size']]),
+            $raisedToMinimum => $this->line('rounded_min', $params + ['min' => $r['min_order_qty']]),
+            default => $this->line('rounded_pack', $params + ['pack' => $r['pack_size']]),
+        };
+    }
+
+    /** @return array{code: string, params: array<string, mixed>} */
+    private function line(string $code, array $params = []): array
+    {
+        return ['code' => $code, 'params' => $params];
+    }
+
+    private function round(float|int|null $n, int $precision = 1): float|int
+    {
+        $r = round((float) $n, $precision);
+
+        return floor($r) === $r ? (int) $r : $r;
+    }
+
+    private function number(float|int $n, string $locale): string
+    {
+        return Number::format($n, maxPrecision: 2, locale: $locale) ?: (string) $n;
+    }
+
+    /** Short day + month in a language ("Oct 15", "15/10"). */
+    public function formatDate(string $date, string $locale): string
+    {
+        return CarbonImmutable::parse($date)->locale($locale)->isoFormat(__('explanation.date_format', [], $locale));
     }
 }

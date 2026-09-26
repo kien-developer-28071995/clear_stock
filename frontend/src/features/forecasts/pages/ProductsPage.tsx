@@ -67,7 +67,10 @@ export function ProductsPage() {
                     onPreviousPage={() => update({ page: (filters.page ?? 1) - 1 })}
                     onNextPage={() => update({ page: (filters.page ?? 1) + 1 })}
                 >
-                    <s-grid slot="filters" gap="small-200" gridTemplateColumns={showLocations ? '1fr auto auto auto' : '1fr auto auto'}>
+                    <s-grid slot="filters" gap="small-200" gridTemplateColumns={
+                            // Narrow screens: one filter per line.
+                            showLocations ? '@container (inline-size > 560px) 1fr auto auto auto, 1fr' : '@container (inline-size > 560px) 1fr auto auto, 1fr'
+                        }>
                         <s-search-field
                             label={t('products.search')}
                             labelAccessibilityVisibility="exclusive"
@@ -134,7 +137,14 @@ export function ProductsPage() {
                                 <s-table-cell>
                                     <StatusBadge status={row.status} />
                                 </s-table-cell>
-                                <s-table-cell>{formatNumber(row.current_stock, 0)}</s-table-cell>
+                                <s-table-cell>
+                                    <s-stack gap="small-100">
+                                        <s-text>{formatNumber(row.current_stock, 0)}</s-text>
+                                        {row.incoming_stock > 0 && (
+                                            <s-text color="subdued">{t('product.incomingShort', { qty: formatNumber(row.incoming_stock, 0) })}</s-text>
+                                        )}
+                                    </s-stack>
+                                </s-table-cell>
                                 <s-table-cell>{formatNumber(row.avg_daily_sales, 2)}</s-table-cell>
                                 <s-table-cell>{row.days_of_cover === null ? '∞' : formatNumber(row.days_of_cover, 0)}</s-table-cell>
                                 <s-table-cell>{row.avg_daily_sales > 0 ? formatDate(row.reorder_date) : '—'}</s-table-cell>

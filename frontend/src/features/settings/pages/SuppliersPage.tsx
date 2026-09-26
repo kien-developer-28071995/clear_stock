@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useModal } from '@/hooks/useModal';
+import { useConfirm } from '@/components/ui/ConfirmModal';
 import { pickVariants } from '@/lib/resourcePicker';
 import { ErrorBanner } from '@/components/ui/ErrorBanner';
 import { ExportPurchaseOrderButton } from '@/features/forecasts/components/ExportPurchaseOrderButton';
@@ -14,6 +15,7 @@ export function SuppliersPage() {
     const remove = useDeleteSupplier();
     const assign = useAssignSupplier();
     const modal = useModal();
+    const { confirm, modal: confirmModal } = useConfirm();
     const [editing, setEditing] = useState<Supplier | null>(null);
 
     const openNew = () => {
@@ -32,16 +34,18 @@ export function SuppliersPage() {
             { onSuccess: (r) => shopify.toast.show(t('suppliers.assigned', { count: (r as { updated: number }).updated, name: s.name })) },
         );
     };
-    const confirmDelete = (s: Supplier) => {
-        if (window.confirm(t('suppliers.confirmDelete', { name: s.name }))) {
-            remove.mutate(s.id, { onSuccess: () => shopify.toast.show(t('suppliers.deleted')) });
-        }
+    const confirmDelete = async (s: Supplier) => {
+        const ok = await confirm({ heading: t('confirm.deleteSupplier'), body: t('suppliers.confirmDelete', { name: s.name }), confirmLabel: t('common.delete'), destructive: true });
+        if (ok) remove.mutate(s.id, { onSuccess: () => shopify.toast.show(t('suppliers.deleted')) });
     };
 
     return (
         <s-page heading={t('nav.suppliers')}>
             <s-button slot="primary-action" variant="primary" onClick={openNew}>
                 {t('suppliers.add')}
+            </s-button>
+            <s-button slot="secondary-actions" href="/suppliers/import">
+                {t('import.fromStocky')}
             </s-button>
             {error && <ErrorBanner error={error} onRetry={() => refetch()} />}
 
@@ -50,6 +54,7 @@ export function SuppliersPage() {
                     <s-empty-state heading={t('suppliers.emptyHeading')}>
                         <s-paragraph slot="subheading">{t('suppliers.emptyBody')}</s-paragraph>
                         <s-button slot="primary-action" onClick={openNew}>{t('suppliers.add')}</s-button>
+                        <s-button slot="secondary-actions" href="/suppliers/import">{t('import.fromStocky')}</s-button>
                     </s-empty-state>
                 </s-section>
             ) : (
@@ -88,6 +93,7 @@ export function SuppliersPage() {
             )}
 
             <SupplierModal modalRef={modal.ref} supplier={editing} onDone={modal.close} />
+            {confirmModal}
         </s-page>
     );
 }

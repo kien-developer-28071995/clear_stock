@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Monitoring\ReportErrorsToSlack;
 use App\Repositories\Contracts\ShopRepositoryInterface;
 use App\Services\Forecast\ForecastCalculator;
 use App\Services\ShopAuthService;
@@ -11,8 +12,14 @@ use App\Services\Shopify\ShopifyOAuthClient;
 use App\Services\Shopify\ShopTokenService;
 use App\Services\ShopService;
 use App\Support\ShopContext;
+use Illuminate\Console\Events\CommandStarting;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Http\Client\Factory as Http;
+use Illuminate\Log\Events\MessageLogged;
+use Illuminate\Queue\Events\JobProcessing;
+use Illuminate\Support\Facades\Context;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -64,6 +71,12 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        //
+        // Error monitoring: every log record at error level (unhandled exceptions included) goes to Slack.
+        Event::listen(MessageLogged::class, ReportErrorsToSlack::class);
+
+        // Where an error happened, attached to its alert.
+        Queue::before(fn (JobProcessing $e) => Context::add('job', $e->job->resolveName()));
+        Queue::after(fn () => Context::forget('job'));
+        Event::listen(CommandStarting::class, fn (CommandStarting $e) => $e->command && Context::add('command', $e->command));
     }
 }

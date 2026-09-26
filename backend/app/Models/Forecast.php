@@ -15,6 +15,7 @@ use Illuminate\Support\Carbon;
  * @property int $variant_id
  * @property ?int $location_id
  * @property int $current_stock
+ * @property int $incoming_stock on the way (Shopify "incoming"), counted toward reordering
  * @property string $avg_daily_sales
  * @property ?string $days_of_cover
  * @property ?Carbon $stockout_date
@@ -30,7 +31,7 @@ class Forecast extends Model
     use BelongsToShop, HasFactory;
 
     protected $fillable = [
-        'shop_id', 'variant_id', 'location_id', 'current_stock', 'avg_daily_sales', 'days_of_cover',
+        'shop_id', 'variant_id', 'location_id', 'current_stock', 'incoming_stock', 'avg_daily_sales', 'days_of_cover',
         'stockout_date', 'reorder_date', 'reorder_point', 'suggested_qty', 'confidence', 'explanation', 'computed_at',
     ];
 
@@ -38,6 +39,7 @@ class Forecast extends Model
     {
         return [
             'current_stock' => 'integer',
+            'incoming_stock' => 'integer',
             'avg_daily_sales' => 'decimal:3',
             'days_of_cover' => 'decimal:1',
             'stockout_date' => 'date',

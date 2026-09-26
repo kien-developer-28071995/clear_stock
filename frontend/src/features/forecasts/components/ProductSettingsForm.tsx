@@ -3,6 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { fieldError } from '@/lib/http';
 import { useUpdateVariantSettings } from '@/features/forecasts/hooks/useForecasts';
 import type { ForecastDetail } from '@/features/forecasts/types';
+import { formatNumber } from '@/utils/format';
+import { SaveBar } from '@/components/ui/SaveBar';
 import { useSuppliers } from '@/features/settings/hooks/useSettings';
 
 const toNumberOrNull = (v: string) => (v.trim() === '' ? null : Number(v));
@@ -15,12 +17,33 @@ export function ProductSettingsForm({ f }: { f: ForecastDetail }) {
     const [supplierId, setSupplierId] = useState('');
     const [leadTime, setLeadTime] = useState('');
     const [safety, setSafety] = useState('');
+    const [minOrder, setMinOrder] = useState('');
+    const [pack, setPack] = useState('');
+    const [minStock, setMinStock] = useState('');
+    const [maxStock, setMaxStock] = useState('');
 
-    useEffect(() => {
-        setSupplierId(f.settings.supplier_id ? String(f.settings.supplier_id) : '');
-        setLeadTime(f.settings.lead_time_override?.toString() ?? '');
-        setSafety(f.settings.safety_days?.toString() ?? '');
-    }, [f.settings]);
+    const saved = {
+        supplierId: f.settings.supplier_id ? String(f.settings.supplier_id) : '',
+        leadTime: f.settings.lead_time_override?.toString() ?? '',
+        safety: f.settings.safety_days?.toString() ?? '',
+        minOrder: f.settings.min_order_qty?.toString() ?? '',
+        pack: f.settings.pack_size?.toString() ?? '',
+        minStock: f.settings.min_stock?.toString() ?? '',
+        maxStock: f.settings.max_stock?.toString() ?? '',
+    };
+    const reset = () => {
+        setSupplierId(saved.supplierId);
+        setLeadTime(saved.leadTime);
+        setSafety(saved.safety);
+        setMinOrder(saved.minOrder);
+        setPack(saved.pack);
+        setMinStock(saved.minStock);
+        setMaxStock(saved.maxStock);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    useEffect(reset, [f.settings]);
+    const current = { supplierId, leadTime, safety, minOrder, pack, minStock, maxStock };
+    const dirty = JSON.stringify(current) !== JSON.stringify(saved);
 
     const supplier = suppliers.data?.find((s) => String(s.id) === supplierId);
     const leadFallback = supplier?.lead_time_days ?? f.defaults.lead_time_days;
@@ -31,12 +54,17 @@ export function ProductSettingsForm({ f }: { f: ForecastDetail }) {
                 supplier_id: supplierId ? Number(supplierId) : null,
                 lead_time_override: toNumberOrNull(leadTime),
                 safety_days: toNumberOrNull(safety),
+                min_order_qty: toNumberOrNull(minOrder),
+                pack_size: toNumberOrNull(pack),
+                min_stock: toNumberOrNull(minStock),
+                max_stock: toNumberOrNull(maxStock),
             },
             { onSuccess: () => shopify.toast.show(t('common.saved')) },
         );
 
     return (
         <s-section heading={t('productSettings.heading')}>
+            <SaveBar id="product-settings-save-bar" dirty={dirty} saving={update.isPending} onSave={submit} onDiscard={reset} />
             <s-stack gap="base">
                 <s-select
                     label={t('table.supplier')}
@@ -73,11 +101,46 @@ export function ProductSettingsForm({ f }: { f: ForecastDetail }) {
                         onInput={(e) => setSafety(e.currentTarget.value)}
                     />
                 </s-grid>
-                <s-stack direction="inline">
-                    <s-button onClick={submit} loading={update.isPending || undefined}>
-                        {t('productSettings.save')}
-                    </s-button>
-                </s-stack>
+                <s-grid gridTemplateColumns="@container (inline-size > 500px) 1fr 1fr, 1fr" gap="base">
+                    <s-number-field
+                        label={t('productSettings.minOrder')}
+                        min={1}
+                        placeholder={t('productSettings.none')}
+                        details={t('productSettings.minOrderHelp')}
+                        value={minOrder}
+                        error={fieldError(update.error, 'min_order_qty')}
+                        onInput={(e) => setMinOrder(e.currentTarget.value)}
+                    />
+                    <s-number-field
+                        label={t('productSettings.packSize')}
+                        min={1}
+                        placeholder={t('productSettings.none')}
+                        details={t('productSettings.packSizeHelp')}
+                        value={pack}
+                        error={fieldError(update.error, 'pack_size')}
+                        onInput={(e) => setPack(e.currentTarget.value)}
+                    />
+                </s-grid>
+                <s-grid gridTemplateColumns="@container (inline-size > 500px) 1fr 1fr, 1fr" gap="base">
+                    <s-number-field
+                        label={t('productSettings.minStock')}
+                        min={0}
+                        placeholder={t('productSettings.fromForecast', { qty: formatNumber(f.explanation?.reorder.computed_point ?? f.reorder_point, 0) })}
+                        details={t('productSettings.minStockHelp')}
+                        value={minStock}
+                        error={fieldError(update.error, 'min_stock')}
+                        onInput={(e) => setMinStock(e.currentTarget.value)}
+                    />
+                    <s-number-field
+                        label={t('productSettings.maxStock')}
+                        min={1}
+                        placeholder={t('productSettings.fromForecastShort')}
+                        details={t('productSettings.maxStockHelp')}
+                        value={maxStock}
+                        error={fieldError(update.error, 'max_stock')}
+                        onInput={(e) => setMaxStock(e.currentTarget.value)}
+                    />
+                </s-grid>
             </s-stack>
         </s-section>
     );

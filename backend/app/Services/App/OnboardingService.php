@@ -10,6 +10,7 @@ use App\Repositories\Contracts\AlertSettingRepositoryInterface;
 use App\Repositories\Contracts\ShopRepositoryInterface;
 use App\Services\Shopify\AdminApiClient;
 use App\Support\CacheKeys;
+use App\Support\Monitor;
 use Illuminate\Contracts\Cache\Repository as Cache;
 
 /** The two onboarding questions: default lead time (pre-filled 14) and the alert email. */
@@ -55,7 +56,9 @@ class OnboardingService
         return $this->cache->remember(CacheKeys::shopContactEmail($shop->id), 86400, function () use ($shop) {
             try {
                 return $this->admin->query($shop, '{ shop { contactEmail } }')['shop']['contactEmail'] ?? null;
-            } catch (ShopifyApiException|ShopifyReauthorizeException) {
+            } catch (ShopifyApiException|ShopifyReauthorizeException $e) {
+                Monitor::expected($e, 'onboarding contact email', ['shop' => $shop->domain]);
+
                 return null;
             }
         });

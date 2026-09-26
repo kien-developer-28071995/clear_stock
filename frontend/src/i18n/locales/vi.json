@@ -15,7 +15,8 @@
     "actions": "Thao tác",
     "daysSuffix": "ngày",
     "saved": "Đã lưu cài đặt",
-    "dayCount_other": "{{count}} ngày"
+    "dayCount_other": "{{count}} ngày",
+    "discard": "Hủy thay đổi"
   },
   "nav": {
     "home": "Trang chủ",
@@ -23,7 +24,9 @@
     "suppliers": "Nhà cung cấp",
     "bundles": "Combo",
     "settings": "Cài đặt",
-    "plans": "Gói dịch vụ"
+    "plans": "Gói dịch vụ",
+    "reorder": "Cần nhập hàng",
+    "insights": "Phân tích"
   },
   "notFound": {
     "heading": "Không tìm thấy trang",
@@ -36,7 +39,10 @@
     "checkFields": "Vui lòng kiểm tra các ô được đánh dấu.",
     "requestFailed": "Yêu cầu thất bại ({{status}}). Vui lòng thử lại.",
     "downloadFailed": "Tải xuống thất bại.",
-    "exportFailed": "Xuất file thất bại"
+    "exportFailed": "Xuất file thất bại",
+    "crashHeading": "Trang này gặp lỗi",
+    "crashBody": "Chúng tôi đã nhận được thông báo và sẽ kiểm tra. Tải lại trang thường sẽ khắc phục được.",
+    "reload": "Tải lại"
   },
   "status": {
     "out_of_stock": "Hết hàng",
@@ -66,7 +72,29 @@
     "notSynced": "Chưa đồng bộ",
     "stats": "{{variants, number}} biến thể, {{orders, number}} đơn hàng",
     "retry": "Đồng bộ lại",
-    "syncNow": "Đồng bộ ngay"
+    "syncNow": "Đồng bộ ngay",
+    "stages": {
+      "unknown": "Đang đồng bộ",
+      "queued": "Đang bắt đầu đồng bộ",
+      "fetching": "Đang tải sản phẩm, tồn kho và đơn hàng từ Shopify",
+      "importing_catalog": "Đang nhập sản phẩm và biến thể",
+      "importing_inventory": "Đang nhập tồn kho",
+      "importing_orders": "Đang tính doanh số theo ngày",
+      "rebuilding_stock": "Đang xác định các ngày hết hàng",
+      "completed": "Đồng bộ xong",
+      "failed": "Đồng bộ thất bại"
+    },
+    "errors": {
+      "unknown": "Đã có lỗi khi đồng bộ. Chúng tôi sẽ tự thử lại tối nay, hoặc bạn có thể thử lại ngay.",
+      "shopify_error": "Shopify phản hồi không như mong đợi. Chúng tôi sẽ tự thử lại tối nay, hoặc bạn có thể thử lại ngay.",
+      "reauthorize": "App đã mất quyền truy cập cửa hàng. Vui lòng mở lại app để kết nối lại.",
+      "timeout": "Đồng bộ mất quá nhiều thời gian nên đã dừng. Chúng tôi sẽ tự thử lại tối nay, hoặc bạn có thể thử lại ngay.",
+      "export_access_denied": "Shopify chưa cho phép app đọc {{data}} của bạn. Vui lòng thử lại sau; nếu lỗi vẫn lặp lại, hãy liên hệ hỗ trợ.",
+      "export_failed": "Shopify không xuất được {{data}} của bạn ({{status}}). Chúng tôi sẽ tự thử lại tối nay, hoặc bạn có thể thử lại ngay.",
+      "data_orders": "đơn hàng",
+      "data_variants": "sản phẩm",
+      "data_inventory": "tồn kho"
+    }
   },
   "onboarding": {
     "heading": "Chào mừng đến với {{app}}",
@@ -96,11 +124,24 @@
     "nothingToday": "Hôm nay không có gì cần nhập",
     "toReorderToday_other": "Hôm nay cần nhập {{count}} sản phẩm",
     "forecastUpdated": "Dự báo cập nhật {{when}}",
-    "chip": "{{label}} · {{n}}",
     "preparingHeading": "Đang chuẩn bị dự báo",
     "preparingBody": "Chúng tôi đang nhập dữ liệu cửa hàng. Dự báo sẽ hiện ở đây ngay khi xong.",
     "emptyHeading": "Chưa có dự báo",
-    "emptyBody": "Dự báo cần sản phẩm có theo dõi tồn kho. Hãy đồng bộ lại sau khi thêm sản phẩm."
+    "emptyBody": "Dự báo cần sản phẩm có theo dõi tồn kho. Hãy đồng bộ lại sau khi thêm sản phẩm.",
+    "kpi": {
+      "outOfStock": "Đang mất doanh số",
+      "reorderNow": "Cần đặt trước khi hết",
+      "thisWeekLabel": "Nhập trong tuần",
+      "thisWeek": "Hạn đặt hàng trong 7 ngày tới",
+      "slowLabel": "Hàng bán chậm",
+      "slowValue_other": "Đang kẹt ở {{count}} sản phẩm",
+      "slowCount_other": "Sản phẩm tồn trên 180 ngày"
+    },
+    "urgentHeading": "Gấp nhất",
+    "thisWeekHeading": "Sắp tới trong tuần",
+    "seeAll_other": "Xem tất cả {{count}}",
+    "dataSynced": "Dữ liệu đồng bộ {{when}}",
+    "notSyncedYet": "Đang chờ lần đồng bộ đầu tiên"
   },
   "actions": {
     "noneLeft": "Hết hàng",
@@ -187,7 +228,7 @@
       },
       "suppliers": {
         "title": "Thêm nhà cung cấp và lead time",
-        "body": "Sản phẩm từ nhà cung cấp giao chậm sẽ được nhắc nhập sớm hơn. Bạn cũng có thể xuất đơn đặt hàng riêng cho từng nhà cung cấp.",
+        "body": "Sản phẩm từ nhà cung cấp giao chậm sẽ được nhắc nhập sớm hơn. Bạn cũng có thể xuất đơn đặt hàng riêng cho từng nhà cung cấp. Chuyển từ Stocky sang? Nhập đơn đặt hàng cũ để thiết lập một lần là xong.",
         "action": "Thêm nhà cung cấp",
         "skip": "Tôi không dùng nhà cung cấp"
       },
@@ -212,7 +253,9 @@
     "sellsPerDay": "Bán mỗi ngày",
     "runsOut": "Hết hàng vào",
     "reorderPoint": "Điểm đặt hàng lại",
-    "units_other": "{{qty}} cái"
+    "units_other": "{{qty}} cái",
+    "onTheWay": "Đang về",
+    "incomingShort": "+{{qty}} đang về"
   },
   "why": {
     "heading": "Vì sao ra các con số này?",
@@ -262,7 +305,18 @@
     "fromDefault": "{{days}} (mặc định cửa hàng)",
     "safety": "Tồn kho dự phòng",
     "safetyHelp": "Số ngày hàng giữ thêm phòng khi bán tăng đột biến hoặc hàng về trễ.",
-    "save": "Lưu cài đặt"
+    "save": "Lưu cài đặt",
+    "minOrder": "Số lượng đặt tối thiểu",
+    "minOrderHelp": "Số lượng tối thiểu nhà cung cấp nhận cho một đơn. Gợi ý thấp hơn sẽ được nâng lên mức này.",
+    "packSize": "Quy cách thùng",
+    "packSizeHelp": "Số cái mỗi thùng hoặc lốc. Gợi ý được làm tròn lên số thùng chẵn.",
+    "none": "Không có",
+    "minStock": "Min (đặt hàng khi còn)",
+    "minStockHelp": "Đặt hàng khi tồn kho cộng hàng đang về giảm xuống mức này. Để trống để dự báo tự quyết định.",
+    "maxStock": "Max (nhập tới mức)",
+    "maxStockHelp": "Mỗi lần nhập sẽ bù tồn kho lên mức này. Để trống để dự báo tự quyết định.",
+    "fromForecast": "Theo dự báo: {{qty}}",
+    "fromForecastShort": "Theo dự báo"
   },
   "products": {
     "freeLimit_other": "Gói Miễn phí dự báo {{count}} sản phẩm bán chạy nhất.",
@@ -299,7 +353,11 @@
     "sendOn": "Gửi vào",
     "setupGuide": "Hướng dẫn thiết lập",
     "setupGuideBack": "Hướng dẫn thiết lập đã hiện lại ở Trang chủ",
-    "showSetupGuide": "Hiện hướng dẫn thiết lập ở Trang chủ"
+    "showSetupGuide": "Hiện hướng dẫn thiết lập ở Trang chủ",
+    "languageHeading": "Ngôn ngữ",
+    "language": "Ngôn ngữ của app",
+    "languageHelp": "Email cảnh báo được gửi bằng tiếng Anh.",
+    "languageAuto": "Giống Shopify admin ({{language}})"
   },
   "suppliers": {
     "add": "Thêm nhà cung cấp",
@@ -372,6 +430,149 @@
     "trialNote": "Dùng thử miễn phí {{count}} ngày, sau đó Shopify thu phí",
     "switchToFree": "Chuyển sang Miễn phí",
     "startTrial": "Dùng thử miễn phí {{count}} ngày",
-    "choose": "Chọn gói {{plan}}"
+    "choose": "Chọn gói {{plan}}",
+    "lockedHint": "Có trong gói {{plan}}"
+  },
+  "apiErrors": {
+    "generic": "Đã có lỗi xảy ra. Vui lòng thử lại.",
+    "validation_failed": "Vui lòng kiểm tra các ô được đánh dấu.",
+    "plan_required": "Tính năng này có trong gói {{plan}}.",
+    "session_expired": "Phiên làm việc đã hết hạn. Vui lòng tải lại app.",
+    "unauthorized": "Phiên làm việc đã hết hạn. Vui lòng tải lại app.",
+    "shopify_unavailable": "Không kết nối được với Shopify. Vui lòng thử lại sau giây lát.",
+    "sync_cooldown": "Vừa đồng bộ xong. Bạn có thể đồng bộ lại sau {{minutes}} phút.",
+    "too_many_requests": "Quá nhiều yêu cầu. Vui lòng chờ một chút rồi thử lại.",
+    "not_found": "Trang hoặc mục này không còn tồn tại.",
+    "product_not_found": "Sản phẩm này không còn tồn tại.",
+    "forecast_not_found": "Sản phẩm này chưa có dự báo.",
+    "supplier_not_found": "Nhà cung cấp này không còn tồn tại.",
+    "bundle_not_found": "Combo này không còn tồn tại.",
+    "forbidden": "Bạn không có quyền truy cập mục này.",
+    "server_error": "Hệ thống gặp lỗi. Vui lòng thử lại.",
+    "unavailable": "App đang được cập nhật. Vui lòng thử lại sau một phút."
+  },
+  "validation": {
+    "invalid": "Giá trị không hợp lệ.",
+    "required": "Vui lòng nhập ô này.",
+    "integer": "Nhập một số nguyên.",
+    "numeric": "Nhập một số.",
+    "string": "Nhập văn bản.",
+    "boolean": "Giá trị không hợp lệ.",
+    "array": "Giá trị không hợp lệ.",
+    "email": "Nhập địa chỉ email hợp lệ.",
+    "date": "Nhập ngày hợp lệ.",
+    "after": "Chọn một ngày muộn hơn.",
+    "after_or_equal": "Chọn hôm nay hoặc một ngày sau đó.",
+    "min": "Tối thiểu là {{value}}.",
+    "max": "Tối đa là {{value}}.",
+    "between": "Phải nằm trong khoảng {{min}} đến {{max}}.",
+    "in": "Chọn một trong các lựa chọn.",
+    "enum": "Chọn một trong các lựa chọn.",
+    "exists": "Mục này không còn tồn tại.",
+    "unique": "Tên này đã được dùng.",
+    "invalid_product": "Sản phẩm không hợp lệ.",
+    "product_not_synced": "Sản phẩm này chưa được đồng bộ. Hãy thử lại sau lần đồng bộ tới.",
+    "bundle_contains_itself": "Combo không thể chứa chính nó.",
+    "step_not_skippable": "Không thể bỏ qua bước này.",
+    "unknown_value": "Giá trị không hợp lệ.",
+    "file": "Hãy tải lên một file.",
+    "mimetypes": "Hãy tải lên file CSV.",
+    "file_unreadable": "Không đọc được file này. Hãy tải lên file CSV có dòng tiêu đề.",
+    "no_rows": "File này không có dữ liệu.",
+    "too_many_rows": "File quá lớn. Hãy chia thành các file nhỏ hơn.",
+    "mapping_incomplete": "Hãy chọn cột nhà cung cấp và một cột sản phẩm (SKU, ID biến thể hoặc tên sản phẩm).",
+    "max_below_min": "Max phải lớn hơn hoặc bằng Min."
+  },
+  "explanation": {
+    "unknown": "—",
+    "avg_override": "Bạn đặt tốc độ bán {{avg}}/ngày; ước tính của chúng tôi là {{computed}}/ngày.",
+    "avg_override_note": "Bạn đặt tốc độ bán {{avg}}/ngày ({{note}}); ước tính của chúng tôi là {{computed}}/ngày.",
+    "no_rate_yet": "Chưa đủ ngày còn hàng để đo tốc độ bán.",
+    "no_sales_while_in_stock_other": "Không bán được trong {{count}} ngày gần nhất dù còn hàng.",
+    "sells_over_window_other": "Bán {{avg}}/ngày trong {{count}} ngày gần nhất.",
+    "sells_over_window_excluded_other": "Bán {{avg}}/ngày trong {{days}} ngày gần nhất (đã bỏ {{count}} ngày hết hàng).",
+    "blended_rate": "Tốc độ tổng hợp {{avg}}/ngày ({{parts}}).",
+    "window_part_other": "{{count}} ngày {{avg}}/ngày × {{weight}}%",
+    "seasonality_rose_other": "Cùng kỳ năm trước, doanh số tăng ×{{factor}} trong {{count}} ngày tiếp theo, nên chúng tôi điều chỉnh thành {{avg}}/ngày.",
+    "seasonality_fell_other": "Cùng kỳ năm trước, doanh số giảm ×{{factor}} trong {{count}} ngày tiếp theo, nên chúng tôi điều chỉnh thành {{avg}}/ngày.",
+    "bundle_contribution_other": "Gồm {{avg}}/ngày bán trong combo \"{{bundle}}\" ({{count}} cái mỗi combo).",
+    "reorder_point_other": "Lead time {{lead_days}} ngày ({{lead_source}}) + {{safety_days}} ngày dự phòng → điểm đặt hàng lại {{count}} cái.",
+    "lead_source_override": "bạn đặt cho dự báo này",
+    "lead_source_variant": "đặt riêng cho SKU này",
+    "lead_source_supplier": "nhà cung cấp {{supplier}}",
+    "lead_source_shop_default": "mặc định cửa hàng",
+    "order_today_out_of_stock_other": "Đang hết hàng → nhập {{count}} cái ngay hôm nay.",
+    "runs_out_other": "Còn {{stock}} cái, sẽ hết khoảng {{stockout_date}} → nhập {{count}} cái trước {{reorder_date}}.",
+    "confidence": "Độ tin cậy: {{level}}.",
+    "confidence_with_reasons": "Độ tin cậy: {{level}} ({{reasons}}).",
+    "confidence_high": "cao",
+    "confidence_medium": "trung bình",
+    "confidence_low": "thấp",
+    "reason_little_history_other": "chỉ có {{count}} ngày lịch sử còn hàng",
+    "reason_few_sales_other": "bán ít ({{count}} cái trong 90 ngày)",
+    "reason_no_sales": "không bán được trong 90 ngày",
+    "reason_volatile": "doanh số dao động mạnh giữa các tuần",
+    "reason_average_overridden": "tốc độ bán do bạn đặt",
+    "incoming_stock_other": "Đã có {{count}} cái đang về (đơn nhập hàng hoặc chuyển kho trong Shopify), đã được trừ vào số cần nhập.",
+    "out_of_stock_incoming_covers": "Đang hết hàng; số hàng đang về đủ cho lần nhập tới nên chưa cần đặt thêm.",
+    "runs_out_incoming_covers": "Còn {{stock}} cái, sẽ hết khoảng {{stockout_date}}; số hàng đang về đủ cho lần nhập tới nên chưa cần đặt thêm.",
+    "rounded_min": "Cần {{needed}} cái; nhà cung cấp nhận tối thiểu {{min}} nên nhập {{count}}.",
+    "rounded_pack": "Cần {{needed}} cái; làm tròn lên thùng {{pack}} cái → {{count}}.",
+    "rounded_min_and_pack": "Cần {{needed}} cái; tối thiểu {{min}}, theo thùng {{pack}} cái → {{count}}.",
+    "reorder_point_manual_other": "Điểm đặt hàng lại do bạn đặt: {{count}} cái.",
+    "order_up_to_max_other": "Mỗi lần nhập bù tồn kho lên mức tối đa {{count}} cái bạn đặt.",
+    "below_min_order_other": "Tồn {{stock}} cái (tính cả hàng đang về) đã chạm mức tối thiểu → nhập {{count}} cái ngay hôm nay.",
+    "above_min": "Tồn {{stock}} cái (tính cả hàng đang về) vẫn trên mức tối thiểu; chưa có doanh số nên chưa cần nhập.",
+    "no_order_needed": "Hiện chưa cần nhập thêm."
+  },
+  "import": {
+    "fromStocky": "Nhập từ Stocky",
+    "heading": "Nhập nhà cung cấp từ đơn đặt hàng",
+    "intro": "Chuyển từ Stocky sang? Stocky không xuất được danh sách nhà cung cấp, nhưng đơn đặt hàng cho biết ai cung cấp sản phẩm nào. Tải chúng lên, chúng tôi sẽ tạo nhà cung cấp, gán từng sản phẩm cho nhà cung cấp bạn đặt gần nhất và đo lead time từ các lần giao hàng trước.",
+    "stepExport": "Trong Stocky, mở Purchase orders (hoặc Reports) và xuất ra CSV. Nhiều file cũng được.",
+    "stepUpload": "Kéo thả các file vào bên dưới. Chưa có gì được lưu cho tới khi bạn xác nhận.",
+    "stepCheck": "Kiểm tra nhà cung cấp và lead time chúng tôi tìm được, rồi bấm nhập.",
+    "otherApps": "File CSV đơn đặt hàng từ app khác hoặc bảng tính cũng dùng được, miễn là có cột nhà cung cấp và cột SKU, ID biến thể hoặc tên sản phẩm.",
+    "dropLabel": "File CSV đơn đặt hàng",
+    "filesChosen_other": "{{count}} file: {{names}}",
+    "columnsHeading": "Các cột",
+    "columnsHelp": "Chúng tôi đã tự nhận diện các cột này. Hãy sửa nếu thấy chưa đúng.",
+    "missing": "Chưa tìm thấy: {{fields}}. Hãy chọn đúng cột bên dưới.",
+    "required": {
+      "supplier": "cột nhà cung cấp",
+      "product": "cột sản phẩm (SKU, ID biến thể hoặc tên sản phẩm)"
+    },
+    "notInFile": "Không có trong file",
+    "fields": {
+      "po_number": "Số đơn đặt hàng",
+      "supplier": "Nhà cung cấp",
+      "sku": "SKU",
+      "variant_id": "ID biến thể Shopify",
+      "product": "Tên sản phẩm",
+      "variant": "Tên biến thể",
+      "ordered_at": "Ngày đặt",
+      "expected_at": "Ngày dự kiến về",
+      "received_at": "Ngày nhận hàng"
+    },
+    "suppliersHeading": "Nhà cung cấp",
+    "summary_other": "{{rows}} dòng, {{orders}} đơn đặt hàng, {{count}} nhà cung cấp.",
+    "orders": "Đơn đặt hàng",
+    "existing": "Đã có",
+    "new": "Mới",
+    "measured_other": "Đo được: {{days}} ngày (trung vị của {{count}} lần giao)",
+    "notMeasured": "Không có ngày giao hàng: để trống để dùng mặc định cửa hàng",
+    "matched_other": "{{count}} sản phẩm sẽ được gán cho nhà cung cấp mà bạn đặt hàng gần nhất.",
+    "unmatched_other": "{{count}} dòng không khớp sản phẩm nào trong cửa hàng (ví dụ {{samples}}) và sẽ được bỏ qua.",
+    "replace_other": "Thay luôn nhà cung cấp của {{count}} sản phẩm đã có nhà cung cấp",
+    "apply": "Nhập",
+    "done_other": "Đã nhập: {{suppliers}} nhà cung cấp mới, gán {{count}} sản phẩm"
+  },
+  "insights": {
+    "empty": "Chưa có gì để hiển thị: phần phân tích sẽ có khi sản phẩm có dự báo."
+  },
+  "confirm": {
+    "deleteSupplier": "Xóa nhà cung cấp?",
+    "removeBundle": "Gỡ combo?",
+    "switchToFree": "Chuyển sang gói Miễn phí?"
   }
 }

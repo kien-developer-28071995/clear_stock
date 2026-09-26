@@ -30,6 +30,11 @@ final readonly class ForecastInput
         public ?int $supplierLeadTimeDays = null,
         public array $bundles = [],
         public array $overrides = [],
+        public int $incomingStock = 0,          // on the way (Shopify "incoming": purchase orders, transfers)
+        public ?int $minOrderQty = null,        // supplier minimum order quantity (units)
+        public ?int $packSize = null,           // units per case: orders are whole cases
+        public ?int $minStock = null,           // manual reorder point (min)
+        public ?int $maxStock = null,           // manual order-up-to level (max)
     ) {}
 
     public function override(OverrideField $field): ?array

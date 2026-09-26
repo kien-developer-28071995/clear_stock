@@ -1,10 +1,15 @@
-/** Plain-language "why this number" sentences produced by the backend formatter. */
-export function Explanation({ sentences, limit }: { sentences: string[]; limit?: number }) {
-    const shown = limit ? sentences.slice(0, limit) : sentences;
+import { useTranslation } from 'react-i18next';
+import { translateCode } from '@/i18n/codes';
+import type { Coded } from '@/types/coded';
+
+/** "Why this number" sentences, from the forecast's explanation lines ({code, params}). */
+export function Explanation({ lines, limit }: { lines: Coded[]; limit?: number }) {
+    useTranslation(); // re-render when the language changes
+    const shown = limit ? lines.slice(0, limit) : lines;
     return (
         <s-unordered-list>
-            {shown.map((sentence) => (
-                <s-list-item key={sentence}>{sentence}</s-list-item>
+            {shown.map((line, i) => (
+                <s-list-item key={`${line.code}-${i}`}>{translateCode('explanation', line)}</s-list-item>
             ))}
         </s-unordered-list>
     );

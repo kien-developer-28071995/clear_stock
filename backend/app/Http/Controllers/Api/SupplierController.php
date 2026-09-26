@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Exceptions\ApiException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SupplierRequest;
 use App\Http\Resources\SupplierResource;
@@ -28,7 +29,7 @@ class SupplierController extends Controller
     public function update(SupplierRequest $request, ShopContext $context, int $supplier): SupplierResource
     {
         $shop = $context->shop();
-        $model = $this->suppliers->find($shop, $supplier) ?? abort(404, 'Supplier not found.');
+        $model = $this->suppliers->find($shop, $supplier) ?? throw ApiException::notFound('supplier');
 
         return new SupplierResource($this->suppliers->update($shop, $model, $request->validated()));
     }
@@ -36,7 +37,7 @@ class SupplierController extends Controller
     public function destroy(ShopContext $context, int $supplier): Response
     {
         $shop = $context->shop();
-        $model = $this->suppliers->find($shop, $supplier) ?? abort(404, 'Supplier not found.');
+        $model = $this->suppliers->find($shop, $supplier) ?? throw ApiException::notFound('supplier');
         $this->suppliers->delete($shop, $model);
 
         return response()->noContent();

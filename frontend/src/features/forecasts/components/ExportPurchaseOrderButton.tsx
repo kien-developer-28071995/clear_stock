@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
-import { http, ApiError } from '@/lib/http';
+import { http, ApiError, errorMessage } from '@/lib/http';
 import { useEntitlements } from '@/hooks/useEntitlements';
 
 /** Growth plan: download a CSV purchase order of everything to reorder now (optionally one supplier). */
@@ -34,7 +34,7 @@ export function ExportPurchaseOrderButton({ supplierId, locationId, variantIds, 
             if (variantIds?.length) params.set('variant_ids', variantIds.join(','));
             await http.download(`/purchase-orders/export${params.size ? `?${params}` : ''}`);
         } catch (e) {
-            shopify.toast.show(e instanceof ApiError ? e.message : t('errors.exportFailed'), { isError: true });
+            shopify.toast.show(e instanceof ApiError ? errorMessage(e) : t('errors.exportFailed'), { isError: true });
         } finally {
             setBusy(false);
         }

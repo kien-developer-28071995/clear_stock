@@ -1,62 +1,49 @@
 import { useTranslation } from 'react-i18next';
 import { appConfig } from '@/lib/appConfig';
-import { LoadingPage } from '@/components/ui/LoadingPage';
-import { ErrorBanner } from '@/components/ui/ErrorBanner';
 import { SyncStatusCard } from '@/features/sync/components/SyncStatusCard';
 import { useSyncStatus } from '@/features/sync/hooks/useSync';
-import { useDashboard } from '@/features/dashboard/hooks/useDashboard';
+import { DashboardGate } from '@/features/dashboard/components/DashboardGate';
 import { HomeHeader } from '@/features/dashboard/components/HomeHeader';
-import { ActionList } from '@/features/dashboard/components/ActionList';
-import { RunwayChart } from '@/features/dashboard/components/RunwayChart';
-import { SlowMovers } from '@/features/dashboard/components/SlowMovers';
+import { HomeKpis } from '@/features/dashboard/components/HomeKpis';
+import { UrgentList } from '@/features/dashboard/components/UrgentList';
 import { PlanLimitBanner } from '@/features/dashboard/components/PlanLimitBanner';
 import { SetupGuide } from '@/features/setup/components/SetupGuide';
-import { Tip } from '@/features/setup/components/Tip';
 
-/** Home: today's to-do list first, the overview (runway, slow stock) below. */
+/**
+ * Home: only what needs attention. Four numbers, the most urgent products, and the
+ * sync card while a sync runs or failed. Details live on Reorder and Insights.
+ */
 export function DashboardPage() {
     const { t } = useTranslation();
-    const { data, isPending, error, refetch } = useDashboard();
     const sync = useSyncStatus();
-
-    if (isPending) return <LoadingPage heading={appConfig.appName} />;
-
-    if (error || !data) {
-        return (
-            <s-page heading={appConfig.appName}>
-                <ErrorBanner error={error} onRetry={() => refetch()} />
-            </s-page>
-        );
-    }
-
-    if (data.counts.total === 0) {
-        const running = sync.data?.status === 'running';
-        return (
-            <s-page heading={appConfig.appName}>
-                <s-section>
-                    <s-empty-state heading={running ? t('home.preparingHeading') : t('home.emptyHeading')}>
-                        <s-paragraph slot="subheading">{running ? t('home.preparingBody') : t('home.emptyBody')}</s-paragraph>
-                    </s-empty-state>
-                </s-section>
-                <SetupGuide />
-                <SyncStatusCard />
-            </s-page>
-        );
-    }
+    const syncNeedsAttention = sync.data?.status === 'running' || sync.data?.status === 'failed';
 
     return (
-        <s-page heading={appConfig.appName}>
-            <PlanLimitBanner counts={data.counts} />
-            <SetupGuide />
-            <s-section>
-                <HomeHeader dashboard={data} />
-            </s-section>
-            <Tip id="home_actions">{t('tips.home_actions')}</Tip>
-            <ActionList dashboard={data} />
-            <Tip id="home_runway">{t('tips.home_runway')}</Tip>
-            <RunwayChart items={data.runway} />
-            <SlowMovers dashboard={data} />
-            <SyncStatusCard />
-        </s-page>
+        <DashboardGate heading={appConfig.appName}>
+            {(data) =>
+                data.counts.total === 0 ? (
+                    <s-page heading={appConfig.appName}>
+                        <s-section>
+                            <s-empty-state heading={sync.data?.status === 'running' ? t('home.preparingHeading') : t('home.emptyHeading')}>
+                                <s-paragraph slot="subheading">{sync.data?.status === 'running' ? t('home.preparingBody') : t('home.emptyBody')}</s-paragraph>
+                            </s-empty-state>
+                        </s-section>
+                        <SetupGuide />
+                        <SyncStatusCard />
+                    </s-page>
+                ) : (
+                    <s-page heading={appConfig.appName}>
+                        <PlanLimitBanner counts={data.counts} />
+                        {syncNeedsAttention && <SyncStatusCard />}
+                        <SetupGuide />
+                        <s-stack gap="base">
+                            <HomeHeader dashboard={data} />
+                            <HomeKpis dashboard={data} />
+                            <UrgentList dashboard={data} />
+                        </s-stack>
+                    </s-page>
+                )
+            }
+        </DashboardGate>
     );
 }

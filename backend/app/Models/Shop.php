@@ -31,12 +31,13 @@ use Illuminate\Support\Carbon;
  * @property ?Carbon $trial_started_at
  * @property ?string $currency
  * @property string $timezone
+ * @property ?string $locale Language chosen in Settings (null = Shopify admin language)
  * @property int $default_lead_time_days
  * @property int $default_safety_days
  * @property ?Carbon $onboarded_at
  * @property ?array{events?: array<string, string>, skipped?: array<int, string>, dismissed_at?: ?string, tips_dismissed?: array<int, string>} $setup_guide
  * @property SyncStatus $sync_status
- * @property ?string $sync_error
+ * @property ?array{code: string, params: array<string, mixed>} $sync_error
  * @property ?Carbon $last_synced_at
  * @property ?Carbon $forecasted_at
  * @property ?Carbon $installed_at
@@ -51,7 +52,7 @@ class Shop extends Model
     protected $fillable = [
         'domain', 'name',
         'access_token', 'access_token_expires_at', 'refresh_token', 'refresh_token_expires_at', 'scopes',
-        'plan', 'plan_interval', 'subscription_id', 'subscription_status', 'plan_renews_at', 'trial_started_at', 'currency', 'timezone', 'default_lead_time_days', 'default_safety_days', 'onboarded_at', 'setup_guide',
+        'plan', 'plan_interval', 'subscription_id', 'subscription_status', 'plan_renews_at', 'trial_started_at', 'currency', 'timezone', 'locale', 'default_lead_time_days', 'default_safety_days', 'onboarded_at', 'setup_guide',
         'sync_status', 'sync_error', 'last_synced_at', 'forecasted_at',
         'installed_at', 'uninstalled_at',
     ];
@@ -78,6 +79,7 @@ class Shop extends Model
             'plan_renews_at' => 'datetime',
             'trial_started_at' => 'datetime',
             'sync_status' => SyncStatus::class,
+            'sync_error' => 'array',
             'last_synced_at' => 'datetime',
             'forecasted_at' => 'datetime',
             'installed_at' => 'datetime',

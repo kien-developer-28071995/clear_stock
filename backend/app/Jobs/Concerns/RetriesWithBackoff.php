@@ -21,7 +21,8 @@ trait RetriesWithBackoff
 
     public function failed(Throwable $e): void
     {
-        Log::error('Job failed permanently', [
+        // One alert per job class; the attempts' own exceptions were reported as they happened.
+        Log::error('Job failed permanently: '.class_basename(static::class), [
             'job' => static::class,
             'shop' => $this->shopDomain ?? null,
             'error' => $e->getMessage(),

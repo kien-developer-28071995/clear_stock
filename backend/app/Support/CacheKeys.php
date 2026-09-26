@@ -52,6 +52,29 @@ final class CacheKeys
 
     public const TTL_DASHBOARD = 3600;
 
+    /**
+     * Bumped on every catalog write: products, locations, inventory, bundles, product
+     * settings, suppliers. Catalog read caches include it in their key.
+     */
+    public static function catalogVersion(int $shopId): string
+    {
+        return 'catalog:version:'.$shopId;
+    }
+
+    public const TTL_CATALOG = 3600;
+
+    /** A catalog read ($part: locations, bundles, tracked-count…) at a catalog version. */
+    public static function catalog(int $shopId, int $version, string $part): string
+    {
+        return "catalog:{$shopId}:v{$version}:{$part}";
+    }
+
+    /** A page of the product list, at a forecast and a catalog version. */
+    public static function forecastPage(int $shopId, int $forecastVersion, int $catalogVersion, string $today, string $filtersHash): string
+    {
+        return "forecasts:page:{$shopId}:f{$forecastVersion}:c{$catalogVersion}:{$today}:{$filtersHash}";
+    }
+
     public static function dashboard(int $shopId, int $version, string $today): string
     {
         return "dashboard:{$shopId}:v{$version}:{$today}";

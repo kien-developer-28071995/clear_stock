@@ -12,8 +12,8 @@ use App\Services\Shopify\SessionToken;
 use App\Services\Shopify\SessionTokenValidator;
 use App\Services\Shopify\ShopTokenService;
 use App\Support\CacheKeys;
+use App\Support\Monitor;
 use Illuminate\Contracts\Cache\Repository as Cache;
-use Illuminate\Support\Facades\Log;
 
 /**
  * Turns an App Bridge session token into an authenticated, installed Shop.
@@ -55,7 +55,7 @@ class ShopAuthService
             try {
                 return $this->tokens->exchange($session->shopDomain, $session->raw);
             } catch (InvalidSessionTokenException|ShopifyApiException $e) {
-                Log::info('Scope re-check skipped', ['shop' => $shop->domain, 'error' => $e->getMessage()]);
+                Monitor::expected($e, 'scope re-check', ['shop' => $shop->domain]);
             }
         }
 

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Exceptions\ApiException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\VariantSettingsRequest;
 use App\Http\Resources\VariantOptionResource;
@@ -30,10 +31,10 @@ class VariantController extends Controller
     public function updateSettings(VariantSettingsRequest $request, ShopContext $context, int $variant): JsonResponse
     {
         $shop = $context->shop();
-        $model = $this->variants->find($shop, $variant) ?? abort(404, 'Product not found.');
+        $model = $this->variants->find($shop, $variant) ?? throw ApiException::notFound('product');
         $this->adjust->updateVariantSettings($shop, $model, $request->settings());
 
-        return response()->json(['data' => $model->only(['id', 'supplier_id', 'lead_time_override', 'safety_days'])]);
+        return response()->json(['data' => $model->only(['id', 'supplier_id', 'lead_time_override', 'safety_days', 'min_order_qty', 'pack_size', 'min_stock', 'max_stock'])]);
     }
 
     public function bulkUpdateSettings(VariantSettingsRequest $request, ShopContext $context): JsonResponse

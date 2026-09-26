@@ -5,6 +5,7 @@ import type { TFunction } from 'i18next';
 import { useQueryClient } from '@tanstack/react-query';
 import { LoadingPage } from '@/components/ui/LoadingPage';
 import { ErrorBanner } from '@/components/ui/ErrorBanner';
+import { useConfirm } from '@/components/ui/ConfirmModal';
 import { useBilling, useChangePlan } from '@/features/billing/hooks/useBilling';
 import type { Interval, PlanInfo } from '@/features/billing/types';
 import { formatMoney, formatNumber } from '@/utils/format';
@@ -31,6 +32,7 @@ export function PlansPage() {
     const confirmed = params.get('confirmed') === '1';
     const { data, isPending, error, refetch } = useBilling(confirmed);
     const change = useChangePlan();
+    const { confirm, modal: confirmModal } = useConfirm();
     const qc = useQueryClient();
     const [interval, setInterval] = useState<Interval>('monthly');
 
@@ -57,8 +59,11 @@ export function PlansPage() {
         );
     }
 
-    const choose = (plan: PlanInfo) => {
-        if (plan.key === 'free' && !window.confirm(t('plans.confirmFree', { count: plan.limits.max_skus ?? 0 }))) {
+    const choose = async (plan: PlanInfo) => {
+        if (
+            plan.key === 'free' &&
+            !(await confirm({ heading: t('confirm.switchToFree'), body: t('plans.confirmFree', { count: plan.limits.max_skus ?? 0 }), confirmLabel: t('plans.switchToFree'), destructive: true }))
+        ) {
             return;
         }
         change.mutate({ plan: plan.key, interval: plan.key === 'free' ? undefined : interval });
@@ -130,6 +135,7 @@ export function PlansPage() {
                     );
                 })}
             </s-grid>
+            {confirmModal}
         </s-page>
     );
 }

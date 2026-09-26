@@ -52,11 +52,11 @@ export function LocationForecasts({ f }: { f: ForecastDetail }) {
                         ))}
                     </s-table-body>
                 </s-table>
-                {opened?.forecast && opened.forecast.explanation_sentences.length > 0 && (
+                {opened?.forecast && opened.forecast.explanation_lines.length > 0 && (
                     <s-box padding="base" background="subdued" borderRadius="base">
                         <s-stack gap="small-200">
                             <s-text type="strong">{t('locations.why', { location: opened.location })}</s-text>
-                            <Explanation sentences={opened.forecast.explanation_sentences} />
+                            <Explanation lines={opened.forecast.explanation_lines} />
                         </s-stack>
                     </s-box>
                 )}
