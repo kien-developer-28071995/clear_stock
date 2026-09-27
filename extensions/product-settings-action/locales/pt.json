@@ -1,0 +1,31 @@
+{
+    "name": "Definir fornecedor e prazo",
+    "intro": {
+        "one": "Aplica-se a todas as variantes do produto selecionado no Clear Stock. Campos vazios não são alterados.",
+        "many": "Aplica-se a todas as variantes dos {{count}} produtos selecionados no Clear Stock. Campos vazios não são alterados.",
+        "other": "Aplica-se a todas as variantes dos {{count}} produtos selecionados no Clear Stock. Campos vazios não são alterados."
+    },
+    "supplier": "Fornecedor",
+    "keep": "Manter o atual",
+    "noSupplier": "Sem fornecedor",
+    "noSuppliers": "Ainda não há fornecedores: adicione em Clear Stock › Fornecedores.",
+    "leadTime": "Prazo de entrega (dias)",
+    "leadTimeHelp": "Dias entre o pedido e o recebimento. Substitui o prazo do fornecedor.",
+    "safety": "Estoque de segurança (dias)",
+    "safetyHelp": "Dias extras de estoque caso as vendas subam ou uma entrega atrase.",
+    "apply": "Aplicar",
+    "cancel": "Cancelar",
+    "close": "Fechar",
+    "nothing": "Escolha um fornecedor ou digite um número primeiro.",
+    "done": {
+        "one": "{{count}} variante atualizada. As previsões estão sendo recalculadas.",
+        "many": "{{count}} variantes atualizadas. As previsões estão sendo recalculadas.",
+        "other": "{{count}} variantes atualizadas. As previsões estão sendo recalculadas."
+    },
+    "noneKnown": "Nenhum destes produtos está no Clear Stock ainda. Eles aparecem após a próxima sincronização.",
+    "errors": {
+        "generic": "Não foi possível salvar. Tente novamente em instantes.",
+        "network": "Não foi possível conectar ao Clear Stock. Verifique sua conexão e tente novamente.",
+        "invalid": "Verifique os valores: prazo de entrega e estoque de segurança devem ser números inteiros de 0 a 365."
+    }
+}

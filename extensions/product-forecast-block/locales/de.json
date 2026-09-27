@@ -1,0 +1,185 @@
+{
+    "name": "Bestandsprognose",
+    "locale": "de",
+    "variant": "Variante",
+    "state": "Status",
+    "inStock": "Auf Lager",
+    "perDay": "Verkauf / Tag",
+    "runsOut": "Geht aus",
+    "orderBy": "Bestellen bis",
+    "suggested": "Bestellvorschlag",
+    "incoming": "+{{qty}} unterwegs",
+    "never": "—",
+    "why": "Warum diese Zahlen",
+    "whyFor": "Warum diese Zahlen ({{name}})",
+    "open": "In Clear Stock öffnen",
+    "seePlans": "Tarife ansehen",
+    "summary": "{{status}} · {{qty}} bis {{date}} bestellen",
+    "summaryNoOrder": "{{status}}",
+    "notSynced": "Dieses Produkt ist noch nicht in Clear Stock. Es erscheint nach der nächsten Synchronisierung (jede Nacht, oder Einstellungen › Jetzt synchronisieren in der App).",
+    "reasons": {
+        "not_tracked": "Der Lagerbestand wird in Shopify nicht verfolgt",
+        "plan_limit": "Keine Prognose im Free-Tarif (nur Bestseller)",
+        "no_forecast": "Noch keine Prognose"
+    },
+    "errors": {
+        "generic": "Die Prognose konnte nicht geladen werden. Versuche es gleich noch einmal.",
+        "network": "Clear Stock ist nicht erreichbar. Prüfe deine Verbindung und versuche es erneut."
+    },
+    "status": {
+        "out_of_stock": "Ausverkauft",
+        "reorder_now": "Jetzt nachbestellen",
+        "slow": "Langsamdreher",
+        "healthy": "OK",
+        "overstock": "Überbestand",
+        "discontinued": "Ausgelistet"
+    },
+    "confidence": {
+        "low": "Geringe Sicherheit",
+        "medium": "Mittlere Sicherheit",
+        "high": "Hohe Sicherheit"
+    },
+    "explanation": {
+        "unknown": "—",
+        "avg_override": "Du hast die Verkäufe auf {{avg}}/Tag gesetzt; unsere Schätzung war {{computed}}/Tag.",
+        "avg_override_note": "Du hast die Verkäufe auf {{avg}}/Tag gesetzt ({{note}}); unsere Schätzung war {{computed}}/Tag.",
+        "no_rate_yet": "Noch nicht genug Tage auf Lager, um eine Verkaufsrate zu messen.",
+        "no_sales_while_in_stock": {
+            "one": "Keine Verkäufe am letzten {{count}} Tag auf Lager.",
+            "other": "Keine Verkäufe in den letzten {{count}} Tagen auf Lager."
+        },
+        "sells_over_window": {
+            "one": "Verkauft {{avg}}/Tag am letzten {{count}} Tag.",
+            "other": "Verkauft {{avg}}/Tag in den letzten {{count}} Tagen."
+        },
+        "sells_over_window_excluded": {
+            "one": "Verkauft {{avg}}/Tag in den letzten {{days}} Tagen ({{count}} ausverkaufter Tag ausgelassen).",
+            "other": "Verkauft {{avg}}/Tag in den letzten {{days}} Tagen ({{count}} ausverkaufte Tage ausgelassen)."
+        },
+        "blended_rate": "Gemischte Rate {{avg}}/Tag ({{parts}}).",
+        "window_part": {
+            "one": "{{count}} Tag {{avg}}/Tag × {{weight}} %",
+            "other": "{{count}} Tage {{avg}}/Tag × {{weight}} %"
+        },
+        "seasonality_rose": {
+            "one": "Im Vorjahr stiegen die Verkäufe am folgenden Tag um ×{{factor}}, daher haben wir auf {{avg}}/Tag angepasst.",
+            "other": "Im Vorjahr stiegen die Verkäufe in den folgenden {{count}} Tagen um ×{{factor}}, daher haben wir auf {{avg}}/Tag angepasst."
+        },
+        "seasonality_fell": {
+            "one": "Im Vorjahr sanken die Verkäufe am folgenden Tag auf ×{{factor}}, daher haben wir auf {{avg}}/Tag angepasst.",
+            "other": "Im Vorjahr sanken die Verkäufe in den folgenden {{count}} Tagen auf ×{{factor}}, daher haben wir auf {{avg}}/Tag angepasst."
+        },
+        "spikes_capped": {
+            "one": "{{count}} einmalige Spitze mit dem üblichen Wert gezählt ({{top}} verkauft am {{top_date}}, üblich {{usual}}/Tag).",
+            "other": "{{count}} einmalige Spitzen mit dem üblichen Wert gezählt (größte: {{top}} verkauft am {{top_date}}, üblich {{usual}}/Tag)."
+        },
+        "order_cycle_supplier": {
+            "one": "Bestellungen decken {{count}} Tag Verkäufe ab: der Bestellrhythmus von {{supplier}}.",
+            "other": "Bestellungen decken {{count}} Tage Verkäufe ab: der Bestellrhythmus von {{supplier}}."
+        },
+        "lost_sales": {
+            "one": "{{count}} Tag in den letzten {{days}} Tagen ausverkauft: etwa {{units}} Verkäufe entgangen.",
+            "other": "{{count}} Tage in den letzten {{days}} Tagen ausverkauft: etwa {{units}} Verkäufe entgangen."
+        },
+        "bundle_contribution": {
+            "one": "Enthält {{avg}}/Tag, verkauft in „{{bundle}}“ ({{count}} pro Bundle).",
+            "other": "Enthält {{avg}}/Tag, verkauft in „{{bundle}}“ ({{count}} pro Bundle)."
+        },
+        "reorder_point": {
+            "one": "Lieferzeit {{lead_days}} Tage ({{lead_source}}) + {{safety_days}} Sicherheitstage → Meldebestand {{count}} Stück.",
+            "other": "Lieferzeit {{lead_days}} Tage ({{lead_source}}) + {{safety_days}} Sicherheitstage → Meldebestand {{count}} Stück."
+        },
+        "lead_source_override": "von dir für diese Prognose festgelegt",
+        "lead_source_variant": "für diese SKU festgelegt",
+        "lead_source_supplier": "Lieferant {{supplier}}",
+        "lead_source_shop_default": "Shop-Standard",
+        "order_today_out_of_stock": {
+            "one": "Jetzt ausverkauft → heute {{count}} Stück bestellen.",
+            "other": "Jetzt ausverkauft → heute {{count}} Stück bestellen."
+        },
+        "runs_out": {
+            "one": "{{stock}} auf Lager gehen etwa am {{stockout_date}} aus → {{count}} Stück bis {{reorder_date}} bestellen.",
+            "other": "{{stock}} auf Lager gehen etwa am {{stockout_date}} aus → {{count}} Stück bis {{reorder_date}} bestellen."
+        },
+        "confidence": "Sicherheit: {{level}}.",
+        "confidence_with_reasons": "Sicherheit: {{level}} ({{reasons}}).",
+        "confidence_high": "hoch",
+        "confidence_medium": "mittel",
+        "confidence_low": "gering",
+        "reason_little_history": {
+            "one": "nur {{count}} Tag Historie auf Lager",
+            "other": "nur {{count}} Tage Historie auf Lager"
+        },
+        "reason_few_sales": {
+            "one": "wenige Verkäufe ({{count}} in 90 Tagen)",
+            "other": "wenige Verkäufe ({{count}} in 90 Tagen)"
+        },
+        "reason_no_sales": "keine Verkäufe in 90 Tagen",
+        "reason_volatile": "Verkäufe schwanken stark von Woche zu Woche",
+        "reason_average_overridden": "Rate manuell festgelegt",
+        "incoming_stock": {
+            "one": "{{count}} Stück ist bereits unterwegs (Bestellungen oder Umlagerungen in Shopify) und zählt für diese Bestellung.",
+            "other": "{{count}} Stück sind bereits unterwegs (Bestellungen oder Umlagerungen in Shopify) und zählen für diese Bestellung."
+        },
+        "out_of_stock_incoming_covers": "Jetzt ausverkauft; die unterwegs befindliche Ware deckt die nächste Nachbestellung, daher ist keine neue Bestellung nötig.",
+        "runs_out_incoming_covers": "{{stock}} auf Lager gehen etwa am {{stockout_date}} aus; die unterwegs befindliche Ware deckt die nächste Nachbestellung, daher ist keine neue Bestellung nötig.",
+        "rounded_min": "Du brauchst {{needed}}; die Mindestmenge des Lieferanten ist {{min}}, also {{count}} bestellen.",
+        "rounded_pack": "Du brauchst {{needed}}; aufgerundet auf ganze Packungen zu {{pack}} → {{count}}.",
+        "rounded_min_and_pack": "Du brauchst {{needed}}; die Mindestmenge des Lieferanten ist {{min}}, in Packungen zu {{pack}} → {{count}}.",
+        "rounding_supplier_default": "Mindestbestellmenge / Verpackungseinheit: Standardwerte von {{supplier}}.",
+        "reorder_point_manual": {
+            "one": "Von dir festgelegter Meldebestand: {{count}} Stück.",
+            "other": "Von dir festgelegter Meldebestand: {{count}} Stück."
+        },
+        "order_up_to_max": {
+            "one": "Bestellungen füllen bis zu deinem Maximum von {{count}} Stück auf.",
+            "other": "Bestellungen füllen bis zu deinem Maximum von {{count}} Stück auf."
+        },
+        "below_min_order": {
+            "one": "{{stock}} auf Lager (inkl. unterwegs) liegen auf oder unter deinem Minimum → heute {{count}} Stück bestellen.",
+            "other": "{{stock}} auf Lager (inkl. unterwegs) liegen auf oder unter deinem Minimum → heute {{count}} Stück bestellen."
+        },
+        "above_min": "{{stock}} auf Lager (inkl. unterwegs) liegen über deinem Minimum; noch keine Verkäufe, also nichts zu bestellen.",
+        "no_order_needed": "Im Moment nichts zu bestellen.",
+        "overstock": {
+            "one": "{{count}} Stück mehr als die {{target}}, die gehalten werden sollten (Lieferzeit, Sicherheit und nächster Bestellzyklus): Nachbestellung aufschieben oder eine Aktion starten.",
+            "other": "{{count}} Stück mehr als die {{target}}, die gehalten werden sollten (Lieferzeit, Sicherheit und nächster Bestellzyklus): Nachbestellung aufschieben oder eine Aktion starten."
+        },
+        "reason_uses_reference": "Schätzung teils anhand eines ähnlichen Produkts",
+        "reference_blend": {
+            "one": "Neues Produkt mit {{count}} Tag eigener Verkäufe: {{ref_share}} % der Schätzung stammen von {{name}} ({{ref_avg}}/Tag zu {{percent}} %) → {{avg}}/Tag.",
+            "other": "Neues Produkt mit {{count}} Tagen eigener Verkäufe: {{ref_share}} % der Schätzung stammen von {{name}} ({{ref_avg}}/Tag zu {{percent}} %) → {{avg}}/Tag."
+        },
+        "reference_done": {
+            "one": "Genug eigene Historie ({{count}} Tag auf Lager): übernimmt die Rate von {{name}} nicht mehr.",
+            "other": "Genug eigene Historie ({{count}} Tage auf Lager): übernimmt die Rate von {{name}} nicht mehr."
+        },
+        "reference_no_forecast": "{{name}} hat noch keine Prognose, daher wird seine Rate nicht verwendet.",
+        "discontinued_sells_through": {
+            "one": "Keine Nachbestellung (ausgelistet): das letzte {{count}} Stück ist etwa am {{stockout_date}} verkauft.",
+            "other": "Keine Nachbestellung (ausgelistet): die letzten {{count}} Stück sind etwa am {{stockout_date}} verkauft."
+        },
+        "discontinued_no_sales": {
+            "one": "Keine Nachbestellung (ausgelistet): {{count}} Stück übrig, keine aktuellen Verkäufe.",
+            "other": "Keine Nachbestellung (ausgelistet): {{count}} Stück übrig, keine aktuellen Verkäufe."
+        },
+        "discontinued_sold_out": "Keine Nachbestellung (ausgelistet): ausverkauft.",
+        "order_weekday_moved": "Du bestellst bei {{supplier}} an festen Wochentagen, also am {{reorder_date}} statt am {{due_date}} bestellen.",
+        "event_past": {
+            "one": "{{name}} (×{{multiplier}}): {{count}} Tag mit dem normalen Wert gezählt.",
+            "other": "{{name}} (×{{multiplier}}): {{count}} Tage mit dem normalen Wert gezählt."
+        },
+        "event_upcoming": {
+            "one": "{{name}} ({{from_date}} – {{to_date}}, ×{{multiplier}}) fügt der Bestellmenge {{count}} Stück hinzu.",
+            "other": "{{name}} ({{from_date}} – {{to_date}}, ×{{multiplier}}) fügt der Bestellmenge {{count}} Stück hinzu."
+        },
+        "event_upcoming_lower": {
+            "one": "{{name}} ({{from_date}} – {{to_date}}, ×{{multiplier}}) zieht {{count}} Stück von der Bestellmenge ab.",
+            "other": "{{name}} ({{from_date}} – {{to_date}}, ×{{multiplier}}) zieht {{count}} Stück von der Bestellmenge ab."
+        },
+        "ordered_manual": {
+            "one": "Du hast {{count}} Stück als bestellt markiert (erwartet am {{expected_date}}): zählt als unterwegs.",
+            "other": "Du hast {{count}} Stück als bestellt markiert (erwartet am {{expected_date}}): zählt als unterwegs."
+        }
+    }
+}

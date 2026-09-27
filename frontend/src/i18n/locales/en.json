@@ -777,9 +777,9 @@
       "flow_triggers_active": "Your Shopify Flow workflows using Clear Stock triggers stop running.",
       "reference_products_one": "{{count}} new product stops borrowing a similar product's sales rate.",
       "reference_products_other": "{{count}} new products stop borrowing a similar product's sales rate.",
-      "supplier_emails": "Emailing orders to suppliers stops."
-    },
-    "order_budget": "Your monthly order budget and its priorities are not available."
+      "supplier_emails": "Emailing orders to suppliers stops.",
+      "order_budget": "Your monthly order budget and its priorities are not available."
+    }
   },
   "vendors": {
     "button": "Create from vendors",

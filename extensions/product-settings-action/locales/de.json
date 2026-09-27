@@ -1,0 +1,29 @@
+{
+    "name": "Lieferant & Lieferzeit festlegen",
+    "intro": {
+        "one": "Gilt für jede Variante des ausgewählten Produkts in Clear Stock. Leere Felder bleiben unverändert.",
+        "other": "Gilt für jede Variante der {{count}} ausgewählten Produkte in Clear Stock. Leere Felder bleiben unverändert."
+    },
+    "supplier": "Lieferant",
+    "keep": "Aktuellen beibehalten",
+    "noSupplier": "Kein Lieferant",
+    "noSuppliers": "Noch keine Lieferanten: füge sie in Clear Stock › Lieferanten hinzu.",
+    "leadTime": "Lieferzeit (Tage)",
+    "leadTimeHelp": "Tage von der Bestellung bis zum Wareneingang. Ersetzt die Lieferzeit des Lieferanten.",
+    "safety": "Sicherheitsbestand (Tage)",
+    "safetyHelp": "Zusätzliche Tage Bestand, falls die Verkäufe steigen oder eine Lieferung sich verspätet.",
+    "apply": "Anwenden",
+    "cancel": "Abbrechen",
+    "close": "Schließen",
+    "nothing": "Wähle zuerst einen Lieferanten oder gib eine Zahl ein.",
+    "done": {
+        "one": "{{count}} Variante aktualisiert. Die Prognosen werden neu berechnet.",
+        "other": "{{count}} Varianten aktualisiert. Die Prognosen werden neu berechnet."
+    },
+    "noneKnown": "Keines dieser Produkte ist bereits in Clear Stock. Sie erscheinen nach der nächsten Synchronisierung.",
+    "errors": {
+        "generic": "Speichern fehlgeschlagen. Versuche es gleich noch einmal.",
+        "network": "Clear Stock ist nicht erreichbar. Prüfe deine Verbindung und versuche es erneut.",
+        "invalid": "Prüfe die Werte: Lieferzeit und Sicherheitsbestand müssen ganze Zahlen von 0 bis 365 sein."
+    }
+}
