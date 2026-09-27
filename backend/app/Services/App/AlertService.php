@@ -64,7 +64,7 @@ class AlertService
         }
 
         $items = $this->forecasts->reorderList($shop, $local->toDateString(), null)
-            ->reject(fn (Forecast $f) => $f->variant->alerts_muted)
+            ->reject(fn (Forecast $f) => $f->variant->alerts_muted || $f->variant->discontinued)
             ->sortBy([fn ($a, $b) => ($a->current_stock > 0) <=> ($b->current_stock > 0), fn ($a, $b) => $a->reorder_date <=> $b->reorder_date])
             ->values();
         $recent = $this->logs->recentVariantAlerts($shop, $now->subDays((int) config('alerts.realert_days')));

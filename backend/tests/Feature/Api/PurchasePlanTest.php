@@ -73,3 +73,25 @@ it('is a Starter feature and can be switched off', function () {
     config(['features.purchase_plan' => false]);
     $this->getJson('/api/purchase-plan', $this->auth)->assertNotFound()->assertJsonPath('code', 'feature_disabled');
 });
+
+it('exports every planned order as CSV (Starter, needs PO export)', function () {
+    app(ForecastService::class)->runForShop($this->shop);
+
+    $csv = $this->get('/api/purchase-plan/export?weeks=4', $this->auth)->assertOk()
+        ->assertHeader('Content-Type', 'text/csv; charset=UTF-8')->streamedContent();
+    $lines = array_map('str_getcsv', explode("\n", trim(substr($csv, 3))));
+
+    expect($lines[0])->toBe(['Order date', 'Week', 'Supplier', 'Product', 'SKU', 'Order quantity', 'Unit cost', 'Line total', 'Currency'])
+        ->and(array_slice($lines, 1))->toHaveCount(2)
+        ->and($lines[1])->toMatchArray([0 => '2026-09-20', 1 => '1', 3 => 'Cup', 5 => '154', 6 => ''])
+        ->and($lines[2])->toMatchArray([0 => '2026-09-24', 3 => 'Mug', 5 => '120', 6 => '2.5', 7 => '300', 8 => 'USD']);
+
+    config(['features.purchase_orders' => false]);
+    $this->get('/api/purchase-plan/export', $this->auth)->assertNotFound();
+});
+
+it('leaves discontinued products out of the plan', function () {
+    $this->mug->update(['discontinued' => true]);
+
+    expect(collect(purchasePlan()['items'])->pluck('name')->all())->toBe(['Cup']);
+});

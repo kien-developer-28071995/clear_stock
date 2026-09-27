@@ -44,12 +44,15 @@ class ForecastDetailResource extends ForecastResource
                 'min_stock' => $v->min_stock,
                 'max_stock' => $v->max_stock,
                 'alerts_muted' => $v->alerts_muted,
+                'discontinued' => $v->discontinued,
                 // New products: similar product whose rate is borrowed (see explanation.reference).
                 'reference_variant_id' => $v->reference_variant_id,
                 'reference_name' => $v->reference_variant_id ? $v->reference?->displayName() : null,
                 'reference_percent' => $v->reference_percent,
             ],
             'defaults' => $shop,
+            // Last judged forecast of this product next to what really sold (null until there is one).
+            'accuracy' => $request->attributes->get('accuracy'),
         ];
     }
 

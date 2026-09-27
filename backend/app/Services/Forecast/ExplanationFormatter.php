@@ -98,7 +98,15 @@ class ExplanationFormatter
         // Reorder
         $min = $e['reorder']['min_stock'] ?? null; // absent in explanations computed before min/max existed
         $max = $e['reorder']['max_stock'] ?? null;
-        if ($e['avg_daily_sales'] > 0 || $min !== null) {
+        if ($e['discontinued'] ?? false) {
+            // No longer reordered: only how long what is left lasts.
+            $stock = $e['stock']['current'];
+            $out[] = match (true) {
+                $stock <= 0 => $this->line('discontinued_sold_out'),
+                $e['stockout_date'] === null => $this->line('discontinued_no_sales', ['count' => $stock]),
+                default => $this->line('discontinued_sells_through', ['count' => $stock, 'stockout_date' => $e['stockout_date']]),
+            };
+        } elseif ($e['avg_daily_sales'] > 0 || $min !== null) {
             if ($min !== null) {
                 $out[] = $this->line('reorder_point_manual', ['count' => $min]);
             } else {

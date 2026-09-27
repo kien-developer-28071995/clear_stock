@@ -23,6 +23,12 @@ class EloquentForecastRepository implements ForecastRepositoryInterface
             ->orderBy('id')->pluck('id')->map(fn ($id) => (int) $id)->all();
     }
 
+    public function discontinuedVariantIds(Shop $shop): array
+    {
+        return DB::table('variants')->where('shop_id', $shop->id)->where('discontinued', true)
+            ->pluck('id')->map(fn ($id) => (int) $id)->all();
+    }
+
     public function variantsWithSuppliers(Shop $shop, array $ids): Collection
     {
         return Variant::query()->forShop($shop)->whereIn('id', $ids)->with('supplier')->get()->keyBy('id');
@@ -203,5 +209,26 @@ class EloquentForecastRepository implements ForecastRepositoryInterface
         $key = CacheKeys::forecastVersion($shop->id);
         Cache::add($key, 0, now()->addDays(30));
         Cache::increment($key);
+    }
+
+    public function saveWeeklySnapshots(Shop $shop, string $weekStart, array $rows): void
+    {
+        $now = now();
+        foreach (array_chunk($rows, self::CHUNK) as $chunk) {
+            DB::table('forecast_snapshots')->insertOrIgnore(array_map(fn ($r) => [
+                'shop_id' => $shop->id,
+                'variant_id' => $r['variant_id'],
+                'week_start' => $weekStart,
+                'avg_daily_sales' => $r['avg_daily_sales'],
+                'avg_source' => $r['avg_source'],
+                'has_bundles' => $r['has_bundles'],
+                'created_at' => $now,
+            ], $chunk));
+        }
+    }
+
+    public function pruneSnapshots(Shop $shop, string $before): int
+    {
+        return DB::table('forecast_snapshots')->where('shop_id', $shop->id)->where('week_start', '<', $before)->delete();
     }
 }

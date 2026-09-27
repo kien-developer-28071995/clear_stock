@@ -14,6 +14,7 @@ final class ForecastStatusResolver
         $cover = $f->days_of_cover !== null ? (float) $f->days_of_cover : null;
 
         return match (true) {
+            (bool) $f->variant?->discontinued => ForecastStatus::Discontinued,
             $f->current_stock <= 0 && $avg > 0 => ForecastStatus::OutOfStock,
             $f->reorder_date !== null && $f->reorder_date->toDateString() <= $today => ForecastStatus::ReorderNow,
             $f->current_stock > 0 && ($avg == 0 || ($cover !== null && $cover > config('forecast.slow_mover_days'))) => ForecastStatus::Slow,

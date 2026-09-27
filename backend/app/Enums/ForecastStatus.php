@@ -10,4 +10,5 @@ enum ForecastStatus: string
     case Slow = 'slow';                // stock lasts longer than slow_mover_days, or never sells
     case Overstock = 'overstock';      // still selling, but holds clearly more than the order-up-to level
     case Healthy = 'healthy';          // reorder date in the future
+    case Discontinued = 'discontinued'; // merchant no longer reorders it (sells through what is left)
 }

@@ -28,6 +28,8 @@ class VariantSettingsRequest extends FormRequest
             'min_stock' => ['sometimes', 'nullable', 'integer', 'min:0', 'max:1000000'],
             'max_stock' => ['sometimes', 'nullable', 'integer', 'min:1', 'max:1000000'],
             'alerts_muted' => ['sometimes', 'boolean'],
+            // No longer reordered: sells through what is left (no suggestions, alerts, plan).
+            'discontinued' => ['sometimes', 'boolean'],
             // New products: a similar product (local id or Shopify variant gid) and the share of its rate.
             'reference_variant' => ['sometimes', 'nullable', function (string $attr, mixed $value, \Closure $fail) {
                 if (! is_int($value) && ! (is_string($value) && preg_match('#^gid://shopify/ProductVariant/\d+$#', $value))) {
@@ -46,6 +48,6 @@ class VariantSettingsRequest extends FormRequest
 
     public function settings(): array
     {
-        return $this->safe()->only(['supplier_id', 'lead_time_override', 'safety_days', 'min_order_qty', 'pack_size', 'min_stock', 'max_stock', 'alerts_muted']);
+        return $this->safe()->only(['supplier_id', 'lead_time_override', 'safety_days', 'min_order_qty', 'pack_size', 'min_stock', 'max_stock', 'alerts_muted', 'discontinued']);
     }
 }

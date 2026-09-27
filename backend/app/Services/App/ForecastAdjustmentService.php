@@ -46,13 +46,17 @@ class ForecastAdjustmentService
         $this->engine->runForShop($shop, [$variant->id]);
     }
 
-    /** @param array{supplier_id?: ?int, lead_time_override?: ?int, safety_days?: ?int, min_order_qty?: ?int, pack_size?: ?int, min_stock?: ?int, max_stock?: ?int, alerts_muted?: bool} $settings */
+    /** @param array{supplier_id?: ?int, lead_time_override?: ?int, safety_days?: ?int, min_order_qty?: ?int, pack_size?: ?int, min_stock?: ?int, max_stock?: ?int, alerts_muted?: bool, discontinued?: bool} $settings */
     public function updateVariantSettings(Shop $shop, Variant $variant, array $settings, array $reference = []): Variant
     {
         $this->assertMinBelowMax($settings + $variant->only(['min_stock', 'max_stock']));
         $settings += $this->referenceSettings($shop, $variant, $reference);
+        $wasDiscontinued = $variant->discontinued;
         $variant = $this->variants->updateSettings($variant, $settings);
         $this->engine->runForShop($shop, [$variant->id]);
+        if ($variant->discontinued !== $wasDiscontinued) {
+            $this->refreshLimitedPlan($shop);
+        }
 
         return $variant;
     }
@@ -69,8 +73,22 @@ class ForecastAdjustmentService
         $this->assertMinBelowMax($settings);
         $updated = $this->variants->bulkUpdateSettings($shop, $variantIds, $settings);
         RecomputeForecasts::dispatch($shop->id, $variantIds);
+        if (array_key_exists('discontinued', $settings)) {
+            $this->refreshLimitedPlan($shop);
+        }
 
         return $updated;
+    }
+
+    /**
+     * Discontinued products sit outside the Free plan's product limit, so marking one frees a
+     * slot (or unmarking takes one): the whole shop is recomputed to pick the right products.
+     */
+    private function refreshLimitedPlan(Shop $shop): void
+    {
+        if (Entitlements::for($shop)->maxSkus() !== null) {
+            RecomputeForecasts::dispatch($shop->id);
+        }
     }
 
     /**

@@ -23,6 +23,46 @@ class PurchasePlanService
         private readonly PurchasePlanner $planner,
     ) {}
 
+    /**
+     * Every planned order as CSV rows (date, supplier, product, quantity, cost), to send ahead to
+     * suppliers or plan cash in a spreadsheet. Needs the purchase plan and PO export.
+     *
+     * @param  array{supplier_id?: ?int, vendor?: ?string}  $filters
+     * @return array{filename: string, rows: array<int, array<int, string|int|float|null>>}
+     */
+    public function export(Shop $shop, int $weeks, array $filters = []): array
+    {
+        Entitlements::for($shop)->require(Feature::PurchasePlan);
+        Entitlements::for($shop)->require(Feature::PurchaseOrders);
+
+        $today = CarbonImmutable::now($shop->timezone)->startOfDay();
+        $until = $today->addWeeks($weeks)->toDateString();
+
+        $lines = [];
+        foreach ($this->forecasts->planningRows($shop, $filters) as $row) {
+            foreach ($this->planner->orders($row, $today->toDateString(), $until) as $o) {
+                $cost = $row['unit_cost'];
+                $lines[] = [
+                    $o['date'],
+                    intdiv((int) $today->diffInDays(CarbonImmutable::parse($o['date'])), 7) + 1,
+                    $row['supplier'] ?? '',
+                    $row['name'],
+                    $row['sku'] ?? '',
+                    $o['qty'],
+                    $cost,
+                    $cost !== null ? round($cost * $o['qty'], 2) : null,
+                    $shop->currency,
+                ];
+            }
+        }
+        usort($lines, fn ($a, $b) => [$a[0], $a[2], $a[3]] <=> [$b[0], $b[2], $b[3]]);
+
+        return [
+            'filename' => "purchase-plan-{$weeks}w-{$today->toDateString()}.csv",
+            'rows' => [['Order date', 'Week', 'Supplier', 'Product', 'SKU', 'Order quantity', 'Unit cost', 'Line total', 'Currency'], ...$lines],
+        ];
+    }
+
     /** @param array{supplier_id?: ?int, vendor?: ?string} $filters */
     public function build(Shop $shop, int $weeks, array $filters = []): array
     {

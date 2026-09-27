@@ -52,7 +52,8 @@
     "reorder_now": "Cần đặt ngay",
     "slow": "Bán chậm",
     "healthy": "Ổn",
-    "overstock": "Tồn thừa"
+    "overstock": "Tồn thừa",
+    "discontinued": "Ngừng nhập"
   },
   "confidence": {
     "low": "Độ tin cậy thấp",
@@ -328,6 +329,8 @@
     "maxStockHelp": "Mỗi lần nhập sẽ bù tồn kho lên mức này. Để trống để dự báo tự quyết định.",
     "muteAlerts": "Không gửi cảnh báo cho sản phẩm này",
     "muteAlertsHelp": "Bỏ sản phẩm khỏi email tóm tắt và email tức thời. Dự báo và danh sách cần nhập hàng vẫn có sản phẩm này.",
+    "discontinued": "Ngừng nhập sản phẩm này",
+    "discontinuedHelp": "Bán hết hàng còn lại: không gợi ý nhập, không cảnh báo, không đưa vào kế hoạch nhập hay Flow. Sản phẩm vẫn hiện kèm ngày bán hết, và không tính vào giới hạn của gói Free.",
     "fromForecast": "Theo dự báo: {{qty}}",
     "fromForecastShort": "Theo dự báo",
     "fromSupplierQty": "{{qty}} (nhà cung cấp)",
@@ -596,7 +599,10 @@
     "reason_uses_reference": "ước tính một phần từ sản phẩm tương tự",
     "reference_blend_other": "Sản phẩm mới có {{count}} ngày bán của riêng nó: {{ref_share}}% ước tính lấy từ {{name}} ({{ref_avg}}/ngày × {{percent}}%) → {{avg}}/ngày.",
     "reference_done_other": "Đã đủ lịch sử riêng ({{count}} ngày còn hàng): không còn dùng tốc độ bán của {{name}}.",
-    "reference_no_forecast": "{{name}} chưa có dự báo nên chưa dùng được tốc độ bán của nó."
+    "reference_no_forecast": "{{name}} chưa có dự báo nên chưa dùng được tốc độ bán của nó.",
+    "discontinued_sells_through_other": "Ngừng nhập: {{count}} cái còn lại sẽ bán hết khoảng {{stockout_date}}.",
+    "discontinued_no_sales_other": "Ngừng nhập: còn {{count}} cái, gần đây chưa bán được.",
+    "discontinued_sold_out": "Ngừng nhập: đã bán hết."
   },
   "import": {
     "fromStocky": "Nhập từ Stocky",
@@ -932,6 +938,32 @@
     "firstOrder": "Đơn đầu tiên",
     "noSupplier": "Chưa có NCC",
     "orderDates": "Các đơn",
-    "orderOn": "{{date}}: {{qty}}"
+    "orderOn": "{{date}}: {{qty}}",
+    "export": "Xuất đơn hàng (CSV)"
+  },
+  "discontinued": {
+    "heading": "Hàng ngừng nhập",
+    "summaryWithValue_other": "{{count}} sản phẩm ngừng nhập còn {{units}} cái ({{value}} theo giá vốn) cần bán hết.",
+    "summaryUnits_other": "{{count}} sản phẩm ngừng nhập còn {{units}} cái cần bán hết.",
+    "viewAll": "Xem sản phẩm ngừng nhập",
+    "summary": "Bạn đã ngừng nhập sản phẩm này: không gợi ý đặt hàng, không cảnh báo và không đưa vào kế hoạch nhập."
+  },
+  "accuracy": {
+    "heading": "Độ chính xác dự báo",
+    "collecting_other": "Kiểm tra dự báo cần thời gian: mỗi tuần app lưu dự báo và so với lượng bán thực tế trong {{count}} ngày sau đó. Kết quả đầu tiên vào {{date}}.",
+    "collectingSoon_other": "Mỗi tuần app lưu dự báo và so với lượng bán thực tế trong {{count}} ngày sau đó. Kết quả đầu tiên có sau lần dự báo đầu tiên.",
+    "noSales": "Không có doanh số từ {{from}} đến {{to}} để so với dự báo.",
+    "summary_other": "Chính xác {{accuracy}} từ {{from}} đến {{to}}, trên {{count}} sản phẩm.",
+    "biasHigh": "Nhìn chung dự báo cao hơn thực tế {{percent}}.",
+    "biasLow": "Nhìn chung dự báo thấp hơn thực tế {{percent}}.",
+    "biasNone": "Không lệch hẳn về phía cao hay thấp.",
+    "how_other": "Độ chính xác = 1 − (tổng số cái dự báo lệch ÷ số cái bán được), chỉ tính ngày còn hàng. Không tính sản phẩm còn hàng dưới {{count}} ngày và sản phẩm có dự báo gồm doanh số combo.",
+    "bySource_other": "Dự báo của app: {{computed}}. Tốc độ bán bạn tự chỉnh ({{count}} sản phẩm): {{override}}.",
+    "trend": "Các tuần trước:",
+    "forecast": "Dự báo",
+    "actual": "Bán thực tế",
+    "difference": "Chênh lệch (cái)",
+    "perDay": "{{value}}/ngày",
+    "product": "Dự báo từ {{from}} đến {{to}}: {{predicted}}/ngày. Thực tế bán: {{actual}}/ngày (ngày còn hàng)."
   }
 }

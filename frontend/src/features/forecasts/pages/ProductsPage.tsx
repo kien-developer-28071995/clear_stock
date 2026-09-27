@@ -12,7 +12,7 @@ import type { ForecastFilters } from '@/features/forecasts/types';
 import { formatDate, formatNumber } from '@/utils/format';
 import { NO_VALUE, fromOption, optionValue } from '@/utils/select';
 
-const STATUS_OPTIONS = ['reorder_now', 'out_of_stock', 'overstock', 'slow', 'healthy'] as const;
+const STATUS_OPTIONS = ['reorder_now', 'out_of_stock', 'overstock', 'slow', 'healthy', 'discontinued'] as const;
 const SORT_OPTIONS = ['urgency', 'cover', 'suggested', 'value', 'revenue', 'name'] as const;
 const ABC_OPTIONS = ['A', 'B', 'C'] as const;
 

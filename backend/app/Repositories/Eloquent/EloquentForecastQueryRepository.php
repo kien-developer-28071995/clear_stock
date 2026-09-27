@@ -7,6 +7,7 @@ use App\Models\Forecast;
 use App\Models\Shop;
 use App\Models\Variant;
 use App\Repositories\Contracts\ForecastQueryRepositoryInterface;
+use Carbon\CarbonImmutable;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
@@ -125,7 +126,7 @@ class EloquentForecastQueryRepository implements ForecastQueryRepositoryInterfac
     public function actionItems(Shop $shop, string $until, int $limit): Collection
     {
         return $this->base($shop)->with('variant')
-            ->where('forecasts.avg_daily_sales', '>', 0)
+            ->where('forecasts.avg_daily_sales', '>', 0)->where('variants.discontinued', false)
             ->where(fn ($q) => $q->where('forecasts.current_stock', '<=', 0)->orWhere('forecasts.reorder_date', '<=', $until))
             ->orderByRaw('forecasts.current_stock > 0')
             ->orderBy('forecasts.reorder_date')
@@ -137,7 +138,7 @@ class EloquentForecastQueryRepository implements ForecastQueryRepositoryInterfac
     public function runway(Shop $shop, int $limit): Collection
     {
         return $this->base($shop)->with('variant')
-            ->where('forecasts.avg_daily_sales', '>', 0)
+            ->where('forecasts.avg_daily_sales', '>', 0)->where('variants.discontinued', false)
             ->orderBy('forecasts.days_of_cover')
             ->orderByDesc('forecasts.avg_daily_sales')
             ->limit($limit)->get(['forecasts.*']);
@@ -225,7 +226,8 @@ class EloquentForecastQueryRepository implements ForecastQueryRepositoryInterfac
 
     public function planningRows(Shop $shop, array $filters): iterable
     {
-        $query = $this->base($shop)->with('variant.supplier')
+        // Discontinued products are never ordered again: no plan, scenario or Flow trigger.
+        $query = $this->base($shop)->with('variant.supplier')->where('variants.discontinued', false)
             ->when(($filters['supplier_id'] ?? null) !== null, fn ($q) => $q->where('variants.supplier_id', $filters['supplier_id']))
             ->when(($filters['vendor'] ?? '') !== '', fn ($q) => $q->where('variants.vendor', $filters['vendor']))
             ->when(in_array($filters['abc'] ?? '', ['A', 'B', 'C'], true), fn ($q) => $q->where('variants.abc_class', $filters['abc']))
@@ -295,6 +297,51 @@ class EloquentForecastQueryRepository implements ForecastQueryRepositoryInterfac
         ];
     }
 
+    public function discontinuedStock(Shop $shop): array
+    {
+        $row = $this->statusQuery($shop, ForecastStatus::Discontinued, '')->where('forecasts.current_stock', '>', 0)
+            ->selectRaw('COUNT(*) as n, COALESCE(SUM(forecasts.current_stock), 0) as units, '
+                .'COALESCE(SUM(forecasts.current_stock * variants.unit_cost), 0) as value, '
+                .'SUM(CASE WHEN variants.unit_cost IS NULL THEN 1 ELSE 0 END) as missing')
+            ->toBase()->first();
+
+        return ['count' => (int) $row->n, 'units' => (int) $row->units, 'value' => round((float) $row->value, 2), 'missing_cost' => (int) $row->missing];
+    }
+
+    public function snapshotWeeks(Shop $shop, string $latestStart, int $limit): array
+    {
+        return DB::table('forecast_snapshots')->where('shop_id', $shop->id)->where('week_start', '<=', $latestStart)
+            ->distinct()->orderByDesc('week_start')->limit($limit)->pluck('week_start')
+            ->map(fn ($d) => substr((string) $d, 0, 10))->all();
+    }
+
+    public function accuracyRows(Shop $shop, string $weekStart, int $horizonDays, ?int $variantId = null): array
+    {
+        $to = CarbonImmutable::parse($weekStart)->addDays($horizonDays - 1)->toDateString();
+
+        return DB::table('forecast_snapshots as s')
+            ->join('variants as v', 'v.id', '=', 's.variant_id')
+            ->leftJoin('daily_sales as d', fn ($j) => $j->on('d.variant_id', '=', 's.variant_id')->whereBetween('d.date', [$weekStart, $to]))
+            ->where('s.shop_id', $shop->id)->where('s.week_start', $weekStart)->where('s.has_bundles', false)
+            ->where('v.is_active', true)
+            ->when($variantId !== null, fn ($q) => $q->where('s.variant_id', $variantId))
+            ->groupBy('s.variant_id', 's.avg_daily_sales', 's.avg_source', 'v.product_title', 'v.title', 'v.sku')
+            ->selectRaw('s.variant_id, s.avg_daily_sales, s.avg_source, v.product_title, v.title, v.sku, '
+                // Net units per day, never negative (same as the forecast's demand).
+                .'COALESCE(SUM(CASE WHEN d.was_in_stock = 1 AND d.units_sold > d.units_returned THEN d.units_sold - d.units_returned ELSE 0 END), 0) as units, '
+                .'COALESCE(SUM(CASE WHEN d.was_in_stock = 0 THEN 1 ELSE 0 END), 0) as oos_days')
+            ->orderBy('s.variant_id')
+            ->get()->map(fn ($r) => [
+                'variant_id' => (int) $r->variant_id,
+                'name' => $r->title && $r->title !== 'Default Title' ? "{$r->product_title} - {$r->title}" : $r->product_title,
+                'sku' => $r->sku,
+                'predicted' => (float) $r->avg_daily_sales,
+                'source' => $r->avg_source,
+                'units' => (int) $r->units,
+                'oos_days' => (int) $r->oos_days,
+            ])->all();
+    }
+
     /**
      * Forecasts of active variants of this shop, joined to variants for search/sort.
      * Combined (all locations) by default, or one location's forecasts.
@@ -333,12 +380,16 @@ class EloquentForecastQueryRepository implements ForecastQueryRepositoryInterfac
         $overstock = '(forecasts.avg_daily_sales > 0 AND forecasts.target_stock > 0 AND forecasts.excess_units > forecasts.target_stock * ?)';
         $upcoming = 'forecasts.reorder_date > ? AND forecasts.days_of_cover <= ?';
 
-        return match ($status) {
+        // Discontinued products have a status of their own and none of the others.
+        [$sql, $bindings] = match ($status) {
+            ForecastStatus::Discontinued => ['variants.discontinued = 1', []],
             ForecastStatus::ReorderNow => ['forecasts.reorder_date <= ?', [$today]],
             ForecastStatus::OutOfStock => ['(forecasts.current_stock <= 0 AND forecasts.avg_daily_sales > 0)', []],
             ForecastStatus::Slow => ['(forecasts.current_stock > 0 AND (forecasts.avg_daily_sales = 0 OR forecasts.days_of_cover > ?))', [$slowDays]],
             ForecastStatus::Overstock => ["({$upcoming} AND forecasts.current_stock > 0 AND {$overstock})", [$today, $slowDays, $ratio]],
             ForecastStatus::Healthy => ["({$upcoming} AND NOT {$overstock})", [$today, $slowDays, $ratio]],
         };
+
+        return $status === ForecastStatus::Discontinued ? [$sql, $bindings] : ["(variants.discontinued = 0 AND {$sql})", $bindings];
     }
 }

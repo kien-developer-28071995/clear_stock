@@ -3,7 +3,7 @@ import { useEffect, useState } from 'preact/hooks';
 import { api, ApiError } from '../../shared/api';
 import { formatDate, formatNumber, translateCode, type Coded } from '../../shared/i18n';
 
-type Status = 'out_of_stock' | 'reorder_now' | 'overstock' | 'slow' | 'healthy';
+type Status = 'out_of_stock' | 'reorder_now' | 'overstock' | 'slow' | 'healthy' | 'discontinued';
 
 interface Forecast {
     status: Status;
@@ -33,13 +33,14 @@ interface ProductForecast {
 
 type State = { kind: 'loading' } | { kind: 'error'; message: string } | { kind: 'ready'; data: ProductForecast };
 
-const URGENCY: Status[] = ['out_of_stock', 'reorder_now', 'overstock', 'slow', 'healthy'];
+const URGENCY: Status[] = ['out_of_stock', 'reorder_now', 'overstock', 'slow', 'healthy', 'discontinued'];
 const TONE: Record<Status, 'critical' | 'warning' | 'caution' | 'neutral' | 'success'> = {
     out_of_stock: 'critical',
     reorder_now: 'warning',
     overstock: 'caution',
     slow: 'neutral',
     healthy: 'success',
+    discontinued: 'neutral',
 };
 
 export default async () => {

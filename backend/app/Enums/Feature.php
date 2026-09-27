@@ -31,12 +31,14 @@ enum Feature: string
     case LostSales = 'lost_sales';
     /** Purchase plan: what to order and spend week by week over the next 12 weeks. */
     case PurchasePlan = 'purchase_plan';
+    /** Forecast accuracy: past forecasts next to what really sold (every plan). */
+    case Accuracy = 'accuracy';
 
     /** The cheapest plan that includes it (for upgrade prompts). */
     public function minimumPlan(): Plan
     {
         return match ($this) {
-            self::Explanations, self::Abc, self::SpikeFilter, self::LostSales => Plan::Free,
+            self::Explanations, self::Abc, self::SpikeFilter, self::LostSales, self::Accuracy => Plan::Free,
             self::Locations, self::Transfers, self::RealtimeAlerts, self::SupplierAutoEmail, self::FlowTriggers => Plan::Growth,
             default => Plan::Starter,
         };

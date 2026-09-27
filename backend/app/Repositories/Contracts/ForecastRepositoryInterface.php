@@ -11,6 +11,9 @@ interface ForecastRepositoryInterface
     /** @return array<int, int> ids of active, inventory-tracked variants (the ones we forecast) */
     public function forecastableVariantIds(Shop $shop): array;
 
+    /** @return array<int, int> ids of variants the merchant no longer reorders */
+    public function discontinuedVariantIds(Shop $shop): array;
+
     /**
      * @param  array<int, int>  $ids
      * @return Collection<int, Variant> with supplier loaded, keyed by id
@@ -78,4 +81,15 @@ interface ForecastRepositoryInterface
      * @param  array<int, array{class: string, revenue: float, share: float}>  $classes  variant id => class
      */
     public function saveAbcClasses(Shop $shop, array $classes): void;
+
+    /**
+     * The week's forecast rates, kept to measure accuracy later. The first full forecast run
+     * of a week writes them; later runs that week leave them as they are.
+     *
+     * @param  array<int, array{variant_id: int, avg_daily_sales: float, avg_source: string, has_bundles: bool}>  $rows
+     */
+    public function saveWeeklySnapshots(Shop $shop, string $weekStart, array $rows): void;
+
+    /** Snapshots older than this date are deleted. */
+    public function pruneSnapshots(Shop $shop, string $before): int;
 }

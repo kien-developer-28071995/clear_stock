@@ -19,6 +19,8 @@ use Carbon\CarbonImmutable;
  *  5. Reorder point = average x (lead time + safety days).
  *     Suggested qty = average x (lead time + safety days + order cycle) - stock.
  *  6. Lost sales: the average x out-of-stock days of the last 30 days.
+ *  7. Discontinued products (merchant no longer reorders them) keep the sell-through numbers
+ *     (days of cover, stock-out date) but get no reorder point, order or overstock.
  */
 class ForecastCalculator
 {
@@ -74,9 +76,14 @@ class ForecastCalculator
         if ($in->orderRulesSupplier !== null) {
             $rounding['supplier'] = $in->orderRulesSupplier; // explained as the supplier's defaults
         }
+        // Discontinued: the stock left sells through; nothing is reordered, held "too much" or missed.
+        if ($in->discontinued) {
+            [$reorderPoint, $targetStock, $excess, $overstock, $suggested, $reorderDate] = [0, 0, 0, false, 0, null];
+            $rounding = ['needed' => 0, 'min_order_qty' => null, 'pack_size' => null, 'final' => 0];
+        }
 
         $window30 = collect($windows)->firstWhere('days', 30);
-        $lostDays = (int) ($window30['oos_days'] ?? 0);
+        $lostDays = $in->discontinued ? 0 : (int) ($window30['oos_days'] ?? 0);
         $lostUnits = round($lostDays * $avg, 2);
 
         $confidence = $this->confidence($windows, $series, $end, $avgOverride !== null);
@@ -111,6 +118,7 @@ class ForecastCalculator
             'lead_time' => $leadTime,
             'safety' => $safety + ['units' => round($avg * $safety['days'], 1)],
             'stock' => ['current' => $stock, 'incoming' => $incoming, 'position' => $position],
+            'discontinued' => $in->discontinued,
             'reorder' => [
                 'lead_time_demand' => round($avg * $leadTime['days'], 1),
                 'point' => $reorderPoint,

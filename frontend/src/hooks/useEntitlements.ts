@@ -21,6 +21,7 @@ const NONE: Entitlements = {
     spike_filter: true,
     lost_sales: true,
     purchase_plan: false,
+    accuracy: true,
     features: {
         what_if: true,
         reference_products: true,
@@ -28,6 +29,7 @@ const NONE: Entitlements = {
         purchase_plan: true,
         spike_filter: true,
         lost_sales: true,
+        accuracy: true,
         purchase_orders: true,
         supplier_emails: true,
         locations: true,

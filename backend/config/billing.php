@@ -37,6 +37,7 @@ return [
                 'spike_filter' => true,         // one-off sales spikes capped before averaging
                 'lost_sales' => true,           // sales lost while out of stock
                 'purchase_plan' => false,       // 12-week order + spend plan
+                'accuracy' => true,             // forecast accuracy report
             ],
         ],
         'starter' => [
@@ -60,6 +61,7 @@ return [
                 'spike_filter' => true,
                 'lost_sales' => true,
                 'purchase_plan' => true,
+                'accuracy' => true,
             ],
         ],
         'growth' => [
@@ -86,6 +88,7 @@ return [
                 'spike_filter' => true,
                 'lost_sales' => true,
                 'purchase_plan' => true,
+                'accuracy' => true,
             ],
         ],
     ],

@@ -5,6 +5,8 @@ import { Overstock } from '@/features/dashboard/components/Overstock';
 import { SlowMovers } from '@/features/dashboard/components/SlowMovers';
 import { LostSales } from '@/features/dashboard/components/LostSales';
 import { AbcSummary } from '@/features/dashboard/components/AbcSummary';
+import { ForecastAccuracy } from '@/features/dashboard/components/ForecastAccuracy';
+import { DiscontinuedStock } from '@/features/dashboard/components/DiscontinuedStock';
 import { Tip } from '@/features/setup/components/Tip';
 
 /** The overview: days of stock left per product, and money tied up in slow stock. */
@@ -22,6 +24,8 @@ export function InsightsPage() {
                     <AbcSummary dashboard={data} />
                     <Overstock dashboard={data} />
                     <SlowMovers dashboard={data} />
+                    <DiscontinuedStock dashboard={data} />
+                    <ForecastAccuracy />
                     {data.runway.length === 0 && data.slow_movers.count === 0 && data.overstock.count === 0 && (
                         <s-section>
                             <s-paragraph>{t('insights.empty')}</s-paragraph>
