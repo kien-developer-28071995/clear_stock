@@ -126,6 +126,21 @@ describe('automatic emails', function () {
         expect($this->service->sendDue($this->shop->fresh(), ($this->at)('2026-09-28 09:00')))->toBe(1);
     });
 
+    it('sends on the supplier order weekdays only, once each of those days', function () {
+        // 2026-09-21 is a Monday, 09-24 a Thursday.
+        $this->acme->update(['order_weekdays' => [1, 4]]);
+        $this->travelTo('2026-09-21 06:00:00');
+        app(ForecastService::class)->runForShop($this->shop->fresh());
+
+        expect($this->service->sendDue($this->shop->fresh(), ($this->at)('2026-09-21 09:00')))->toBe(1)
+            ->and($this->service->sendDue($this->shop->fresh(), ($this->at)('2026-09-21 15:00')))->toBe(0)   // already today
+            ->and($this->service->sendDue($this->shop->fresh(), ($this->at)('2026-09-22 09:00')))->toBe(0);  // Tuesday
+
+        $this->travelTo('2026-09-24 06:00:00');
+        app(ForecastService::class)->runForShop($this->shop->fresh());
+        expect($this->service->sendDue($this->shop->fresh(), ($this->at)('2026-09-24 09:00')))->toBe(1);    // Thursday, within the week
+    });
+
     it('stays quiet without anything due, with stale forecasts or off plan', function () {
         $this->mug->update(['supplier_id' => null]);
         expect($this->service->sendDue($this->shop->fresh(), ($this->at)('2026-09-20 09:00')))->toBe(0);

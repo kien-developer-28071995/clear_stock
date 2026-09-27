@@ -100,7 +100,7 @@ Nguồn lần 2: https://community.shopify.dev/t/feature-request-expose-the-exis
 19. ✅ **Chu kỳ đặt hàng theo NCC** (mọi gói, cài đặt lõi): `suppliers.order_cycle_days` thay cho 30 ngày mặc định khi tính lượng đặt; dùng chung cho what-if và kế hoạch nhập; dòng giải thích `order_cycle_supplier`. (Assisty "supplier cadence".)
 20. ✅ **Kế hoạch nhập hàng 12 tuần** (Starter+, `FEATURE_PURCHASE_PLAN`): trang `/purchase-plan`, `PurchasePlanner` thuần mô phỏng từng ngày với đúng phép tính đặt hàng, tổng theo tuần (biểu đồ chi phí), theo NCC, theo sản phẩm; lọc NCC/Vendor, 4/8/12 tuần; không lưu gì. (Inventory Planner cash flow, Assisty buying calendar.)
 
-### Đề xuất tiếp → đã làm ở lần 4 (#21–23), còn lại: lịch đặt hàng (calendar) theo NCC.
+### Đề xuất tiếp → đã làm ở lần 4 (#21–23) và #24 (lịch đặt hàng theo NCC).
 
 ## Nghiên cứu bổ sung (2026-09-27, lần 4)
 
@@ -112,6 +112,7 @@ Nguồn lần 2: https://community.shopify.dev/t/feature-request-expose-the-exis
 ### Đã làm (2026-09-27)
 21. ✅ **Ngừng nhập sản phẩm** (mọi gói, cài đặt lõi): `variants.discontinued`, ô "Ngừng nhập" trong Cài đặt sản phẩm (và cập nhật hàng loạt qua `/variants/settings`). Dự báo vẫn tính ngày bán hết, nhưng không có điểm đặt lại, gợi ý nhập, tồn thừa hay doanh thu mất; trạng thái riêng "Ngừng nhập" (lọc được), không có trong việc cần làm ở Home, cảnh báo email/tức thời, kế hoạch nhập, what-if, Flow. **Không tính vào giới hạn 50 SKU của Free** (đổi cờ này trên gói có giới hạn sẽ chạy lại dự báo cả shop). Mục "Hàng ngừng nhập" ở Phân tích (số cái + tiền theo giá vốn còn phải bán hết). Dòng giải thích `discontinued_*`.
 22. ✅ **Độ chính xác dự báo** (mọi gói, `FEATURE_ACCURACY`): bảng `forecast_snapshots` (lần dự báo đầy đủ đầu tiên mỗi tuần, từ thứ Hai giờ shop; giữ 16 tuần). `/api/accuracy` so tốc độ dự báo với bán thực tế trên ngày còn hàng trong 28 ngày sau đó: độ chính xác = 1 − WAPE, độ lệch (dự báo cao/thấp), tách dự báo của app với tốc độ merchant tự chỉnh, xu hướng 8 tuần, các sản phẩm lệch nhiều nhất. Bỏ qua sản phẩm còn hàng < 14 ngày và dự báo có doanh số combo. Mục ở Phân tích + một dòng trên trang sản phẩm. Kết quả đầu tiên có sau 4 tuần (trước đó hiện ngày có kết quả).
+24. ✅ **Ngày đặt hàng theo NCC + lịch đặt hàng** (mọi gói cho ngày đặt hàng; lịch nằm trong Kế hoạch nhập, Starter): `suppliers.order_weekdays` (thứ ISO, vd. Thứ Hai + Thứ Năm; không chọn = ngày nào cũng được). Ngày cần đặt của sản phẩm dời về ngày đặt hàng gần nhất trước hạn (lỡ ngày đó thì đặt hôm nay), nên Home, trạng thái "Cần đặt ngay", cảnh báo, Flow, what-if và kế hoạch nhập đều theo; giải thích có dòng `order_weekday_moved` (hạn thực tế vs ngày đặt). Email tự động cho NCC (Growth) chỉ gửi vào các ngày này, tối đa 1 lần/ngày. Trang Kế hoạch nhập có mục "Lịch đặt hàng": mỗi dòng = ngày × NCC (số sản phẩm, số cái, chi phí). (Assisty "buying calendar / supplier cadence".)
 23. ✅ **Xuất đơn hàng từ kế hoạch nhập** (Starter, cần cả `purchase_plan` và `purchase_orders`): nút "Xuất đơn hàng (CSV)" ở trang Kế hoạch nhập, mỗi dòng = một lần đặt (ngày, tuần, NCC, sản phẩm, SKU, số lượng, giá vốn, thành tiền), theo bộ lọc đang chọn.
 
 ## Việc sắp tới (tổng hợp, theo thứ tự đề xuất)

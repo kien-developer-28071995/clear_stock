@@ -565,3 +565,27 @@ it('explains a sold-out discontinued product', function () {
     expect($r->suggestedQty)->toBe(0)->and($r->reorderDate)->toBeNull();
     expect((new ExplanationFormatter)->lines($r->explanation)[1]['code'])->toBe('discontinued_sold_out');
 });
+
+it('moves the order date back to the supplier order weekday', function () {
+    // 4/day, 100 in stock: due 2026-09-24 (a Thursday). Orders go out on Mondays.
+    $r = calc(input(history(120, 4), stock: 100, extra: ['orderWeekdays' => [1], 'supplierName' => 'Acme']));
+
+    expect($r->reorderDate)->toBe('2026-09-21')
+        ->and($r->explanation['reorder']['order_weekdays'])->toBe(['days' => [1], 'supplier' => 'Acme', 'due_date' => '2026-09-24']);
+    $lines = (new ExplanationFormatter)->lines($r->explanation);
+    expect(collect($lines)->firstWhere('code', 'order_weekday_moved')['params'])
+        ->toBe(['supplier' => 'Acme', 'reorder_date' => '2026-09-21', 'due_date' => '2026-09-24']);
+
+    // Due on an order day: unchanged, no extra line. Tuesdays + Thursdays.
+    $same = calc(input(history(120, 4), stock: 100, extra: ['orderWeekdays' => [2, 4]]));
+    expect($same->reorderDate)->toBe('2026-09-24')
+        ->and(array_column((new ExplanationFormatter)->lines($same->explanation), 'code'))->not->toContain('order_weekday_moved');
+});
+
+it('orders today when the last order weekday before the due date has passed', function () {
+    // Due 2026-09-22 (Tuesday); order day Monday 09-21 is after today (Sunday 09-20)... use Saturdays: last one 09-19 is past.
+    $r = calc(input(history(120, 4), stock: 92, extra: ['orderWeekdays' => [6]]));
+
+    expect($r->explanation['reorder']['order_weekdays']['due_date'])->toBe('2026-09-22')
+        ->and($r->reorderDate)->toBe('2026-09-20');
+});

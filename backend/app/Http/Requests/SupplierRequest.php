@@ -22,8 +22,24 @@ class SupplierRequest extends FormRequest
             'pack_size' => ['sometimes', 'nullable', 'integer', 'min:1', 'max:100000'],
             // How often orders go to this supplier: an order covers this many days of sales (null = app default).
             'order_cycle_days' => ['sometimes', 'nullable', 'integer', 'min:1', 'max:365'],
+            // Weekdays orders are placed with this supplier (ISO: 1 = Monday ... 7 = Sunday); empty/null = any day.
+            'order_weekdays' => ['sometimes', 'nullable', 'array', 'max:7'],
+            'order_weekdays.*' => ['integer', 'between:1,7'], // duplicates are dropped
             // Automatic purchase order emails (Growth); needs a supplier email.
             'auto_email' => ['sometimes', 'boolean'],
         ];
+    }
+
+    /** Sorted weekdays, or null for "any day". */
+    public function validated($key = null, $default = null): mixed
+    {
+        $data = parent::validated($key, $default);
+        if ($key === null && array_key_exists('order_weekdays', $data)) {
+            $days = array_values(array_unique(array_map('intval', $data['order_weekdays'] ?? [])));
+            sort($days);
+            $data['order_weekdays'] = $days === [] || count($days) === 7 ? null : $days;
+        }
+
+        return $data;
     }
 }

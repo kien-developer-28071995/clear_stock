@@ -163,6 +163,7 @@
             "one": "Not reordered (discontinued): {{count}} unit left, no recent sales.",
             "other": "Not reordered (discontinued): {{count}} units left, no recent sales."
         },
-        "discontinued_sold_out": "Not reordered (discontinued): sold out."
+        "discontinued_sold_out": "Not reordered (discontinued): sold out.",
+        "order_weekday_moved": "You order from {{supplier}} on set weekdays, so order on {{reorder_date}} instead of {{due_date}}."
     }
 }

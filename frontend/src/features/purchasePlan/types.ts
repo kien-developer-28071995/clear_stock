@@ -27,6 +27,14 @@ export interface PurchasePlanSupplier extends Spend {
     first_order: string;
 }
 
+/** One order day with one supplier (supplier null = products without a supplier). */
+export interface PurchasePlanCalendarEntry extends Omit<Spend, 'orders'> {
+    date: string;
+    supplier_id: number | null;
+    supplier: string | null;
+    products: number;
+}
+
 export interface PurchasePlanItem {
     variant_id: number;
     name: string;
@@ -47,6 +55,8 @@ export interface PurchasePlan {
     totals: Spend & { products: number };
     by_week: PurchasePlanWeek[];
     by_supplier: PurchasePlanSupplier[];
+    /** When to order from whom, by date. */
+    calendar: PurchasePlanCalendarEntry[];
     /** First 200 products, biggest spend first. */
     items: PurchasePlanItem[];
     items_total: number;

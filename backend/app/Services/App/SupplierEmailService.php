@@ -113,8 +113,14 @@ class SupplierEmailService
             if (! $supplier->auto_email || ! $supplier->email) {
                 continue;
             }
+            // With order weekdays: send on those days only, at most once each day; else once a week.
+            $days = $supplier->order_weekdays;
+            $local = $now->setTimezone($shop->timezone);
+            if ($days !== null && ! in_array($local->isoWeekday(), $days, true)) {
+                continue;
+            }
             $last = $this->emails->lastSentAt($supplier, SupplierEmail::TRIGGER_AUTO);
-            if ($last !== null && $last->gt($since)) {
+            if ($last !== null && $last->gt($days !== null ? $local->startOfDay() : $since)) {
                 continue;
             }
             $items = $this->dueItems($shop, $supplier, null);

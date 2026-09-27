@@ -417,7 +417,10 @@
     "orderRulesHelp": "Đơn tối thiểu và quy cách thùng áp dụng cho mọi sản phẩm của nhà cung cấp này, trừ khi sản phẩm có cài đặt riêng.",
     "orderCycle": "Đặt hàng mỗi",
     "orderCycleDefault_other": "Mặc định: {{count}} ngày",
-    "orderCycleHelp": "Bao lâu bạn đặt hàng NCC này một lần. Mỗi đơn gợi ý đủ bán ngần ấy ngày, cộng thêm lead time và tồn an toàn."
+    "orderCycleHelp": "Bao lâu bạn đặt hàng NCC này một lần. Mỗi đơn gợi ý đủ bán ngần ấy ngày, cộng thêm lead time và tồn an toàn.",
+    "orderDays": "Ngày đặt hàng",
+    "orderDaysHelp": "Những ngày bạn đặt hàng với nhà cung cấp này. Sản phẩm đến hạn vào giữa hai ngày sẽ được đặt vào ngày đặt hàng liền trước, để không bị hết hàng. Không chọn ngày nào = ngày nào cũng được.",
+    "ordersOn": "Đặt hàng: {{days}}"
   },
   "bundles": {
     "add": "Thêm combo",
@@ -602,7 +605,8 @@
     "reference_no_forecast": "{{name}} chưa có dự báo nên chưa dùng được tốc độ bán của nó.",
     "discontinued_sells_through_other": "Ngừng nhập: {{count}} cái còn lại sẽ bán hết khoảng {{stockout_date}}.",
     "discontinued_no_sales_other": "Ngừng nhập: còn {{count}} cái, gần đây chưa bán được.",
-    "discontinued_sold_out": "Ngừng nhập: đã bán hết."
+    "discontinued_sold_out": "Ngừng nhập: đã bán hết.",
+    "order_weekday_moved": "Bạn đặt hàng {{supplier}} vào các ngày cố định trong tuần, nên cần đặt vào {{reorder_date}} thay vì {{due_date}}."
   },
   "import": {
     "fromStocky": "Nhập từ Stocky",
@@ -939,7 +943,10 @@
     "noSupplier": "Chưa có NCC",
     "orderDates": "Các đơn",
     "orderOn": "{{date}}: {{qty}}",
-    "export": "Xuất đơn hàng (CSV)"
+    "export": "Xuất đơn hàng (CSV)",
+    "calendar": "Lịch đặt hàng",
+    "orderDay": "Ngày đặt",
+    "today": "Hôm nay"
   },
   "discontinued": {
     "heading": "Hàng ngừng nhập",

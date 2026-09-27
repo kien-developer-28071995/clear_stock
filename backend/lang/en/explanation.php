@@ -26,6 +26,7 @@ return [
     'below_min_order' => ':stock in stock (with stock on the way) is at or below your minimum → order :count unit today.|:stock in stock (with stock on the way) is at or below your minimum → order :count units today.',
     'above_min' => ':stock in stock (with stock on the way) is above your minimum; no sales yet, so nothing to order.',
     'no_order_needed' => 'Nothing to order right now.',
+    'order_weekday_moved' => 'You order from :supplier on set weekdays, so order on :reorder_date instead of :due_date.',
     'discontinued_sells_through' => 'Not reordered (discontinued): the last :count unit sells out around :stockout_date.|Not reordered (discontinued): the last :count units sell out around :stockout_date.',
     'discontinued_no_sales' => 'Not reordered (discontinued): :count unit left, no recent sales.|Not reordered (discontinued): :count units left, no recent sales.',
     'discontinued_sold_out' => 'Not reordered (discontinued): sold out.',

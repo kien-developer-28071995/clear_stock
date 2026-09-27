@@ -40,6 +40,7 @@ final readonly class ForecastInput
         public ?int $orderCycleDays = null,     // supplier's order cycle (days of sales an order covers); null = app default
         public bool $filterSpikes = false,      // cap one-off sales spikes to the usual level before averaging
         public bool $discontinued = false,      // merchant no longer reorders it: sell through what is left
+        public ?array $orderWeekdays = null,    // ISO weekdays the supplier's orders are placed on (null = any day)
     ) {}
 
     public function override(OverrideField $field): ?array

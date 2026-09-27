@@ -68,11 +68,11 @@ class ForecastCalculator
 
         // --- 5. Reorder maths -----------------------------------------------------------
         $plan = $this->reorderPlan($in->asOf, $avg, $in->currentStock, $in->incomingStock, $leadTime['days'], $safety['days'],
-            $in->minStock, $in->maxStock, $in->minOrderQty, $in->packSize, $in->orderCycleDays);
+            $in->minStock, $in->maxStock, $in->minOrderQty, $in->packSize, $in->orderCycleDays, $in->orderWeekdays);
         ['stock' => $stock, 'incoming' => $incoming, 'position' => $position, 'cycle' => $cycle, 'computed_point' => $computedPoint,
             'point' => $reorderPoint, 'target' => $targetStock, 'excess' => $excess, 'overstock' => $overstock, 'min' => $min, 'max' => $max,
             'rounding' => $rounding, 'suggested' => $suggested, 'days_of_cover' => $daysOfCover, 'stockout_date' => $stockoutDate,
-            'reorder_date' => $reorderDate] = $plan;
+            'reorder_date' => $reorderDate, 'due_date' => $dueDate] = $plan;
         if ($in->orderRulesSupplier !== null) {
             $rounding['supplier'] = $in->orderRulesSupplier; // explained as the supplier's defaults
         }
@@ -126,6 +126,12 @@ class ForecastCalculator
                 'order_cycle_days' => $cycle,
                 'order_cycle_source' => $in->orderCycleDays !== null ? 'supplier' : 'default',
                 'order_cycle_supplier' => $in->orderCycleDays !== null ? $in->supplierName : null,
+                // The supplier's order weekdays moved the order date back from the date it is due.
+                'order_weekdays' => $in->orderWeekdays !== null && $reorderDate !== null ? [
+                    'days' => $in->orderWeekdays,
+                    'supplier' => $in->supplierName,
+                    'due_date' => $dueDate,
+                ] : null,
                 'suggested_qty' => $suggested,
                 'computed_point' => $computedPoint,
                 'target' => $targetStock,
@@ -214,6 +220,7 @@ class ForecastCalculator
     public function reorderPlan(
         CarbonImmutable $asOf, float $avg, int $stock, int $incoming, int $leadTimeDays, int $safetyDays,
         ?int $minStock = null, ?int $maxStock = null, ?int $minOrderQty = null, ?int $packSize = null, ?int $orderCycleDays = null,
+        ?array $orderWeekdays = null,
     ): array {
         $incoming = max(0, $incoming);
         $position = $stock + $incoming;
@@ -243,13 +250,39 @@ class ForecastCalculator
             $reorderDate = $asOf->addDays($position <= $reorderPoint ? 0 : (int) floor(($position - $reorderPoint) / $avg))->toDateString();
         }
 
+        // The supplier only takes orders on some weekdays: order on the last of them on or before the due date.
+        $dueDate = $reorderDate;
+        $reorderDate = $this->onOrderDay($reorderDate, $asOf, $orderWeekdays);
+
         return [
+            'due_date' => $dueDate,
             'stock' => $stock, 'incoming' => $incoming, 'position' => $position, 'cycle' => $cycle,
             'computed_point' => $computedPoint, 'point' => $reorderPoint, 'target' => $targetStock,
             'excess' => $excess, 'overstock' => $overstock, 'min' => $min, 'max' => $max,
             'rounding' => $rounding, 'suggested' => $rounding['final'],
             'days_of_cover' => $daysOfCover, 'stockout_date' => $stockoutDate, 'reorder_date' => $reorderDate,
         ];
+    }
+
+    /**
+     * The last order weekday on or before $date, never before $asOf (a missed order day means
+     * ordering today). Without order weekdays (or every day), $date itself.
+     *
+     * @param  ?array<int, int>  $weekdays  ISO weekdays (1 = Monday)
+     */
+    public function onOrderDay(?string $date, CarbonImmutable $asOf, ?array $weekdays): ?string
+    {
+        if ($date === null || $weekdays === null || $weekdays === [] || count(array_unique($weekdays)) >= 7) {
+            return $date;
+        }
+        $today = $asOf->toDateString();
+        for ($day = CarbonImmutable::parse($date); $day->toDateString() > $today; $day = $day->subDay()) {
+            if (in_array($day->isoWeekday(), $weekdays, true)) {
+                return $day->toDateString();
+            }
+        }
+
+        return $today;
     }
 
     /**

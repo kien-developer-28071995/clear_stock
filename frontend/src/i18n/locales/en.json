@@ -438,7 +438,10 @@
     "orderCycle": "Order every",
     "orderCycleDefault_one": "Default: {{count}} day",
     "orderCycleDefault_other": "Default: {{count}} days",
-    "orderCycleHelp": "How often you order from this supplier. Each suggested order covers this many days of sales on top of lead time and safety stock."
+    "orderCycleHelp": "How often you order from this supplier. Each suggested order covers this many days of sales on top of lead time and safety stock.",
+    "orderDays": "Order days",
+    "orderDaysHelp": "Days you place orders with this supplier. A product due in between is ordered on the order day before it, so nothing runs out. None ticked = any day.",
+    "ordersOn": "Orders on {{days}}"
   },
   "bundles": {
     "add": "Add bundle",
@@ -649,7 +652,8 @@
     "discontinued_sells_through_other": "Not reordered (discontinued): the last {{count}} units sell out around {{stockout_date}}.",
     "discontinued_no_sales_one": "Not reordered (discontinued): {{count}} unit left, no recent sales.",
     "discontinued_no_sales_other": "Not reordered (discontinued): {{count}} units left, no recent sales.",
-    "discontinued_sold_out": "Not reordered (discontinued): sold out."
+    "discontinued_sold_out": "Not reordered (discontinued): sold out.",
+    "order_weekday_moved": "You order from {{supplier}} on set weekdays, so order on {{reorder_date}} instead of {{due_date}}."
   },
   "import": {
     "fromStocky": "Import from Stocky",
@@ -1026,7 +1030,10 @@
     "noSupplier": "No supplier",
     "orderDates": "Orders",
     "orderOn": "{{date}}: {{qty}}",
-    "export": "Export orders (CSV)"
+    "export": "Export orders (CSV)",
+    "calendar": "Order calendar",
+    "orderDay": "Order on",
+    "today": "Today"
   },
   "discontinued": {
     "heading": "Discontinued stock",

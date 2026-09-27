@@ -187,6 +187,25 @@ for (const plan of ['free', 'starter', 'growth'] as PlanKey[]) {
             await app.screenshot({ path: `e2e-results/purchase-plan-${plan}.png`, fullPage: true });
         });
 
+        test('purchase plan: order calendar follows the supplier order days', async ({ app }) => {
+            if (!has.purchase_plan) return;
+            type Plan = { data: { totals: { units: number }; calendar: { date: string; supplier: string | null; units: number }[] } };
+            type Suppliers = { data: { id: number; name: string; order_weekdays: number[] | null }[] };
+            await open(app, '/purchase-plan');
+            const plan = (await api<Plan>(app, '/purchase-plan')).data;
+            expect(plan.calendar.reduce((sum, c) => sum + c.units, 0)).toBe(plan.totals.units);
+            if (plan.calendar.length > 0) await expect(app.locator('s-section[heading="Order calendar"] s-table-body s-table-row')).toHaveCount(plan.calendar.length);
+
+            // Suppliers with order days: every later order falls on one of them.
+            const suppliers = (await api<Suppliers>(app, '/suppliers')).data.filter((s) => s.order_weekdays);
+            for (const s of suppliers) {
+                for (const c of plan.calendar.filter((c) => c.supplier === s.name && c.date > plan.calendar[0].date)) {
+                    const iso = ((new Date(`${c.date}T00:00:00Z`).getUTCDay() + 6) % 7) + 1;
+                    expect(s.order_weekdays).toContain(iso);
+                }
+            }
+        });
+
         test('insights show forecast accuracy (or when it starts)', async ({ app }) => {
             type Accuracy = { data: { available: boolean; latest: { products: number } | null } };
             await open(app, '/insights');
@@ -331,8 +350,14 @@ for (const plan of ['free', 'starter', 'growth'] as PlanKey[]) {
 
             await row.locator('s-button', { hasText: 'Edit' }).click();
             await modal.getByRole('spinbutton', { name: /lead time/i }).fill('11');
+            // Order days: Monday and Thursday.
+            await modal.getByRole('checkbox', { name: 'Mon' }).check();
+            await modal.getByRole('checkbox', { name: 'Thu' }).check();
             await modal.locator('s-button[slot="primary-action"]').click();
             await expect(row).toContainText('11 days');
+            await expect(row).toContainText('Orders on Mon, Thu');
+            type Suppliers = { data: { name: string; order_weekdays: number[] | null }[] };
+            expect((await api<Suppliers>(app, '/suppliers')).data.find((s) => s.name === name)?.order_weekdays).toEqual([1, 4]);
 
             // Emailing a purchase order to a supplier (with an email address) is Starter and up.
             const email = row.locator('s-button', { hasText: /email/i });

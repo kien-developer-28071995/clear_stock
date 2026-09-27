@@ -261,6 +261,7 @@ class EloquentForecastQueryRepository implements ForecastQueryRepositoryInterfac
                 'min_order_qty' => $v->effectiveMinOrderQty(),
                 'pack_size' => $v->effectivePackSize(),
                 'order_cycle_days' => $v->supplier?->order_cycle_days,
+                'order_weekdays' => $v->supplier?->order_weekdays,
                 // The stored forecast itself (Flow triggers).
                 'reorder_date' => $f->reorder_date?->toDateString(),
                 'stockout_date' => $f->stockout_date?->toDateString(),

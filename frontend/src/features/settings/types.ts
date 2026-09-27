@@ -31,13 +31,15 @@ export interface Supplier {
     pack_size: number | null;
     /** How often orders go to this supplier: an order covers this many days of sales (null = app default). */
     order_cycle_days: number | null;
+    /** ISO weekdays orders are placed on (1 = Monday); null = any day. */
+    order_weekdays: number[] | null;
     variants_count: number | null;
     /** Growth: purchase orders emailed automatically when this supplier's products are due. */
     auto_email: boolean;
     last_emailed_at: string | null;
 }
 
-export type SupplierInput = Pick<Supplier, 'name' | 'email' | 'lead_time_days' | 'min_order_qty' | 'pack_size' | 'order_cycle_days'> & { auto_email?: boolean };
+export type SupplierInput = Pick<Supplier, 'name' | 'email' | 'lead_time_days' | 'min_order_qty' | 'pack_size' | 'order_cycle_days' | 'order_weekdays'> & { auto_email?: boolean };
 
 /** A Shopify vendor that can become a supplier. */
 export interface VendorCandidate {
