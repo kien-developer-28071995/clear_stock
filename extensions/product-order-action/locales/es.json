@@ -1,0 +1,31 @@
+{
+    "locale": "es",
+    "name": "Marcar como pedido",
+    "intro": "¿Lo pediste fuera de Shopify (correo, teléfono, portal del proveedor)? Clear Stock lo cuenta como en camino y deja de sugerirlo. Las cantidades empiezan en el pedido sugerido.",
+    "quantity": "Cantidad pedida",
+    "inStock": "{{qty}} en stock",
+    "suggested": "sugerido {{qty}} antes del {{date}}",
+    "nothingSuggested": "aún no hay que pedir",
+    "alreadyOrdered": "{{qty}} ya marcadas como pedidas (llegan el {{date}})",
+    "expected": "Llegada prevista",
+    "expectedHelp": "Vacío = hoy + plazo de entrega.",
+    "reference": "Referencia (opcional)",
+    "help": "Solo para pedidos no registrados en Shopify: las órdenes de compra y transferencias de Shopify ya cuentan como en camino.",
+    "save": "Marcar como pedido",
+    "cancel": "Cancelar",
+    "close": "Cerrar",
+    "nothing": "Introduce una cantidad para al menos una variante.",
+    "done": {
+        "one": "{{count}} variante marcada como pedida. Ahora cuenta como en camino.",
+        "many": "{{count}} variantes marcadas como pedidas. Ahora cuentan como en camino.",
+        "other": "{{count}} variantes marcadas como pedidas. Ahora cuentan como en camino."
+    },
+    "openOrders": "Ver pedidos realizados en Clear Stock",
+    "notSynced": "Este producto aún no está en Clear Stock. Aparecerá tras la próxima sincronización.",
+    "noForecast": "Ninguna variante de este producto tiene aún una previsión para pedir.",
+    "errors": {
+        "generic": "No se pudo guardar. Inténtalo de nuevo en un momento.",
+        "network": "No se pudo conectar con Clear Stock. Revisa tu conexión e inténtalo de nuevo.",
+        "invalid": "Revisa las cantidades (números enteros) y la fecha."
+    }
+}

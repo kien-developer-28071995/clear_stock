@@ -1,0 +1,29 @@
+{
+    "locale": "vi",
+    "name": "Đánh dấu đã đặt",
+    "intro": "Bạn đã đặt sản phẩm này ngoài Shopify (email, điện thoại, cổng của NCC)? Clear Stock sẽ tính là hàng đang về và không gợi ý đặt lại. Số lượng điền sẵn theo gợi ý.",
+    "quantity": "Số lượng đã đặt",
+    "inStock": "Còn {{qty}}",
+    "suggested": "gợi ý {{qty}} trước {{date}}",
+    "nothingSuggested": "chưa cần đặt",
+    "alreadyOrdered": "đã đánh dấu đặt {{qty}} (về {{date}})",
+    "expected": "Dự kiến về",
+    "expectedHelp": "Để trống = hôm nay + lead time.",
+    "reference": "Mã đơn (không bắt buộc)",
+    "help": "Chỉ dùng cho đơn không nhập vào Shopify: đơn đặt hàng và phiếu chuyển kho trong Shopify đã được tính là đang về.",
+    "save": "Đánh dấu đã đặt",
+    "cancel": "Huỷ",
+    "close": "Đóng",
+    "nothing": "Nhập số lượng cho ít nhất một biến thể.",
+    "done": {
+        "other": "Đã đánh dấu {{count}} biến thể là đã đặt. Hàng được tính là đang về."
+    },
+    "openOrders": "Xem đơn đã đặt trong Clear Stock",
+    "notSynced": "Sản phẩm này chưa có trong Clear Stock. Sẽ xuất hiện sau lần đồng bộ tới.",
+    "noForecast": "Chưa biến thể nào của sản phẩm này có dự báo để đặt hàng.",
+    "errors": {
+        "generic": "Không lưu được. Hãy thử lại sau giây lát.",
+        "network": "Không kết nối được Clear Stock. Kiểm tra kết nối rồi thử lại.",
+        "invalid": "Kiểm tra số lượng (số nguyên) và ngày."
+    }
+}

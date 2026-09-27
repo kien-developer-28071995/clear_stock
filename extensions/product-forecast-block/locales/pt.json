@@ -209,5 +209,6 @@
             "other": "Você marcou {{count}} unidades como pedidas (chegam em {{expected_date}}): contam como a caminho.",
             "many": "Você marcou {{count}} unidades como pedidas (chegam em {{expected_date}}): contam como a caminho."
         }
-    }
+    },
+    "ordered": "{{qty}} marcadas como pedidas"
 }

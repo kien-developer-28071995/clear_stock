@@ -6,14 +6,14 @@
 #  - no write_orders (dev-only, for dev:fake-orders)
 #  - no fulfillment-order scopes: per-location forecasts are switched off (FEATURE_LOCATIONS=false)
 #  - no optional write_inventory_transfers: transfers are switched off (FEATURE_TRANSFERS=false)
-#  - only the two product-page extensions: Flow triggers are switched off (FEATURE_FLOW_TRIGGERS=false)
+#  - only the three product-page extensions: Flow triggers are switched off (FEATURE_FLOW_TRIGGERS=false)
 # Switching one of those features on later = add its scope / extension here and deploy again.
 
 client_id = "REPLACE_WITH_PRODUCTION_CLIENT_ID"
 name = "Clear Stock"
 application_url = "https://REPLACE_WITH_PRODUCTION_HOST"
 embedded = true
-extension_directories = [ "extensions/product-forecast-block", "extensions/product-settings-action" ]
+extension_directories = [ "extensions/product-forecast-block", "extensions/product-settings-action", "extensions/product-order-action" ]
 
 [build]
 automatically_update_urls_on_dev = false

@@ -1,7 +1,8 @@
 api_version = "2026-07"
 
-# "More actions" on the Shopify product list: set supplier, lead time and safety days for
-# every variant of the selected products at once. POST /api/extension/product-settings.
+# Reorder settings (supplier, lead time, safety days, minimum order, pack size, discontinued) for
+# every variant of the products: "More actions" on the product list (selected products) and on a
+# product page. POST /api/extension/product-settings.
 [[extensions]]
 type = "ui_extension"
 name = "t:name"
@@ -10,4 +11,8 @@ uid = "15e4bae7-69c2-4981-874e-0df929f1e2f5"
 
   [[extensions.targeting]]
   target = "admin.product-index.selection-action.render"
+  module = "./src/ProductSettingsAction.tsx"
+
+  [[extensions.targeting]]
+  target = "admin.product-details.action.render"
   module = "./src/ProductSettingsAction.tsx"

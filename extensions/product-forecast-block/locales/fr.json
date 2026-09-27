@@ -209,5 +209,6 @@
             "other": "Vous avez marqué {{count}} unités comme commandées (attendues le {{expected_date}}) : comptées comme en route.",
             "many": "Vous avez marqué {{count}} unités comme commandées (attendues le {{expected_date}}) : comptées comme en route."
         }
-    }
+    },
+    "ordered": "{{qty}} marquées comme commandées"
 }

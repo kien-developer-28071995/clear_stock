@@ -1,0 +1,30 @@
+{
+    "locale": "en",
+    "name": "Mark as ordered",
+    "intro": "Ordered this outside Shopify (email, phone, a supplier portal)? Clear Stock counts it as on the way and stops suggesting it. Quantities start at the suggested order.",
+    "quantity": "Quantity ordered",
+    "inStock": "{{qty}} in stock",
+    "suggested": "suggested {{qty}} by {{date}}",
+    "nothingSuggested": "nothing to order yet",
+    "alreadyOrdered": "{{qty}} already marked as ordered (expected {{date}})",
+    "expected": "Expected",
+    "expectedHelp": "Empty = today + lead time.",
+    "reference": "Reference (optional)",
+    "help": "Only for orders not entered in Shopify: Shopify purchase orders and transfers already count as on the way.",
+    "save": "Mark as ordered",
+    "cancel": "Cancel",
+    "close": "Close",
+    "nothing": "Enter a quantity for at least one variant.",
+    "done": {
+        "one": "{{count}} variant marked as ordered. It now counts as on the way.",
+        "other": "{{count}} variants marked as ordered. They now count as on the way."
+    },
+    "openOrders": "See orders placed in Clear Stock",
+    "notSynced": "This product isn't in Clear Stock yet. It appears after the next sync.",
+    "noForecast": "No variant of this product has a forecast to order from yet.",
+    "errors": {
+        "generic": "Couldn't save. Try again in a moment.",
+        "network": "Couldn't reach Clear Stock. Check your connection and try again.",
+        "invalid": "Check the quantities (whole numbers) and the date."
+    }
+}

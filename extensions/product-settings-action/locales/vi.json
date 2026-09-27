@@ -1,5 +1,5 @@
 {
-    "name": "Đặt NCC & lead time",
+    "name": "Cài đặt nhập hàng",
     "intro": {
         "other": "Áp dụng cho mọi biến thể của {{count}} sản phẩm đã chọn trong Clear Stock. Ô để trống sẽ giữ nguyên."
     },
@@ -14,7 +14,7 @@
     "apply": "Áp dụng",
     "cancel": "Hủy",
     "close": "Đóng",
-    "nothing": "Hãy chọn nhà cung cấp hoặc nhập một con số trước.",
+    "nothing": "Chọn nhà cung cấp, trạng thái hoặc nhập một số trước.",
     "done": {
         "other": "Đã cập nhật {{count}} biến thể. Dự báo đang được tính lại."
     },
@@ -22,6 +22,15 @@
     "errors": {
         "generic": "Không lưu được. Hãy thử lại sau giây lát.",
         "network": "Không kết nối được tới Clear Stock. Kiểm tra kết nối rồi thử lại.",
-        "invalid": "Kiểm tra lại: lead time và tồn kho an toàn phải là số nguyên từ 0 đến 365."
-    }
+        "invalid": "Kiểm tra giá trị: lead time và tồn an toàn là số nguyên 0–365, đặt tối thiểu và quy cách thùng tối thiểu là 1."
+    },
+    "minOrder": "Đặt tối thiểu",
+    "minOrderHelp": "Số lượng đặt tối thiểu của NCC (cái).",
+    "packSize": "Quy cách thùng",
+    "packSizeHelp": "Số cái mỗi thùng: lượng đặt được làm tròn lên thùng nguyên.",
+    "discontinued": "Ngừng nhập",
+    "discontinuedKeep": "Giữ nguyên",
+    "discontinuedYes": "Có: ngừng nhập",
+    "discontinuedNo": "Không: nhập như thường",
+    "discontinuedHelp": "Sản phẩm ngừng nhập chỉ bán hết tồn còn lại: không gợi ý đặt, không cảnh báo."
 }

@@ -181,5 +181,6 @@
             "one": "Du hast {{count}} Stück als bestellt markiert (erwartet am {{expected_date}}): zählt als unterwegs.",
             "other": "Du hast {{count}} Stück als bestellt markiert (erwartet am {{expected_date}}): zählt als unterwegs."
         }
-    }
+    },
+    "ordered": "{{qty}} als bestellt markiert"
 }

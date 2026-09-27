@@ -89,8 +89,9 @@ Ký hiệu: ✅ có · — không có. Cột **Công tắc** là biến `FEATURE
 |---|---|:-:|:-:|:-:|---|:-:|
 | Đồng bộ Shopify | Bulk Operation lần đầu, mỗi đêm chỉ lấy phần thay đổi | ✅ | ✅ | ✅ | — | Bật |
 | **Giá vốn nhập trong app** | Trang Giá vốn, sửa hàng loạt, nhập CSV (dùng thẳng file xuất của Shopify); thắng giá Shopify | ✅ | ✅ | ✅ | — | Bật |
-| Block dự báo trên trang sản phẩm Shopify | Admin UI extension | ✅ | ✅ | ✅ | — | Bật |
-| Đặt NCC/lead time hàng loạt từ danh sách sản phẩm Shopify | Admin action extension | ✅ | ✅ | ✅ | — | Bật |
+| Block dự báo trên trang sản phẩm Shopify | Admin UI extension; **cũng có trên trang biến thể**, kèm dòng "đã đặt" | ✅ | ✅ | ✅ | — | Bật |
+| **Đánh dấu đã đặt từ trang sản phẩm/biến thể Shopify** | More actions → số lượng gợi ý điền sẵn, ngày dự kiến, mã đơn | ✅ | ✅ | ✅ | — | Bật |
+| Cài đặt nhập hàng từ Shopify | Danh sách sản phẩm (chọn nhiều) **và trang sản phẩm**: NCC, lead time, tồn an toàn, **MOQ, quy cách thùng, ngừng nhập** | ✅ | ✅ | ✅ | — | Bật |
 | Onboarding 2 câu hỏi + setup guide | | ✅ | ✅ | ✅ | — | Bật |
 | **Ngôn ngữ** | EN, VI, **ES, DE, FR, PT**; theo ngôn ngữ admin hoặc chọn trong Settings (email vẫn tiếng Anh) | ✅ | ✅ | ✅ | — | Bật |
 | Trang công khai Privacy / Support | | ✅ | ✅ | ✅ | — | Bật |

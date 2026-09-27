@@ -116,6 +116,8 @@ Route::middleware('shopify.session')->group(function () {
     // Shopify admin extensions: forecast block on the product page, bulk settings on the product list.
     Route::get('/extension/products/{product}', [ProductExtensionController::class, 'show'])->whereNumber('product');
     Route::post('/extension/product-settings', [ProductExtensionController::class, 'updateSettings'])->middleware('throttle:30,1');
+    Route::get('/extension/variants/{variant}', [ProductExtensionController::class, 'showVariant'])->whereNumber('variant');
+    Route::post('/extension/manual-orders', [ProductExtensionController::class, 'markOrdered'])->middleware('throttle:30,1');
 
     // Growth: move stock between locations before ordering (draft transfers in Shopify).
     Route::get('/transfers', [TransferController::class, 'index']);

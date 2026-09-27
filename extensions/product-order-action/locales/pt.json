@@ -1,0 +1,31 @@
+{
+    "locale": "pt",
+    "name": "Marcar como pedido",
+    "intro": "Pediu isto fora da Shopify (e-mail, telefone, portal do fornecedor)? O Clear Stock conta como a caminho e para de sugerir. As quantidades começam no pedido sugerido.",
+    "quantity": "Quantidade pedida",
+    "inStock": "{{qty}} em estoque",
+    "suggested": "sugerido {{qty}} até {{date}}",
+    "nothingSuggested": "nada a pedir ainda",
+    "alreadyOrdered": "{{qty}} já marcadas como pedidas (chegam em {{date}})",
+    "expected": "Previsão de chegada",
+    "expectedHelp": "Vazio = hoje + prazo de entrega.",
+    "reference": "Referência (opcional)",
+    "help": "Só para pedidos não registrados na Shopify: pedidos de compra e transferências da Shopify já contam como a caminho.",
+    "save": "Marcar como pedido",
+    "cancel": "Cancelar",
+    "close": "Fechar",
+    "nothing": "Informe uma quantidade para pelo menos uma variante.",
+    "done": {
+        "one": "{{count}} variante marcada como pedida. Agora conta como a caminho.",
+        "many": "{{count}} variantes marcadas como pedidas. Agora contam como a caminho.",
+        "other": "{{count}} variantes marcadas como pedidas. Agora contam como a caminho."
+    },
+    "openOrders": "Ver pedidos feitos no Clear Stock",
+    "notSynced": "Este produto ainda não está no Clear Stock. Ele aparece após a próxima sincronização.",
+    "noForecast": "Nenhuma variante deste produto tem previsão para pedir ainda.",
+    "errors": {
+        "generic": "Não foi possível salvar. Tente novamente em instantes.",
+        "network": "Não foi possível conectar ao Clear Stock. Verifique sua conexão e tente novamente.",
+        "invalid": "Verifique as quantidades (números inteiros) e a data."
+    }
+}
