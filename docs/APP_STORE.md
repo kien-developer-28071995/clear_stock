@@ -15,6 +15,7 @@ switched off with `FEATURE_*` (README "Feature switches") and can be released la
 | Purchase order CSV export | **On** (Starter) | A download, nothing sent anywhere. |
 | Sales what-if | **On** (Starter) | Read-only calculation. |
 | Purchase plan (12 weeks of orders and spend, CSV export) | **On** (Starter) | Read-only calculation and a download. |
+| Sales events (promotions, Black Friday) | **On** (every plan) | A setting that feeds the forecast. |
 | Forecast accuracy report | **On** (every plan) | Read-only view: past forecasts next to what really sold. |
 | One-off sales spikes ignored, sales lost to stock-outs | **On** (every plan) | Forecast quality and a read-only view; merchants can turn spike filtering off in Settings. |
 | New products from a similar product | **On** (Starter) | A setting on the product page. |

@@ -589,3 +589,46 @@ it('orders today when the last order weekday before the due date has passed', fu
     expect($r->explanation['reorder']['order_weekdays']['due_date'])->toBe('2026-09-22')
         ->and($r->reorderDate)->toBe('2026-09-20');
 });
+
+it('adds an upcoming sales event to the reorder point, order, stock-out and reorder dates', function () {
+    // 4/day, 200 in stock; Sep 25-29 sells x2 (+20 units, inside the 21-day lead + safety window).
+    $event = ['name' => 'Promo', 'from' => '2026-09-25', 'to' => '2026-09-29', 'multiplier' => 2.0];
+    $r = calc(input(history(120, 4), stock: 200, extra: ['events' => [$event]]));
+
+    expect($r->avgDailySales)->toBe(4.0)
+        ->and($r->reorderPoint)->toBe(104)            // 84 + 20
+        ->and($r->targetStock)->toBe(224)             // 204 + 20
+        ->and($r->suggestedQty)->toBe(24)
+        ->and($r->stockoutDate)->toBe('2026-11-04')   // 45 days instead of 50
+        ->and($r->reorderDate)->toBe('2026-10-14')    // instead of Oct 19
+        ->and($r->explanation['events']['upcoming'])->toBe([
+            ['name' => 'Promo', 'from' => '2026-09-25', 'to' => '2026-09-29', 'multiplier' => 2.0, 'days' => 5, 'units_lead' => 20.0, 'units_order' => 20.0],
+        ]);
+    expect(collect((new ExplanationFormatter)->lines($r->explanation))->firstWhere('code', 'event_upcoming')['params'])
+        ->toMatchArray(['name' => 'Promo', 'count' => 20, 'multiplier' => 2]);
+
+    // Events that ended, or lie beyond the order window, change nothing ahead.
+    $far = calc(input(history(120, 4), stock: 200, extra: ['events' => [['name' => 'Xmas', 'from' => '2027-06-01', 'to' => '2027-06-05', 'multiplier' => 3.0]]]));
+    expect($far->reorderPoint)->toBe(84)->and($far->explanation['events']['upcoming'])->toBe([]);
+});
+
+it('lowers demand for an event below 1 (a closure)', function () {
+    $r = calc(input(history(120, 4), stock: 200, extra: ['events' => [['name' => 'Closed', 'from' => '2026-09-20', 'to' => '2026-09-26', 'multiplier' => 0.5]]]));
+
+    expect($r->reorderPoint)->toBe(70)   // 84 - 7 days x 2
+        ->and(collect((new ExplanationFormatter)->lines($r->explanation))->pluck('code'))->toContain('event_upcoming_lower');
+});
+
+it('counts past event days at their normal level', function () {
+    // Normally 4/day; a x2 promotion 10-14 days ago sold 8/day.
+    $days = history(120, fn ($ago) => $ago >= 10 && $ago <= 14 ? 8 : 4);
+    $event = ['name' => 'Summer sale', 'from' => '2026-09-06', 'to' => '2026-09-10', 'multiplier' => 2.0];
+
+    expect(calc(input($days))->avgDailySales)->toBeGreaterThan(4.3);
+
+    $r = calc(input($days, extra: ['events' => [$event]]));
+    expect($r->avgDailySales)->toBe(4.0)
+        ->and($r->explanation['events']['past'][0])->toMatchArray(['days' => 5, 'units_removed' => 20.0]);
+    expect(collect((new ExplanationFormatter)->lines($r->explanation))->firstWhere('code', 'event_past')['params'])
+        ->toMatchArray(['name' => 'Summer sale', 'count' => 5]);
+});

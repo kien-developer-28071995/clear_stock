@@ -8,6 +8,7 @@ use App\Models\Shop;
 use App\Repositories\Contracts\DailySalesRepositoryInterface;
 use App\Repositories\Contracts\ForecastRepositoryInterface;
 use App\Repositories\Contracts\LocationSalesRepositoryInterface;
+use App\Services\App\SalesEventService;
 use App\Support\Entitlements;
 use Carbon\CarbonImmutable;
 
@@ -18,6 +19,7 @@ class ForecastInputBuilder
         private readonly ForecastRepositoryInterface $forecasts,
         private readonly DailySalesRepositoryInterface $sales,
         private readonly LocationSalesRepositoryInterface $locationSales,
+        private readonly SalesEventService $salesEvents,
     ) {}
 
     /**
@@ -81,6 +83,7 @@ class ForecastInputBuilder
                     filterSpikes: $base->filterSpikes,
                     discontinued: $base->discontinued,
                     orderWeekdays: $base->orderWeekdays,
+                    events: $base->events,
                 )];
             }
         }
@@ -113,6 +116,7 @@ class ForecastInputBuilder
         $bundleIds = array_values(array_unique(array_merge([], ...array_map('array_keys', $bundles))));
         $rows = $this->sales->rowsBetween($shop, array_values(array_unique([...$variantIds, ...$bundleIds])), $historyStart, $yesterday);
         $filterSpikes = $shop->filter_sales_spikes && Entitlements::for($shop)->has(Feature::SpikeFilter);
+        $events = $this->salesEvents->matcher($shop, $asOf);
 
         $inputs = [];
         foreach ($variantIds as $id) {
@@ -165,6 +169,7 @@ class ForecastInputBuilder
                 filterSpikes: $filterSpikes,
                 discontinued: $variant->discontinued,
                 orderWeekdays: $variant->supplier?->order_weekdays,
+                events: $events->for($id, $variant->supplier_id),
             );
         }
 

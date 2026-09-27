@@ -164,6 +164,18 @@
             "other": "Not reordered (discontinued): {{count}} units left, no recent sales."
         },
         "discontinued_sold_out": "Not reordered (discontinued): sold out.",
-        "order_weekday_moved": "You order from {{supplier}} on set weekdays, so order on {{reorder_date}} instead of {{due_date}}."
+        "order_weekday_moved": "You order from {{supplier}} on set weekdays, so order on {{reorder_date}} instead of {{due_date}}.",
+        "event_past": {
+            "one": "{{name}} (×{{multiplier}}): {{count}} day counted at its normal level.",
+            "other": "{{name}} (×{{multiplier}}): {{count}} days counted at their normal level."
+        },
+        "event_upcoming": {
+            "one": "{{name}} ({{from_date}} – {{to_date}}, ×{{multiplier}}) adds {{count}} unit to what to order.",
+            "other": "{{name}} ({{from_date}} – {{to_date}}, ×{{multiplier}}) adds {{count}} units to what to order."
+        },
+        "event_upcoming_lower": {
+            "one": "{{name}} ({{from_date}} – {{to_date}}, ×{{multiplier}}) takes {{count}} unit off what to order.",
+            "other": "{{name}} ({{from_date}} – {{to_date}}, ×{{multiplier}}) takes {{count}} units off what to order."
+        }
     }
 }

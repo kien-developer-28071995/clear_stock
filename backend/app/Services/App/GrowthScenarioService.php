@@ -22,6 +22,7 @@ class GrowthScenarioService
     public function __construct(
         private readonly ForecastQueryRepositoryInterface $forecasts,
         private readonly ForecastCalculator $calculator,
+        private readonly SalesEventService $salesEvents,
     ) {}
 
     /**
@@ -38,7 +39,9 @@ class GrowthScenarioService
         $totals = ['now' => $this->emptyTotals(), 'scenario' => $this->emptyTotals()];
         $items = [];
 
+        $events = $this->salesEvents->matcher($shop);
         foreach ($this->forecasts->planningRows($shop, $filters) as $row) {
+            $row['events'] = $events->for($row['variant_id'], $row['supplier_id']);
             $now = $this->side($row, $row['avg'], $today, $until);
             $scenario = $this->side($row, round($row['avg'] * $factor, 2), $today, $until);
             if (! $now['due'] && ! $scenario['due']) {
@@ -83,7 +86,7 @@ class GrowthScenarioService
     private function side(array $row, float $avg, string $today, string $until): array
     {
         $asOf = CarbonImmutable::parse($row['as_of']);
-        $args = [$row['lead_time_days'], $row['safety_days'], $row['min_stock'], $row['max_stock'], $row['min_order_qty'], $row['pack_size'], $row['order_cycle_days'] ?? null, $row['order_weekdays'] ?? null];
+        $args = [$row['lead_time_days'], $row['safety_days'], $row['min_stock'], $row['max_stock'], $row['min_order_qty'], $row['pack_size'], $row['order_cycle_days'] ?? null, $row['order_weekdays'] ?? null, $row['events'] ?? []];
         $plan = $this->calculator->reorderPlan($asOf, $avg, $row['stock'], $row['incoming'], ...$args);
 
         $date = $plan['reorder_date'];

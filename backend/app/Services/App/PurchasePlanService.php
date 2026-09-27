@@ -21,6 +21,7 @@ class PurchasePlanService
     public function __construct(
         private readonly ForecastQueryRepositoryInterface $forecasts,
         private readonly PurchasePlanner $planner,
+        private readonly SalesEventService $salesEvents,
     ) {}
 
     /**
@@ -39,7 +40,9 @@ class PurchasePlanService
         $until = $today->addWeeks($weeks)->toDateString();
 
         $lines = [];
+        $events = $this->salesEvents->matcher($shop);
         foreach ($this->forecasts->planningRows($shop, $filters) as $row) {
+            $row['events'] = $events->for($row['variant_id'], $row['supplier_id']);
             foreach ($this->planner->orders($row, $today->toDateString(), $until) as $o) {
                 $cost = $row['unit_cost'];
                 $lines[] = [
@@ -80,7 +83,9 @@ class PurchasePlanService
         $items = [];
         $totals = ['products' => 0, 'orders' => 0, 'units' => 0, 'cost' => 0.0, 'missing_cost' => 0];
 
+        $events = $this->salesEvents->matcher($shop);
         foreach ($this->forecasts->planningRows($shop, $filters) as $row) {
+            $row['events'] = $events->for($row['variant_id'], $row['supplier_id']);
             $orders = $this->planner->orders($row, $today->toDateString(), $until);
             if ($orders === []) {
                 continue;

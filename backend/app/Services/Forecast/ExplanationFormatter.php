@@ -67,6 +67,19 @@ class ExplanationFormatter
             ]);
         }
 
+        // Sales events the merchant entered (absent in older explanations)
+        foreach ($e['events']['past'] ?? [] as $ev) {
+            if ($e['avg_source'] !== 'override') {
+                $out[] = $this->line('event_past', ['name' => $ev['name'], 'count' => $ev['days'], 'multiplier' => $this->round($ev['multiplier'], 2)]);
+            }
+        }
+        foreach ($e['events']['upcoming'] ?? [] as $ev) {
+            $out[] = $this->line($ev['units_order'] >= 0 ? 'event_upcoming' : 'event_upcoming_lower', [
+                'name' => $ev['name'], 'from_date' => $ev['from'], 'to_date' => $ev['to'],
+                'multiplier' => $this->round($ev['multiplier'], 2), 'count' => (int) round(abs($ev['units_order'])),
+            ]);
+        }
+
         // Seasonality
         $s = $e['seasonality'];
         if ($s['applied']) {
