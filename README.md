@@ -384,7 +384,7 @@ Errors are posted to one Slack channel through an incoming webhook (`MONITORING_
 ```bash
 docker compose -f docker-compose.prod.yml build     # or: make prod-build
 docker compose -f docker-compose.prod.yml up -d     # or: make prod-up
-make prod-migrate                                   # migrations never run automatically
+make prod-migrate                                   # by hand (CI/CD deploys run additive migrations itself)
 ```
 - Multi-stage `Dockerfile`: frontend build (Node) → `composer install --no-dev` → slim PHP-FPM runtime (`app`), plus an nginx image (`web`) with the built assets.
 - No source mounts, no Node, no Mailpit. `config:cache`, `route:cache`, `view:cache`, `event:cache` run at container start.

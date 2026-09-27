@@ -125,7 +125,7 @@ Dev (docker-compose.yml):
 Production (docker-compose.prod.yml + Dockerfile multi-stage):
 - Stage build frontend (npm ci && npm run build), stage composer install --no-dev, stage runtime tối giản
 - Không mount source code, không có node và mailpit
-- Chạy config:cache, route:cache, view:cache khi khởi động; migration chạy bằng lệnh riêng, không tự động
+- Chạy config:cache, route:cache, view:cache khi khởi động; migration không chạy khi container khởi động. Deploy (CI/CD) tự chạy migration chỉ-thêm (bảng/cột/index), sau khi backup; migration xóa/đổi tên/đổi kiểu dừng deploy chờ chạy tay (quyết định 2026-09-27, tắt bằng Variable `AUTO_MIGRATE=false`). Viết migration theo kiểu mở rộng rồi thu gọn: bản cũ phải chạy được trên schema mới
 - Horizon và scheduler tự khởi động lại khi lỗi (restart: unless-stopped)
 - Healthcheck cho app, mysql, redis; log ra stdout
 
