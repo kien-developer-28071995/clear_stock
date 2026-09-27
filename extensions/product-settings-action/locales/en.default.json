@@ -1,5 +1,5 @@
 {
-    "name": "Set supplier & lead time",
+    "name": "Reorder settings",
     "intro": {
         "one": "Applies to every variant of the selected product in Clear Stock. Empty fields are left as they are.",
         "other": "Applies to every variant of the {{count}} selected products in Clear Stock. Empty fields are left as they are."
@@ -15,7 +15,7 @@
     "apply": "Apply",
     "cancel": "Cancel",
     "close": "Close",
-    "nothing": "Choose a supplier or enter a number first.",
+    "nothing": "Choose a supplier, a status or enter a number first.",
     "done": {
         "one": "Updated {{count}} variant. Forecasts are being recalculated.",
         "other": "Updated {{count}} variants. Forecasts are being recalculated."
@@ -24,6 +24,15 @@
     "errors": {
         "generic": "Couldn't save. Try again in a moment.",
         "network": "Couldn't reach Clear Stock. Check your connection and try again.",
-        "invalid": "Check the values: lead time and safety stock must be whole numbers from 0 to 365."
-    }
+        "invalid": "Check the values: lead time and safety stock are whole numbers from 0 to 365, minimum order and pack size at least 1."
+    },
+    "minOrder": "Minimum order",
+    "minOrderHelp": "The supplier's minimum order in units.",
+    "packSize": "Pack size",
+    "packSizeHelp": "Units per case: orders are rounded up to whole packs.",
+    "discontinued": "Discontinued",
+    "discontinuedKeep": "Keep current",
+    "discontinuedYes": "Yes: stop reordering",
+    "discontinuedNo": "No: reorder as usual",
+    "discontinuedHelp": "Discontinued products only sell through what is left: no order suggestions or alerts."
 }

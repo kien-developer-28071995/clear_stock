@@ -129,7 +129,7 @@ test.describe('product list bulk action', () => {
         await expect(page.getByText('Applies to every variant of the selected product')).toBeVisible();
         // Nothing chosen: nothing is sent.
         await page.locator('s-button[slot="primary-action"]').click();
-        await expect(page.locator('s-banner[tone="critical"]')).toContainText('Choose a supplier or enter a number first.');
+        await expect(page.locator('s-banner[tone="critical"]')).toContainText('Choose a supplier, a status or enter a number first.');
 
         try {
             await page.locator('s-number-field[label="Lead time (days)"]').evaluate((el: HTMLElement & { value: string }) => {
@@ -144,6 +144,70 @@ test.describe('product list bulk action', () => {
             await expect.poll(() => page.evaluate(() => (window as unknown as { __closed: boolean }).__closed)).toBe(true);
         } finally {
             php(`App\\Models\\Variant::where("shopify_product_id", ${productId})->update(["lead_time_override" => ${before ?? 'null'}]); echo json_encode(true);`);
+            artisan('forecast:run');
+        }
+        void errors;
+    });
+});
+
+test.describe('variant page block', () => {
+    test('shows the forecast of that one variant', async ({ page, errors }) => {
+        const { variantId } = productToReorder();
+        const shopifyVariantId = php<{ id: number }>(`echo json_encode(["id" => App\\Models\\Variant::find(${variantId})->shopify_variant_id]);`).id;
+        await mount(page, 'product-forecast-block/src/ProductForecastBlock.js', 'product-forecast-block', [`gid://shopify/ProductVariant/${shopifyVariantId}`]);
+
+        await expect(page.locator('s-admin-block[heading="Stock forecast"]')).toBeVisible();
+        await expect(page.locator('s-table-body s-table-row')).toHaveCount(1);
+        await expect(page.locator('s-badge')).toContainText('Reorder now');
+        await expect(page.locator(`s-link[href="app:products/${variantId}"]`).last()).toContainText('Open in Clear Stock');
+        void errors;
+    });
+});
+
+test.describe('product page: mark as ordered', () => {
+    test('records the suggested quantity as on the way', async ({ page, errors }) => {
+        const { productId, variantId } = productToReorder();
+        const suggested = php<{ qty: number }>(`echo json_encode(["qty" => App\\Models\\Forecast::where("variant_id", ${variantId})->whereNull("location_id")->value("suggested_qty")]);`).qty;
+        await mount(page, 'product-order-action/src/ProductOrderAction.js', 'product-order-action', [`gid://shopify/Product/${productId}`]);
+
+        await expect(page.locator('s-admin-action[heading="Mark as ordered"]')).toBeVisible();
+        const field = page.locator('s-number-field').first();
+        // Shopify's components only exist in the admin: here the value is the element's attribute.
+        await expect(field).toHaveAttribute('value', String(suggested));
+        try {
+            await page.locator('s-button[slot="primary-action"]').click();
+            await expect(page.locator('s-banner[tone="success"]')).toContainText(/marked as ordered/);
+            const open = php<{ qty: number | null }>(`echo json_encode(["qty" => App\\Models\\ManualOrder::where("variant_id", ${variantId})->where("status", "open")->latest("id")->value("quantity")]);`).qty;
+            expect(open).toBe(suggested);
+            await expect(page.locator('s-link[href="app:orders"]')).toBeVisible();
+        } finally {
+            php(`App\\Models\\ManualOrder::where("variant_id", ${variantId})->where("status", "open")->update(["status" => "cancelled", "closed_at" => now()]); echo json_encode(true);`);
+            artisan('forecast:run');
+        }
+        void errors;
+    });
+});
+
+test.describe('product page: reorder settings', () => {
+    test('sets pack size and discontinued for the product', async ({ page, errors }) => {
+        const { productId, variantId } = productToReorder();
+        await mount(page, 'product-settings-action/src/ProductSettingsAction.js', 'product-settings-action', [`gid://shopify/Product/${productId}`]);
+        await expect(page.locator('s-admin-action[heading="Reorder settings"]')).toBeVisible();
+        try {
+            await page.locator('s-number-field[label="Pack size"]').evaluate((el: HTMLElement & { value: string }) => {
+                el.value = '12';
+                el.dispatchEvent(new Event('input', { bubbles: true }));
+            });
+            await page.locator('s-select[label="Discontinued"]').evaluate((el: HTMLElement & { value: string }) => {
+                el.value = 'yes';
+                el.dispatchEvent(new Event('change', { bubbles: true }));
+            });
+            await page.locator('s-button[slot="primary-action"]').click();
+            await expect(page.locator('s-banner[tone="success"]')).toBeVisible();
+            const v = php<{ pack: number | null; discontinued: boolean }>(`$v = App\\Models\\Variant::find(${variantId}); echo json_encode(["pack" => $v->pack_size, "discontinued" => $v->discontinued]);`);
+            expect(v).toEqual({ pack: 12, discontinued: true });
+        } finally {
+            php(`App\\Models\\Variant::where("shopify_product_id", ${productId})->update(["pack_size" => null, "discontinued" => false]); echo json_encode(true);`);
             artisan('forecast:run');
         }
         void errors;

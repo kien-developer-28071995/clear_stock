@@ -181,5 +181,6 @@
             "one": "You marked {{count}} unit as ordered (expected {{expected_date}}): counted as on the way.",
             "other": "You marked {{count}} units as ordered (expected {{expected_date}}): counted as on the way."
         }
-    }
+    },
+    "ordered": "{{qty}} marked as ordered"
 }

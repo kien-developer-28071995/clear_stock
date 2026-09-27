@@ -1,5 +1,5 @@
 {
-    "name": "Definir proveedor y plazo",
+    "name": "Ajustes de reposición",
     "intro": {
         "one": "Se aplica a todas las variantes del producto seleccionado en Clear Stock. Los campos vacíos no se cambian.",
         "many": "Se aplica a todas las variantes de los {{count}} productos seleccionados en Clear Stock. Los campos vacíos no se cambian.",
@@ -16,7 +16,7 @@
     "apply": "Aplicar",
     "cancel": "Cancelar",
     "close": "Cerrar",
-    "nothing": "Elige un proveedor o introduce un número primero.",
+    "nothing": "Elige un proveedor, un estado o introduce un número primero.",
     "done": {
         "one": "{{count}} variante actualizada. Se están recalculando las previsiones.",
         "many": "{{count}} variantes actualizadas. Se están recalculando las previsiones.",
@@ -26,6 +26,15 @@
     "errors": {
         "generic": "No se pudo guardar. Inténtalo de nuevo en un momento.",
         "network": "No se pudo conectar con Clear Stock. Revisa tu conexión e inténtalo de nuevo.",
-        "invalid": "Revisa los valores: el plazo de entrega y el stock de seguridad deben ser números enteros de 0 a 365."
-    }
+        "invalid": "Revisa los valores: el plazo de entrega y el stock de seguridad son números enteros de 0 a 365; el pedido mínimo y el tamaño del paquete, al menos 1."
+    },
+    "minOrder": "Pedido mínimo",
+    "minOrderHelp": "El pedido mínimo del proveedor en unidades.",
+    "packSize": "Tamaño del paquete",
+    "packSizeHelp": "Unidades por caja: los pedidos se redondean a paquetes completos.",
+    "discontinued": "Descontinuado",
+    "discontinuedKeep": "Mantener el actual",
+    "discontinuedYes": "Sí: dejar de reponer",
+    "discontinuedNo": "No: reponer como siempre",
+    "discontinuedHelp": "Los productos descontinuados solo venden lo que queda: sin sugerencias de pedido ni alertas."
 }

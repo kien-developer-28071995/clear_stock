@@ -88,3 +88,29 @@ it('rejects bad product ids and suppliers of another shop, and ignores products 
     $this->postJson('/api/extension/product-settings', ['product_ids' => ['gid://shopify/Product/999'], 'lead_time_override' => 5], $this->auth)
         ->assertOk()->assertJsonPath('data.updated', 0);
 });
+
+it('returns one variant for the variant page, with what is already marked as ordered', function () {
+    $this->getJson("/api/extension/variants/{$this->small->shopify_variant_id}", $this->auth)->assertOk()
+        ->assertJsonPath('data.synced', true)
+        ->assertJsonCount(1, 'data.variants')
+        ->assertJsonPath('data.variants.0.variant_id', $this->small->id)
+        ->assertJsonPath('data.variants.0.ordered', null);
+    $this->getJson('/api/extension/variants/999999', $this->auth)->assertOk()->assertJsonPath('data.synced', false);
+
+    $this->postJson('/api/extension/manual-orders', ['items' => [['variant_id' => $this->small->id, 'quantity' => 150]], 'reference' => 'PO-9'], $this->auth)
+        ->assertCreated()->assertJsonPath('data.recorded', 1);
+
+    $this->getJson('/api/extension/products/700', $this->auth)
+        ->assertJsonPath('data.variants.0.ordered.units', 150)
+        ->assertJsonPath('data.variants.0.ordered.expected_on', '2026-10-04')
+        ->assertJsonPath('data.variants.0.forecast.incoming_stock', 150);
+});
+
+it('sets minimum order, pack size and discontinued from the product page action', function () {
+    $this->postJson('/api/extension/product-settings', ['product_ids' => ['gid://shopify/Product/700'], 'min_order_qty' => 24, 'pack_size' => 12, 'discontinued' => true], $this->auth)
+        ->assertOk()->assertJsonPath('data.updated', 2);
+
+    expect($this->small->fresh())->min_order_qty->toBe(24)->pack_size->toBe(12)->discontinued->toBeTrue()
+        ->and($this->other->fresh()->discontinued)->toBeFalse();
+    $this->postJson('/api/extension/product-settings', ['product_ids' => ['gid://shopify/Product/700'], 'pack_size' => 0], $this->auth)->assertUnprocessable();
+});

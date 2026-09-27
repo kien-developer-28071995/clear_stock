@@ -42,7 +42,7 @@ Vite's dev server and HMR websocket are proxied through nginx on the same HTTPS 
 ### 5. Push the config to Shopify and install (2 min)
 ```bash
 make extensions                     # admin extension deps (npm workspace at the repo root)
-npx @shopify/cli@latest app deploy  # app config + the two admin extensions
+npx @shopify/cli@latest app deploy  # app config + the three admin extensions
 ```
 (First run asks you to log in and link the app.) Then in the Dev Dashboard open the app → **Test your app / Install** on your dev store. The app opens embedded in the admin and shows “Hello, <store name>”.
 
@@ -219,14 +219,15 @@ The app is translated into English, Vietnamese, Spanish, German, French and Port
 
 ## Admin extensions (Shopify product pages)
 
-Two [admin UI extensions](https://shopify.dev/docs/api/admin-extensions) in `extensions/` (Preact, API 2026-07), deployed with `app deploy`:
+Three [admin UI extensions](https://shopify.dev/docs/api/admin-extensions) in `extensions/` (Preact, API 2026-07), deployed with `app deploy`:
 
 | Extension | Where | What |
 |---|---|---|
-| `product-forecast-block` | Product page (`admin.product-details.block.render`) | Each variant's status, stock, sales/day, stock-out date, order-by date and suggested order; the plain-language "why" of the most urgent variant; link into the app (`app:products/{id}`). |
-| `product-settings-action` | Product list → select → **More actions** (`admin.product-index.selection-action.render`) | Set supplier, lead time and safety days on every variant of the selected products. |
+| `product-forecast-block` | Product page (`admin.product-details.block.render`) and variant page (`admin.product-variant-details.block.render`) | Each variant's status, stock (with what is on the way and marked as ordered), sales/day, stock-out date, order-by date and suggested order; the plain-language "why" of the most urgent variant; link into the app (`app:products/{id}`). On a variant page, just that variant. |
+| `product-settings-action` | Product list → select → **More actions** (`admin.product-index.selection-action.render`) and product page → **More actions** (`admin.product-details.action.render`) | Reorder settings on every variant: supplier, lead time, safety days, minimum order, pack size, discontinued. |
+| `product-order-action` | Product and variant page → **More actions** (`admin.product-details.action.render`, `admin.product-variant-details.action.render`) | Mark as ordered (an order placed outside Shopify): quantities start at the suggested order, optional expected date and reference; counted as on the way in the app. |
 
-- **Backend:** `GET /api/extension/products/{shopifyProductId}` and `POST /api/extension/product-settings` (`ProductExtensionController` → `ProductExtensionService`). Extensions call relative `api/...` URLs; Shopify resolves them against `application_url` and adds the ID token, verified by the same middleware as the app. They run on Shopify's extension domain, so `config/cors.php` allows cross-origin calls to `api/*` (bearer tokens only, no cookies).
+- **Backend:** `GET /api/extension/products/{shopifyProductId}`, `GET /api/extension/variants/{shopifyVariantId}`, `POST /api/extension/product-settings` and `POST /api/extension/manual-orders` (`ProductExtensionController` → `ProductExtensionService`). Extensions call relative `api/...` URLs; Shopify resolves them against `application_url` and adds the ID token, verified by the same middleware as the app. They run on Shopify's extension domain, so `config/cors.php` allows cross-origin calls to `api/*` (bearer tokens only, no cookies).
 - **Translations:** extension locale files hold their own strings; the `status`, `confidence` and `explanation` sections are copied from `frontend/src/i18n/locales` by `npm run extensions:locales` (i18next plurals → Shopify plural objects). `make e2e` fails if they are out of date.
 - **Layout:** the repo-root `package.json` is only the Shopify CLI workspace for the extensions (the CLI installs dependencies from the app root); backend and frontend keep their own.
 - **Tests:** `frontend/e2e/extensions.spec.ts` runs the real bundles against the API with Shopify's extension host stubbed. To see them in the admin, run `npx @shopify/cli@latest app dev` (or deploy) and open a product.

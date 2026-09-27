@@ -3,8 +3,10 @@
 namespace App\Services\App;
 
 use App\Enums\Feature;
+use App\Models\ManualOrder;
 use App\Models\Shop;
 use App\Models\Variant;
+use App\Repositories\Contracts\ManualOrderRepositoryInterface;
 use App\Repositories\Contracts\VariantRepositoryInterface;
 use App\Services\Forecast\ExplanationFormatter;
 use App\Support\Entitlements;
@@ -13,8 +15,8 @@ use App\Support\Gid;
 use Carbon\CarbonImmutable;
 
 /**
- * Data for the Shopify admin extensions: the forecast block on the product page and
- * the bulk "set supplier and lead time" action on the product list.
+ * Data for the Shopify admin extensions: the forecast block on the product and variant
+ * pages, "mark as ordered" and the reorder settings action (product page and product list).
  */
 class ProductExtensionService
 {
@@ -22,6 +24,7 @@ class ProductExtensionService
         private readonly VariantRepositoryInterface $variants,
         private readonly ExplanationFormatter $explanations,
         private readonly ForecastAdjustmentService $adjust,
+        private readonly ManualOrderRepositoryInterface $manualOrders,
     ) {}
 
     /**
@@ -34,11 +37,17 @@ class ProductExtensionService
         $entitlements = Entitlements::for($shop);
         $explain = $entitlements->has(Feature::Explanations);
 
-        $variants = $this->variants->findByShopifyProductIds($shop, [$shopifyProductId])->map(function (Variant $v) use ($today, $entitlements, $explain) {
+        $found = $this->variants->findByShopifyProductIds($shop, [$shopifyProductId]);
+        // Orders placed outside Shopify ("mark as ordered") still counted as on the way.
+        $ordered = $found->isEmpty() ? [] : $this->manualOrders->onTheWay($shop, ManualOrder::countedFrom($today), $found->pluck('id')->all());
+        $variants = $found->map(function (Variant $v) use ($today, $entitlements, $explain, $ordered) {
             $f = $v->forecast;
 
             return [
                 'variant_id' => $v->id,
+                'shopify_variant_id' => $v->shopify_variant_id,
+                'discontinued' => $v->discontinued,
+                'ordered' => $ordered[$v->id] ?? null,
                 // Single-variant products are called "Default Title" in Shopify.
                 'title' => $v->title !== null && $v->title !== 'Default Title' ? $v->title : null,
                 'sku' => $v->sku,
@@ -66,8 +75,21 @@ class ProductExtensionService
         return ['synced' => $variants !== [], 'variants' => $variants];
     }
 
+    /** The variant page: the same data as the product, for this one variant. */
+    public function variantForecast(Shop $shop, int $shopifyVariantId): array
+    {
+        $variant = $this->variants->findByShopifyIds($shop, [$shopifyVariantId])->first();
+        if ($variant === null) {
+            return ['synced' => false, 'variants' => []];
+        }
+        $product = $this->productForecast($shop, $variant->shopify_product_id);
+
+        return ['synced' => true, 'variants' => array_values(array_filter($product['variants'], fn ($v) => $v['variant_id'] === $variant->id))];
+    }
+
     /**
-     * Applies the same settings (supplier, lead time, safety days) to every variant of
+     * Applies the same settings (supplier, lead time, safety days, minimum order, pack size,
+     * discontinued) to every variant of
      * the selected Shopify products. Returns how many variants were updated.
      *
      * @param  array<int, string>  $productGids  gid://shopify/Product/…

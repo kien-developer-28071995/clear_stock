@@ -1,0 +1,30 @@
+{
+    "locale": "de",
+    "name": "Als bestellt markieren",
+    "intro": "Außerhalb von Shopify bestellt (E-Mail, Telefon, Lieferantenportal)? Clear Stock zählt es als unterwegs und schlägt es nicht mehr vor. Die Mengen beginnen beim Bestellvorschlag.",
+    "quantity": "Bestellte Menge",
+    "inStock": "{{qty}} auf Lager",
+    "suggested": "Vorschlag {{qty}} bis {{date}}",
+    "nothingSuggested": "noch nichts zu bestellen",
+    "alreadyOrdered": "{{qty}} bereits als bestellt markiert (erwartet am {{date}})",
+    "expected": "Erwartet",
+    "expectedHelp": "Leer = heute + Lieferzeit.",
+    "reference": "Referenz (optional)",
+    "help": "Nur für Bestellungen, die nicht in Shopify erfasst sind: Shopify-Bestellungen und Umlagerungen zählen bereits als unterwegs.",
+    "save": "Als bestellt markieren",
+    "cancel": "Abbrechen",
+    "close": "Schließen",
+    "nothing": "Gib für mindestens eine Variante eine Menge ein.",
+    "done": {
+        "one": "{{count}} Variante als bestellt markiert. Sie zählt jetzt als unterwegs.",
+        "other": "{{count}} Varianten als bestellt markiert. Sie zählen jetzt als unterwegs."
+    },
+    "openOrders": "Aufgegebene Bestellungen in Clear Stock ansehen",
+    "notSynced": "Dieses Produkt ist noch nicht in Clear Stock. Es erscheint nach der nächsten Synchronisierung.",
+    "noForecast": "Noch keine Variante dieses Produkts hat eine Prognose zum Bestellen.",
+    "errors": {
+        "generic": "Speichern fehlgeschlagen. Versuche es gleich noch einmal.",
+        "network": "Clear Stock ist nicht erreichbar. Prüfe deine Verbindung und versuche es erneut.",
+        "invalid": "Prüfe die Mengen (ganze Zahlen) und das Datum."
+    }
+}

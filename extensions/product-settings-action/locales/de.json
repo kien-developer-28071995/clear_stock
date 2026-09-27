@@ -1,5 +1,5 @@
 {
-    "name": "Lieferant & Lieferzeit festlegen",
+    "name": "Nachbestell-Einstellungen",
     "intro": {
         "one": "Gilt für jede Variante des ausgewählten Produkts in Clear Stock. Leere Felder bleiben unverändert.",
         "other": "Gilt für jede Variante der {{count}} ausgewählten Produkte in Clear Stock. Leere Felder bleiben unverändert."
@@ -15,7 +15,7 @@
     "apply": "Anwenden",
     "cancel": "Abbrechen",
     "close": "Schließen",
-    "nothing": "Wähle zuerst einen Lieferanten oder gib eine Zahl ein.",
+    "nothing": "Wähle zuerst einen Lieferanten oder Status oder gib eine Zahl ein.",
     "done": {
         "one": "{{count}} Variante aktualisiert. Die Prognosen werden neu berechnet.",
         "other": "{{count}} Varianten aktualisiert. Die Prognosen werden neu berechnet."
@@ -24,6 +24,15 @@
     "errors": {
         "generic": "Speichern fehlgeschlagen. Versuche es gleich noch einmal.",
         "network": "Clear Stock ist nicht erreichbar. Prüfe deine Verbindung und versuche es erneut.",
-        "invalid": "Prüfe die Werte: Lieferzeit und Sicherheitsbestand müssen ganze Zahlen von 0 bis 365 sein."
-    }
+        "invalid": "Prüfe die Werte: Lieferzeit und Sicherheitsbestand sind ganze Zahlen von 0 bis 365, Mindestbestellmenge und Verpackungseinheit mindestens 1."
+    },
+    "minOrder": "Mindestbestellmenge",
+    "minOrderHelp": "Die Mindestbestellmenge des Lieferanten in Stück.",
+    "packSize": "Verpackungseinheit",
+    "packSizeHelp": "Stück pro Karton: Bestellungen werden auf ganze Packungen aufgerundet.",
+    "discontinued": "Ausgelistet",
+    "discontinuedKeep": "Aktuellen beibehalten",
+    "discontinuedYes": "Ja: nicht mehr nachbestellen",
+    "discontinuedNo": "Nein: wie gewohnt nachbestellen",
+    "discontinuedHelp": "Ausgelistete Produkte verkaufen nur den Restbestand ab: keine Bestellvorschläge oder Warnungen."
 }

@@ -24,6 +24,8 @@ interface VariantForecast {
     sku: string | null;
     forecast: Forecast | null;
     not_forecast_reason: 'not_tracked' | 'plan_limit' | 'no_forecast' | null;
+    /** Marked as ordered outside Shopify (already part of incoming_stock). */
+    ordered: { units: number; expected_on: string } | null;
 }
 
 interface ProductForecast {
@@ -57,14 +59,16 @@ function mostUrgent(variants: VariantForecast[]): VariantForecast | undefined {
 function ProductForecastBlock() {
     const { i18n, data } = shopify;
     const t = i18n.translate;
-    const productGid = data.selected[0]?.id ?? '';
+    // The product page, or a variant page (the same block, for that one variant).
+    const gid = data.selected[0]?.id ?? '';
+    const path = `extension/${gid.includes('/ProductVariant/') ? 'variants' : 'products'}/${gid.split('/').pop()}`;
     const [state, setState] = useState<State>({ kind: 'loading' });
 
     useEffect(() => {
-        api<ProductForecast>(`extension/products/${productGid.split('/').pop()}`)
+        api<ProductForecast>(path)
             .then((result) => setState({ kind: 'ready', data: result }))
             .catch((e) => setState({ kind: 'error', message: t(e instanceof ApiError && e.code === 'network_error' ? 'errors.network' : 'errors.generic') }));
-    }, [productGid]);
+    }, [path]);
 
     if (state.kind === 'loading') {
         return (
@@ -134,6 +138,7 @@ function ProductForecastBlock() {
                                             <s-stack gap="small-500">
                                                 <s-text>{formatNumber(i18n, f.current_stock, 0)}</s-text>
                                                 {f.incoming_stock > 0 && <s-text color="subdued">{t('incoming', { qty: formatNumber(i18n, f.incoming_stock, 0) })}</s-text>}
+                                                {v.ordered && <s-text color="subdued">{t('ordered', { qty: formatNumber(i18n, v.ordered.units, 0) })}</s-text>}
                                             </s-stack>
                                         ) : (
                                             '—'

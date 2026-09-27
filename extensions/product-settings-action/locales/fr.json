@@ -1,5 +1,5 @@
 {
-    "name": "Définir fournisseur et délai",
+    "name": "Paramètres de réassort",
     "intro": {
         "one": "S'applique à chaque variante du produit sélectionné dans Clear Stock. Les champs vides restent inchangés.",
         "many": "S'applique à chaque variante des {{count}} produits sélectionnés dans Clear Stock. Les champs vides restent inchangés.",
@@ -16,7 +16,7 @@
     "apply": "Appliquer",
     "cancel": "Annuler",
     "close": "Fermer",
-    "nothing": "Choisissez d'abord un fournisseur ou saisissez un nombre.",
+    "nothing": "Choisissez d'abord un fournisseur, un statut ou saisissez un nombre.",
     "done": {
         "one": "{{count}} variante mise à jour. Les prévisions sont en cours de recalcul.",
         "many": "{{count}} variantes mises à jour. Les prévisions sont en cours de recalcul.",
@@ -26,6 +26,15 @@
     "errors": {
         "generic": "Enregistrement impossible. Réessayez dans un instant.",
         "network": "Impossible de joindre Clear Stock. Vérifiez votre connexion et réessayez.",
-        "invalid": "Vérifiez les valeurs : le délai de livraison et le stock de sécurité doivent être des nombres entiers de 0 à 365."
-    }
+        "invalid": "Vérifiez les valeurs : le délai de livraison et le stock de sécurité sont des nombres entiers de 0 à 365, la commande minimum et le conditionnement au moins 1."
+    },
+    "minOrder": "Commande minimum",
+    "minOrderHelp": "La commande minimum du fournisseur en unités.",
+    "packSize": "Conditionnement",
+    "packSizeHelp": "Unités par carton : les commandes sont arrondies au pack entier.",
+    "discontinued": "Arrêté",
+    "discontinuedKeep": "Conserver l'actuel",
+    "discontinuedYes": "Oui : ne plus recommander",
+    "discontinuedNo": "Non : recommander normalement",
+    "discontinuedHelp": "Les produits arrêtés écoulent seulement le stock restant : pas de suggestions de commande ni d'alertes."
 }

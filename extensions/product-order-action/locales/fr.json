@@ -1,0 +1,31 @@
+{
+    "locale": "fr",
+    "name": "Marquer comme commandé",
+    "intro": "Commandé en dehors de Shopify (e-mail, téléphone, portail fournisseur) ? Clear Stock le compte comme en route et cesse de le suggérer. Les quantités partent de la commande suggérée.",
+    "quantity": "Quantité commandée",
+    "inStock": "{{qty}} en stock",
+    "suggested": "suggéré {{qty}} avant le {{date}}",
+    "nothingSuggested": "rien à commander pour le moment",
+    "alreadyOrdered": "{{qty}} déjà marquées comme commandées (attendues le {{date}})",
+    "expected": "Arrivée prévue",
+    "expectedHelp": "Vide = aujourd'hui + délai de livraison.",
+    "reference": "Référence (facultatif)",
+    "help": "Uniquement pour les commandes non saisies dans Shopify : les bons de commande et transferts Shopify comptent déjà comme en route.",
+    "save": "Marquer comme commandé",
+    "cancel": "Annuler",
+    "close": "Fermer",
+    "nothing": "Saisissez une quantité pour au moins une variante.",
+    "done": {
+        "one": "{{count}} variante marquée comme commandée. Elle compte désormais comme en route.",
+        "many": "{{count}} variantes marquées comme commandées. Elles comptent désormais comme en route.",
+        "other": "{{count}} variantes marquées comme commandées. Elles comptent désormais comme en route."
+    },
+    "openOrders": "Voir les commandes passées dans Clear Stock",
+    "notSynced": "Ce produit n'est pas encore dans Clear Stock. Il apparaîtra après la prochaine synchronisation.",
+    "noForecast": "Aucune variante de ce produit n'a encore de prévision à commander.",
+    "errors": {
+        "generic": "Enregistrement impossible. Réessayez dans un instant.",
+        "network": "Impossible de joindre Clear Stock. Vérifiez votre connexion et réessayez.",
+        "invalid": "Vérifiez les quantités (nombres entiers) et la date."
+    }
+}
