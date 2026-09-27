@@ -83,6 +83,14 @@ interface ForecastRepositoryInterface
     public function saveAbcClasses(Shop $shop, array $classes): void;
 
     /**
+     * Active manual bundles with any of these components, with every component and its price.
+     *
+     * @param  array<int, int>  $componentIds
+     * @return array{bundles: array<int, array<int, int>>, prices: array<int, ?float>} bundle id => component id => units; component id => price
+     */
+    public function bundlesWithComponents(Shop $shop, array $componentIds): array;
+
+    /**
      * The week's forecast rates, kept to measure accuracy later. The first full forecast run
      * of a week writes them; later runs that week leave them as they are.
      *

@@ -8,6 +8,8 @@ import { useEntitlements, useFeature } from '@/hooks/useEntitlements';
 import { useFacets } from '@/features/forecasts/hooks/useForecasts';
 import { useSuppliers } from '@/features/settings/hooks/useSettings';
 import { useWhatIf } from '@/features/whatif/hooks/useWhatIf';
+import { whatIfApi } from '@/features/whatif/api/whatIfApi';
+import { ApiError, errorMessage } from '@/lib/http';
 import type { Horizon, WhatIfItem, WhatIfParams, WhatIfSide, WhatIfTotals } from '@/features/whatif/types';
 import { formatDate, formatMoney, formatNumber } from '@/utils/format';
 import { NO_VALUE, fromOption, optionValue } from '@/utils/select';
@@ -72,6 +74,20 @@ function WhatIfView() {
     const suppliers = useSuppliers().data ?? [];
     const vendors = useFacets().data?.vendors ?? [];
 
+    const poAllowed = useEntitlements().purchase_orders;
+    const poExists = useFeature('purchase_orders');
+    const [exporting, setExporting] = useState(false);
+    const exportCsv = async () => {
+        setExporting(true);
+        try {
+            await whatIfApi.export(params);
+        } catch (e) {
+            shopify.toast.show(e instanceof ApiError ? errorMessage(e) : t('errors.exportFailed'), { isError: true });
+        } finally {
+            setExporting(false);
+        }
+    };
+
     const update = (patch: Partial<WhatIfParams>) => {
         const next = { ...params, ...patch };
         setSearch(Object.fromEntries(Object.entries(next).filter(([, v]) => v !== '' && v !== undefined).map(([k, v]) => [k, String(v)])), { replace: true });
@@ -99,6 +115,11 @@ function WhatIfView() {
 
     return (
         <s-page heading={t('nav.whatIf')}>
+            {poAllowed && poExists && (data?.totals.scenario.products ?? 0) > 0 && (
+                <s-button slot="secondary-actions" icon="export" loading={exporting || undefined} onClick={exportCsv}>
+                    {t('whatIf.export')}
+                </s-button>
+            )}
             <s-section heading={t('whatIf.scenario')}>
                 <s-stack gap="base">
                     <s-paragraph>{t('whatIf.intro')}</s-paragraph>

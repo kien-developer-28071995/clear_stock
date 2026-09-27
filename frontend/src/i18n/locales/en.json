@@ -908,7 +908,8 @@
     "riskBadge_other": "Runs out before a {{count}}-day delivery",
     "truncated_one": "Showing {{shown}} of {{count}} product (earliest orders first). Totals include all of them.",
     "truncated_other": "Showing {{shown}} of {{count}} products (earliest orders first). Totals include all of them.",
-    "locked": "Try \"what if sales grow 20%?\" and see what to order, when, and what it costs, before committing."
+    "locked": "Try \"what if sales grow 20%?\" and see what to order, when, and what it costs, before committing.",
+    "export": "Export scenario orders (CSV)"
   },
   "flow": {
     "heading": "Shopify Flow",

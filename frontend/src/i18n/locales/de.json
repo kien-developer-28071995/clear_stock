@@ -908,7 +908,8 @@
     "riskBadge_other": "Geht vor einer Lieferung in {{count}} Tagen aus",
     "truncated_one": "{{shown}} von {{count}} Produkt angezeigt (früheste Bestellungen zuerst). Die Summen enthalten alle.",
     "truncated_other": "{{shown}} von {{count}} Produkten angezeigt (früheste Bestellungen zuerst). Die Summen enthalten alle.",
-    "locked": "Probiere „Was, wenn der Umsatz um 20 % wächst?“ und sieh, was du wann bestellen müsstest und was es kostet, bevor du dich festlegst."
+    "locked": "Probiere „Was, wenn der Umsatz um 20 % wächst?“ und sieh, was du wann bestellen müsstest und was es kostet, bevor du dich festlegst.",
+    "export": "Szenario-Bestellungen exportieren (CSV)"
   },
   "flow": {
     "heading": "Shopify Flow",

@@ -231,4 +231,24 @@ class EloquentForecastRepository implements ForecastRepositoryInterface
     {
         return DB::table('forecast_snapshots')->where('shop_id', $shop->id)->where('week_start', '<', $before)->delete();
     }
+
+    public function bundlesWithComponents(Shop $shop, array $componentIds): array
+    {
+        $bundleIds = DB::table('bundle_components')->where('shop_id', $shop->id)->where('source', BundleComponent::SOURCE_MANUAL)
+            ->whereIn('component_variant_id', $componentIds)->distinct()->pluck('bundle_variant_id')->all();
+        $rows = DB::table('bundle_components')->join('variants as b', 'b.id', '=', 'bundle_components.bundle_variant_id')
+            ->join('variants as c', 'c.id', '=', 'bundle_components.component_variant_id')
+            ->where('bundle_components.shop_id', $shop->id)->where('bundle_components.source', BundleComponent::SOURCE_MANUAL)
+            ->whereIn('bundle_components.bundle_variant_id', $bundleIds)->where('b.is_active', true)
+            ->get(['bundle_components.bundle_variant_id', 'bundle_components.component_variant_id', 'bundle_components.quantity', 'c.price']);
+
+        $bundles = [];
+        $prices = [];
+        foreach ($rows as $r) {
+            $bundles[(int) $r->bundle_variant_id][(int) $r->component_variant_id] = (int) $r->quantity;
+            $prices[(int) $r->component_variant_id] = $r->price !== null ? (float) $r->price : null;
+        }
+
+        return ['bundles' => $bundles, 'prices' => $prices];
+    }
 }

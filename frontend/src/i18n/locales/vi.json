@@ -824,7 +824,8 @@
     "notDue": "Chưa cần",
     "riskBadge_other": "Hết hàng trước khi kịp về ({{count}} ngày giao)",
     "truncated_other": "Hiển thị {{shown}}/{{count}} sản phẩm (đơn cần đặt sớm nhất trước). Tổng tính trên tất cả.",
-    "locked": "Thử \"nếu doanh số tăng 20% thì sao?\" để xem cần nhập gì, khi nào và tốn bao nhiêu trước khi quyết định."
+    "locked": "Thử \"nếu doanh số tăng 20% thì sao?\" để xem cần nhập gì, khi nào và tốn bao nhiêu trước khi quyết định.",
+    "export": "Xuất đơn theo kịch bản (CSV)"
   },
   "flow": {
     "heading": "Shopify Flow",
