@@ -3,6 +3,7 @@
 use App\Enums\SyncStatus;
 use App\Events\ShopInstalled;
 use App\Models\Shop;
+use Illuminate\Encryption\Encrypter;
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Http;
@@ -70,6 +71,19 @@ it('re-exchanges when the offline token has expired during a merchant session', 
 
     expect(Shop::first()->access_token)->toBe('shpat_new');
     Http::assertSentCount(1); // exchange only, not a reinstall
+});
+
+it('gets a fresh token when the stored one no longer decrypts (APP_KEY lost), without reinstalling', function () {
+    Event::fake([ShopInstalled::class]);
+    fakeShopify();
+    $shop = Shop::factory()->create(['domain' => 'demo.myshopify.com']);
+    DB::table('shops')->where('id', $shop->id)->update(['access_token' => (new Encrypter(str_repeat('z', 32), 'AES-256-CBC'))->encryptString('shpat_lost')]);
+
+    $this->getJson('/api/shop', ['Authorization' => 'Bearer '.sessionToken()])->assertOk();
+
+    expect(Shop::first()->access_token)->toBe('shpat_new');
+    Http::assertSentCount(1); // exchange only
+    Event::assertNotDispatched(ShopInstalled::class);
 });
 
 it('re-exchanges when required scopes are missing', function () {

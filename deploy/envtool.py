@@ -41,7 +41,7 @@ REQUIRED = [
 WEAK = {'DB_PASSWORD': {'secret'}, 'DB_ROOT_PASSWORD': {'root'}}
 # Kept visible as Variables even at their default, so they can be switched from the GitHub UI.
 ALWAYS_VARIABLE = re.compile(r'^(FEATURE_.*|BILLING_GROWTH_OFFERED|LOG_LEVEL)$')
-SECRET = re.compile(r'(^APP_KEY$|_SECRET$|PASSWORD$|TOKEN$|WEBHOOK_URL$|USERNAME$|_USER$)')
+SECRET = re.compile(r'(^APP_KEY$|^APP_PREVIOUS_KEYS$|_SECRET$|PASSWORD$|TOKEN$|WEBHOOK_URL$|USERNAME$|_USER$)')
 # Values written without quotes; anything else is single-quoted (no interpolation in Laravel or compose).
 BARE = re.compile(r'^[A-Za-z0-9_./:@,+=%-]*$')
 
@@ -200,10 +200,10 @@ def push(args):
     if 'APP_KEY' not in plan or plan['APP_KEY'] == '':
         if args.source:
             print('!! The file has no APP_KEY. Use the one the server already runs with: a new key makes '
-                  'stored Shopify tokens unreadable.', file=sys.stderr)
+                  'stored Shopify tokens unreadable (to change it, see docs/DEPLOY.md "Đổi APP_KEY").', file=sys.stderr)
             return 1
         plan['APP_KEY'] = 'base64:' + base64.b64encode(secrets.token_bytes(32)).decode()
-        print('APP_KEY: generated a new key (first setup only; never change it afterwards).')
+        print('APP_KEY: generated a new key (first setup only; change it later only as in docs/DEPLOY.md "Đổi APP_KEY").')
 
     # Ask for required values that are still missing (hidden input for secrets).
     for key in REQUIRED:
