@@ -71,6 +71,10 @@ return [
     // (a supplier's own order cycle, suppliers.order_cycle_days, wins).
     'order_cycle_days' => 30,
 
+    // Orders placed outside Shopify ("mark as ordered") count as on the way until received or cancelled,
+    // and for this many days past their expected date (a late delivery); after that the merchant is asked.
+    'manual_order_grace_days' => 3,
+
     // Forecast accuracy: each week's forecast rate (first full run from Monday, shop time) is compared
     // with what really sold per in-stock day over the next `horizon_days`. A product counts when it had
     // at least `min_in_stock_days` in stock in that period. Weekly snapshots are kept `keep_weeks`.

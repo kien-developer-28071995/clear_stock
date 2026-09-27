@@ -31,7 +31,8 @@
     "insights": "Insights",
     "whatIf": "What-if",
     "purchasePlan": "Purchase plan",
-    "events": "Sales events"
+    "events": "Sales events",
+    "orders": "Orders placed"
   },
   "notFound": {
     "heading": "Page not found",
@@ -663,7 +664,9 @@
     "event_upcoming_one": "{{name}} ({{from_date}} – {{to_date}}, ×{{multiplier}}) adds {{count}} unit to what to order.",
     "event_upcoming_other": "{{name}} ({{from_date}} – {{to_date}}, ×{{multiplier}}) adds {{count}} units to what to order.",
     "event_upcoming_lower_one": "{{name}} ({{from_date}} – {{to_date}}, ×{{multiplier}}) takes {{count}} unit off what to order.",
-    "event_upcoming_lower_other": "{{name}} ({{from_date}} – {{to_date}}, ×{{multiplier}}) takes {{count}} units off what to order."
+    "event_upcoming_lower_other": "{{name}} ({{from_date}} – {{to_date}}, ×{{multiplier}}) takes {{count}} units off what to order.",
+    "ordered_manual_one": "You marked {{count}} unit as ordered (expected {{expected_date}}): counted as on the way.",
+    "ordered_manual_other": "You marked {{count}} units as ordered (expected {{expected_date}}): counted as on the way."
   },
   "import": {
     "fromStocky": "Import from Stocky",
@@ -739,7 +742,8 @@
     "autoBadge": "Auto email",
     "auto": "Email purchase orders automatically",
     "autoHelp": "When this supplier's products need ordering, we email them the purchase order (at most once a week, from 8am your time). Replies go to your alert email.",
-    "autoPaused": "Auto email paused (Growth)"
+    "autoPaused": "Auto email paused (Growth)",
+    "recordsOrder": "After sending, these quantities count as on the way (see Orders placed)."
   },
   "downgrade": {
     "heading": "Switch to {{plan}}?",
@@ -1110,5 +1114,48 @@
     "emptyBody": "Planning a Black Friday or a sale? Add it so orders cover the extra demand in time.",
     "deleteHeading": "Delete event?",
     "confirmDelete": "Delete \"{{name}}\"? Forecasts will be recomputed without it."
+  },
+  "orders": {
+    "mark": "Mark as ordered",
+    "markSelected": "Mark as ordered",
+    "markHeading": "Mark as ordered",
+    "markIntroOne": "Ordered \"{{name}}\" outside Shopify (email, phone, a supplier portal)? It will count as on the way, so it is not suggested again.",
+    "markIntro_one": "{{count}} product ({{units}} units, the suggested quantities) will count as on the way, so they are not suggested again.",
+    "markIntro_other": "{{count}} products ({{units}} units, the suggested quantities) will count as on the way, so they are not suggested again.",
+    "markHelp": "Only for orders not entered in Shopify: Shopify purchase orders and transfers already show as on the way.",
+    "quantity": "Quantity",
+    "expected": "Expected",
+    "expectedHelp": "Empty = today + lead time.",
+    "reference": "Reference",
+    "status": "Status",
+    "recorded_one": "{{count}} product marked as ordered",
+    "recorded_other": "{{count}} products marked as ordered",
+    "intro": "Orders you placed outside Shopify. While open they count as stock on the way, and for a few days past the expected date in case the delivery is late. Mark them received once the stock is in Shopify.",
+    "openHeading": "On the way",
+    "closedHeading": "Recently closed",
+    "orderedOn": "ordered {{date}}",
+    "viaEmail": "Emailed to supplier",
+    "receive": "Received",
+    "cancel": "Cancel order",
+    "done": {
+      "received": "Marked as received",
+      "cancelled": "Order cancelled",
+      "open": "Order reopened"
+    },
+    "state": {
+      "open": "On the way",
+      "late": "Late",
+      "overdue": "Overdue",
+      "received": "Received",
+      "cancelled": "Cancelled"
+    },
+    "emptyHeading": "No open orders",
+    "emptyBody": "On the Reorder page, select products and choose \"Mark as ordered\" after ordering them outside Shopify.",
+    "overdueHeading_one": "{{count}} order is past its expected date",
+    "overdueHeading_other": "{{count}} orders are past their expected date",
+    "overdueBody": "They no longer count as on the way. Mark them received, or cancel them if they will not come.",
+    "review": "Review orders",
+    "link_one": "Orders placed ({{count}})",
+    "link_other": "Orders placed ({{count}})"
   }
 }

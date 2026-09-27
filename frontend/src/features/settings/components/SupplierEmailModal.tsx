@@ -115,6 +115,7 @@ export function SupplierEmailModal({ modalRef, supplier, onDone }: Props) {
                         error={fieldError(send.error, 'reply_to')}
                         onInput={(e) => setReplyTo(e.currentTarget.value)}
                     />
+                    <s-text color="subdued">{t('supplierEmail.recordsOrder')}</s-text>
                 </s-stack>
             )}
             <s-button

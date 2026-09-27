@@ -39,6 +39,7 @@ const PAGES: [string, string][] = [
     ['/bundles', 'Bundles'],
     ['/settings', 'Settings'],
     ['/events', 'Sales events'],
+    ['/orders', 'Orders placed'],
     ['/plans', 'Plans'],
 ];
 
@@ -242,6 +243,43 @@ for (const plan of ['free', 'starter', 'growth'] as PlanKey[]) {
             await app.locator('s-modal s-button[slot="primary-action"]', { hasText: 'Delete' }).click();
             await expect(row).toHaveCount(0);
             expect((await api<Events>(app, '/sales-events')).data.some((e) => e.name === name)).toBe(false);
+        });
+
+        test('products ordered outside Shopify count as on the way until received', async ({ app }) => {
+            type Orders = { data: { open: { id: number; variant_id: number; quantity: number }[] } };
+            type Detail = { data: { suggested_qty: number; incoming_stock: number } };
+            const call = (path: string, method: string, body?: unknown) =>
+                app.evaluate(async ({ path, method, body }) => {
+                    const r = await fetch(`/api${path}`, { method, headers: { Authorization: `Bearer ${await window.shopify.idToken()}`, 'Content-Type': 'application/json', Accept: 'application/json' }, body: body ? JSON.stringify(body) : undefined });
+                    return r.status;
+                }, { path, method, body });
+
+            await open(app, '/products?status=reorder_now');
+            await app.locator('s-table-body s-table-row s-link').first().click();
+            await settled(app);
+            const variantId = Number(app.url().split('/').pop());
+            const before = (await api<Detail>(app, `/forecasts/${variantId}`)).data;
+            expect(before.suggested_qty).toBeGreaterThan(0);
+
+            // The product page's "Mark as ordered" (a header action) with the suggested quantity.
+            await app.locator('s-button', { hasText: 'Mark as ordered' }).first().evaluate((el: HTMLElement) => el.click());
+            const modal = app.locator('s-modal#mark-ordered-product');
+            await expect(modal.getByRole('spinbutton', { name: 'Quantity' })).toHaveValue(String(before.suggested_qty));
+            await modal.locator('s-button[slot="primary-action"]').click();
+            await expect.poll(() => toasts(app)).toContainEqual(expect.stringContaining('marked as ordered'));
+            const after = (await api<Detail>(app, `/forecasts/${variantId}`)).data;
+            expect(after.suggested_qty).toBe(0);
+            expect(after.incoming_stock).toBe(before.incoming_stock + before.suggested_qty);
+
+            await open(app, '/orders');
+            const orders = (await api<Orders>(app, '/manual-orders')).data.open.filter((o) => o.variant_id === variantId);
+            expect(orders).toHaveLength(1);
+            await app.locator('s-table-row', { hasText: String(before.suggested_qty) }).locator('s-button', { hasText: 'Received' }).first().click();
+            await expect.poll(async () => (await api<Orders>(app, '/manual-orders')).data.open.some((o) => o.variant_id === variantId)).toBe(false);
+            expect((await api<Detail>(app, `/forecasts/${variantId}`)).data.suggested_qty).toBe(before.suggested_qty);
+
+            // Leave nothing open (other tests read the reorder list).
+            for (const o of (await api<Orders>(app, '/manual-orders')).data.open) expect(await call(`/manual-orders/${o.id}`, 'PATCH', { status: 'cancelled' })).toBe(200);
         });
 
         test('insights show forecast accuracy (or when it starts)', async ({ app }) => {

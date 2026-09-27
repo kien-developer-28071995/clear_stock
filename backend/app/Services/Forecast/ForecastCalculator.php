@@ -121,7 +121,8 @@ class ForecastCalculator
             'reference' => $reference,
             'lead_time' => $leadTime,
             'safety' => $safety + ['units' => round($avg * $safety['days'], 1)],
-            'stock' => ['current' => $stock, 'incoming' => $incoming, 'position' => $position],
+            // incoming includes `ordered` (orders the merchant marked as placed outside Shopify).
+            'stock' => ['current' => $stock, 'incoming' => $incoming, 'position' => $position, 'ordered' => $in->ordered],
             'discontinued' => $in->discontinued,
             'reorder' => [
                 'lead_time_demand' => round($avg * $leadTime['days'], 1),

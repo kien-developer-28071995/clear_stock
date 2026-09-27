@@ -8,7 +8,7 @@ export const settingsKeys = {
 };
 
 /** Queries derived from these inputs: forecasts (recompute is queued server-side) and setup guide steps. */
-const forecastQueries = [['dashboard'], ['forecasts'], ['setup-guide']];
+const forecastQueries = [['dashboard'], ['forecasts'], ['setup-guide'], ['manual-orders']];
 
 export function useSettings() {
     return useQuery({ queryKey: settingsKeys.settings, queryFn: settingsApi.get });

@@ -6,6 +6,7 @@ use App\Enums\Feature;
 use App\Exceptions\ApiException;
 use App\Mail\SupplierOrderMail;
 use App\Models\Forecast;
+use App\Models\ManualOrder;
 use App\Models\Shop;
 use App\Models\Supplier;
 use App\Models\SupplierEmail;
@@ -36,6 +37,7 @@ class SupplierEmailService
         private readonly VariantRepositoryInterface $variants,
         private readonly AlertSettingRepositoryInterface $alerts,
         private readonly OnboardingService $onboarding,
+        private readonly ManualOrderService $manualOrders,
     ) {}
 
     /**
@@ -85,6 +87,10 @@ class SupplierEmailService
         Mail::to($supplier->email)->queue(new SupplierOrderMail($shop, $supplier->name, $lines, $message ? trim($message) : null, $replyTo));
 
         Log::info('Supplier purchase order emailed', ['shop' => $shop->domain, 'supplier' => $supplier->id, 'trigger' => $trigger, 'items' => count($lines)]);
+
+        // What was emailed is ordered: count it as on the way so it is not suggested again.
+        $this->manualOrders->record($shop, array_map(fn ($l) => ['variant_id' => $l['variant_id'], 'quantity' => $l['quantity']], $lines),
+            reference: 'Email', source: ManualOrder::SOURCE_SUPPLIER_EMAIL);
 
         return $this->emails->log($shop, $supplier, $trigger, $supplier->email, $replyTo, $lines);
     }
