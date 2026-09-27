@@ -46,11 +46,14 @@ class ForecastService
             $this->classifyAbc($shop, $ids, $asOf);
         }
 
-        // Free plan: the best-selling products up to the plan's SKU limit.
+        // Free plan: the best-selling products up to the plan's SKU limit. Discontinued products
+        // (no longer reordered) are forecast on top of it: they only sell through.
+        $discontinued = array_values(array_intersect($ids, $this->forecasts->discontinuedVariantIds($shop)));
         $max = Entitlements::for($shop)->maxSkus();
-        if ($max !== null && count($ids) > $max) {
-            $notForecasted = count($ids) - $max;
-            $ids = $this->sales->topSellers($shop, $ids, $asOf->subDays(90)->toDateString(), $max);
+        if ($max !== null && count($ids) - count($discontinued) > $max) {
+            $active = array_values(array_diff($ids, $discontinued));
+            $notForecasted = count($active) - $max;
+            $ids = [...$this->sales->topSellers($shop, $active, $asOf->subDays(90)->toDateString(), $max), ...$discontinued];
         }
 
         if ($onlyVariantIds !== null) {
@@ -64,12 +67,19 @@ class ForecastService
 
         $stats = ['variants' => 0, 'reorder_now' => 0, 'low_confidence' => 0, 'removed' => 0, 'not_forecasted' => $notForecasted, 'location_forecasts' => 0];
 
+        $snapshots = [];
         foreach (array_chunk($ids, self::BATCH) as $batch) {
             $rows = [];
             $inputs = $this->inputs->build($shop, $batch, $stock, $asOf, $incoming);
             foreach ($inputs as $input) {
                 $r = $this->calculator->calculate($input);
                 $rows[] = $this->row($r, $computedAt);
+                $snapshots[] = [
+                    'variant_id' => $r->variantId,
+                    'avg_daily_sales' => $r->avgDailySales,
+                    'avg_source' => $r->explanation['avg_source'],
+                    'has_bundles' => $r->explanation['bundles'] !== [],
+                ];
                 $stats['variants']++;
                 $stats['reorder_now'] += $r->reorderDate !== null && $r->reorderDate <= $asOf->toDateString() ? 1 : 0;
                 $stats['low_confidence'] += $r->confidence->value === 'low' ? 1 : 0;
@@ -94,6 +104,7 @@ class ForecastService
         if ($onlyVariantIds === null) {
             // Variants no longer active/tracked keep no stale forecast.
             $stats['removed'] = $this->forecasts->deleteForecastsExcept($shop, $ids);
+            $this->saveSnapshots($shop, $asOf, $snapshots);
             $shop = $this->shops->update($shop, ['forecasted_at' => $computedAt]);
         }
 
@@ -101,6 +112,13 @@ class ForecastService
         ForecastsUpdated::dispatch($shop, $stats);
 
         return $stats;
+    }
+
+    /** This week's rates, for the accuracy report (weeks start on Monday, shop time). */
+    private function saveSnapshots(Shop $shop, CarbonImmutable $asOf, array $rows): void
+    {
+        $this->forecasts->saveWeeklySnapshots($shop, $asOf->startOfWeek(CarbonImmutable::MONDAY)->toDateString(), $rows);
+        $this->forecasts->pruneSnapshots($shop, $asOf->subWeeks((int) config('forecast.accuracy.keep_weeks'))->toDateString());
     }
 
     /** @param array<int, int> $ids */

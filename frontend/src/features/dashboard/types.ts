@@ -68,7 +68,7 @@ export interface Dashboard {
     today: string;
     currency: string | null;
     forecasted_at: string | null;
-    counts: { total: number; tracked: number; reorder_now: number; out_of_stock: number; slow: number; overstock: number; healthy: number };
+    counts: { total: number; tracked: number; reorder_now: number; out_of_stock: number; slow: number; overstock: number; healthy: number; discontinued: number };
     explanations_locked: boolean;
     actions: Record<ActionGroup, ActionItem[]>;
     actions_truncated: boolean;
@@ -76,6 +76,8 @@ export interface Dashboard {
     slow_movers: { value: number; count: number; missing_cost: number; days: number; top: SlowMover[] };
     /** Still selling, but holding clearly more than the order-up-to level. */
     overstock: { value: number; units: number; count: number; missing_cost: number; top: OverstockItem[] };
+    /** Discontinued products still in stock (sell-through). */
+    discontinued: { count: number; units: number; value: number; missing_cost: number };
     /** Sales missed on out-of-stock days of the last 30 days; null when switched off app-wide. */
     lost_sales: { units: number; revenue: number; count: number; missing_price: number; days: number; top: LostSaleItem[] } | null;
     /** Products, revenue and stock value per ABC class. */
@@ -87,4 +89,41 @@ export interface Dashboard {
         days: number;
         thresholds: { a: number; b: number };
     } | null;
+}
+
+export interface AccuracyItem {
+    variant_id: number;
+    name: string;
+    sku: string | null;
+    source: 'computed' | 'override' | 'reference';
+    in_stock_days: number;
+    predicted: number;
+    actual: number;
+    forecast_units: number;
+    actual_units: number;
+    error_units: number;
+}
+
+export interface AccuracyScore {
+    accuracy: number | null;
+    bias: number | null;
+}
+
+/** Past forecasts next to what really sold (GET /accuracy). */
+export interface AccuracyReport {
+    horizon_days: number;
+    min_in_stock_days: number;
+    available: boolean;
+    /** While collecting: when the first result is due (null before the first forecast). */
+    first_result_on: string | null;
+    latest: (AccuracyScore & {
+        week_start: string;
+        week_end: string;
+        products: number;
+        forecast_units: number;
+        actual_units: number;
+        by_source: Partial<Record<AccuracyItem['source'], AccuracyScore & { products: number }>>;
+        top_misses: AccuracyItem[];
+    }) | null;
+    trend: (AccuracyScore & { week_start: string; products: number })[];
 }

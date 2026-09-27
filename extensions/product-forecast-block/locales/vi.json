@@ -31,7 +31,8 @@
         "reorder_now": "Cần đặt ngay",
         "slow": "Bán chậm",
         "healthy": "Ổn",
-        "overstock": "Tồn thừa"
+        "overstock": "Tồn thừa",
+        "discontinued": "Ngừng nhập"
     },
     "confidence": {
         "low": "Độ tin cậy thấp",
@@ -131,6 +132,13 @@
         "reference_done": {
             "other": "Đã đủ lịch sử riêng ({{count}} ngày còn hàng): không còn dùng tốc độ bán của {{name}}."
         },
-        "reference_no_forecast": "{{name}} chưa có dự báo nên chưa dùng được tốc độ bán của nó."
+        "reference_no_forecast": "{{name}} chưa có dự báo nên chưa dùng được tốc độ bán của nó.",
+        "discontinued_sells_through": {
+            "other": "Ngừng nhập: {{count}} cái còn lại sẽ bán hết khoảng {{stockout_date}}."
+        },
+        "discontinued_no_sales": {
+            "other": "Ngừng nhập: còn {{count}} cái, gần đây chưa bán được."
+        },
+        "discontinued_sold_out": "Ngừng nhập: đã bán hết."
     }
 }

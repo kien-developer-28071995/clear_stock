@@ -126,12 +126,23 @@ export interface ForecastDetail extends ForecastRow {
         max_stock: number | null;
         /** No alert email (digest or real-time) mentions this product. */
         alerts_muted: boolean;
+        /** No longer reordered: sells through what is left (no suggestion, alert or plan). */
+        discontinued: boolean;
         /** New products: similar product whose sales rate is borrowed, and the share of it (null = 100%). */
         reference_variant_id: number | null;
         reference_name: string | null;
         reference_percent: number | null;
     };
     defaults: { lead_time_days: number; safety_days: number };
+    /** Latest judged week: the forecast then vs what really sold per in-stock day (null until there is one). */
+    accuracy: {
+        week_start: string;
+        week_end: string;
+        predicted: number;
+        actual: number;
+        in_stock_days: number;
+        source: 'computed' | 'override' | 'reference';
+    } | null;
 }
 
 export interface LocationForecast {
@@ -174,6 +185,7 @@ export interface VariantSettingsInput {
     min_stock?: number | null;
     max_stock?: number | null;
     alerts_muted?: boolean;
+    discontinued?: boolean;
     /** Local id or Shopify variant gid (resource picker); null removes it. */
     reference_variant?: number | string | null;
     reference_percent?: number | null;

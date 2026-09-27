@@ -100,10 +100,19 @@ Nguồn lần 2: https://community.shopify.dev/t/feature-request-expose-the-exis
 19. ✅ **Chu kỳ đặt hàng theo NCC** (mọi gói, cài đặt lõi): `suppliers.order_cycle_days` thay cho 30 ngày mặc định khi tính lượng đặt; dùng chung cho what-if và kế hoạch nhập; dòng giải thích `order_cycle_supplier`. (Assisty "supplier cadence".)
 20. ✅ **Kế hoạch nhập hàng 12 tuần** (Starter+, `FEATURE_PURCHASE_PLAN`): trang `/purchase-plan`, `PurchasePlanner` thuần mô phỏng từng ngày với đúng phép tính đặt hàng, tổng theo tuần (biểu đồ chi phí), theo NCC, theo sản phẩm; lọc NCC/Vendor, 4/8/12 tuần; không lưu gì. (Inventory Planner cash flow, Assisty buying calendar.)
 
-### Đề xuất tiếp
-- **Báo cáo độ chính xác dự báo** (Forthcast): lưu snapshot tốc độ bán hằng tuần (nhỏ), so với bán thực tế 4 tuần sau, hiển thị sai số theo sản phẩm → tăng niềm tin "minh bạch".
-- **Loại sản phẩm khỏi kế hoạch** (Forstock): đánh dấu hàng bán một lần/ngừng kinh doanh, không tính vào giới hạn 50 SKU của Free.
-- **Xuất PO theo kế hoạch nhập** và lịch đặt hàng (calendar) theo NCC.
+### Đề xuất tiếp → đã làm ở lần 4 (#21–23), còn lại: lịch đặt hàng (calendar) theo NCC.
+
+## Nghiên cứu bổ sung (2026-09-27, lần 4)
+
+### Phát hiện
+- Stockcast, DemandMind, IFH đều quảng bá **"dead stock detection"** (hàng không bán được, kẹt vốn); ta đã có Bán chậm + Tồn thừa, nhưng thiếu cách nói "sản phẩm này tôi không nhập nữa, chỉ bán hết" (Forstock: loại sản phẩm khỏi kế hoạch).
+- Forthcast bán **báo cáo độ chính xác dự báo**: đúng lời hứa "minh bạch" của ta, và gần như không đối thủ giá rẻ nào có. Là bằng chứng cụ thể cho câu "mọi con số đều kiểm tra được".
+- Review IFH vẫn xin **gom đơn theo nhà sản xuất** để đặt cùng lúc: kế hoạch nhập đã gom theo NCC, còn thiếu bước đưa ra file.
+
+### Đã làm (2026-09-27)
+21. ✅ **Ngừng nhập sản phẩm** (mọi gói, cài đặt lõi): `variants.discontinued`, ô "Ngừng nhập" trong Cài đặt sản phẩm (và cập nhật hàng loạt qua `/variants/settings`). Dự báo vẫn tính ngày bán hết, nhưng không có điểm đặt lại, gợi ý nhập, tồn thừa hay doanh thu mất; trạng thái riêng "Ngừng nhập" (lọc được), không có trong việc cần làm ở Home, cảnh báo email/tức thời, kế hoạch nhập, what-if, Flow. **Không tính vào giới hạn 50 SKU của Free** (đổi cờ này trên gói có giới hạn sẽ chạy lại dự báo cả shop). Mục "Hàng ngừng nhập" ở Phân tích (số cái + tiền theo giá vốn còn phải bán hết). Dòng giải thích `discontinued_*`.
+22. ✅ **Độ chính xác dự báo** (mọi gói, `FEATURE_ACCURACY`): bảng `forecast_snapshots` (lần dự báo đầy đủ đầu tiên mỗi tuần, từ thứ Hai giờ shop; giữ 16 tuần). `/api/accuracy` so tốc độ dự báo với bán thực tế trên ngày còn hàng trong 28 ngày sau đó: độ chính xác = 1 − WAPE, độ lệch (dự báo cao/thấp), tách dự báo của app với tốc độ merchant tự chỉnh, xu hướng 8 tuần, các sản phẩm lệch nhiều nhất. Bỏ qua sản phẩm còn hàng < 14 ngày và dự báo có doanh số combo. Mục ở Phân tích + một dòng trên trang sản phẩm. Kết quả đầu tiên có sau 4 tuần (trước đó hiện ngày có kết quả).
+23. ✅ **Xuất đơn hàng từ kế hoạch nhập** (Starter, cần cả `purchase_plan` và `purchase_orders`): nút "Xuất đơn hàng (CSV)" ở trang Kế hoạch nhập, mỗi dòng = một lần đặt (ngày, tuần, NCC, sản phẩm, SKU, số lượng, giá vốn, thành tiền), theo bộ lọc đang chọn.
 
 ## Việc sắp tới (tổng hợp, theo thứ tự đề xuất)
 

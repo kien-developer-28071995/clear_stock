@@ -7,6 +7,7 @@ const STATUS_TONE: Record<ForecastStatus, 'critical' | 'warning' | 'neutral' | '
     slow: 'neutral',
     overstock: 'caution',
     healthy: 'success',
+    discontinued: 'neutral',
 };
 
 export function StatusBadge({ status }: { status: ForecastStatus }) {

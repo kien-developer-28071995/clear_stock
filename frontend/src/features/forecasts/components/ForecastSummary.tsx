@@ -19,6 +19,7 @@ export function ForecastSummary({ f }: { f: ForecastDetail }) {
     const selling = f.avg_daily_sales > 0;
     const currency = useShop().data?.currency ?? null;
     const abc = f.abc;
+    const discontinued = f.status === 'discontinued';
 
     return (
         <s-section>
@@ -46,14 +47,28 @@ export function ForecastSummary({ f }: { f: ForecastDetail }) {
                     <Metric label={t('product.sellsPerDay')} value={formatNumber(f.avg_daily_sales, 2)} />
                     <Metric label={t('slow.daysOfStock')} value={f.days_of_cover === null ? t('slow.noSales') : formatNumber(f.days_of_cover, 0)} />
                     <Metric label={t('product.runsOut')} value={selling ? formatDate(f.stockout_date) : '—'} />
-                    <Metric label={t('product.reorderPoint')} value={t('product.units', { count: f.reorder_point, qty: formatNumber(f.reorder_point, 0) })} />
-                    <Metric label={t('table.orderBy')} value={selling ? formatDate(f.reorder_date) : '—'} />
+                    {!discontinued && (<>
+                        <Metric label={t('product.reorderPoint')} value={t('product.units', { count: f.reorder_point, qty: formatNumber(f.reorder_point, 0) })} />
+                        <Metric label={t('table.orderBy')} value={selling ? formatDate(f.reorder_date) : '—'} />
+                    </>)}
                     {f.status === 'overstock' && (
                         <Metric label={t('overstock.excess')} value={t('product.units', { count: f.excess_units, qty: formatNumber(f.excess_units, 0) })} />
                     )}
-                    <Metric label={t('table.suggestedOrder')} value={t('product.units', { count: f.suggested_qty, qty: formatNumber(f.suggested_qty, 0) })} />
+                    {!discontinued && <Metric label={t('table.suggestedOrder')} value={t('product.units', { count: f.suggested_qty, qty: formatNumber(f.suggested_qty, 0) })} />}
                     <Metric label={t('table.supplier')} value={f.supplier?.name ?? t('common.notSet')} />
                 </s-grid>
+                {discontinued && <s-text color="subdued">{t('discontinued.summary')}</s-text>}
+                {/* How the forecast of a few weeks ago compared with what really sold. */}
+                {f.accuracy && (
+                    <s-text color="subdued">
+                        {t('accuracy.product', {
+                            from: formatDate(f.accuracy.week_start),
+                            to: formatDate(f.accuracy.week_end),
+                            predicted: formatNumber(f.accuracy.predicted, 2),
+                            actual: formatNumber(f.accuracy.actual, 2),
+                        })}
+                    </s-text>
+                )}
             </s-stack>
         </s-section>
     );

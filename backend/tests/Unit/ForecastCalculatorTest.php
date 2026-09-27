@@ -539,3 +539,29 @@ it('uses the supplier order cycle for the suggested order', function () {
         ->and($r->explanation['reorder']['order_cycle_source'])->toBe('supplier')
         ->and($r->explanation['reorder']['order_cycle_supplier'])->toBe('Acme');
 });
+
+it('only sells through a discontinued product: no reorder, overstock or lost sales', function () {
+    // 4/day, 5 out-of-stock days recently, far more stock than needed.
+    $r = calc(input(history(120, fn ($ago) => $ago <= 5 ? ['sold' => 0, 'in_stock' => false] : 4), stock: 600, extra: ['discontinued' => true]));
+
+    expect($r->avgDailySales)->toBe(4.0)
+        ->and($r->stockoutDate)->toBe('2027-02-17')    // 600 / 4 = 150 days: still shown
+        ->and($r->reorderDate)->toBeNull()
+        ->and($r->reorderPoint)->toBe(0)
+        ->and($r->suggestedQty)->toBe(0)
+        ->and($r->targetStock)->toBe(0)
+        ->and($r->excessUnits)->toBe(0)
+        ->and($r->lostUnits30d)->toBe(0.0)
+        ->and($r->explanation['discontinued'])->toBeTrue();
+
+    $codes = array_column((new ExplanationFormatter)->lines($r->explanation), 'code');
+    expect($codes)->toContain('discontinued_sells_through')
+        ->not->toContain('runs_out')->not->toContain('overstock')->not->toContain('lost_sales');
+});
+
+it('explains a sold-out discontinued product', function () {
+    $r = calc(input(history(60, 2), stock: 0, extra: ['discontinued' => true]));
+
+    expect($r->suggestedQty)->toBe(0)->and($r->reorderDate)->toBeNull();
+    expect((new ExplanationFormatter)->lines($r->explanation)[1]['code'])->toBe('discontinued_sold_out');
+});

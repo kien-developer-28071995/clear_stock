@@ -71,6 +71,16 @@ return [
     // (a supplier's own order cycle, suppliers.order_cycle_days, wins).
     'order_cycle_days' => 30,
 
+    // Forecast accuracy: each week's forecast rate (first full run from Monday, shop time) is compared
+    // with what really sold per in-stock day over the next `horizon_days`. A product counts when it had
+    // at least `min_in_stock_days` in stock in that period. Weekly snapshots are kept `keep_weeks`.
+    'accuracy' => [
+        'horizon_days' => 28,
+        'min_in_stock_days' => 14,
+        'weeks' => 8,       // weeks shown in the trend
+        'keep_weeks' => 16,
+    ],
+
     'confidence' => [
         'low_in_stock_days' => 14,  // fewer in-stock days in the last 90 => low
         'low_units' => 5,           // fewer units in the last 90 days => low

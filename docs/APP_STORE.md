@@ -10,11 +10,12 @@ switched off with `FEATURE_*` (README "Feature switches") and can be released la
 
 | Feature | v1 | Why |
 |---|---|---|
-| Forecasts, "why this number?", adjustments, bundles, alerts (digest), suppliers, Stocky import, vendors → suppliers, MOQ/pack, min/max, incoming stock, sync-failure email, product-page block + bulk action | **On** (core, no switch) | The product. Read-only, no extra scope. |
+| Forecasts, "why this number?", adjustments, bundles, alerts (digest), suppliers, Stocky import, vendors → suppliers, MOQ/pack, min/max, discontinued products, incoming stock, sync-failure email, product-page block + bulk action | **On** (core, no switch) | The product. Read-only, no extra scope. |
 | ABC classes | **On** | Read-only view of existing data. |
 | Purchase order CSV export | **On** (Starter) | A download, nothing sent anywhere. |
 | Sales what-if | **On** (Starter) | Read-only calculation. |
-| Purchase plan (12 weeks of orders and spend) | **On** (Starter) | Read-only calculation. |
+| Purchase plan (12 weeks of orders and spend, CSV export) | **On** (Starter) | Read-only calculation and a download. |
+| Forecast accuracy report | **On** (every plan) | Read-only view: past forecasts next to what really sold. |
 | One-off sales spikes ignored, sales lost to stock-outs | **On** (every plan) | Forecast quality and a read-only view; merchants can turn spike filtering off in Settings. |
 | New products from a similar product | **On** (Starter) | A setting on the product page. |
 | Emailing orders to suppliers | Off | Sends email to third parties on the merchant's behalf: more review questions and needs a verified sending domain first. |

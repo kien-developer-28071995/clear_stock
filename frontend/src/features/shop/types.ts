@@ -26,6 +26,8 @@ export interface Entitlements {
     lost_sales: boolean;
     /** 12-week order and spend plan (Starter and up). */
     purchase_plan: boolean;
+    /** Past forecasts vs what really sold (every plan). */
+    accuracy: boolean;
     /** App-wide switches (backend config/features.php): off = hide, don't upsell. */
     features: FeatureSwitches;
 }
@@ -37,6 +39,7 @@ export type FeatureSwitch =
     | 'purchase_plan'
     | 'spike_filter'
     | 'lost_sales'
+    | 'accuracy'
     | 'purchase_orders'
     | 'supplier_emails'
     | 'locations'

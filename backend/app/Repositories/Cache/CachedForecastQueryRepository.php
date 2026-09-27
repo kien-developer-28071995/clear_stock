@@ -101,6 +101,24 @@ class CachedForecastQueryRepository implements ForecastQueryRepositoryInterface
         return $this->remember($shop, 'any', 'abc', fn () => $this->inner->abcSummary($shop));
     }
 
+    public function discontinuedStock(Shop $shop): array
+    {
+        return $this->remember($shop, 'any', 'discontinued', fn () => $this->inner->discontinuedStock($shop));
+    }
+
+    public function snapshotWeeks(Shop $shop, string $latestStart, int $limit): array
+    {
+        return $this->inner->snapshotWeeks($shop, $latestStart, $limit);
+    }
+
+    public function accuracyRows(Shop $shop, string $weekStart, int $horizonDays, ?int $variantId = null): array
+    {
+        // Past weeks' sales are final once synced; the forecast version changes after every sync.
+        return $variantId !== null
+            ? $this->inner->accuracyRows($shop, $weekStart, $horizonDays, $variantId)
+            : $this->remember($shop, $weekStart, "accuracy{$horizonDays}", fn () => $this->inner->accuracyRows($shop, $weekStart, $horizonDays));
+    }
+
     private function remember(Shop $shop, string $today, string $part, callable $resolve): mixed
     {
         return $this->cache->remember(CacheKeys::dashboard($shop->id, $this->forecastVersion($shop), $today).':'.$part, CacheKeys::TTL_DASHBOARD, $resolve);

@@ -39,6 +39,7 @@ final readonly class ForecastInput
         public ?array $reference = null,        // {variant_id, name, avg: ?float, percent}: similar product for a new one
         public ?int $orderCycleDays = null,     // supplier's order cycle (days of sales an order covers); null = app default
         public bool $filterSpikes = false,      // cap one-off sales spikes to the usual level before averaging
+        public bool $discontinued = false,      // merchant no longer reorders it: sell through what is left
     ) {}
 
     public function override(OverrideField $field): ?array

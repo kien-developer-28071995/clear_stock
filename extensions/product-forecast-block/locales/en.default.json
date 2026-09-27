@@ -31,7 +31,8 @@
         "reorder_now": "Reorder now",
         "slow": "Slow-moving",
         "healthy": "OK",
-        "overstock": "Overstock"
+        "overstock": "Overstock",
+        "discontinued": "Discontinued"
     },
     "confidence": {
         "low": "Low confidence",
@@ -153,6 +154,15 @@
             "one": "Enough own history ({{count}} in-stock day): no longer borrows the rate of {{name}}.",
             "other": "Enough own history ({{count}} in-stock days): no longer borrows the rate of {{name}}."
         },
-        "reference_no_forecast": "{{name}} has no forecast yet, so its rate is not used."
+        "reference_no_forecast": "{{name}} has no forecast yet, so its rate is not used.",
+        "discontinued_sells_through": {
+            "one": "Not reordered (discontinued): the last {{count}} unit sells out around {{stockout_date}}.",
+            "other": "Not reordered (discontinued): the last {{count}} units sell out around {{stockout_date}}."
+        },
+        "discontinued_no_sales": {
+            "one": "Not reordered (discontinued): {{count}} unit left, no recent sales.",
+            "other": "Not reordered (discontinued): {{count}} units left, no recent sales."
+        },
+        "discontinued_sold_out": "Not reordered (discontinued): sold out."
     }
 }

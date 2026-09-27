@@ -85,4 +85,20 @@ interface ForecastQueryRepositoryInterface
      *     min_order_qty: ?int, pack_size: ?int}>
      */
     public function planningRows(Shop $shop, array $filters): iterable;
+
+    /** @return array{count: int, units: int, value: float, missing_cost: int} discontinued products that still have stock */
+    public function discontinuedStock(Shop $shop): array;
+
+    /** @return array<int, string> weeks (Y-m-d, newest first) with forecast snapshots, up to $latestStart */
+    public function snapshotWeeks(Shop $shop, string $latestStart, int $limit): array;
+
+    /**
+     * The forecast of each product in a snapshot week next to what it really sold over the following
+     * $horizonDays: net units on in-stock days and the number of out-of-stock days. Active products
+     * only; forecasts that included bundle sales are left out (bundle demand is not in own sales).
+     *
+     * @param  ?int  $variantId  one product only
+     * @return array<int, array{variant_id: int, name: string, sku: ?string, predicted: float, source: string, units: int, oos_days: int}>
+     */
+    public function accuracyRows(Shop $shop, string $weekStart, int $horizonDays, ?int $variantId = null): array;
 }

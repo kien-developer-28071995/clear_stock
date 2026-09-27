@@ -12,6 +12,7 @@ use App\Http\Resources\ForecastListResource;
 use App\Models\Shop;
 use App\Repositories\Contracts\CatalogRepositoryInterface;
 use App\Repositories\Contracts\VariantRepositoryInterface;
+use App\Services\App\ForecastAccuracyService;
 use App\Services\App\ForecastAdjustmentService;
 use App\Services\App\ForecastQueryService;
 use App\Support\Entitlements;
@@ -27,6 +28,7 @@ class ForecastController extends Controller
         private readonly ForecastAdjustmentService $adjust,
         private readonly VariantRepositoryInterface $variants,
         private readonly CatalogRepositoryInterface $catalog,
+        private readonly ForecastAccuracyService $accuracy,
     ) {}
 
     public function index(ForecastIndexRequest $request, ShopContext $context): JsonResponse
@@ -102,6 +104,7 @@ class ForecastController extends Controller
         ]);
         $entitlements = Entitlements::for($shop);
         $request->attributes->set('explanations', $entitlements->has(Feature::Explanations));
+        $request->attributes->set('accuracy', $this->accuracy->forVariant($shop, $variantId));
         $request->attributes->set('by_location', $entitlements->has(Feature::Locations)
             ? $this->query->byLocation($shop, $variantId)
             : null);

@@ -180,7 +180,7 @@ class RealtimeAlertService
         $recent = $this->logs->recentVariantAlerts($shop, $now->subDays((int) config('alerts.realert_days')));
         $due = $pending->filter(function ($state) use ($mode, $recent) {
             $type = $state->level->alertType();
-            if ($type === null || $state->variant === null || $state->variant->alerts_muted) {
+            if ($type === null || $state->variant === null || $state->variant->alerts_muted || $state->variant->discontinued) {
                 return false;
             }
             if ($mode === RealtimeAlertMode::OutOfStock && $type !== AlertType::OutOfStock) {

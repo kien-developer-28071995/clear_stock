@@ -243,6 +243,7 @@ Two [admin UI extensions](https://shopify.dev/docs/api/admin-extensions) in `ext
 | `FEATURE_PURCHASE_PLAN` | Purchase plan page (12 weeks of orders and spend, Starter) | |
 | `FEATURE_SPIKE_FILTER` | One-off sales spikes capped before averaging (every plan; merchants can also turn it off in Settings) | forecasts use raw sales while off |
 | `FEATURE_LOST_SALES` | Sales lost to stock-outs (Insights, explanation line) | still computed, just hidden |
+| `FEATURE_ACCURACY` | Forecast accuracy (Insights, product page): each week's forecast vs what really sold | weekly snapshots are still saved |
 | `FEATURE_PURCHASE_ORDERS` | Purchase order CSV export | |
 | `FEATURE_SUPPLIER_EMAILS` | Emailing orders to suppliers (by hand and automatic) | |
 | `FEATURE_LOCATIONS` | Per-location forecasts | needs `read_*_fulfillment_orders`; when switched back on, run `sync:run --full` for Growth shops |

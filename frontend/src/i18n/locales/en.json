@@ -53,7 +53,8 @@
     "reorder_now": "Reorder now",
     "slow": "Slow-moving",
     "healthy": "OK",
-    "overstock": "Overstock"
+    "overstock": "Overstock",
+    "discontinued": "Discontinued"
   },
   "confidence": {
     "low": "Low confidence",
@@ -345,6 +346,8 @@
     "maxStockHelp": "Orders fill stock up to this level. Leave empty to let the forecast decide.",
     "muteAlerts": "Don't send alerts for this product",
     "muteAlertsHelp": "Leaves it out of summary and real-time emails. Forecasts and the reorder list still include it.",
+    "discontinued": "Discontinued: stop reordering this product",
+    "discontinuedHelp": "Sell through what is left: no order suggestions, alerts, purchase plan or Flow triggers. It stays visible with its sell-out date, and it does not count toward the Free plan limit.",
     "fromForecast": "Forecast: {{qty}}",
     "fromForecastShort": "From the forecast",
     "fromSupplierQty": "{{qty}} (supplier)",
@@ -641,7 +644,12 @@
     "reference_blend_other": "New product with {{count}} days of its own sales: {{ref_share}}% of the estimate comes from {{name}} ({{ref_avg}}/day at {{percent}}%) → {{avg}}/day.",
     "reference_done_one": "Enough own history ({{count}} in-stock day): no longer borrows the rate of {{name}}.",
     "reference_done_other": "Enough own history ({{count}} in-stock days): no longer borrows the rate of {{name}}.",
-    "reference_no_forecast": "{{name}} has no forecast yet, so its rate is not used."
+    "reference_no_forecast": "{{name}} has no forecast yet, so its rate is not used.",
+    "discontinued_sells_through_one": "Not reordered (discontinued): the last {{count}} unit sells out around {{stockout_date}}.",
+    "discontinued_sells_through_other": "Not reordered (discontinued): the last {{count}} units sell out around {{stockout_date}}.",
+    "discontinued_no_sales_one": "Not reordered (discontinued): {{count}} unit left, no recent sales.",
+    "discontinued_no_sales_other": "Not reordered (discontinued): {{count}} units left, no recent sales.",
+    "discontinued_sold_out": "Not reordered (discontinued): sold out."
   },
   "import": {
     "fromStocky": "Import from Stocky",
@@ -1017,6 +1025,39 @@
     "firstOrder": "First order",
     "noSupplier": "No supplier",
     "orderDates": "Orders",
-    "orderOn": "{{date}}: {{qty}}"
+    "orderOn": "{{date}}: {{qty}}",
+    "export": "Export orders (CSV)"
+  },
+  "discontinued": {
+    "heading": "Discontinued stock",
+    "summaryWithValue_one": "{{count}} discontinued product still holds {{units}} units ({{value}} at cost) to sell through.",
+    "summaryWithValue_other": "{{count}} discontinued products still hold {{units}} units ({{value}} at cost) to sell through.",
+    "summaryUnits_one": "{{count}} discontinued product still holds {{units}} units to sell through.",
+    "summaryUnits_other": "{{count}} discontinued products still hold {{units}} units to sell through.",
+    "viewAll": "See discontinued products",
+    "summary": "You stopped reordering this product: no order is suggested, and it is left out of alerts and the purchase plan."
+  },
+  "accuracy": {
+    "heading": "Forecast accuracy",
+    "collecting_one": "Checking our forecasts takes time: each week we save the forecast and compare it with what really sells over the next {{count}} day. First result on {{date}}.",
+    "collecting_other": "Checking our forecasts takes time: each week we save the forecast and compare it with what really sells over the next {{count}} days. First result on {{date}}.",
+    "collectingSoon_one": "Each week we save the forecast and compare it with what really sells over the next {{count}} day. The first result appears after the first forecast.",
+    "collectingSoon_other": "Each week we save the forecast and compare it with what really sells over the next {{count}} days. The first result appears after the first forecast.",
+    "noSales": "No sales from {{from}} to {{to}} to compare the forecast with.",
+    "summary_one": "{{accuracy}} accurate from {{from}} to {{to}}, across {{count}} product.",
+    "summary_other": "{{accuracy}} accurate from {{from}} to {{to}}, across {{count}} products.",
+    "biasHigh": "Forecasts were {{percent}} higher than sales overall.",
+    "biasLow": "Forecasts were {{percent}} lower than sales overall.",
+    "biasNone": "No lean toward too high or too low.",
+    "how_one": "Accuracy = 1 − (total forecast miss in units ÷ units sold), counting in-stock days only. Products in stock fewer than {{count}} day, and products whose forecast included bundle sales, are left out.",
+    "how_other": "Accuracy = 1 − (total forecast miss in units ÷ units sold), counting in-stock days only. Products in stock fewer than {{count}} days, and products whose forecast included bundle sales, are left out.",
+    "bySource_one": "Our forecasts: {{computed}}. Your adjusted sales rates ({{count}} product): {{override}}.",
+    "bySource_other": "Our forecasts: {{computed}}. Your adjusted sales rates ({{count}} products): {{override}}.",
+    "trend": "Earlier weeks:",
+    "forecast": "Forecast",
+    "actual": "Sold",
+    "difference": "Difference (units)",
+    "perDay": "{{value}}/day",
+    "product": "Forecast from {{from}} to {{to}}: {{predicted}}/day. Really sold: {{actual}}/day (in-stock days)."
   }
 }

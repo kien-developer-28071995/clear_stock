@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\BillingController;
 use App\Http\Controllers\Api\BundleController;
 use App\Http\Controllers\Api\ClientErrorController;
 use App\Http\Controllers\Api\DashboardController;
+use App\Http\Controllers\Api\ForecastAccuracyController;
 use App\Http\Controllers\Api\ForecastController;
 use App\Http\Controllers\Api\GrowthScenarioController;
 use App\Http\Controllers\Api\ImportController;
@@ -75,7 +76,11 @@ Route::middleware('shopify.session')->group(function () {
     Route::get('/what-if', GrowthScenarioController::class);
 
     // Purchase plan: orders and spend week by week at the current sales rates (nothing saved).
-    Route::get('/purchase-plan', PurchasePlanController::class);
+    Route::get('/purchase-plan', [PurchasePlanController::class, 'show']);
+    Route::get('/purchase-plan/export', [PurchasePlanController::class, 'export']);
+
+    // Forecast accuracy: past forecasts next to what really sold.
+    Route::get('/accuracy', ForecastAccuracyController::class);
 
     Route::get('/purchase-orders/export', [PurchaseOrderController::class, 'export']);
 

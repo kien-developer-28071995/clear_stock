@@ -175,7 +175,50 @@ for (const plan of ['free', 'starter', 'growth'] as PlanKey[]) {
             }
             const plan4 = await api<Plan>(app, '/purchase-plan?weeks=4');
             expect(plan4.data.totals.units).toBeLessThanOrEqual(plan12.data.totals.units);
+            if (plan12.data.totals.orders > 0) {
+                // Every planned order as a CSV line.
+                const download = app.waitForEvent('download');
+                // A page header action: rendered by the admin, so clicked directly.
+                await app.locator('s-button', { hasText: 'Export orders (CSV)' }).first().evaluate((el: HTMLElement) => el.click());
+                const lines = fs.readFileSync(await (await download).path(), 'utf8').trim().split('\n');
+                expect(lines[0]).toContain('Order date');
+                expect(lines).toHaveLength(plan12.data.totals.orders + 1);
+            }
             await app.screenshot({ path: `e2e-results/purchase-plan-${plan}.png`, fullPage: true });
+        });
+
+        test('insights show forecast accuracy (or when it starts)', async ({ app }) => {
+            type Accuracy = { data: { available: boolean; latest: { products: number } | null } };
+            await open(app, '/insights');
+            const report = (await api<Accuracy>(app, '/accuracy')).data;
+            const section = app.locator('s-section[heading="Forecast accuracy"]');
+            await expect(section).toBeVisible();
+            await expect(section).toContainText(report.available ? 'accurate from' : 'each week we save the forecast');
+            await app.screenshot({ path: `e2e-results/accuracy-${plan}.png`, fullPage: true });
+        });
+
+        test('a discontinued product gets no order suggestion until it is reordered again', async ({ app }) => {
+            type Detail = { data: { status: string; suggested_qty: number; settings: { discontinued: boolean }; explanation_lines: { code: string }[] } };
+            await open(app, '/products?status=reorder_now');
+            await app.locator('s-table-body s-table-row s-link').first().click();
+            await settled(app);
+            const variantId = Number(app.url().split('/').pop());
+
+            await app.getByRole('checkbox', { name: 'Discontinued: stop reordering this product' }).check();
+            await saveBar(app, 'product-settings-save-bar');
+            await expect.poll(async () => (await api<Detail>(app, `/forecasts/${variantId}`)).data.status).toBe('discontinued');
+            const detail = (await api<Detail>(app, `/forecasts/${variantId}`)).data;
+            expect(detail.suggested_qty).toBe(0);
+            expect(detail.explanation_lines.some((l) => l.code.startsWith('discontinued_'))).toBe(true);
+            await expect(app.getByText('You stopped reordering this product').first()).toBeVisible();
+
+            await open(app, '/products?status=discontinued');
+            await expect(app.locator('s-table-body s-table-row')).toHaveCount(1);
+
+            await open(app, `/products/${variantId}`);
+            await app.getByRole('checkbox', { name: 'Discontinued: stop reordering this product' }).uncheck();
+            await saveBar(app, 'product-settings-save-bar');
+            await expect.poll(async () => (await api<Detail>(app, `/forecasts/${variantId}`)).data.settings.discontinued).toBe(false);
         });
 
         test('insights show sales lost to stock-outs', async ({ app }) => {

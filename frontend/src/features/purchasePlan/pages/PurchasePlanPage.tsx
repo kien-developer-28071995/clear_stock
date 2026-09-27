@@ -1,9 +1,12 @@
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router';
 import { ErrorBanner } from '@/components/ui/ErrorBanner';
 import { LoadingPage } from '@/components/ui/LoadingPage';
 import { UpgradePrompt } from '@/components/ui/UpgradePrompt';
-import { useEntitlements } from '@/hooks/useEntitlements';
+import { useEntitlements, useFeature } from '@/hooks/useEntitlements';
+import { ApiError, errorMessage } from '@/lib/http';
+import { purchasePlanApi } from '@/features/purchasePlan/api/purchasePlanApi';
 import { useFacets } from '@/features/forecasts/hooks/useForecasts';
 import { useSuppliers } from '@/features/settings/hooks/useSettings';
 import { usePurchasePlan } from '@/features/purchasePlan/hooks/usePurchasePlan';
@@ -44,6 +47,21 @@ function PurchasePlanView() {
     const suppliers = useSuppliers().data ?? [];
     const vendors = useFacets().data?.vendors ?? [];
 
+    const poAllowed = useEntitlements().purchase_orders;
+    const poExists = useFeature('purchase_orders');
+    const canExport = poAllowed && poExists;
+    const [exporting, setExporting] = useState(false);
+    const exportCsv = async () => {
+        setExporting(true);
+        try {
+            await purchasePlanApi.export(params);
+        } catch (e) {
+            shopify.toast.show(e instanceof ApiError ? errorMessage(e) : t('errors.exportFailed'), { isError: true });
+        } finally {
+            setExporting(false);
+        }
+    };
+
     const update = (patch: Partial<PurchasePlanParams>) => {
         const next = { ...params, ...patch };
         setSearch(Object.fromEntries(Object.entries(next).filter(([, v]) => v !== '' && v !== undefined).map(([k, v]) => [k, String(v)])), { replace: true });
@@ -64,6 +82,11 @@ function PurchasePlanView() {
     return (
         <s-page heading={t('nav.purchasePlan')}>
             <s-link slot="breadcrumb-actions" href="/reorder">{t('nav.reorder')}</s-link>
+            {canExport && data.totals.orders > 0 && (
+                <s-button slot="secondary-actions" icon="export" loading={exporting || undefined} onClick={exportCsv}>
+                    {t('purchasePlan.export')}
+                </s-button>
+            )}
             <s-section>
                 <s-stack gap="base">
                     <s-paragraph>{t('purchasePlan.intro')}</s-paragraph>

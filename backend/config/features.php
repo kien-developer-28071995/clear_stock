@@ -23,6 +23,7 @@ return [
     // Forecast quality and insight (every plan)
     'spike_filter' => (bool) env('FEATURE_SPIKE_FILTER', true),       // cap one-off sales spikes
     'lost_sales' => (bool) env('FEATURE_LOST_SALES', true),           // sales lost while out of stock
+    'accuracy' => (bool) env('FEATURE_ACCURACY', true),               // past forecasts vs what really sold
 
     // Ordering
     'purchase_orders' => (bool) env('FEATURE_PURCHASE_ORDERS', true),   // PO export (CSV)

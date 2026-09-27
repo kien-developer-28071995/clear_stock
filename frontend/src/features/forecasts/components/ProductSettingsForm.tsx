@@ -29,6 +29,7 @@ export function ProductSettingsForm({ f }: { f: ForecastDetail }) {
     const [minStock, setMinStock] = useState('');
     const [maxStock, setMaxStock] = useState('');
     const [muted, setMuted] = useState(false);
+    const [discontinued, setDiscontinued] = useState(false);
     // Similar product: local id (saved) or Shopify gid (just picked); null = none.
     const [reference, setReference] = useState<{ id: number | string; name: string } | null>(null);
     const [referencePercent, setReferencePercent] = useState('');
@@ -44,6 +45,7 @@ export function ProductSettingsForm({ f }: { f: ForecastDetail }) {
         minStock: f.settings.min_stock?.toString() ?? '',
         maxStock: f.settings.max_stock?.toString() ?? '',
         muted: f.settings.alerts_muted,
+        discontinued: f.settings.discontinued,
         reference: f.settings.reference_variant_id ? { id: f.settings.reference_variant_id, name: f.settings.reference_name ?? '' } : null,
         referencePercent: f.settings.reference_percent?.toString() ?? '',
     };
@@ -56,12 +58,13 @@ export function ProductSettingsForm({ f }: { f: ForecastDetail }) {
         setMinStock(saved.minStock);
         setMaxStock(saved.maxStock);
         setMuted(saved.muted);
+        setDiscontinued(saved.discontinued);
         setReference(saved.reference);
         setReferencePercent(saved.referencePercent);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(reset, [f.settings]);
-    const current = { supplierId, leadTime, safety, minOrder, pack, minStock, maxStock, muted, reference, referencePercent };
+    const current = { supplierId, leadTime, safety, minOrder, pack, minStock, maxStock, muted, discontinued, reference, referencePercent };
     const pickReference = async () => {
         const [picked] = await pickVariants();
         if (picked) setReference({ id: picked.gid, name: picked.name });
@@ -82,6 +85,7 @@ export function ProductSettingsForm({ f }: { f: ForecastDetail }) {
                 min_stock: toNumberOrNull(minStock),
                 max_stock: toNumberOrNull(maxStock),
                 alerts_muted: muted,
+                discontinued,
                 // Only sent when changed: a Free shop can still save its other settings.
                 ...(reference?.id !== saved.reference?.id ? { reference_variant: reference?.id ?? null } : {}),
                 ...(reference ? { reference_percent: toNumberOrNull(referencePercent) } : {}),
@@ -199,6 +203,12 @@ export function ProductSettingsForm({ f }: { f: ForecastDetail }) {
                     {fieldError(update.error, 'reference_variant') && <s-text tone="critical">{fieldError(update.error, 'reference_variant')}</s-text>}
                     <s-text color="subdued">{t('productSettings.referenceHelp', { count: REFERENCE_FULL_AFTER_DAYS })}</s-text>
                 </s-stack>)}
+                <s-checkbox
+                    label={t('productSettings.discontinued')}
+                    details={t('productSettings.discontinuedHelp')}
+                    checked={discontinued || undefined}
+                    onChange={(e) => setDiscontinued(e.currentTarget.checked)}
+                />
                 <s-checkbox
                     label={t('productSettings.muteAlerts')}
                     details={t('productSettings.muteAlertsHelp')}
