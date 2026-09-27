@@ -104,7 +104,7 @@ scp deploy@<server>:/opt/clear_stock/backend/.env ./server.env
 python3 deploy/envtool.py push --from server.env && rm server.env
 ```
 
-> **Không bao giờ đổi `APP_KEY`** sau khi đã có shop cài: token Shopify lưu trong DB được mã hóa bằng key này. `DB_PASSWORD` / `DB_ROOT_PASSWORD` chỉ có tác dụng khi MySQL khởi tạo lần đầu; đổi secret sau đó không đổi mật khẩu database.
+> **Không đổi thẳng `APP_KEY`** sau khi đã có shop cài: token Shopify lưu trong DB được mã hóa bằng key này. Muốn đổi (lộ key, định kỳ) thì làm theo mục "Đổi APP_KEY" bên dưới. `DB_PASSWORD` / `DB_ROOT_PASSWORD` chỉ có tác dụng khi MySQL khởi tạo lần đầu; đổi secret sau đó không đổi mật khẩu database.
 
 **Quyền cho workflow**: Settings → Actions → General → Workflow permissions: *Read and write* (để đẩy image lên GHCR). Workflow đã khai báo `packages: write`.
 
@@ -122,6 +122,22 @@ python3 deploy/envtool.py push --from server.env && rm server.env
 - **Quay lại bản cũ**: Actions → Deploy → *Run workflow* → điền **tag** của bản cũ (ví dụ `sha-1a2b3c4`, xem trong GHCR hoặc file `/opt/clear_stock/.deployed-tag`). Không build lại, chỉ đổi image. Nếu bản mới đã chạy migration, kiểm tra migration đó có tương thích ngược không; backup nằm trong `/opt/clear_stock/backups/`.
 - **Xem log**: `docker compose -f docker-compose.prod.yml logs -f --tail=100 app horizon` (chạy trong `/opt/clear_stock`).
 - **Đổi cấu hình** (ví dụ bật công tắc `FEATURE_*`): sửa Secret/Variable trong Settings → Environments → `production`, rồi Actions → Deploy → *Run workflow* → **tag** = `current`. Không build lại: chỉ dựng lại `.env`, chạy preflight và khởi động lại app/horizon/scheduler/web (MySQL, Redis không restart). Lần deploy code tiếp theo cũng tự áp dụng.
+
+### Đổi APP_KEY (xoay key)
+
+`APP_KEY` chỉ dùng để mã hóa `shops.access_token` và `shops.refresh_token` (app không dùng cookie, session hay URL ký). Laravel giải mã được bằng key cũ nếu key cũ nằm trong `APP_PREVIOUS_KEYS`, nên đổi key không làm gián đoạn:
+
+1. Tạo key mới: `docker run --rm php:8.4-cli php -r "echo 'base64:'.base64_encode(random_bytes(32)).PHP_EOL;"`
+2. Trong Settings → Environments → `production`: tạo Secret `APP_PREVIOUS_KEYS` = **key cũ** (giá trị `APP_KEY` hiện tại), rồi đổi Secret `APP_KEY` = **key mới**. Làm theo đúng thứ tự này và giữ bản key cũ ở nơi an toàn tới khi xong bước 4.
+3. Actions → Deploy → *Run workflow*, tag = `current`. App chạy với key mới và vẫn đọc được token cũ.
+4. Mã hóa lại token bằng key mới (chạy được nhiều lần; `--dry-run` để xem trước):
+   ```bash
+   docker compose -f docker-compose.prod.yml exec app php artisan app:reencrypt-secrets
+   ```
+   Lệnh báo số token đã chuyển; nếu còn token không đọc được thì báo shop nào và **dừng lại, không xóa key cũ**.
+5. Khi lệnh báo 0 token không đọc được: xóa Secret `APP_PREVIOUS_KEYS` (hoặc để rỗng) rồi deploy `current` lần nữa.
+
+Nếu **mất hẳn key cũ**: token không giải mã được nữa; shop vẫn còn dữ liệu nhưng app không gọi được Shopify cho tới khi merchant mở lại app (token exchange cấp token mới). Backup DB không giúp được vì token trong backup cũng mã hóa bằng key cũ.
 
 ## 5. Backup database hằng ngày
 

@@ -7,6 +7,7 @@ use App\Enums\PlanInterval;
 use App\Enums\SyncStatus;
 use App\Observers\ShopObserver;
 use Database\Factories\ShopFactory;
+use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -99,7 +100,18 @@ class Shop extends Model
 
     public function isInstalled(): bool
     {
-        return $this->uninstalled_at === null && $this->access_token !== null;
+        // Raw column: no decryption needed to know a token is stored.
+        return $this->uninstalled_at === null && $this->getRawOriginal('access_token') !== null;
+    }
+
+    /** False when the stored token can't be decrypted (APP_KEY changed without APP_PREVIOUS_KEYS). */
+    public function hasReadableAccessToken(): bool
+    {
+        try {
+            return $this->access_token !== null;
+        } catch (DecryptException) {
+            return false;
+        }
     }
 
     /** Token is missing or (about to be) expired. Non-expiring tokens have no expiry date. */

@@ -65,6 +65,8 @@ class ShopAuthService
     private function needsTokenExchange(Shop $shop): bool
     {
         return ! $shop->isInstalled()
+            // Key lost in an APP_KEY change: the merchant's session gets a fresh token.
+            || ! $shop->hasReadableAccessToken()
             // Merchant has an active session: acquire a new token instead of refreshing.
             || $shop->accessTokenNeedsRefresh($this->refreshMargin);
     }
@@ -72,6 +74,11 @@ class ShopAuthService
     private function install(SessionToken $session, ?Shop $existing): Shop
     {
         $isNewInstall = $existing === null || ! $existing->isInstalled();
+        if ($existing !== null && ! $existing->hasReadableAccessToken()) {
+            // APP_KEY changed without the old key: drop the unreadable tokens (saving over them would
+            // try to decrypt them); the exchange below stores new ones. Not a reinstall.
+            $existing = $this->shops->update($existing, ['access_token' => null, 'refresh_token' => null]);
+        }
 
         $extra = $isNewInstall ? [
             'installed_at' => now(),
