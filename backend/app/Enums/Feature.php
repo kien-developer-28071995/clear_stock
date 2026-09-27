@@ -35,6 +35,8 @@ enum Feature: string
     case Accuracy = 'accuracy';
     /** Sales events (promotions, Black Friday) raising or lowering demand on set days (every plan). */
     case SalesEvents = 'sales_events';
+    /** Monthly purchasing budget: what to reorder first when cash is short (Starter). */
+    case OrderBudget = 'order_budget';
 
     /** The cheapest plan that includes it (for upgrade prompts). */
     public function minimumPlan(): Plan

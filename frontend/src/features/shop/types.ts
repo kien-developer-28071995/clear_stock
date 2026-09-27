@@ -30,6 +30,8 @@ export interface Entitlements {
     accuracy: boolean;
     /** Promotions / known sales changes in the forecast (every plan). */
     sales_events: boolean;
+    /** Monthly purchasing budget and priorities (Starter and up). */
+    order_budget: boolean;
     /** App-wide switches (backend config/features.php): off = hide, don't upsell. */
     features: FeatureSwitches;
 }
@@ -43,6 +45,7 @@ export type FeatureSwitch =
     | 'lost_sales'
     | 'accuracy'
     | 'sales_events'
+    | 'order_budget'
     | 'purchase_orders'
     | 'supplier_emails'
     | 'locations'

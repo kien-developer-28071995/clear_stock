@@ -58,3 +58,8 @@ export function formatDateWithWeekday(ymd: string | null): string {
         new Date(Date.UTC(y, m - 1, d)),
     );
 }
+
+/** "2026-10" -> "October 2026" / "tháng 10 năm 2026". */
+export function formatMonth(ym: string): string {
+    return new Intl.DateTimeFormat(currentLocale(), { month: 'long', year: 'numeric', timeZone: 'UTC' }).format(new Date(`${ym}-01T00:00:00Z`));
+}

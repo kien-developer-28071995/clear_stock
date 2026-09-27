@@ -23,6 +23,7 @@ const NONE: Entitlements = {
     purchase_plan: false,
     accuracy: true,
     sales_events: true,
+    order_budget: false,
     features: {
         what_if: true,
         reference_products: true,
@@ -32,6 +33,7 @@ const NONE: Entitlements = {
         lost_sales: true,
         accuracy: true,
         sales_events: true,
+        order_budget: true,
         purchase_orders: true,
         supplier_emails: true,
         locations: true,

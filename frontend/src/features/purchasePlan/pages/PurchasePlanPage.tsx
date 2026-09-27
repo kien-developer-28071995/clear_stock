@@ -13,7 +13,7 @@ import { useSuppliers } from '@/features/settings/hooks/useSettings';
 import { usePurchasePlan } from '@/features/purchasePlan/hooks/usePurchasePlan';
 import { WeeklySpendChart } from '@/features/purchasePlan/components/WeeklySpendChart';
 import type { PurchasePlanParams, Weeks } from '@/features/purchasePlan/types';
-import { formatDate, formatDateWithWeekday, formatMoney, formatNumber } from '@/utils/format';
+import { formatDate, formatDateWithWeekday, formatMoney, formatMonth, formatNumber } from '@/utils/format';
 import { NO_VALUE, fromOption, optionValue } from '@/utils/select';
 
 const WEEKS: Weeks[] = [4, 8, 12];
@@ -156,6 +156,22 @@ function PurchasePlanView() {
                             <MissingCostNote count={data.totals.missing_cost} text={t('whatIf.missingCost', { count: data.totals.missing_cost })} />
                         </s-stack>
                     </s-section>
+
+                    {/* Spend per month against the monthly budget. */}
+                    {data.budget !== null && (
+                        <s-section heading={t('purchasePlan.byMonth')}>
+                            <s-stack gap="small-200">
+                                {data.by_month.map((m) => (
+                                    <s-stack key={m.month} direction="inline" gap="small-200" alignItems="center">
+                                        <s-text type="strong">{formatMonth(m.month)}</s-text>
+                                        <s-text>{t('purchasePlan.monthVsBudget', { cost: money(m.cost, m.missing_cost), budget: money(data.budget) })}</s-text>
+                                        {m.cost > (data.budget ?? 0) && <s-badge tone="warning">{t('purchasePlan.overBudget', { amount: money(m.cost - (data.budget ?? 0)) })}</s-badge>}
+                                    </s-stack>
+                                ))}
+                                <s-link href="/budget">{t('purchasePlan.budgetLink')}</s-link>
+                            </s-stack>
+                        </s-section>
+                    )}
 
                     {/* Order calendar: what to order from whom, day by day. */}
                     <s-section heading={t('purchasePlan.calendar')} padding="none">

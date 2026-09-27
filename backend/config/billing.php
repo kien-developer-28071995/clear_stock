@@ -39,6 +39,7 @@ return [
                 'purchase_plan' => false,       // 12-week order + spend plan
                 'accuracy' => true,             // forecast accuracy report
                 'sales_events' => true,         // promotions / Black Friday in the forecast
+                'order_budget' => false,        // monthly purchasing budget and priorities
             ],
         ],
         'starter' => [
@@ -64,6 +65,7 @@ return [
                 'purchase_plan' => true,
                 'accuracy' => true,
                 'sales_events' => true,
+                'order_budget' => true,
             ],
         ],
         'growth' => [
@@ -92,6 +94,7 @@ return [
                 'purchase_plan' => true,
                 'accuracy' => true,
                 'sales_events' => true,
+                'order_budget' => true,
             ],
         ],
     ],

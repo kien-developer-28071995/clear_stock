@@ -115,6 +115,10 @@ class DowngradeImpactService
             $out[] = $this->line('purchase_plan');
         }
 
+        if ($loses(Feature::OrderBudget) && $shop->order_budget !== null) {
+            $out[] = $this->line('order_budget');
+        }
+
         return $out;
     }
 

@@ -41,6 +41,7 @@ const PAGES: [string, string][] = [
     ['/events', 'Sales events'],
     ['/orders', 'Orders placed'],
     ['/costs', 'Unit costs'],
+    ['/budget', 'Order budget'],
     ['/plans', 'Plans'],
 ];
 
@@ -301,6 +302,29 @@ for (const plan of ['free', 'starter', 'growth'] as PlanKey[]) {
             await app.getByRole('spinbutton', { name: 'Unit cost' }).fill('');
             await saveBar(app, 'product-settings-save-bar');
             await expect.poll(async () => (await api<Detail>(app, `/forecasts/${row.variant_id}`)).data.settings.cost_override).toBeNull();
+        });
+
+        test('order budget ranks what is due and follows the plan', async ({ app }) => {
+            type Budget = { data: { budget: number | null; remaining: number | null; items: { priority: number; in_budget: boolean; cost: number | null }[] } };
+            await open(app, '/budget');
+            if (!has.purchase_plan) {
+                await expect(app.locator('s-banner[heading="Included in Starter"]')).toBeVisible();
+                expect(await app.evaluate(async () => (await fetch('/api/budget', { headers: { Authorization: `Bearer ${await window.shopify.idToken()}` } })).status)).toBe(402);
+                return;
+            }
+            await app.getByRole('spinbutton', { name: 'Monthly budget' }).fill('1');
+            await saveBar(app, 'budget-save-bar');
+            const data = (await api<Budget>(app, '/budget')).data;
+            expect(data.budget).toBe(1);
+            expect(data.items.map((i) => i.priority)).toEqual(data.items.map((_, n) => n + 1));
+            // $1 fits nothing with a cost.
+            expect(data.items.filter((i) => i.cost !== null && i.cost > 1).every((i) => !i.in_budget)).toBe(true);
+            if (data.items.length > 0) await expect(app.locator('s-table-body s-table-row')).toHaveCount(data.items.length);
+            await app.screenshot({ path: `e2e-results/budget-${plan}.png`, fullPage: true });
+
+            await app.getByRole('spinbutton', { name: 'Monthly budget' }).fill('');
+            await saveBar(app, 'budget-save-bar');
+            expect((await api<Budget>(app, '/budget')).data.budget).toBeNull();
         });
 
         test('insights show forecast accuracy (or when it starts)', async ({ app }) => {

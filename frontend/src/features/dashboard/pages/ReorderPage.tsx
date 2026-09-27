@@ -24,6 +24,7 @@ export function ReorderPage() {
     const { t } = useTranslation();
     const [vendor, setVendor] = useState('');
     const purchaseOrders = useFeature('purchase_orders');
+    const budget = useFeature('order_budget');
     // Growth: stock that other locations can send, to move before ordering.
     const transfers = useTransfers(useEntitlements().transfers).data;
     const transferUnits = transfers?.routes.reduce((sum, r) => sum + r.total_units, 0) ?? 0;
@@ -39,13 +40,23 @@ export function ReorderPage() {
                 return (
                     <s-page heading={t('nav.reorder')}>
                         <s-link slot="breadcrumb-actions" href="/">{t('nav.home')}</s-link>
+                        {budget && (
+                            <s-button slot="secondary-actions" href="/budget">
+                                {t('nav.budget')}
+                            </s-button>
+                        )}
                         <s-button slot="secondary-actions" href="/orders">
                             {t('orders.link', { count: orders?.open.length ?? 0 })}
                         </s-button>
                         {overdue > 0 && (
                             <s-banner tone="warning" heading={t('orders.overdueHeading', { count: overdue })}>
                                 <s-paragraph>{t('orders.overdueBody')}</s-paragraph>
-                                <s-button slot="secondary-actions" href="/orders">{t('orders.review')}</s-button>
+                                {budget && (
+                            <s-button slot="secondary-actions" href="/budget">
+                                {t('nav.budget')}
+                            </s-button>
+                        )}
+                        <s-button slot="secondary-actions" href="/orders">{t('orders.review')}</s-button>
                             </s-banner>
                         )}
                         <Tip id="home_actions">{t(purchaseOrders ? 'tips.home_actions' : 'tips.home_actions_no_po')}</Tip>
