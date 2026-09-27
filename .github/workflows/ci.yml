@@ -57,3 +57,34 @@ jobs:
       - name: Build
         run: npm run build
         working-directory: frontend
+
+  # Production images build on every push and pull request (not pushed anywhere), so a broken
+  # Dockerfile shows up before merge. Deploy (deploy.yml) builds and pushes them from main,
+  # sharing this layer cache.
+  docker:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        target: [app, web]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: docker/setup-buildx-action@v3
+      - name: Build ${{ matrix.target }} image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          target: ${{ matrix.target }}
+          push: false
+          cache-from: type=gha,scope=${{ matrix.target }}
+          cache-to: type=gha,scope=${{ matrix.target }},mode=max
+
+  # backend/.env template renders (deploy/envtool.py) with every required value present.
+  env-template:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Render with placeholder values
+        env:
+          SECRETS_JSON: '{"APP_KEY":"base64:ci","SHOPIFY_API_KEY":"k","SHOPIFY_API_SECRET":"s","DB_PASSWORD":"p","DB_ROOT_PASSWORD":"r","HORIZON_BASIC_AUTH_USER":"u","HORIZON_BASIC_AUTH_PASSWORD":"p"}'
+          VARS_JSON: '{"APP_URL":"https://ci.example.test","MAIL_HOST":"smtp.ci.test","MAIL_FROM_ADDRESS":"a@ci.test","SUPPORT_EMAIL":"s@ci.test"}'
+        run: python3 deploy/envtool.py render --out "$RUNNER_TEMP/backend.env"

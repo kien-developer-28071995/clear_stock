@@ -6,9 +6,10 @@ push main ─▶ CI (test backend + frontend) ─▶ Deploy: build image ─▶ 
                           pull image → app:preflight → (migration) → đổi container → kiểm tra /up
 ```
 
-- **CI** (`.github/workflows/ci.yml`): Pint, Pest, kiểm tra TypeScript, i18n, locale extension, build frontend. Chạy ở mọi push và pull request.
+- **CI** (`.github/workflows/ci.yml`): Pint, Pest, kiểm tra TypeScript, i18n, locale extension, build frontend, **build thử 2 image Docker** (không đẩy đi đâu) và kiểm tra template `.env`. Chạy ở mọi push và pull request.
 - **Deploy** (`.github/workflows/deploy.yml`): chỉ chạy khi CI trên `main` pass. Build image `app` và `web` **một lần** trên GitHub, đẩy lên GitHub Container Registry với tag `sha-<commit>`, rồi SSH vào server chạy `deploy/deploy.sh`.
-- Server **không cần mã nguồn** và không build gì: chỉ có `docker-compose.prod.yml`, `deploy.sh` (workflow tự copy lên) và file cấu hình `backend/.env`.
+- Server **không cần mã nguồn** và không build gì: chỉ có `docker-compose.prod.yml`, `deploy.sh` và `backend/.env`, cả ba do workflow tự copy lên.
+- **`backend/.env` được dựng từ GitHub** (Secrets + Variables của environment `production`, mục 2b), không sửa tay trên server.
 - **Migration không tự chạy** (quy định của dự án). Nếu bản mới có migration chưa chạy, deploy **dừng lại trước khi đổi container**, app cũ vẫn chạy. Muốn chạy migration: vào Actions → Deploy → *Run workflow* → tick `migrate`. Script tự backup database trước khi migrate.
 - Nếu `app:preflight` báo lỗi cấu hình (debug bật, billing test, scope sai...) thì cũng dừng, không đổi container.
 
@@ -28,17 +29,7 @@ sudo usermod -aG docker deploy
 sudo mkdir -p /opt/clear_stock/backend && sudo chown -R deploy:deploy /opt/clear_stock
 ```
 
-**File cấu hình app**: tạo `/opt/clear_stock/backend/.env` từ `backend/.env.production.example` và điền đủ:
-
-- `APP_KEY`: tạo bằng `docker run --rm php:8.4-cli php -r "echo 'base64:'.base64_encode(random_bytes(32)).PHP_EOL;"`
-- `APP_URL`: domain HTTPS
-- `SHOPIFY_API_KEY` / `SHOPIFY_API_SECRET` của **app production**
-- `DB_PASSWORD`, `DB_ROOT_PASSWORD`: mật khẩu mạnh, không dùng `root` / `secret`
-- `MAIL_*`, `SUPPORT_EMAIL`, `HORIZON_BASIC_AUTH_*`, `MONITORING_SLACK_*`
-
-```bash
-chmod 600 /opt/clear_stock/backend/.env
-```
+**File cấu hình app** (`backend/.env`): không cần tạo tay, workflow dựng từ GitHub (mục 2b).
 
 **Cổng**: tạo `/opt/clear_stock/.env` (file này chỉ để compose đọc, khác `backend/.env`) để container `web` chỉ nghe nội bộ, Caddy lo HTTPS phía trước:
 
@@ -90,6 +81,31 @@ ssh-keygen -t ed25519 -f clear_stock_deploy -N "" -C "github-actions-deploy"
 | `DEPLOY_SSH_KEY` | nội dung file `clear_stock_deploy` (private key) |
 | `DEPLOY_KNOWN_HOSTS` | kết quả `ssh-keyscan` ở trên |
 
+### 2b. Cấu hình app (`backend/.env`) bằng Secrets + Variables
+
+Mỗi lần deploy, workflow chạy `deploy/envtool.py render`: lấy khung `backend/.env.production.example`, key nào có **Secret** hoặc **Variable** cùng tên trong environment `production` thì dùng giá trị đó, còn lại giữ mặc định của khung. File được copy lên server (`chmod 600`) và `deploy.sh` mới đổi sang nó; nếu deploy dừng trước khi đổi container thì file cũ được trả lại (`backend/.env.previous` giữ bản trước).
+
+- **Secret** (ẩn, không đọc lại được): `APP_KEY`, `SHOPIFY_API_SECRET`, `DB_PASSWORD`, `DB_ROOT_PASSWORD`, `HORIZON_BASIC_AUTH_USER`, `HORIZON_BASIC_AUTH_PASSWORD`, `MAIL_USERNAME`, `MAIL_PASSWORD`, `MONITORING_SLACK_WEBHOOK_URL`, `MONITORING_SLACK_EVENTS_WEBHOOK_URL`.
+- **Variable** (xem/sửa trên giao diện GitHub): `APP_URL`, `SHOPIFY_API_KEY` (client ID, vốn công khai), `MAIL_HOST`, `MAIL_PORT`, `MAIL_FROM_ADDRESS`, `SUPPORT_EMAIL`, `LOG_LEVEL`, mọi `FEATURE_*`, `BILLING_GROWTH_OFFERED`...
+- **Bắt buộc** (thiếu là deploy dừng, báo rõ key nào): `APP_KEY`, `APP_URL`, `SHOPIFY_API_KEY`, `SHOPIFY_API_SECRET`, `DB_PASSWORD`, `DB_ROOT_PASSWORD` (không được là `secret`/`root`), `HORIZON_BASIC_AUTH_*`, `MAIL_HOST`, `MAIL_FROM_ADDRESS`, `SUPPORT_EMAIL`. Sau đó `app:preflight` vẫn kiểm tra như trước.
+- **Key không có trong khung**: thêm Secret/Variable cùng tên và liệt kê tên đó trong Variable `EXTRA_ENV_KEYS` (cách nhau bằng dấu phẩy).
+- **Chưa có Secret `APP_KEY`** = chưa bật cách này: server giữ nguyên `backend/.env` tự tạo (cách cũ vẫn chạy).
+
+**Nhập nhanh bằng lệnh** (máy bạn, cần `gh auth login`):
+
+```bash
+python3 deploy/envtool.py push
+```
+
+Lệnh hỏi các giá trị bắt buộc (mật khẩu nhập ẩn), tự tạo `APP_KEY` cho lần đầu, đặt `FEATURE_*` thành Variable để bật/tắt trên GitHub, rồi ghi tất cả vào environment `production`. Đã có `backend/.env` trên server thì chép về rồi dùng `--from`, để giữ **đúng `APP_KEY` đang chạy**:
+
+```bash
+scp deploy@<server>:/opt/clear_stock/backend/.env ./server.env
+python3 deploy/envtool.py push --from server.env && rm server.env
+```
+
+> **Không bao giờ đổi `APP_KEY`** sau khi đã có shop cài: token Shopify lưu trong DB được mã hóa bằng key này. `DB_PASSWORD` / `DB_ROOT_PASSWORD` chỉ có tác dụng khi MySQL khởi tạo lần đầu; đổi secret sau đó không đổi mật khẩu database.
+
 **Quyền cho workflow**: Settings → Actions → General → Workflow permissions: *Read and write* (để đẩy image lên GHCR). Workflow đã khai báo `packages: write`.
 
 ## 3. Lần deploy đầu tiên
@@ -105,7 +121,7 @@ ssh-keygen -t ed25519 -f clear_stock_deploy -N "" -C "github-actions-deploy"
 - **Có migration mới**: deploy tự động báo "pending migration" và dừng. Chạy lại bằng tay với `migrate = true`.
 - **Quay lại bản cũ**: Actions → Deploy → *Run workflow* → điền **tag** của bản cũ (ví dụ `sha-1a2b3c4`, xem trong GHCR hoặc file `/opt/clear_stock/.deployed-tag`). Không build lại, chỉ đổi image. Nếu bản mới đã chạy migration, kiểm tra migration đó có tương thích ngược không; backup nằm trong `/opt/clear_stock/backups/`.
 - **Xem log**: `docker compose -f docker-compose.prod.yml logs -f --tail=100 app horizon` (chạy trong `/opt/clear_stock`).
-- **Đổi cấu hình** (`backend/.env`, ví dụ công tắc `FEATURE_*`): sửa file trên server rồi chạy `docker compose -f docker-compose.prod.yml up -d --force-recreate app horizon scheduler`. Container khởi động lại sẽ cache lại config.
+- **Đổi cấu hình** (ví dụ bật công tắc `FEATURE_*`): sửa Secret/Variable trong Settings → Environments → `production`, rồi Actions → Deploy → *Run workflow* → **tag** = `current`. Không build lại: chỉ dựng lại `.env`, chạy preflight và khởi động lại app/horizon/scheduler/web (MySQL, Redis không restart). Lần deploy code tiếp theo cũng tự áp dụng.
 
 ## 5. Backup database hằng ngày
 

@@ -3,14 +3,38 @@
 # Called by .github/workflows/deploy.yml over SSH; can also be run by hand:
 #   IMAGE_PREFIX=ghcr.io/<owner>/clear_stock bash deploy.sh sha-1a2b3c4 [--migrate]
 #
-# Order: pull -> preflight -> (migrations) -> switch containers -> health check.
+# Order: (new .env) -> pull -> preflight -> (migrations) -> switch containers -> health check.
 # The running version keeps serving until the new images passed preflight and migrations.
+# backend/.env.incoming (written by the workflow from GitHub Secrets/Variables) replaces backend/.env;
+# if the deploy stops before switching, the previous file is put back.
+# Tag "current" = the version that is running (apply config changes only).
 set -euo pipefail
 cd "$(dirname "$0")"
 
-TAG="${1:?usage: deploy.sh <image tag> [--migrate]}"
+TAG="${1:?usage: deploy.sh <image tag|current> [--migrate]}"
 MIGRATE="${2:-}"
 : "${IMAGE_PREFIX:?IMAGE_PREFIX is required, e.g. ghcr.io/<owner>/clear_stock}"
+if [ "${TAG}" = "current" ]; then
+    TAG="$(cat .deployed-tag 2>/dev/null || true)"
+    [ -n "${TAG}" ] || { echo "No .deployed-tag yet: deploy a real tag first."; exit 1; }
+fi
+
+ENV_CHANGED=0
+SWITCHED=0
+if [ -f backend/.env.incoming ]; then
+    chmod 600 backend/.env.incoming
+    if [ -f backend/.env ] && cmp -s backend/.env.incoming backend/.env; then
+        rm backend/.env.incoming
+        echo "==> backend/.env unchanged"
+    else
+        [ -f backend/.env ] && cp -p backend/.env backend/.env.previous
+        mv backend/.env.incoming backend/.env
+        ENV_CHANGED=1
+        echo "==> backend/.env updated from GitHub Secrets/Variables"
+        # Stopped before switching: the running containers still use the previous file.
+        trap 'if [ "${SWITCHED}" != 1 ] && [ -f backend/.env.previous ]; then mv backend/.env.previous backend/.env; echo "==> previous backend/.env restored"; fi' EXIT
+    fi
+fi
 [ -f backend/.env ] || { echo "backend/.env is missing (see docs/DEPLOY.md)"; exit 1; }
 
 export APP_IMAGE="${IMAGE_PREFIX}-app:${TAG}"
@@ -21,7 +45,8 @@ echo "==> Deploying ${TAG}"
 $DC pull app web
 
 echo "==> Database and Redis"
-$DC up -d --no-build mysql redis
+# A changed .env must not restart the database mid-deploy (a new DB_PASSWORD never applies to an existing database anyway).
+$DC up -d --no-build $([ "${ENV_CHANGED}" = 1 ] && echo --no-recreate) mysql redis
 
 echo "==> Preflight (production configuration)"
 $DC run --rm --no-deps app php artisan app:preflight
@@ -41,7 +66,9 @@ if [ "${pending}" -gt 0 ]; then
 fi
 
 echo "==> Switching containers"
-$DC up -d --no-build --remove-orphans app horizon scheduler web
+SWITCHED=1
+# New config: recreate so every container re-reads backend/.env (config:cache runs on start).
+$DC up -d --no-build --remove-orphans $([ "${ENV_CHANGED}" = 1 ] && echo --force-recreate) app horizon scheduler web
 
 echo "==> Health check"
 for i in $(seq 1 30); do
