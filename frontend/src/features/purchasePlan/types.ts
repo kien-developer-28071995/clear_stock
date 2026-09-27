@@ -55,6 +55,10 @@ export interface PurchasePlan {
     totals: Spend & { products: number };
     by_week: PurchasePlanWeek[];
     by_supplier: PurchasePlanSupplier[];
+    /** Planned spend per calendar month. */
+    by_month: (Spend & { month: string })[];
+    /** Monthly purchasing budget (Starter), null when none is set. */
+    budget: number | null;
     /** When to order from whom, by date. */
     calendar: PurchasePlanCalendarEntry[];
     /** First 200 products, biggest spend first. */

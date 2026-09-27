@@ -33,7 +33,8 @@
     "purchasePlan": "Purchase plan",
     "events": "Sales events",
     "orders": "Orders placed",
-    "costs": "Unit costs"
+    "costs": "Unit costs",
+    "budget": "Order budget"
   },
   "notFound": {
     "heading": "Page not found",
@@ -495,7 +496,10 @@
       "transfers": "Stock transfers between locations",
       "abc": "ABC classes by revenue",
       "spikeFilter": "One-off sales spikes ignored",
-      "lostSales": "Sales lost to stock-outs"
+      "lostSales": "Sales lost to stock-outs",
+      "salesEvents": "Sales events (Black Friday, promotions) in the forecast",
+      "accuracy": "Forecast accuracy report",
+      "orderBudget": "Monthly order budget and priorities"
     },
     "notApproved": "No plan change was approved",
     "nowOn": "You're on {{plan}}",
@@ -774,7 +778,8 @@
       "reference_products_one": "{{count}} new product stops borrowing a similar product's sales rate.",
       "reference_products_other": "{{count}} new products stop borrowing a similar product's sales rate.",
       "supplier_emails": "Emailing orders to suppliers stops."
-    }
+    },
+    "order_budget": "Your monthly order budget and its priorities are not available."
   },
   "vendors": {
     "button": "Create from vendors",
@@ -1049,7 +1054,11 @@
     "export": "Export orders (CSV)",
     "calendar": "Order calendar",
     "orderDay": "Order on",
-    "today": "Today"
+    "today": "Today",
+    "byMonth": "Spend per month",
+    "monthVsBudget": "{{cost}} of {{budget}} budget",
+    "overBudget": "{{amount}} over",
+    "budgetLink": "Order budget and priorities"
   },
   "discontinued": {
     "heading": "Discontinued stock",
@@ -1192,5 +1201,34 @@
     "settingsHeading": "Unit costs",
     "settingsBody": "Money figures need a cost per product. Fill in the ones missing in Shopify, one by one or from a file.",
     "settingsLink": "Manage unit costs"
+  },
+  "budget": {
+    "intro": "Set how much you can spend on stock each month. Everything due now is ranked, most important first, and fills what is left of the budget; the rest waits for next time. Orders you mark as placed this month count as spent.",
+    "locked": "Set a monthly stock budget and see what to reorder first.",
+    "monthly": "Monthly budget",
+    "none": "No budget",
+    "spent": "Spent this month",
+    "spentHint_one": "{{count}} order marked as placed",
+    "spentHint_other": "{{count}} orders marked as placed",
+    "remaining": "Left this month",
+    "how": "Order of priority: out of stock, then products that would run out before a new order arrives, then ABC class A, B, C, then the earliest stock-out. A product that does not fit waits; a cheaper one after it may still fit. Products without a cost are always included.",
+    "nothingDue": "Nothing to reorder right now.",
+    "dueHeading": "Due now, by priority",
+    "summaryNoBudget_one": "{{count}} product to reorder, {{cost}} in total. Set a budget to see what to order first.",
+    "summaryNoBudget_other": "{{count}} products to reorder, {{cost}} in total. Set a budget to see what to order first.",
+    "summary_one": "Within budget: {{count}} product ({{cost}}). Waiting: {{waiting}} ({{waitingCost}}).",
+    "summary_other": "Within budget: {{count}} products ({{cost}}). Waiting: {{waiting}} ({{waitingCost}}).",
+    "export": "Export orders within budget",
+    "why": "Why",
+    "status": "Budget",
+    "inBudget": "Within budget",
+    "waiting": "Waits",
+    "class": "class {{abc}}",
+    "reason": {
+      "out_of_stock": "Out of stock",
+      "runs_out_before_delivery": "Runs out {{date}}, before a delivery",
+      "reorder_point": "Reached reorder point"
+    },
+    "noCost": "No cost"
   }
 }

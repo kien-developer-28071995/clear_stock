@@ -55,4 +55,16 @@ class EloquentManualOrderRepository implements ManualOrderRepositoryInterface
             ->map(fn ($e) => (int) (json_decode((string) $e, true)['lead_time']['days'] ?? 0))
             ->mapWithKeys(fn ($days, $id) => [(int) $id => $days])->all();
     }
+
+    public function spentSince(Shop $shop, string $fromDate): array
+    {
+        $r = DB::table('manual_orders')->join('variants', 'variants.id', '=', 'manual_orders.variant_id')
+            ->where('manual_orders.shop_id', $shop->id)->where('manual_orders.status', '!=', ManualOrder::CANCELLED)
+            ->where('manual_orders.ordered_on', '>=', $fromDate)
+            ->selectRaw('COUNT(*) as n, COALESCE(SUM(manual_orders.quantity * variants.unit_cost), 0) as cost, '
+                .'SUM(CASE WHEN variants.unit_cost IS NULL THEN 1 ELSE 0 END) as missing')
+            ->first();
+
+        return ['orders' => (int) $r->n, 'cost' => round((float) $r->cost, 2), 'missing_cost' => (int) $r->missing];
+    }
 }

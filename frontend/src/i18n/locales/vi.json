@@ -32,7 +32,8 @@
     "purchasePlan": "Kế hoạch nhập",
     "events": "Sự kiện bán hàng",
     "orders": "Đơn đã đặt",
-    "costs": "Giá vốn"
+    "costs": "Giá vốn",
+    "budget": "Ngân sách nhập hàng"
   },
   "notFound": {
     "heading": "Không tìm thấy trang",
@@ -473,7 +474,10 @@
       "transfers": "Chuyển kho giữa các chi nhánh",
       "abc": "Phân loại ABC theo doanh thu",
       "spikeFilter": "Bỏ qua ngày bán đột biến",
-      "lostSales": "Doanh thu mất do hết hàng"
+      "lostSales": "Doanh thu mất do hết hàng",
+      "salesEvents": "Sự kiện bán hàng (Black Friday, khuyến mãi) trong dự báo",
+      "accuracy": "Báo cáo độ chính xác dự báo",
+      "orderBudget": "Ngân sách nhập hàng mỗi tháng và thứ tự ưu tiên"
     },
     "notApproved": "Chưa có thay đổi gói nào được chấp thuận",
     "nowOn": "Bạn đang dùng gói {{plan}}",
@@ -710,7 +714,8 @@
       "flow_triggers_active": "Các quy trình Shopify Flow dùng trigger của Clear Stock sẽ ngừng chạy.",
       "reference_products_other": "{{count}} sản phẩm mới sẽ không còn mượn tốc độ bán của sản phẩm tương tự.",
       "supplier_emails": "Gửi đơn đặt hàng qua email cho nhà cung cấp sẽ dừng."
-    }
+    },
+    "order_budget": "Ngân sách nhập hàng và thứ tự ưu tiên không còn dùng được."
   },
   "vendors": {
     "button": "Tạo từ vendor",
@@ -958,7 +963,11 @@
     "export": "Xuất đơn hàng (CSV)",
     "calendar": "Lịch đặt hàng",
     "orderDay": "Ngày đặt",
-    "today": "Hôm nay"
+    "today": "Hôm nay",
+    "byMonth": "Chi theo tháng",
+    "monthVsBudget": "{{cost}} / ngân sách {{budget}}",
+    "overBudget": "vượt {{amount}}",
+    "budgetLink": "Ngân sách nhập hàng và thứ tự ưu tiên"
   },
   "discontinued": {
     "heading": "Hàng ngừng nhập",
@@ -1083,5 +1092,31 @@
     "settingsHeading": "Giá vốn",
     "settingsBody": "Các con số tiền cần giá vốn của từng sản phẩm. Bổ sung những sản phẩm còn thiếu trên Shopify, từng cái hoặc từ file.",
     "settingsLink": "Quản lý giá vốn"
+  },
+  "budget": {
+    "intro": "Đặt số tiền bạn có thể chi cho hàng mỗi tháng. Mọi sản phẩm cần nhập ngay được xếp theo mức quan trọng và lấp dần phần ngân sách còn lại; phần còn lại để lần sau. Các đơn bạn đánh dấu đã đặt trong tháng được tính là đã chi.",
+    "locked": "Đặt ngân sách nhập hàng mỗi tháng và biết nên nhập gì trước.",
+    "monthly": "Ngân sách mỗi tháng",
+    "none": "Chưa đặt",
+    "spent": "Đã chi tháng này",
+    "spentHint_other": "{{count}} đơn đã đánh dấu đặt",
+    "remaining": "Còn lại tháng này",
+    "how": "Thứ tự ưu tiên: hết hàng, rồi sản phẩm sẽ hết trước khi đơn mới kịp về, rồi nhóm ABC (A, B, C), rồi ngày hết hàng sớm nhất. Sản phẩm không vừa ngân sách sẽ chờ; sản phẩm rẻ hơn phía sau vẫn có thể vừa. Sản phẩm chưa có giá vốn luôn được tính vào.",
+    "nothingDue": "Hiện chưa có gì cần nhập.",
+    "dueHeading": "Cần nhập ngay, theo thứ tự ưu tiên",
+    "summaryNoBudget_other": "{{count}} sản phẩm cần nhập, tổng {{cost}}. Đặt ngân sách để biết nên nhập gì trước.",
+    "summary_other": "Trong ngân sách: {{count}} sản phẩm ({{cost}}). Chờ: {{waiting}} ({{waitingCost}}).",
+    "export": "Xuất đơn trong ngân sách",
+    "why": "Lý do",
+    "status": "Ngân sách",
+    "inBudget": "Trong ngân sách",
+    "waiting": "Chờ",
+    "class": "nhóm {{abc}}",
+    "reason": {
+      "out_of_stock": "Hết hàng",
+      "runs_out_before_delivery": "Hết {{date}}, trước khi hàng kịp về",
+      "reorder_point": "Đã tới điểm đặt lại"
+    },
+    "noCost": "Chưa có giá vốn"
   }
 }

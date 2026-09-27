@@ -80,6 +80,7 @@ class PurchasePlanService
         }
         $suppliers = [];
         $calendar = [];
+        $months = [];
         $items = [];
         $totals = ['products' => 0, 'orders' => 0, 'units' => 0, 'cost' => 0.0, 'missing_cost' => 0];
 
@@ -94,6 +95,11 @@ class PurchasePlanService
             $units = array_sum(array_column($orders, 'qty'));
 
             foreach ($orders as $o) {
+                $m = substr($o['date'], 0, 7);
+                $months[$m] ??= ['month' => $m, 'orders' => 0, 'units' => 0, 'cost' => 0.0, 'missing_cost' => 0];
+                $months[$m]['orders']++;
+                $months[$m]['units'] += $o['qty'];
+                $cost === null ? $months[$m]['missing_cost']++ : $months[$m]['cost'] += $o['qty'] * $cost;
                 $w = intdiv((int) $today->diffInDays(CarbonImmutable::parse($o['date'])), 7);
                 $weekRows[$w]['orders']++;
                 $weekRows[$w]['units'] += $o['qty'];
@@ -144,6 +150,7 @@ class PurchasePlanService
         usort($suppliers, fn ($a, $b) => [-$a['cost'], $a['first_order']] <=> [-$b['cost'], $b['first_order']]);
 
         $money = fn (array $r) => ['cost' => round($r['cost'], 2)] + $r;
+        ksort($months);
         $calendar = array_values($calendar);
         usort($calendar, fn ($a, $b) => [$a['date'], $a['supplier'] ?? "\u{10FFFF}"] <=> [$b['date'], $b['supplier'] ?? "\u{10FFFF}"]);
 
@@ -155,6 +162,9 @@ class PurchasePlanService
             'totals' => $money($totals),
             'by_week' => array_map($money, array_values($weekRows)),
             'by_supplier' => array_map($money, $suppliers),
+            // Spend per calendar month next to the monthly budget (Starter, null when none is set).
+            'by_month' => array_map($money, array_values($months)),
+            'budget' => Entitlements::for($shop)->has(Feature::OrderBudget) && $shop->order_budget !== null ? (float) $shop->order_budget : null,
             // When to order from whom (products without a supplier: supplier null, listed last on a day).
             'calendar' => array_map($money, $calendar),
             'items' => array_slice($items, 0, self::ITEM_LIMIT),

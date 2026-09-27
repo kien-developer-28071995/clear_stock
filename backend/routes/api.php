@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\BillingController;
+use App\Http\Controllers\Api\BudgetController;
 use App\Http\Controllers\Api\BundleController;
 use App\Http\Controllers\Api\ClientErrorController;
 use App\Http\Controllers\Api\CostController;
@@ -81,6 +82,10 @@ Route::middleware('shopify.session')->group(function () {
     // Purchase plan: orders and spend week by week at the current sales rates (nothing saved).
     Route::get('/purchase-plan', [PurchasePlanController::class, 'show']);
     Route::get('/purchase-plan/export', [PurchasePlanController::class, 'export']);
+
+    // Monthly purchasing budget: what to reorder first when cash is short (Starter).
+    Route::get('/budget', [BudgetController::class, 'show']);
+    Route::put('/budget', [BudgetController::class, 'update']);
 
     // Unit costs entered in the app (win over Shopify's cost in money figures).
     Route::get('/costs', [CostController::class, 'index']);

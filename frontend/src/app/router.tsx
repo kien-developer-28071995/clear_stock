@@ -28,6 +28,7 @@ const BundlesPage = page(() => import('@/features/settings/pages/BundlesPage'), 
 const SalesEventsPage = page(() => import('@/features/events/pages/SalesEventsPage'), 'SalesEventsPage');
 const ManualOrdersPage = page(() => import('@/features/orders/pages/ManualOrdersPage'), 'ManualOrdersPage');
 const CostsPage = page(() => import('@/features/costs/pages/CostsPage'), 'CostsPage');
+const BudgetPage = page(() => import('@/features/budget/pages/BudgetPage'), 'BudgetPage');
 const PlansPage = page(() => import('@/features/billing/pages/PlansPage'), 'PlansPage');
 
 /** A page of a feature switched off app-wide is simply not there. */
@@ -44,6 +45,7 @@ export function AppRouter() {
                 <Route path="/" element={<HomeRoute />} />
                 <Route path="/reorder" element={<ReorderPage />} />
                 <Route path="/orders" element={<ManualOrdersPage />} />
+                <Route path="/budget" element={<FeatureRoute feature="order_budget"><BudgetPage /></FeatureRoute>} />
                 <Route path="/transfers" element={<FeatureRoute feature="transfers"><TransfersPage /></FeatureRoute>} />
                 <Route path="/insights" element={<InsightsPage />} />
                 <Route path="/purchase-plan" element={<FeatureRoute feature="purchase_plan"><PurchasePlanPage /></FeatureRoute>} />

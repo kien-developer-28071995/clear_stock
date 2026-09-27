@@ -19,6 +19,7 @@ return [
     'reference_products' => (bool) env('FEATURE_REFERENCE_PRODUCTS', true),
     'abc' => (bool) env('FEATURE_ABC', true),
     'purchase_plan' => (bool) env('FEATURE_PURCHASE_PLAN', true),     // 12-week order + spend plan (Starter+)
+    'order_budget' => (bool) env('FEATURE_ORDER_BUDGET', true),       // monthly purchasing budget + priorities (Starter+)
 
     // Forecast quality and insight (every plan)
     'spike_filter' => (bool) env('FEATURE_SPIKE_FILTER', true),       // cap one-off sales spikes
