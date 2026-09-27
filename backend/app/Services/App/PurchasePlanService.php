@@ -76,6 +76,7 @@ class PurchasePlanService
             $weekRows[$w] = ['start' => $today->addWeeks($w)->toDateString(), 'orders' => 0, 'units' => 0, 'cost' => 0.0, 'missing_cost' => 0];
         }
         $suppliers = [];
+        $calendar = [];
         $items = [];
         $totals = ['products' => 0, 'orders' => 0, 'units' => 0, 'cost' => 0.0, 'missing_cost' => 0];
 
@@ -92,6 +93,16 @@ class PurchasePlanService
                 $weekRows[$w]['orders']++;
                 $weekRows[$w]['units'] += $o['qty'];
                 $cost === null ? $weekRows[$w]['missing_cost']++ : $weekRows[$w]['cost'] += $o['qty'] * $cost;
+            }
+
+            // Order calendar: one entry per order day and supplier.
+            foreach ($orders as $o) {
+                $c = &$calendar[$o['date'].'|'.($row['supplier_id'] ?? 0)];
+                $c ??= ['date' => $o['date'], 'supplier_id' => $row['supplier_id'], 'supplier' => $row['supplier'], 'products' => 0, 'units' => 0, 'cost' => 0.0, 'missing_cost' => 0];
+                $c['products']++;
+                $c['units'] += $o['qty'];
+                $cost === null ? $c['missing_cost']++ : $c['cost'] += $o['qty'] * $cost;
+                unset($c);
             }
 
             $key = $row['supplier_id'] ?? 0;
@@ -128,6 +139,8 @@ class PurchasePlanService
         usort($suppliers, fn ($a, $b) => [-$a['cost'], $a['first_order']] <=> [-$b['cost'], $b['first_order']]);
 
         $money = fn (array $r) => ['cost' => round($r['cost'], 2)] + $r;
+        $calendar = array_values($calendar);
+        usort($calendar, fn ($a, $b) => [$a['date'], $a['supplier'] ?? "\u{10FFFF}"] <=> [$b['date'], $b['supplier'] ?? "\u{10FFFF}"]);
 
         return [
             'today' => $today->toDateString(),
@@ -137,6 +150,8 @@ class PurchasePlanService
             'totals' => $money($totals),
             'by_week' => array_map($money, array_values($weekRows)),
             'by_supplier' => array_map($money, $suppliers),
+            // When to order from whom (products without a supplier: supplier null, listed last on a day).
+            'calendar' => array_map($money, $calendar),
             'items' => array_slice($items, 0, self::ITEM_LIMIT),
             'items_total' => count($items),
         ];

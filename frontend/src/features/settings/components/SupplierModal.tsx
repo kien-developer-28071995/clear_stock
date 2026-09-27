@@ -5,6 +5,9 @@ import { fieldError } from '@/lib/http';
 import { useEntitlements, useFeature } from '@/hooks/useEntitlements';
 import { useCreateSupplier, useUpdateSupplier } from '@/features/settings/hooks/useSettings';
 import type { Supplier } from '@/features/settings/types';
+import { weekdayName } from '@/utils/format';
+
+const WEEKDAYS = [1, 2, 3, 4, 5, 6, 7];
 
 interface Props {
     modalRef: RefObject<ModalElement | null>;
@@ -23,6 +26,7 @@ export function SupplierModal({ modalRef, supplier, onDone }: Props) {
     const [minOrder, setMinOrder] = useState('');
     const [pack, setPack] = useState('');
     const [cycle, setCycle] = useState('');
+    const [weekdays, setWeekdays] = useState<number[]>([]);
     const [autoEmail, setAutoEmail] = useState(false);
     // Emailing an order by hand is Starter; automatic weekly orders are Growth.
     const canAutoEmail = useEntitlements().supplier_auto_email;
@@ -35,6 +39,7 @@ export function SupplierModal({ modalRef, supplier, onDone }: Props) {
         setMinOrder(supplier?.min_order_qty?.toString() ?? '');
         setPack(supplier?.pack_size?.toString() ?? '');
         setCycle(supplier?.order_cycle_days?.toString() ?? '');
+        setWeekdays(supplier?.order_weekdays ?? []);
         setAutoEmail(supplier?.auto_email ?? false);
         create.reset();
         update.reset();
@@ -49,6 +54,7 @@ export function SupplierModal({ modalRef, supplier, onDone }: Props) {
             min_order_qty: minOrder === '' ? null : Number(minOrder),
             pack_size: pack === '' ? null : Number(pack),
             order_cycle_days: cycle === '' ? null : Number(cycle),
+            order_weekdays: weekdays.length === 0 ? null : weekdays,
             ...(canAutoEmail ? { auto_email: autoEmail && email.trim() !== '' } : {}),
         };
         const options = { onSuccess: () => { shopify.toast.show(supplier ? t('suppliers.updated') : t('suppliers.added')); onDone(); } };
@@ -99,6 +105,24 @@ export function SupplierModal({ modalRef, supplier, onDone }: Props) {
                     error={fieldError(mutation.error, 'order_cycle_days')}
                     onInput={(e) => setCycle(e.currentTarget.value)}
                 />
+                <s-stack gap="small-200">
+                    <s-text type="strong">{t('suppliers.orderDays')}</s-text>
+                    <s-stack direction="inline" gap="base">
+                        {WEEKDAYS.map((d) => (
+                            <s-checkbox
+                                key={d}
+                                label={weekdayName(d)}
+                                checked={weekdays.includes(d) || undefined}
+                                onChange={(e) => {
+                                    const on = e.currentTarget.checked;
+                                    setWeekdays((cur) => WEEKDAYS.filter((x) => (x === d ? on : cur.includes(x))));
+                                }}
+                            />
+                        ))}
+                    </s-stack>
+                    {fieldError(mutation.error, 'order_weekdays') && <s-text tone="critical">{fieldError(mutation.error, 'order_weekdays')}</s-text>}
+                    <s-text color="subdued">{t('suppliers.orderDaysHelp')}</s-text>
+                </s-stack>
                 <s-email-field
                     label={t('suppliers.email')}
                     details={t('suppliers.emailHelp')}

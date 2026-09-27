@@ -4,6 +4,7 @@ use App\Models\Location;
 use App\Models\Shop;
 use App\Models\Supplier;
 use App\Services\Forecast\ForecastService;
+use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Queue;
 
@@ -94,4 +95,28 @@ it('leaves discontinued products out of the plan', function () {
     $this->mug->update(['discontinued' => true]);
 
     expect(collect(purchasePlan()['items'])->pluck('name')->all())->toBe(['Cup']);
+});
+
+it('places orders on the supplier order weekdays and lists them in an order calendar', function () {
+    // Mug is due Thu 2026-09-24; Acme takes orders on Mondays: 09-21, then every order moves to a Monday.
+    $acme = Supplier::factory()->for($this->shop)->create(['name' => 'Acme', 'lead_time_days' => null, 'order_weekdays' => [1]]);
+    $this->mug->update(['supplier_id' => $acme->id]);
+
+    $data = purchasePlan(['weeks' => 8]);
+    $mug = collect($data['items'])->firstWhere('name', 'Mug');
+
+    expect(collect($mug['orders'])->pluck('date')->map(fn ($d) => CarbonImmutable::parse($d)->isoWeekday())->unique()->all())->toBe([1])
+        ->and($mug['orders'][0]['date'])->toBe('2026-09-21')
+        ->and($data['calendar'][0])->toMatchArray(['date' => '2026-09-20', 'supplier' => null, 'products' => 1])   // Cup, no supplier
+        ->and($data['calendar'][1])->toMatchArray(['date' => '2026-09-21', 'supplier' => 'Acme', 'products' => 1, 'units' => $mug['orders'][0]['qty']])
+        ->and(collect($data['calendar'])->sum('units'))->toBe($data['totals']['units']);
+});
+
+it('saves supplier order weekdays (sorted, every day = any day)', function () {
+    $this->postJson('/api/suppliers', ['name' => 'Acme', 'order_weekdays' => [4, 1, 1]], $this->auth)->assertCreated()
+        ->assertJsonPath('data.order_weekdays', [1, 4]);
+    $id = Supplier::where('name', 'Acme')->value('id');
+    $this->putJson("/api/suppliers/{$id}", ['name' => 'Acme', 'order_weekdays' => [1, 2, 3, 4, 5, 6, 7]], $this->auth)->assertOk()
+        ->assertJsonPath('data.order_weekdays', null);
+    $this->putJson("/api/suppliers/{$id}", ['name' => 'Acme', 'order_weekdays' => [8]], $this->auth)->assertUnprocessable();
 });

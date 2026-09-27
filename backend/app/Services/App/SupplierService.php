@@ -34,7 +34,7 @@ class SupplierService
     {
         $data = $this->withAutoEmail($shop, $data, $supplier);
         // Lead time and order rules feed the forecasts of the supplier's products.
-        $changed = collect(['lead_time_days', 'min_order_qty', 'pack_size', 'order_cycle_days'])
+        $changed = collect(['lead_time_days', 'min_order_qty', 'pack_size', 'order_cycle_days', 'order_weekdays'])
             ->contains(fn ($field) => array_key_exists($field, $data) && $data[$field] !== $supplier->{$field});
         $supplier = $this->suppliers->update($supplier, $data);
 

@@ -80,6 +80,7 @@ class ForecastInputBuilder
                     orderCycleDays: $base->orderCycleDays,
                     filterSpikes: $base->filterSpikes,
                     discontinued: $base->discontinued,
+                    orderWeekdays: $base->orderWeekdays,
                 )];
             }
         }
@@ -163,6 +164,7 @@ class ForecastInputBuilder
                 orderCycleDays: $variant->supplier?->order_cycle_days,
                 filterSpikes: $filterSpikes,
                 discontinued: $variant->discontinued,
+                orderWeekdays: $variant->supplier?->order_weekdays,
             );
         }
 

@@ -8,7 +8,7 @@ import { ExportPurchaseOrderButton } from '@/features/forecasts/components/Expor
 import { SupplierModal } from '@/features/settings/components/SupplierModal';
 import { SupplierEmailModal } from '@/features/settings/components/SupplierEmailModal';
 import { useEntitlements, useFeature } from '@/hooks/useEntitlements';
-import { timeAgo } from '@/utils/format';
+import { timeAgo, weekdayName } from '@/utils/format';
 import { useAssignSupplier, useDeleteSupplier, useSuppliers } from '@/features/settings/hooks/useSettings';
 import type { Supplier } from '@/features/settings/types';
 
@@ -92,7 +92,12 @@ export function SuppliersPage() {
                                             {emailsExist && s.auto_email && (canAutoEmail ? <s-badge>{t('supplierEmail.autoBadge')}</s-badge> : <s-badge tone="warning">{t('supplierEmail.autoPaused')}</s-badge>)}
                                         </s-stack>
                                     </s-table-cell>
-                                    <s-table-cell>{s.lead_time_days == null ? t('suppliers.storeDefault') : t('common.dayCount', { count: s.lead_time_days })}</s-table-cell>
+                                    <s-table-cell>
+                                        <s-stack gap="small-100">
+                                            <s-text>{s.lead_time_days == null ? t('suppliers.storeDefault') : t('common.dayCount', { count: s.lead_time_days })}</s-text>
+                                            {s.order_weekdays && <s-text color="subdued">{t('suppliers.ordersOn', { days: s.order_weekdays.map((d) => weekdayName(d)).join(', ') })}</s-text>}
+                                        </s-stack>
+                                    </s-table-cell>
                                     <s-table-cell>{s.variants_count ?? 0}</s-table-cell>
                                     <s-table-cell>
                                         <s-button-group>

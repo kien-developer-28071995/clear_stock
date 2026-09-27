@@ -124,6 +124,12 @@ class ExplanationFormatter
                 $out[] = $this->line('order_cycle_supplier', ['count' => $e['reorder']['order_cycle_days'], 'supplier' => $e['reorder']['order_cycle_supplier']]);
             }
 
+            // Supplier's order weekdays moved the order date back (absent in older explanations).
+            $days = $e['reorder']['order_weekdays'] ?? null;
+            if ($days !== null && $days['due_date'] !== null && $e['reorder']['date'] !== $days['due_date']) {
+                $out[] = $this->line('order_weekday_moved', ['supplier' => $days['supplier'], 'reorder_date' => $e['reorder']['date'], 'due_date' => $days['due_date']]);
+            }
+
             $stock = $e['stock']['current'];
             $incoming = $e['stock']['incoming'] ?? 0; // absent in explanations computed before it existed
             $suggested = $e['reorder']['suggested_qty'];

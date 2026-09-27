@@ -12,7 +12,7 @@ import { useSuppliers } from '@/features/settings/hooks/useSettings';
 import { usePurchasePlan } from '@/features/purchasePlan/hooks/usePurchasePlan';
 import { WeeklySpendChart } from '@/features/purchasePlan/components/WeeklySpendChart';
 import type { PurchasePlanParams, Weeks } from '@/features/purchasePlan/types';
-import { formatDate, formatMoney, formatNumber } from '@/utils/format';
+import { formatDate, formatDateWithWeekday, formatMoney, formatNumber } from '@/utils/format';
 import { NO_VALUE, fromOption, optionValue } from '@/utils/select';
 
 const WEEKS: Weeks[] = [4, 8, 12];
@@ -154,6 +154,30 @@ function PurchasePlanView() {
                             <s-text color="subdued">{t('purchasePlan.how')}</s-text>
                             {data.totals.missing_cost > 0 && <s-text color="subdued">{t('whatIf.missingCost', { count: data.totals.missing_cost })}</s-text>}
                         </s-stack>
+                    </s-section>
+
+                    {/* Order calendar: what to order from whom, day by day. */}
+                    <s-section heading={t('purchasePlan.calendar')} padding="none">
+                        <s-table loading={isFetching || undefined}>
+                            <s-table-header-row>
+                                <s-table-header listSlot="primary">{t('purchasePlan.orderDay')}</s-table-header>
+                                <s-table-header>{t('table.supplier')}</s-table-header>
+                                <s-table-header format="numeric">{t('purchasePlan.products')}</s-table-header>
+                                <s-table-header format="numeric">{t('purchasePlan.units')}</s-table-header>
+                                <s-table-header format="currency">{t('purchasePlan.cost')}</s-table-header>
+                            </s-table-header-row>
+                            <s-table-body>
+                                {data.calendar.map((c) => (
+                                    <s-table-row key={`${c.date}-${c.supplier_id ?? 0}`}>
+                                        <s-table-cell>{c.date === data.today ? t('purchasePlan.today') : formatDateWithWeekday(c.date)}</s-table-cell>
+                                        <s-table-cell>{c.supplier ?? t('purchasePlan.noSupplier')}</s-table-cell>
+                                        <s-table-cell>{formatNumber(c.products, 0)}</s-table-cell>
+                                        <s-table-cell>{formatNumber(c.units, 0)}</s-table-cell>
+                                        <s-table-cell>{money(c.cost, c.missing_cost)}</s-table-cell>
+                                    </s-table-row>
+                                ))}
+                            </s-table-body>
+                        </s-table>
                     </s-section>
 
                     {data.by_supplier.length > 1 && (

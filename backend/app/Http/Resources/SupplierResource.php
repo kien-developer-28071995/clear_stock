@@ -20,6 +20,7 @@ class SupplierResource extends JsonResource
             'min_order_qty' => $this->min_order_qty,
             'pack_size' => $this->pack_size,
             'order_cycle_days' => $this->order_cycle_days,
+            'order_weekdays' => $this->order_weekdays,
             'auto_email' => $this->auto_email,
             'last_emailed_at' => $this->last_emailed_at ? Carbon::parse($this->last_emailed_at)->toIso8601String() : null,
             'variants_count' => $this->variants_count ?? null,

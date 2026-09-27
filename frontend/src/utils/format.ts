@@ -43,3 +43,18 @@ export function daysUntil(ymd: string | null, today: string): number | null {
     if (!ymd) return null;
     return Math.round((Date.parse(ymd) - Date.parse(today)) / 86400000);
 }
+
+/** ISO weekday (1 = Monday ... 7 = Sunday) as a short name in the app language: "Mon" / "Th 2". */
+export function weekdayName(isoDay: number, width: 'short' | 'long' = 'short'): string {
+    // 2024-01-01 was a Monday.
+    return new Intl.DateTimeFormat(currentLocale(), { weekday: width, timeZone: 'UTC' }).format(new Date(Date.UTC(2024, 0, isoDay)));
+}
+
+/** Weekday + short date: "Mon, Oct 5". */
+export function formatDateWithWeekday(ymd: string | null): string {
+    if (!ymd) return '—';
+    const [y, m, d] = ymd.split('-').map(Number);
+    return new Intl.DateTimeFormat(currentLocale(), { weekday: 'short', month: 'short', day: 'numeric', timeZone: 'UTC' }).format(
+        new Date(Date.UTC(y, m - 1, d)),
+    );
+}
