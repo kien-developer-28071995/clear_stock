@@ -32,7 +32,8 @@
     "whatIf": "What-if",
     "purchasePlan": "Purchase plan",
     "events": "Sales events",
-    "orders": "Orders placed"
+    "orders": "Orders placed",
+    "costs": "Unit costs"
   },
   "notFound": {
     "heading": "Page not found",
@@ -202,9 +203,9 @@
     "summary_one": "{{count}} product has more than {{days}} days of stock.",
     "summary_other": "{{count}} products have more than {{days}} days of stock.",
     "advice": "Consider a discount or bundle before ordering more.",
-    "addCosts": "Add product costs in Shopify to see how much money is tied up.",
-    "missingCosts_one": "{{count}} product has no cost in Shopify and isn't included in the total.",
-    "missingCosts_other": "{{count}} products have no cost in Shopify and aren't included in the total.",
+    "addCosts": "Add product costs to see how much money is tied up.",
+    "missingCosts_one": "{{count}} product has no cost and isn't included in the total.",
+    "missingCosts_other": "{{count}} products have no cost and aren't included in the total.",
     "daysOfStock": "Days of stock left",
     "value": "Value",
     "noSales": "No sales"
@@ -579,7 +580,8 @@
     "auto_email_needs_email": "Add the supplier email first.",
     "event_too_long": "An event can last at most 3 months. For a lasting change, adjust the sales rate instead.",
     "required_if": "This field is required.",
-    "not_in": "Choose a different value."
+    "not_in": "Choose a different value.",
+    "cost_columns_missing": "The file needs a SKU or barcode column and a cost column."
   },
   "explanation": {
     "unknown": "—",
@@ -887,8 +889,8 @@
     "cost": "Cost at unit cost",
     "stockoutRisk": "Run out before a new order arrives",
     "legend": "Grey: current forecast → bold: this scenario. Quantities are what you would order on the order date.",
-    "missingCost_one": "{{count}} product has no cost in Shopify and isn't included in the cost.",
-    "missingCost_other": "{{count}} products have no cost in Shopify and aren't included in the cost.",
+    "missingCost_one": "{{count}} product has no cost and isn't included in the cost.",
+    "missingCost_other": "{{count}} products have no cost and aren't included in the cost.",
     "nothingDue": {
       "h0": "Nothing needs ordering today in this scenario.",
       "h14": "Nothing needs ordering in the next 14 days in this scenario.",
@@ -1157,5 +1159,38 @@
     "review": "Review orders",
     "link_one": "Orders placed ({{count}})",
     "link_other": "Orders placed ({{count}})"
+  },
+  "costs": {
+    "intro": "Stock value, cash tied up, purchase order and plan totals need each product's unit cost. Enter costs here for products without one in Shopify, or to use your real landed cost. They win over Shopify's cost in the app; Shopify itself is not changed.",
+    "missingCount_one": "{{count}} of {{total}} products has no cost yet.",
+    "missingCount_other": "{{count}} of {{total}} products have no cost yet.",
+    "allSet": "Every tracked product has a cost.",
+    "importHeading": "Import from a file",
+    "importHelp": "A CSV with a SKU (or barcode) column and a cost column. A Shopify product export works as is (\"Variant SKU\", \"Cost per item\").",
+    "importLabel": "Upload CSV",
+    "importResult_one": "{{count}} cost saved.",
+    "importResult_other": "{{count}} costs saved.",
+    "importUnmatched_one": "{{count}} row matched no product ({{examples}}).",
+    "importUnmatched_other": "{{count}} rows matched no product ({{examples}}).",
+    "importInvalid_one": "{{count}} row had a cost we could not read.",
+    "importInvalid_other": "{{count}} rows had a cost we could not read.",
+    "imported_one": "{{count}} cost imported",
+    "imported_other": "{{count}} costs imported",
+    "saved_one": "{{count}} cost saved",
+    "saved_other": "{{count}} costs saved",
+    "missingOnly": "Only products without a cost",
+    "noneMissing": "Every product has a cost.",
+    "shopifyCost": "Cost in Shopify",
+    "appCost": "Your cost",
+    "appCostFor": "Your cost for {{name}}",
+    "limit": "Showing the first {{count}} products (best sellers first). Use search or the file import for the rest.",
+    "addLink": "Add costs",
+    "productField": "Unit cost",
+    "fromShopify": "{{cost}} (Shopify)",
+    "noneInShopify": "Not set in Shopify",
+    "productFieldHelp": "Used for stock value and order totals. Empty = Shopify's cost.",
+    "settingsHeading": "Unit costs",
+    "settingsBody": "Money figures need a cost per product. Fill in the ones missing in Shopify, one by one or from a file.",
+    "settingsLink": "Manage unit costs"
   }
 }

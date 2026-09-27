@@ -30,6 +30,7 @@ export function ProductSettingsForm({ f }: { f: ForecastDetail }) {
     const [maxStock, setMaxStock] = useState('');
     const [muted, setMuted] = useState(false);
     const [discontinued, setDiscontinued] = useState(false);
+    const [cost, setCost] = useState('');
     // Similar product: local id (saved) or Shopify gid (just picked); null = none.
     const [reference, setReference] = useState<{ id: number | string; name: string } | null>(null);
     const [referencePercent, setReferencePercent] = useState('');
@@ -46,6 +47,7 @@ export function ProductSettingsForm({ f }: { f: ForecastDetail }) {
         maxStock: f.settings.max_stock?.toString() ?? '',
         muted: f.settings.alerts_muted,
         discontinued: f.settings.discontinued,
+        cost: f.settings.cost_override?.toString() ?? '',
         reference: f.settings.reference_variant_id ? { id: f.settings.reference_variant_id, name: f.settings.reference_name ?? '' } : null,
         referencePercent: f.settings.reference_percent?.toString() ?? '',
     };
@@ -59,12 +61,13 @@ export function ProductSettingsForm({ f }: { f: ForecastDetail }) {
         setMaxStock(saved.maxStock);
         setMuted(saved.muted);
         setDiscontinued(saved.discontinued);
+        setCost(saved.cost);
         setReference(saved.reference);
         setReferencePercent(saved.referencePercent);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(reset, [f.settings]);
-    const current = { supplierId, leadTime, safety, minOrder, pack, minStock, maxStock, muted, discontinued, reference, referencePercent };
+    const current = { supplierId, leadTime, safety, minOrder, pack, minStock, maxStock, muted, discontinued, cost, reference, referencePercent };
     const pickReference = async () => {
         const [picked] = await pickVariants();
         if (picked) setReference({ id: picked.gid, name: picked.name });
@@ -86,6 +89,7 @@ export function ProductSettingsForm({ f }: { f: ForecastDetail }) {
                 max_stock: toNumberOrNull(maxStock),
                 alerts_muted: muted,
                 discontinued,
+                ...(cost !== saved.cost ? { cost_override: cost.trim() === '' ? null : Number(cost.replace(',', '.')) } : {}),
                 // Only sent when changed: a Free shop can still save its other settings.
                 ...(reference?.id !== saved.reference?.id ? { reference_variant: reference?.id ?? null } : {}),
                 ...(reference ? { reference_percent: toNumberOrNull(referencePercent) } : {}),
@@ -172,6 +176,18 @@ export function ProductSettingsForm({ f }: { f: ForecastDetail }) {
                         onInput={(e) => setMaxStock(e.currentTarget.value)}
                     />
                 </s-grid>
+                <s-box maxInlineSize="240px">
+                    <s-number-field
+                        label={t('costs.productField')}
+                        min={0}
+                        step={0.01}
+                        placeholder={f.settings.shopify_cost != null ? t('costs.fromShopify', { cost: formatNumber(f.settings.shopify_cost, 2) }) : t('costs.noneInShopify')}
+                        details={t('costs.productFieldHelp')}
+                        value={cost}
+                        error={fieldError(update.error, 'cost_override')}
+                        onInput={(e) => setCost(e.currentTarget.value)}
+                    />
+                </s-box>
                 {referenceExists && (<s-stack gap="small-200">
                     <s-text type="strong">{t('productSettings.reference')}</s-text>
                     {!canReference && <UpgradePrompt id="reference-products" plan="starter">{t('productSettings.referenceLocked')}</UpgradePrompt>}

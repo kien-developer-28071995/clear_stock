@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { MissingCostNote } from '@/components/ui/MissingCostNote';
 import type { Dashboard } from '@/features/dashboard/types';
 import { formatMoney, formatNumber } from '@/utils/format';
 
@@ -16,7 +17,7 @@ export function DiscontinuedStock({ dashboard }: { dashboard: Dashboard }) {
                         ? t('discontinued.summaryWithValue', { count: d.count, units: formatNumber(d.units, 0), value: formatMoney(d.value, dashboard.currency) })
                         : t('discontinued.summaryUnits', { count: d.count, units: formatNumber(d.units, 0) })}
                 </s-paragraph>
-                {d.missing_cost > 0 && <s-text color="subdued">{t('slow.missingCosts', { count: d.missing_cost })}</s-text>}
+                <MissingCostNote count={d.missing_cost} />
                 <s-link href="/products?status=discontinued">{t('discontinued.viewAll')}</s-link>
             </s-stack>
         </s-section>

@@ -98,6 +98,13 @@ export function SettingsPage() {
                 </s-stack>
             </s-section>
 
+            <s-section heading={t('costs.settingsHeading')}>
+                <s-stack gap="small-200">
+                    <s-paragraph>{t('costs.settingsBody')}</s-paragraph>
+                    <s-link href="/costs">{t('costs.settingsLink')}</s-link>
+                </s-stack>
+            </s-section>
+
             <s-section heading={t('settings.languageHeading')}>
                 <s-select
                     label={t('settings.language')}

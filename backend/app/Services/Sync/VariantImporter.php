@@ -50,7 +50,7 @@ class VariantImporter
                 'product_type' => trim((string) ($line['product']['productType'] ?? '')) !== '' ? mb_substr(trim($line['product']['productType']), 0, 255) : null,
                 'sku' => ($line['sku'] ?? '') !== '' ? mb_substr((string) $line['sku'], 0, 255) : null,
                 'barcode' => trim((string) ($line['barcode'] ?? '')) !== '' ? mb_substr(trim($line['barcode']), 0, 255) : null,
-                'unit_cost' => $line['inventoryItem']['unitCost']['amount'] ?? null,
+                'shopify_unit_cost' => $line['inventoryItem']['unitCost']['amount'] ?? null,
                 'price' => $line['price'] ?? null,
                 'tracked' => (bool) ($line['inventoryItem']['tracked'] ?? false),
                 'is_active' => ($line['product']['status'] ?? 'ACTIVE') === 'ACTIVE',

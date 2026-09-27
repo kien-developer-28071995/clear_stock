@@ -27,6 +27,7 @@ const VendorSuppliersPage = page(() => import('@/features/settings/pages/VendorS
 const BundlesPage = page(() => import('@/features/settings/pages/BundlesPage'), 'BundlesPage');
 const SalesEventsPage = page(() => import('@/features/events/pages/SalesEventsPage'), 'SalesEventsPage');
 const ManualOrdersPage = page(() => import('@/features/orders/pages/ManualOrdersPage'), 'ManualOrdersPage');
+const CostsPage = page(() => import('@/features/costs/pages/CostsPage'), 'CostsPage');
 const PlansPage = page(() => import('@/features/billing/pages/PlansPage'), 'PlansPage');
 
 /** A page of a feature switched off app-wide is simply not there. */
@@ -55,6 +56,7 @@ export function AppRouter() {
                 <Route path="/suppliers/from-vendors" element={<VendorSuppliersPage />} />
                 <Route path="/bundles" element={<BundlesPage />} />
                 <Route path="/settings" element={<SettingsPage />} />
+                <Route path="/costs" element={<CostsPage />} />
                 <Route path="/plans" element={<PlansPage />} />
                 <Route path="*" element={<NotFoundPage />} />
             </Routes>
