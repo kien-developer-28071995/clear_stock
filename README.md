@@ -202,7 +202,7 @@ API (session-token authenticated): `GET /api/dashboard`, `GET|POST /api/onboardi
 
 ## Languages
 
-The app is translated into English and Vietnamese (react-i18next). It follows the Shopify admin language; merchants can override it in **Settings → Language** (saved on the shop).
+The app is translated into English, Vietnamese, Spanish, German, French and Portuguese (Brazil) (react-i18next). It follows the Shopify admin language; merchants can override it in **Settings → Language** (saved on the shop).
 
 - All UI text lives in the frontend: `frontend/src/i18n/locales/<lang>.json`. The API never returns sentences; it returns snake_case codes with raw params (errors `{code, params}`, validation `errors.<field>[{code, params}]`, forecast `explanation_lines`, sync `stage` and `error`), which the app translates.
 - **Add a language:** copy `en.json` to e.g. `fr.json`, translate, add `'fr'` to `supported_locales` in `backend/config/app.php`. `npm run i18n:check` (also part of `npm run build`) fails on missing keys or plural forms.

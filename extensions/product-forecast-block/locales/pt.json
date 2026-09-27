@@ -1,0 +1,213 @@
+{
+    "name": "Previsão de estoque",
+    "locale": "pt",
+    "variant": "Variante",
+    "state": "Status",
+    "inStock": "Em estoque",
+    "perDay": "Vendas / dia",
+    "runsOut": "Acaba em",
+    "orderBy": "Pedir até",
+    "suggested": "Pedido sugerido",
+    "incoming": "+{{qty}} a caminho",
+    "never": "—",
+    "why": "Por que estes números",
+    "whyFor": "Por que estes números ({{name}})",
+    "open": "Abrir no Clear Stock",
+    "seePlans": "Ver planos",
+    "summary": "{{status}} · pedir {{qty}} até {{date}}",
+    "summaryNoOrder": "{{status}}",
+    "notSynced": "Este produto ainda não está no Clear Stock. Ele aparece após a próxima sincronização (toda noite, ou Configurações › Sincronizar agora no app).",
+    "reasons": {
+        "not_tracked": "O estoque não é controlado na Shopify",
+        "plan_limit": "Sem previsão no plano Free (só os mais vendidos)",
+        "no_forecast": "Ainda sem previsão"
+    },
+    "errors": {
+        "generic": "Não foi possível carregar a previsão. Tente novamente em instantes.",
+        "network": "Não foi possível conectar ao Clear Stock. Verifique sua conexão e tente novamente."
+    },
+    "status": {
+        "out_of_stock": "Esgotado",
+        "reorder_now": "Repor agora",
+        "slow": "Giro lento",
+        "healthy": "OK",
+        "overstock": "Excesso de estoque",
+        "discontinued": "Descontinuado"
+    },
+    "confidence": {
+        "low": "Confiança baixa",
+        "medium": "Confiança média",
+        "high": "Confiança alta"
+    },
+    "explanation": {
+        "unknown": "—",
+        "avg_override": "Você definiu as vendas em {{avg}}/dia; nossa estimativa era {{computed}}/dia.",
+        "avg_override_note": "Você definiu as vendas em {{avg}}/dia ({{note}}); nossa estimativa era {{computed}}/dia.",
+        "no_rate_yet": "Ainda não há dias com estoque suficientes para medir um ritmo de vendas.",
+        "no_sales_while_in_stock": {
+            "one": "Sem vendas no último {{count}} dia com estoque.",
+            "other": "Sem vendas nos últimos {{count}} dias com estoque.",
+            "many": "Sem vendas nos últimos {{count}} dias com estoque."
+        },
+        "sells_over_window": {
+            "one": "Vende {{avg}}/dia no último {{count}} dia.",
+            "other": "Vende {{avg}}/dia nos últimos {{count}} dias.",
+            "many": "Vende {{avg}}/dia nos últimos {{count}} dias."
+        },
+        "sells_over_window_excluded": {
+            "one": "Vende {{avg}}/dia nos últimos {{days}} dias ({{count}} dia sem estoque excluído).",
+            "other": "Vende {{avg}}/dia nos últimos {{days}} dias ({{count}} dias sem estoque excluídos).",
+            "many": "Vende {{avg}}/dia nos últimos {{days}} dias ({{count}} dias sem estoque excluídos)."
+        },
+        "blended_rate": "Ritmo combinado {{avg}}/dia ({{parts}}).",
+        "window_part": {
+            "one": "{{count}} dia {{avg}}/dia × {{weight}}%",
+            "other": "{{count}} dias {{avg}}/dia × {{weight}}%",
+            "many": "{{count}} dias {{avg}}/dia × {{weight}}%"
+        },
+        "seasonality_rose": {
+            "one": "No ano passado, as vendas subiram ×{{factor}} no dia seguinte, então ajustamos para {{avg}}/dia.",
+            "other": "No ano passado, as vendas subiram ×{{factor}} nos {{count}} dias seguintes, então ajustamos para {{avg}}/dia.",
+            "many": "No ano passado, as vendas subiram ×{{factor}} nos {{count}} dias seguintes, então ajustamos para {{avg}}/dia."
+        },
+        "seasonality_fell": {
+            "one": "No ano passado, as vendas caíram para ×{{factor}} no dia seguinte, então ajustamos para {{avg}}/dia.",
+            "other": "No ano passado, as vendas caíram para ×{{factor}} nos {{count}} dias seguintes, então ajustamos para {{avg}}/dia.",
+            "many": "No ano passado, as vendas caíram para ×{{factor}} nos {{count}} dias seguintes, então ajustamos para {{avg}}/dia."
+        },
+        "spikes_capped": {
+            "one": "{{count}} pico pontual contado no nível habitual ({{top}} vendidos em {{top_date}}, normalmente {{usual}}/dia).",
+            "other": "{{count}} picos pontuais contados no nível habitual (o maior: {{top}} vendidos em {{top_date}}, normalmente {{usual}}/dia).",
+            "many": "{{count}} picos pontuais contados no nível habitual (o maior: {{top}} vendidos em {{top_date}}, normalmente {{usual}}/dia)."
+        },
+        "order_cycle_supplier": {
+            "one": "Os pedidos cobrem {{count}} dia de vendas: o ciclo de pedidos de {{supplier}}.",
+            "other": "Os pedidos cobrem {{count}} dias de vendas: o ciclo de pedidos de {{supplier}}.",
+            "many": "Os pedidos cobrem {{count}} dias de vendas: o ciclo de pedidos de {{supplier}}."
+        },
+        "lost_sales": {
+            "one": "Esgotado {{count}} dia nos últimos {{days}} dias: cerca de {{units}} vendas perdidas.",
+            "other": "Esgotado {{count}} dias nos últimos {{days}} dias: cerca de {{units}} vendas perdidas.",
+            "many": "Esgotado {{count}} dias nos últimos {{days}} dias: cerca de {{units}} vendas perdidas."
+        },
+        "bundle_contribution": {
+            "one": "Inclui {{avg}}/dia vendidos dentro de \"{{bundle}}\" ({{count}} por kit).",
+            "other": "Inclui {{avg}}/dia vendidos dentro de \"{{bundle}}\" ({{count}} por kit).",
+            "many": "Inclui {{avg}}/dia vendidos dentro de \"{{bundle}}\" ({{count}} por kit)."
+        },
+        "reorder_point": {
+            "one": "Prazo de entrega {{lead_days}} dias ({{lead_source}}) + {{safety_days}} dias de segurança → ponto de pedido {{count}} unidade.",
+            "other": "Prazo de entrega {{lead_days}} dias ({{lead_source}}) + {{safety_days}} dias de segurança → ponto de pedido {{count}} unidades.",
+            "many": "Prazo de entrega {{lead_days}} dias ({{lead_source}}) + {{safety_days}} dias de segurança → ponto de pedido {{count}} unidades."
+        },
+        "lead_source_override": "definido por você para esta previsão",
+        "lead_source_variant": "definido para este SKU",
+        "lead_source_supplier": "fornecedor {{supplier}}",
+        "lead_source_shop_default": "padrão da loja",
+        "order_today_out_of_stock": {
+            "one": "Esgotado agora → peça {{count}} unidade hoje.",
+            "other": "Esgotado agora → peça {{count}} unidades hoje.",
+            "many": "Esgotado agora → peça {{count}} unidades hoje."
+        },
+        "runs_out": {
+            "one": "As {{stock}} em estoque acabam por volta de {{stockout_date}} → peça {{count}} unidade até {{reorder_date}}.",
+            "other": "As {{stock}} em estoque acabam por volta de {{stockout_date}} → peça {{count}} unidades até {{reorder_date}}.",
+            "many": "As {{stock}} em estoque acabam por volta de {{stockout_date}} → peça {{count}} unidades até {{reorder_date}}."
+        },
+        "confidence": "Confiança: {{level}}.",
+        "confidence_with_reasons": "Confiança: {{level}} ({{reasons}}).",
+        "confidence_high": "alta",
+        "confidence_medium": "média",
+        "confidence_low": "baixa",
+        "reason_little_history": {
+            "one": "só {{count}} dia de histórico com estoque",
+            "other": "só {{count}} dias de histórico com estoque",
+            "many": "só {{count}} dias de histórico com estoque"
+        },
+        "reason_few_sales": {
+            "one": "poucas vendas ({{count}} em 90 dias)",
+            "other": "poucas vendas ({{count}} em 90 dias)",
+            "many": "poucas vendas ({{count}} em 90 dias)"
+        },
+        "reason_no_sales": "sem vendas em 90 dias",
+        "reason_volatile": "as vendas variam muito de uma semana para outra",
+        "reason_average_overridden": "ritmo definido manualmente",
+        "incoming_stock": {
+            "one": "{{count}} unidade já está a caminho (pedidos de compra ou transferências na Shopify) e conta para este pedido.",
+            "other": "{{count}} unidades já estão a caminho (pedidos de compra ou transferências na Shopify) e contam para este pedido.",
+            "many": "{{count}} unidades já estão a caminho (pedidos de compra ou transferências na Shopify) e contam para este pedido."
+        },
+        "out_of_stock_incoming_covers": "Esgotado agora; o estoque a caminho cobre a próxima reposição, então não é preciso um novo pedido.",
+        "runs_out_incoming_covers": "As {{stock}} em estoque acabam por volta de {{stockout_date}}; o estoque a caminho cobre a próxima reposição, então não é preciso um novo pedido.",
+        "rounded_min": "Você precisa de {{needed}}; o mínimo do fornecedor é {{min}}, então peça {{count}}.",
+        "rounded_pack": "Você precisa de {{needed}}; arredondado para embalagens completas de {{pack}} → {{count}}.",
+        "rounded_min_and_pack": "Você precisa de {{needed}}; o mínimo do fornecedor é {{min}}, em embalagens de {{pack}} → {{count}}.",
+        "rounding_supplier_default": "Pedido mínimo / tamanho da embalagem: padrões de {{supplier}}.",
+        "reorder_point_manual": {
+            "one": "Ponto de pedido definido por você: {{count}} unidade.",
+            "other": "Ponto de pedido definido por você: {{count}} unidades.",
+            "many": "Ponto de pedido definido por você: {{count}} unidades."
+        },
+        "order_up_to_max": {
+            "one": "Os pedidos completam até o seu máximo de {{count}} unidade.",
+            "other": "Os pedidos completam até o seu máximo de {{count}} unidades.",
+            "many": "Os pedidos completam até o seu máximo de {{count}} unidades."
+        },
+        "below_min_order": {
+            "one": "{{stock}} em estoque (com o estoque a caminho) está no seu mínimo ou abaixo → peça {{count}} unidade hoje.",
+            "other": "{{stock}} em estoque (com o estoque a caminho) está no seu mínimo ou abaixo → peça {{count}} unidades hoje.",
+            "many": "{{stock}} em estoque (com o estoque a caminho) está no seu mínimo ou abaixo → peça {{count}} unidades hoje."
+        },
+        "above_min": "{{stock}} em estoque (com o estoque a caminho) está acima do seu mínimo; ainda sem vendas, então nada a pedir.",
+        "no_order_needed": "Nada a pedir por enquanto.",
+        "overstock": {
+            "one": "{{count}} unidade a mais que as {{target}} a manter (prazo de entrega, segurança e próximo ciclo de pedido): adie a reposição ou faça uma promoção.",
+            "other": "{{count}} unidades a mais que as {{target}} a manter (prazo de entrega, segurança e próximo ciclo de pedido): adie a reposição ou faça uma promoção.",
+            "many": "{{count}} unidades a mais que as {{target}} a manter (prazo de entrega, segurança e próximo ciclo de pedido): adie a reposição ou faça uma promoção."
+        },
+        "reason_uses_reference": "estimativa baseada em parte em um produto semelhante",
+        "reference_blend": {
+            "one": "Produto novo com {{count}} dia de vendas próprias: {{ref_share}}% da estimativa vem de {{name}} ({{ref_avg}}/dia a {{percent}}%) → {{avg}}/dia.",
+            "other": "Produto novo com {{count}} dias de vendas próprias: {{ref_share}}% da estimativa vem de {{name}} ({{ref_avg}}/dia a {{percent}}%) → {{avg}}/dia.",
+            "many": "Produto novo com {{count}} dias de vendas próprias: {{ref_share}}% da estimativa vem de {{name}} ({{ref_avg}}/dia a {{percent}}%) → {{avg}}/dia."
+        },
+        "reference_done": {
+            "one": "Histórico próprio suficiente ({{count}} dia com estoque): não usa mais o ritmo de {{name}}.",
+            "other": "Histórico próprio suficiente ({{count}} dias com estoque): não usa mais o ritmo de {{name}}.",
+            "many": "Histórico próprio suficiente ({{count}} dias com estoque): não usa mais o ritmo de {{name}}."
+        },
+        "reference_no_forecast": "{{name}} ainda não tem previsão, então o ritmo dele não é usado.",
+        "discontinued_sells_through": {
+            "one": "Sem reposição (descontinuado): a última {{count}} unidade acaba por volta de {{stockout_date}}.",
+            "other": "Sem reposição (descontinuado): as últimas {{count}} unidades acabam por volta de {{stockout_date}}.",
+            "many": "Sem reposição (descontinuado): as últimas {{count}} unidades acabam por volta de {{stockout_date}}."
+        },
+        "discontinued_no_sales": {
+            "one": "Sem reposição (descontinuado): resta {{count}} unidade, sem vendas recentes.",
+            "other": "Sem reposição (descontinuado): restam {{count}} unidades, sem vendas recentes.",
+            "many": "Sem reposição (descontinuado): restam {{count}} unidades, sem vendas recentes."
+        },
+        "discontinued_sold_out": "Sem reposição (descontinuado): esgotado.",
+        "order_weekday_moved": "Você faz pedidos a {{supplier}} em dias fixos da semana, então peça em {{reorder_date}} em vez de {{due_date}}.",
+        "event_past": {
+            "one": "{{name}} (×{{multiplier}}): {{count}} dia contado no nível normal.",
+            "other": "{{name}} (×{{multiplier}}): {{count}} dias contados no nível normal.",
+            "many": "{{name}} (×{{multiplier}}): {{count}} dias contados no nível normal."
+        },
+        "event_upcoming": {
+            "one": "{{name}} ({{from_date}} – {{to_date}}, ×{{multiplier}}) adiciona {{count}} unidade ao que pedir.",
+            "other": "{{name}} ({{from_date}} – {{to_date}}, ×{{multiplier}}) adiciona {{count}} unidades ao que pedir.",
+            "many": "{{name}} ({{from_date}} – {{to_date}}, ×{{multiplier}}) adiciona {{count}} unidades ao que pedir."
+        },
+        "event_upcoming_lower": {
+            "one": "{{name}} ({{from_date}} – {{to_date}}, ×{{multiplier}}) tira {{count}} unidade do que pedir.",
+            "other": "{{name}} ({{from_date}} – {{to_date}}, ×{{multiplier}}) tira {{count}} unidades do que pedir.",
+            "many": "{{name}} ({{from_date}} – {{to_date}}, ×{{multiplier}}) tira {{count}} unidades do que pedir."
+        },
+        "ordered_manual": {
+            "one": "Você marcou {{count}} unidade como pedida (chega em {{expected_date}}): conta como a caminho.",
+            "other": "Você marcou {{count}} unidades como pedidas (chegam em {{expected_date}}): contam como a caminho.",
+            "many": "Você marcou {{count}} unidades como pedidas (chegam em {{expected_date}}): contam como a caminho."
+        }
+    }
+}

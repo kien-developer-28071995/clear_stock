@@ -52,6 +52,10 @@ describe('language', function () {
         $this->putJson('/api/settings', ['locale' => 'vi'], $this->auth)->assertOk()->assertJsonPath('data.locale', 'vi');
         $this->getJson('/api/shop', $this->auth)->assertJsonPath('data.locale', 'vi');
 
+        foreach (['es', 'de', 'fr', 'pt'] as $locale) {
+            $this->putJson('/api/settings', ['locale' => $locale], $this->auth)->assertOk()->assertJsonPath('data.locale', $locale);
+        }
+
         $this->putJson('/api/settings', ['locale' => 'xx'], $this->auth)
             ->assertUnprocessable()->assertJsonPath('errors.locale.0.code', 'in');
 

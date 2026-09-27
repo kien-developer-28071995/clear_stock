@@ -713,9 +713,9 @@
       "flow_triggers": "Trigger cho Shopify Flow sẽ dừng.",
       "flow_triggers_active": "Các quy trình Shopify Flow dùng trigger của Clear Stock sẽ ngừng chạy.",
       "reference_products_other": "{{count}} sản phẩm mới sẽ không còn mượn tốc độ bán của sản phẩm tương tự.",
-      "supplier_emails": "Gửi đơn đặt hàng qua email cho nhà cung cấp sẽ dừng."
-    },
-    "order_budget": "Ngân sách nhập hàng và thứ tự ưu tiên không còn dùng được."
+      "supplier_emails": "Gửi đơn đặt hàng qua email cho nhà cung cấp sẽ dừng.",
+      "order_budget": "Ngân sách nhập hàng và thứ tự ưu tiên không còn dùng được."
+    }
   },
   "vendors": {
     "button": "Tạo từ vendor",

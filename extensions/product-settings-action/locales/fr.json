@@ -1,0 +1,31 @@
+{
+    "name": "Définir fournisseur et délai",
+    "intro": {
+        "one": "S'applique à chaque variante du produit sélectionné dans Clear Stock. Les champs vides restent inchangés.",
+        "many": "S'applique à chaque variante des {{count}} produits sélectionnés dans Clear Stock. Les champs vides restent inchangés.",
+        "other": "S'applique à chaque variante des {{count}} produits sélectionnés dans Clear Stock. Les champs vides restent inchangés."
+    },
+    "supplier": "Fournisseur",
+    "keep": "Conserver l'actuel",
+    "noSupplier": "Aucun fournisseur",
+    "noSuppliers": "Pas encore de fournisseurs : ajoutez-les dans Clear Stock › Fournisseurs.",
+    "leadTime": "Délai de livraison (jours)",
+    "leadTimeHelp": "Jours entre la commande et la réception. Remplace le délai du fournisseur.",
+    "safety": "Stock de sécurité (jours)",
+    "safetyHelp": "Jours de stock supplémentaires au cas où les ventes augmentent ou une livraison a du retard.",
+    "apply": "Appliquer",
+    "cancel": "Annuler",
+    "close": "Fermer",
+    "nothing": "Choisissez d'abord un fournisseur ou saisissez un nombre.",
+    "done": {
+        "one": "{{count}} variante mise à jour. Les prévisions sont en cours de recalcul.",
+        "many": "{{count}} variantes mises à jour. Les prévisions sont en cours de recalcul.",
+        "other": "{{count}} variantes mises à jour. Les prévisions sont en cours de recalcul."
+    },
+    "noneKnown": "Aucun de ces produits n'est encore dans Clear Stock. Ils apparaîtront après la prochaine synchronisation.",
+    "errors": {
+        "generic": "Enregistrement impossible. Réessayez dans un instant.",
+        "network": "Impossible de joindre Clear Stock. Vérifiez votre connexion et réessayez.",
+        "invalid": "Vérifiez les valeurs : le délai de livraison et le stock de sécurité doivent être des nombres entiers de 0 à 365."
+    }
+}

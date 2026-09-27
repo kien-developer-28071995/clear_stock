@@ -455,6 +455,33 @@ for (const plan of ['free', 'starter', 'growth'] as PlanKey[]) {
             await expect(app.locator('s-page[heading="Settings"]')).toBeVisible();
         });
 
+        test('every other language renders the app and the explanations', async ({ app }) => {
+            const languages: [string, string, string, string][] = [
+                ['es', 'Configuración', 'Productos', 'Idioma de la app'],
+                ['de', 'Einstellungen', 'Produkte', 'App-Sprache'],
+                ['fr', 'Paramètres', 'Produits', "Langue de l'application"],
+                ['pt', 'Configurações', 'Produtos', 'Idioma do app'],
+            ];
+            let label = 'App language';
+            for (const [locale, settings, products, languageLabel] of languages) {
+                await open(app, '/settings');
+                await app.getByRole('combobox', { name: label }).selectOption(locale);
+                await saveBar(app, 'settings-save-bar');
+                await expect(app.locator(`s-page[heading="${settings}"]`)).toBeVisible();
+                await open(app, '/products?status=reorder_now');
+                await expect(app.locator(`s-page[heading="${products}"]`)).toBeVisible();
+                // An explanation sentence, not a raw code.
+                await app.locator('s-table-body s-table-row s-link').first().click();
+                await settled(app);
+                await expect(app.locator('body')).not.toContainText('explanation.');
+                label = languageLabel;
+            }
+            await open(app, '/settings');
+            await app.getByRole('combobox', { name: label }).selectOption({ index: 0 });
+            await saveBar(app, 'settings-save-bar');
+            await expect(app.locator('s-page[heading="Settings"]')).toBeVisible();
+        });
+
         test('suppliers can be added, edited and deleted', async ({ app }) => {
             const name = `E2E Supplier ${plan}`;
             await open(app, '/suppliers');
