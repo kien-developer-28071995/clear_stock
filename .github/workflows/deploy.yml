@@ -1,7 +1,9 @@
 # Build the production images once, push them to GitHub Container Registry, and roll them out
 # on the server over SSH (deploy/deploy.sh). Setup: docs/DEPLOY.md.
 #
-# - Automatic after CI passes on main (never runs migrations: stops if the release has pending ones).
+# - Automatic after CI passes on main. Pending migrations run automatically when they only add
+#   (tables, columns, indexes); ones that drop/rename/change stop the deploy for a manual run.
+#   Variable AUTO_MIGRATE=false turns automatic migrations off (then every one needs migrate = true).
 # - Manual (Actions -> Deploy -> Run workflow): run migrations, roll back to an earlier image tag,
 #   or tag = "current" to only apply changed Secrets/Variables (backend/.env) to the running version.
 # - backend/.env is built from GitHub Secrets/Variables of the `production` environment
@@ -16,7 +18,7 @@ on:
   workflow_dispatch:
     inputs:
       migrate:
-        description: Run database migrations (php artisan migrate --force) before switching
+        description: Run every pending migration, also ones that drop or change (additive ones run anyway unless AUTO_MIGRATE=false)
         type: boolean
         default: false
       tag:
@@ -110,4 +112,4 @@ jobs:
       - name: Roll out
         run: |
           ssh -i ~/.ssh/id_deploy -p "${{ secrets.DEPLOY_PORT || 22 }}" "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}" \
-            "cd '${{ secrets.DEPLOY_PATH }}' && IMAGE_PREFIX='${{ env.IMAGE_PREFIX }}' bash deploy.sh '${{ inputs.tag || needs.build.outputs.tag }}' ${{ inputs.migrate && '--migrate' || '' }}"
+            "cd '${{ secrets.DEPLOY_PATH }}' && IMAGE_PREFIX='${{ env.IMAGE_PREFIX }}' bash deploy.sh '${{ inputs.tag || needs.build.outputs.tag }}' ${{ inputs.migrate && '--migrate' || (vars.AUTO_MIGRATE != 'false' && '--migrate=auto' || '') }}"

@@ -1,7 +1,7 @@
 # Production stack. No source mounts, no node, no mailpit.
 #   docker compose -f docker-compose.prod.yml build
 #   docker compose -f docker-compose.prod.yml up -d
-#   make prod-migrate          # migrations are never run automatically
+#   make prod-migrate          # by hand; CI/CD deploys (deploy/deploy.sh) run additive migrations themselves
 # TLS must terminate in front of "web" (load balancer, Caddy, Cloudflare Tunnel...).
 name: clear_stock
 
@@ -33,11 +33,15 @@ services:
       timeout: 3s
       retries: 5
       start_period: 20s
+      # Checked every 2s while starting, so a deploy's switch-over takes seconds, not a 15s interval.
+      start_interval: 2s
 
   horizon:
     <<: *app
     command: ["php", "artisan", "horizon"]
-    stop_grace_period: 60s
+    # On a deploy Horizon stops taking jobs and finishes the running ones (SIGTERM). Killed jobs only
+    # come back after retry_after (up to ~1h for sync imports), so give long imports time to finish.
+    stop_grace_period: 10m
     healthcheck:
       test: ["CMD", "php", "artisan", "horizon:status"]
       interval: 60s
@@ -47,6 +51,8 @@ services:
   scheduler:
     <<: *app
     command: ["php", "artisan", "schedule:work"]
+    # Let a running scheduled command finish before a deploy replaces the container.
+    stop_grace_period: 2m
 
   web:
     build:
@@ -64,6 +70,8 @@ services:
       interval: 15s
       timeout: 3s
       retries: 5
+      start_period: 10s
+      start_interval: 2s
     logging: *logging
 
   mysql:

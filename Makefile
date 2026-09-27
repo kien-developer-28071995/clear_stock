@@ -126,7 +126,7 @@ prod-up: ## Start production stack
 prod-down: ## Stop production stack
 	$(DC_PROD) down
 
-prod-migrate: ## Run migrations in production (explicit, never automatic)
+prod-migrate: ## Run migrations in production by hand (CI/CD deploys run additive ones itself)
 	$(DC_PROD) run --rm app php artisan migrate --force
 
 prod-logs: ## Tail production logs

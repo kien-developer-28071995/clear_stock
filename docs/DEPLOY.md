@@ -10,7 +10,8 @@ push main ─▶ CI (test backend + frontend) ─▶ Deploy: build image ─▶ 
 - **Deploy** (`.github/workflows/deploy.yml`): chỉ chạy khi CI trên `main` pass. Build image `app` và `web` **một lần** trên GitHub, đẩy lên GitHub Container Registry với tag `sha-<commit>`, rồi SSH vào server chạy `deploy/deploy.sh`.
 - Server **không cần mã nguồn** và không build gì: chỉ có `docker-compose.prod.yml`, `deploy.sh` và `backend/.env`, cả ba do workflow tự copy lên.
 - **`backend/.env` được dựng từ GitHub** (Secrets + Variables của environment `production`, mục 2b), không sửa tay trên server.
-- **Migration không tự chạy** (quy định của dự án). Nếu bản mới có migration chưa chạy, deploy **dừng lại trước khi đổi container**, app cũ vẫn chạy. Muốn chạy migration: vào Actions → Deploy → *Run workflow* → tick `migrate`. Script tự backup database trước khi migrate.
+- **Migration tự chạy nếu chỉ thêm** (bảng, cột, index): script backup database, chạy migration, rồi mới đổi container. Script đọc SQL sẽ chạy (`migrate --pretend`); nếu có xóa, đổi tên, đổi kiểu cột, `UPDATE`/`DELETE` dữ liệu thì deploy **dừng trước khi đổi container** (app cũ vẫn chạy) và in ra câu lệnh đó. Kiểm tra xong thì chạy tay: Actions → Deploy → *Run workflow* → tick `migrate`. Tắt hẳn tự động: Variable `AUTO_MIGRATE` = `false`.
+- **Vì sao không tự chạy mọi migration**: trong lúc migrate, bản cũ vẫn phục vụ; khi quay lại bản cũ (rollback), schema không quay lại theo. Nên đổi schema theo kiểu *mở rộng rồi thu gọn*: bản 1 thêm cột mới và code dùng cả hai; bản sau mới xóa cột cũ (bước này chạy tay).
 - Nếu `app:preflight` báo lỗi cấu hình (debug bật, billing test, scope sai...) thì cũng dừng, không đổi container.
 
 ## 1. Chuẩn bị server (làm một lần)
@@ -110,15 +111,15 @@ python3 deploy/envtool.py push --from server.env && rm server.env
 
 ## 3. Lần deploy đầu tiên
 
-1. Push lên `main` → CI chạy. Deploy tự chạy và sẽ **dừng ở bước migration** (database còn trống): đây là đúng.
-2. Actions → **Deploy** → *Run workflow* → tick **migrate** → Run. Script sẽ tạo bảng, bật app và kiểm tra `/up`.
+1. Push lên `main` → CI chạy → Deploy tự chạy: tạo bảng (database trống, toàn migration thêm), bật app và kiểm tra `/up`.
+2. Nếu deploy dừng ở bước migration (có migration xóa/đổi): Actions → **Deploy** → *Run workflow* → tick **migrate** → Run.
 3. Mở `https://<domain>/support`: trang hỗ trợ hiện lên là app đã chạy.
 4. Đẩy cấu hình app lên Shopify, từ máy bạn: `npx @shopify/cli@latest app deploy --config production`. Việc này chỉ cần khi đổi scope, webhook hoặc extension, không cần mỗi lần deploy code.
 
 ## 4. Hằng ngày
 
 - **Deploy code**: merge hoặc push vào `main` là xong (duyệt deploy nếu đã bật required reviewers).
-- **Có migration mới**: deploy tự động báo "pending migration" và dừng. Chạy lại bằng tay với `migrate = true`.
+- **Có migration mới**: loại chỉ thêm thì tự chạy (có backup trong `/opt/clear_stock/backups/`). Loại xóa/đổi thì deploy dừng và in câu lệnh; kiểm tra rồi chạy lại bằng tay với `migrate = true`.
 - **Quay lại bản cũ**: Actions → Deploy → *Run workflow* → điền **tag** của bản cũ (ví dụ `sha-1a2b3c4`, xem trong GHCR hoặc file `/opt/clear_stock/.deployed-tag`). Không build lại, chỉ đổi image. Nếu bản mới đã chạy migration, kiểm tra migration đó có tương thích ngược không; backup nằm trong `/opt/clear_stock/backups/`.
 - **Xem log**: `docker compose -f docker-compose.prod.yml logs -f --tail=100 app horizon` (chạy trong `/opt/clear_stock`).
 - **Đổi cấu hình** (ví dụ bật công tắc `FEATURE_*`): sửa Secret/Variable trong Settings → Environments → `production`, rồi Actions → Deploy → *Run workflow* → **tag** = `current`. Không build lại: chỉ dựng lại `.env`, chạy preflight và khởi động lại app/horizon/scheduler/web (MySQL, Redis không restart). Lần deploy code tiếp theo cũng tự áp dụng.
@@ -138,6 +139,18 @@ python3 deploy/envtool.py push --from server.env && rm server.env
 5. Khi lệnh báo 0 token không đọc được: xóa Secret `APP_PREVIOUS_KEYS` (hoặc để rỗng) rồi deploy `current` lần nữa.
 
 Nếu **mất hẳn key cũ**: token không giải mã được nữa; shop vẫn còn dữ liệu nhưng app không gọi được Shopify cho tới khi merchant mở lại app (token exchange cấp token mới). Backup DB không giúp được vì token trong backup cũng mã hóa bằng key cũ.
+
+### Mỗi lần deploy thì container nào khởi động lại
+
+| Container | Deploy code | Chỉ đổi config (`current`) | Ghi chú |
+|---|---|---|---|
+| `app`, `web` | Tạo lại (image mới) | Tạo lại | Gián đoạn vài giây: healthcheck kiểm tra mỗi 2 giây lúc khởi động (`start_interval`, cần Docker Engine ≥ 25). Webhook Shopify gửi lỗi sẽ tự gửi lại. |
+| `horizon` | Tạo lại | Tạo lại | Nhận SIGTERM: ngừng nhận job, làm xong job đang chạy (tối đa 10 phút, `stop_grace_period`). Job bị ngắt quá hạn sẽ chạy lại sau `retry_after`. |
+| `scheduler` | Tạo lại | Tạo lại | Chờ lệnh đang chạy tối đa 2 phút. Khóa `withoutOverlapping` hết hạn trước chu kỳ kế tiếp nên lệnh bị ngắt không làm lỡ lần chạy sau. |
+| `mysql`, `redis` | Không | Không | Dữ liệu nằm trong volume. Chỉ khởi động lại khi đổi image trong `docker-compose.prod.yml`. |
+
+- Image cũ không còn dùng và cũ hơn 7 ngày được xóa sau mỗi lần deploy thành công, nên ổ đĩa không đầy dần; image 7 ngày gần nhất vẫn còn để quay lại nhanh.
+- Deploy có thể lâu hơn bình thường (tối đa khoảng 10 phút) nếu đúng lúc đó đang có job đồng bộ lớn: Horizon chờ job xong rồi mới dừng.
 
 ## 5. Backup database hằng ngày
 
