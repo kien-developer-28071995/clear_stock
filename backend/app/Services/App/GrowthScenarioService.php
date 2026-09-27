@@ -28,7 +28,7 @@ class GrowthScenarioService
     /**
      * @param  array{supplier_id?: ?int, vendor?: ?string, abc?: ?string}  $filters
      */
-    public function simulate(Shop $shop, int $growthPercent, int $horizonDays, array $filters = []): array
+    public function simulate(Shop $shop, int $growthPercent, int $horizonDays, array $filters = [], ?int $limit = self::ITEM_LIMIT): array
     {
         Entitlements::for($shop)->require(Feature::WhatIf);
 
@@ -73,9 +73,36 @@ class GrowthScenarioService
             'until' => $until,
             'currency' => $shop->currency,
             'totals' => array_map(fn ($t) => ['cost' => round($t['cost'], 2)] + $t, $totals),
-            'items' => array_slice($items, 0, self::ITEM_LIMIT),
+            'items' => $limit === null ? $items : array_slice($items, 0, $limit),
             'items_total' => count($items),
         ];
+    }
+
+    /**
+     * The scenario's orders as a purchase order CSV (Starter: needs PO export too): every product
+     * due within the horizon with the order date and quantity of the scenario.
+     *
+     * @return array{filename: string, rows: array<int, array<int, string|int|float|null>>}
+     */
+    public function export(Shop $shop, int $growthPercent, int $horizonDays, array $filters = []): array
+    {
+        Entitlements::for($shop)->require(Feature::PurchaseOrders);
+        $data = $this->simulate($shop, $growthPercent, $horizonDays, $filters, null);
+
+        $rows = [['Order date', 'Supplier', 'Product', 'SKU', 'Sells per day (scenario)', 'Order quantity', 'Now: order quantity', 'Unit cost', 'Line total', 'Currency']];
+        foreach ($data['items'] as $i) {
+            $s = $i['scenario'];
+            if (($s['order_qty'] ?? 0) <= 0 || $s['order_date'] === null || $s['order_date'] > $data['until']) {
+                continue;
+            }
+            $rows[] = [
+                $s['order_date'], $i['supplier'] ?? '', $i['name'], $i['sku'] ?? '', $s['avg'], $s['order_qty'], $i['now']['order_qty'],
+                $i['unit_cost'], $i['unit_cost'] !== null ? round($i['unit_cost'] * $s['order_qty'], 2) : null, $shop->currency,
+            ];
+        }
+        $sign = $growthPercent >= 0 ? 'plus' : 'minus';
+
+        return ['filename' => "what-if-{$sign}".abs($growthPercent)."-{$data['today']}.csv", 'rows' => $rows];
     }
 
     /**

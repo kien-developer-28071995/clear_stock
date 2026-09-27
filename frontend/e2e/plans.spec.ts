@@ -159,6 +159,13 @@ for (const plan of ['free', 'starter', 'growth'] as PlanKey[]) {
             expect(grown.data.totals.scenario.products).toBeGreaterThanOrEqual(grown.data.totals.now.products);
             await expect(app.locator('s-table-body s-table-row')).toHaveCount(grown.data.items.length);
             await app.screenshot({ path: 'e2e-results/what-if.png', fullPage: true });
+            if (grown.data.totals.scenario.products > 0 && has.purchase_orders) {
+                const download = app.waitForEvent('download');
+                await app.locator('s-button', { hasText: 'Export scenario orders (CSV)' }).first().evaluate((el: HTMLElement) => el.click());
+                const lines = fs.readFileSync(await (await download).path(), 'utf8').trim().split('\n');
+                expect(lines[0]).toContain('Order date');
+                expect(lines.length - 1).toBe(grown.data.totals.scenario.products);
+            }
         });
 
         test('purchase plan: weekly orders and spend follow the forecast', async ({ app }) => {

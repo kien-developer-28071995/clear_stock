@@ -2,6 +2,7 @@
 
 namespace App\Services\Forecast;
 
+use App\Enums\Feature;
 use App\Events\ForecastsUpdated;
 use App\Models\Shop;
 use App\Repositories\Contracts\CatalogRepositoryInterface;
@@ -121,11 +122,23 @@ class ForecastService
         $this->forecasts->pruneSnapshots($shop, $asOf->subWeeks((int) config('forecast.accuracy.keep_weeks'))->toDateString());
     }
 
-    /** @param array<int, int> $ids */
+    /**
+     * Bundles (paid plans): a virtual bundle's revenue counts toward the products inside it,
+     * so a component that mostly sells in bundles is still ranked by what it earns.
+     *
+     * @param  array<int, int>  $ids
+     */
     private function classifyAbc(Shop $shop, array $ids, CarbonImmutable $asOf): void
     {
         $from = $asOf->subDays((int) config('forecast.abc.days'))->toDateString();
-        $this->forecasts->saveAbcClasses($shop, AbcClassifier::fromConfig()->classify($this->forecasts->revenueSince($shop, $ids, $from)));
+        $revenue = $this->forecasts->revenueSince($shop, $ids, $from);
+        if (Entitlements::for($shop)->has(Feature::Bundles)) {
+            ['bundles' => $bundles, 'prices' => $prices] = $this->forecasts->bundlesWithComponents($shop, $ids);
+            if ($bundles !== []) {
+                $revenue = BundleRevenue::attribute($revenue, $bundles, $this->forecasts->revenueSince($shop, array_keys($bundles), $from), $prices, $ids);
+            }
+        }
+        $this->forecasts->saveAbcClasses($shop, AbcClassifier::fromConfig()->classify($revenue));
     }
 
     private function row(ForecastResult $r, \DateTimeInterface $computedAt): array

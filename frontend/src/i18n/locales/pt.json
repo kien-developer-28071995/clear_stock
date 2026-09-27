@@ -992,7 +992,8 @@
     "truncated_one": "Mostrando {{shown}} de {{count}} produto (pedidos mais próximos primeiro). Os totais incluem todos.",
     "truncated_other": "Mostrando {{shown}} de {{count}} produtos (pedidos mais próximos primeiro). Os totais incluem todos.",
     "truncated_many": "Mostrando {{shown}} de {{count}} produtos (pedidos mais próximos primeiro). Os totais incluem todos.",
-    "locked": "Teste \"e se as vendas crescerem 20%?\" e veja o que pedir, quando e quanto custa, antes de se comprometer."
+    "locked": "Teste \"e se as vendas crescerem 20%?\" e veja o que pedir, quando e quanto custa, antes de se comprometer.",
+    "export": "Exportar pedidos do cenário (CSV)"
   },
   "flow": {
     "heading": "Shopify Flow",

@@ -77,7 +77,8 @@ Route::middleware('shopify.session')->group(function () {
     Route::post('/billing', [BillingController::class, 'store'])->middleware('throttle:10,1');
 
     // What-if: sales +/- X% -> what to order (nothing saved).
-    Route::get('/what-if', GrowthScenarioController::class);
+    Route::get('/what-if', [GrowthScenarioController::class, 'show']);
+    Route::get('/what-if/export', [GrowthScenarioController::class, 'export']);
 
     // Purchase plan: orders and spend week by week at the current sales rates (nothing saved).
     Route::get('/purchase-plan', [PurchasePlanController::class, 'show']);

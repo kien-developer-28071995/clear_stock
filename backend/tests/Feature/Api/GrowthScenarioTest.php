@@ -91,3 +91,15 @@ it('validates the scenario', function () {
     $this->getJson('/api/what-if?growth=10&horizon=7', $this->auth)->assertUnprocessable()->assertJsonValidationErrors('horizon');
     $this->getJson('/api/what-if', $this->auth)->assertUnprocessable();
 });
+
+it('exports the scenario orders as a CSV', function () {
+    app(ForecastService::class)->runForShop($this->shop);
+    $csv = $this->get('/api/what-if/export?growth=50&horizon=30', $this->auth)->assertOk()
+        ->assertHeader('Content-Type', 'text/csv; charset=UTF-8')->streamedContent();
+    $lines = array_map('str_getcsv', explode("\n", trim(substr($csv, 3))));
+    $data = $this->getJson('/api/what-if?growth=50&horizon=30', $this->auth)->json('data');
+
+    expect($lines[0][0])->toBe('Order date')
+        ->and(count($lines) - 1)->toBe($data['totals']['scenario']['products'])
+        ->and(array_sum(array_map(fn ($l) => (int) $l[5], array_slice($lines, 1))))->toBe($data['totals']['scenario']['units']);
+});

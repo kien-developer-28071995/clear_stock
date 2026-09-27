@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\BundleComponent;
 use App\Models\DailySale;
 use App\Models\Location;
 use App\Models\Shop;
@@ -101,4 +102,19 @@ it('summarises products, revenue and stock value per class on the dashboard', fu
         ->assertJsonPath('data.abc.classes.C', ['count' => 2, 'revenue' => 90, 'revenue_share' => 0.009, 'stock_value' => 700])
         ->assertJsonPath('data.abc.unclassified', 0)
         ->assertJsonPath('data.abc.days', 90);
+});
+
+it('credits a virtual bundle revenue to the products inside it (paid plans)', function () {
+    $p = abcProducts($this->shop, $this->location);
+    // A gift box (not tracked) with 1 Rare inside sells 20/day at $50: $90k over 90 days, mostly Rare's.
+    $box = product($this->shop, $this->location, 'Gift box', stock: 0, perDay: 20, attrs: ['price' => 50, 'tracked' => false]);
+    BundleComponent::create(['shop_id' => $this->shop->id, 'bundle_variant_id' => $box->id, 'component_variant_id' => $p['rare']->id, 'quantity' => 1, 'source' => 'manual']);
+
+    app(ForecastService::class)->runForShop($this->shop);
+    expect($p['rare']->fresh()->abc_class)->toBe('A')->and((float) $p['rare']->fresh()->revenue_90d)->toEqual(90090);
+
+    // Free plan: no bundles, Rare is ranked on its own sales.
+    $this->shop->update(['plan' => 'free']);
+    app(ForecastService::class)->runForShop($this->shop->fresh());
+    expect($p['rare']->fresh()->abc_class)->toBe('C');
 });

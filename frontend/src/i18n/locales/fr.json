@@ -992,7 +992,8 @@
     "truncated_one": "{{shown}} sur {{count}} produit affiché (commandes les plus proches d'abord). Les totaux les incluent tous.",
     "truncated_other": "{{shown}} sur {{count}} produits affichés (commandes les plus proches d'abord). Les totaux les incluent tous.",
     "truncated_many": "{{shown}} sur {{count}} produits affichés (commandes les plus proches d'abord). Les totaux les incluent tous.",
-    "locked": "Essayez « et si les ventes augmentaient de 20 % ? » et voyez quoi commander, quand, et combien cela coûte, avant de vous engager."
+    "locked": "Essayez « et si les ventes augmentaient de 20 % ? » et voyez quoi commander, quand, et combien cela coûte, avant de vous engager.",
+    "export": "Exporter les commandes du scénario (CSV)"
   },
   "flow": {
     "heading": "Shopify Flow",
