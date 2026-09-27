@@ -40,6 +40,7 @@ const PAGES: [string, string][] = [
     ['/settings', 'Settings'],
     ['/events', 'Sales events'],
     ['/orders', 'Orders placed'],
+    ['/costs', 'Unit costs'],
     ['/plans', 'Plans'],
 ];
 
@@ -280,6 +281,26 @@ for (const plan of ['free', 'starter', 'growth'] as PlanKey[]) {
 
             // Leave nothing open (other tests read the reorder list).
             for (const o of (await api<Orders>(app, '/manual-orders')).data.open) expect(await call(`/manual-orders/${o.id}`, 'PATCH', { status: 'cancelled' })).toBe(200);
+        });
+
+        test('unit costs can be entered in the app and feed the money figures', async ({ app }) => {
+            type Costs = { data: { counts: { missing: number }; items: { variant_id: number; name: string; app_cost: number | null; cost: number | null }[] } };
+            await open(app, '/costs');
+            const list = (await api<Costs>(app, '/costs?missing=1')).data;
+            const row = list.items[0] ?? (await api<Costs>(app, '/costs')).data.items[0];
+            if (list.items.length === 0) await app.getByRole('checkbox', { name: 'Only products without a cost' }).uncheck();
+
+            await app.getByRole('spinbutton', { name: `Your cost for ${row.name}` }).fill('7.25');
+            await saveBar(app, 'costs-save-bar');
+            await expect.poll(async () => (await api<Costs>(app, '/costs')).data.items.find((i) => i.variant_id === row.variant_id)?.cost).toBe(7.25);
+            type Detail = { data: { settings: { cost_override: number | null } } };
+            expect((await api<Detail>(app, `/forecasts/${row.variant_id}`)).data.settings.cost_override).toBe(7.25);
+
+            // Put it back: cleared in the product settings.
+            await open(app, `/products/${row.variant_id}`);
+            await app.getByRole('spinbutton', { name: 'Unit cost' }).fill('');
+            await saveBar(app, 'product-settings-save-bar');
+            await expect.poll(async () => (await api<Detail>(app, `/forecasts/${row.variant_id}`)).data.settings.cost_override).toBeNull();
         });
 
         test('insights show forecast accuracy (or when it starts)', async ({ app }) => {

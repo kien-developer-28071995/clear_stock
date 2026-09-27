@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { MissingCostNote } from '@/components/ui/MissingCostNote';
 import type { Dashboard } from '@/features/dashboard/types';
 import { formatMoney, formatNumber } from '@/utils/format';
 
@@ -17,7 +18,7 @@ export function Overstock({ dashboard }: { dashboard: Dashboard }) {
                         : t('overstock.summary', { units: formatNumber(over.units, 0), count: over.count })}{' '}
                     {t('overstock.advice')}
                 </s-paragraph>
-                {over.missing_cost > 0 && <s-text color="subdued">{t('slow.missingCosts', { count: over.missing_cost })}</s-text>}
+                <MissingCostNote count={over.missing_cost} />
                 <s-table>
                     <s-table-header-row>
                         <s-table-header listSlot="primary">{t('table.product')}</s-table-header>

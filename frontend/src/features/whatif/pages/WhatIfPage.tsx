@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { MissingCostNote } from '@/components/ui/MissingCostNote';
 import { useSearchParams } from 'react-router';
 import { ErrorBanner } from '@/components/ui/ErrorBanner';
 import { UpgradePrompt } from '@/components/ui/UpgradePrompt';
@@ -179,9 +180,7 @@ function WhatIfView() {
                             />
                         </s-grid>
                         <s-text color="subdued">{t('whatIf.legend')}</s-text>
-                        {data.totals.scenario.missing_cost > 0 && (
-                            <s-text color="subdued">{t('whatIf.missingCost', { count: data.totals.scenario.missing_cost })}</s-text>
-                        )}
+                        <MissingCostNote count={data.totals.scenario.missing_cost} text={t('whatIf.missingCost', { count: data.totals.scenario.missing_cost })} />
                     </s-stack>
                 </s-section>
             )}

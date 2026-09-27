@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { MissingCostNote } from '@/components/ui/MissingCostNote';
 import { useSearchParams } from 'react-router';
 import { ErrorBanner } from '@/components/ui/ErrorBanner';
 import { LoadingPage } from '@/components/ui/LoadingPage';
@@ -152,7 +153,7 @@ function PurchasePlanView() {
                             </s-grid>
                             <WeeklySpendChart weeks={data.by_week} currency={data.currency} />
                             <s-text color="subdued">{t('purchasePlan.how')}</s-text>
-                            {data.totals.missing_cost > 0 && <s-text color="subdued">{t('whatIf.missingCost', { count: data.totals.missing_cost })}</s-text>}
+                            <MissingCostNote count={data.totals.missing_cost} text={t('whatIf.missingCost', { count: data.totals.missing_cost })} />
                         </s-stack>
                     </s-section>
 

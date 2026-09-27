@@ -128,6 +128,9 @@ export interface ForecastDetail extends ForecastRow {
         alerts_muted: boolean;
         /** No longer reordered: sells through what is left (no suggestion, alert or plan). */
         discontinued: boolean;
+        /** Unit cost entered in the app (wins), and Shopify's. */
+        cost_override: number | null;
+        shopify_cost: number | null;
         /** New products: similar product whose sales rate is borrowed, and the share of it (null = 100%). */
         reference_variant_id: number | null;
         reference_name: string | null;
@@ -186,6 +189,7 @@ export interface VariantSettingsInput {
     max_stock?: number | null;
     alerts_muted?: boolean;
     discontinued?: boolean;
+    cost_override?: number | null;
     /** Local id or Shopify variant gid (resource picker); null removes it. */
     reference_variant?: number | string | null;
     reference_percent?: number | null;

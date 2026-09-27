@@ -28,6 +28,8 @@ class VariantSettingsRequest extends FormRequest
             'min_stock' => ['sometimes', 'nullable', 'integer', 'min:0', 'max:1000000'],
             'max_stock' => ['sometimes', 'nullable', 'integer', 'min:1', 'max:1000000'],
             'alerts_muted' => ['sometimes', 'boolean'],
+            // Unit cost entered in the app (null = Shopify's cost).
+            'cost_override' => ['sometimes', 'nullable', 'numeric', 'min:0', 'max:10000000'],
             // No longer reordered: sells through what is left (no suggestions, alerts, plan).
             'discontinued' => ['sometimes', 'boolean'],
             // New products: a similar product (local id or Shopify variant gid) and the share of its rate.
@@ -38,6 +40,12 @@ class VariantSettingsRequest extends FormRequest
             }],
             'reference_percent' => ['sometimes', 'nullable', 'integer', 'min:10', 'max:500'],
         ];
+    }
+
+    /** @return array{cost_override?: ?float} */
+    public function costSetting(): array
+    {
+        return $this->safe()->only(['cost_override']);
     }
 
     /** Reference product settings (single product only). @return array{reference_variant?: int|string|null, reference_percent?: ?int} */

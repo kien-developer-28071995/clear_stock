@@ -20,7 +20,9 @@ use Illuminate\Support\Carbon;
  * @property ?string $title
  * @property ?string $sku
  * @property ?string $barcode
- * @property ?string $unit_cost
+ * @property ?string $unit_cost cost used everywhere: cost_override, else Shopify's cost
+ * @property ?string $shopify_unit_cost cost in Shopify (from the sync)
+ * @property ?string $cost_override cost entered in the app (wins over Shopify's)
  * @property ?string $price current selling price (shop currency)
  * @property ?string $abc_class A, B or C by share of recent revenue; null without a price
  * @property string $revenue_90d net units sold in the ABC window x current price
@@ -49,7 +51,7 @@ class Variant extends Model
 
     protected $fillable = [
         'shop_id', 'shopify_variant_id', 'shopify_product_id', 'inventory_item_id',
-        'product_title', 'vendor', 'product_type', 'title', 'sku', 'barcode', 'unit_cost', 'price', 'tracked', 'is_active',
+        'product_title', 'vendor', 'product_type', 'title', 'sku', 'barcode', 'unit_cost', 'shopify_unit_cost', 'cost_override', 'price', 'tracked', 'is_active',
         'supplier_id', 'lead_time_override', 'safety_days', 'min_order_qty', 'pack_size', 'min_stock', 'max_stock', 'alerts_muted', 'discontinued', 'reference_variant_id', 'reference_percent', 'is_bundle', 'shopify_created_at',
     ];
 
@@ -60,6 +62,8 @@ class Variant extends Model
             'shopify_product_id' => 'integer',
             'inventory_item_id' => 'integer',
             'unit_cost' => 'decimal:4',
+            'shopify_unit_cost' => 'decimal:4',
+            'cost_override' => 'decimal:4',
             'price' => 'decimal:2',
             'revenue_90d' => 'decimal:2',
             'revenue_share' => 'decimal:6',

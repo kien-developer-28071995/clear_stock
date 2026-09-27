@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { MissingCostNote } from '@/components/ui/MissingCostNote';
 import type { Dashboard } from '@/features/dashboard/types';
 import { formatMoney, formatNumber } from '@/utils/format';
 
@@ -16,11 +17,7 @@ export function SlowMovers({ dashboard }: { dashboard: Dashboard }) {
                         : t('slow.summary', { count: slow.count, days: slow.days })}{' '}
                     {t('slow.advice')}
                 </s-paragraph>
-                {slow.missing_cost > 0 && (
-                    <s-text color="subdued">
-                        {slow.missing_cost === slow.count ? t('slow.addCosts') : t('slow.missingCosts', { count: slow.missing_cost })}
-                    </s-text>
-                )}
+                <MissingCostNote count={slow.missing_cost} all={slow.missing_cost === slow.count} />
                 {/* Only products with a known cost are listed (the value needs the cost). */}
                 {slow.top.length > 0 && (
                     <s-table>

@@ -12,6 +12,7 @@ use App\Repositories\Cache\CachedVariantRepository;
 use App\Repositories\Contracts\AlertLogRepositoryInterface;
 use App\Repositories\Contracts\AlertSettingRepositoryInterface;
 use App\Repositories\Contracts\CatalogRepositoryInterface;
+use App\Repositories\Contracts\CostRepositoryInterface;
 use App\Repositories\Contracts\DailySalesRepositoryInterface;
 use App\Repositories\Contracts\FlowRepositoryInterface;
 use App\Repositories\Contracts\ForecastQueryRepositoryInterface;
@@ -29,6 +30,7 @@ use App\Repositories\Contracts\VariantRepositoryInterface;
 use App\Repositories\Eloquent\EloquentAlertLogRepository;
 use App\Repositories\Eloquent\EloquentAlertSettingRepository;
 use App\Repositories\Eloquent\EloquentCatalogRepository;
+use App\Repositories\Eloquent\EloquentCostRepository;
 use App\Repositories\Eloquent\EloquentDailySalesRepository;
 use App\Repositories\Eloquent\EloquentFlowRepository;
 use App\Repositories\Eloquent\EloquentForecastQueryRepository;
@@ -82,6 +84,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->singleton(TransferRepositoryInterface::class, EloquentTransferRepository::class);
         $this->app->singleton(SalesEventRepositoryInterface::class, EloquentSalesEventRepository::class);
         $this->app->singleton(ManualOrderRepositoryInterface::class, EloquentManualOrderRepository::class);
+        $this->app->singleton(CostRepositoryInterface::class, EloquentCostRepository::class);
         $this->app->singleton(RealtimeAlertRepositoryInterface::class, EloquentRealtimeAlertRepository::class);
 
         $this->app->singleton(ForecastQueryRepositoryInterface::class, fn ($app) => new CachedForecastQueryRepository(

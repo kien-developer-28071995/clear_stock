@@ -33,11 +33,14 @@ class EloquentCatalogRepository implements CatalogRepositoryInterface
         $now = now();
         $rows = array_map(fn ($r) => $r + ['shop_id' => $shop->id, 'created_at' => $now, 'updated_at' => $now], $rows);
         // Merchant settings (supplier, lead time, safety days, is_bundle) are never overwritten by the sync.
-        $update = ['shopify_product_id', 'inventory_item_id', 'product_title', 'title', 'vendor', 'product_type', 'sku', 'barcode', 'unit_cost', 'price',
+        $update = ['shopify_product_id', 'inventory_item_id', 'product_title', 'title', 'vendor', 'product_type', 'sku', 'barcode', 'shopify_unit_cost', 'price',
             'tracked', 'is_active', 'shopify_created_at', 'updated_at'];
 
         foreach (array_chunk($rows, self::CHUNK) as $chunk) {
             DB::table('variants')->upsert($chunk, ['shop_id', 'shopify_variant_id'], $update);
+            // The cost reports use: the merchant's own cost wins over Shopify's.
+            DB::table('variants')->where('shop_id', $shop->id)->whereIn('shopify_variant_id', array_column($chunk, 'shopify_variant_id'))
+                ->update(['unit_cost' => DB::raw('COALESCE(cost_override, shopify_unit_cost)')]);
         }
     }
 

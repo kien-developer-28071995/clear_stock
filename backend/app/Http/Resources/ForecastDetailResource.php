@@ -45,6 +45,9 @@ class ForecastDetailResource extends ForecastResource
                 'max_stock' => $v->max_stock,
                 'alerts_muted' => $v->alerts_muted,
                 'discontinued' => $v->discontinued,
+                // Cost entered in the app (wins) and Shopify's own.
+                'cost_override' => $v->cost_override !== null ? (float) $v->cost_override : null,
+                'shopify_cost' => $v->shopify_unit_cost !== null ? (float) $v->shopify_unit_cost : null,
                 // New products: similar product whose rate is borrowed (see explanation.reference).
                 'reference_variant_id' => $v->reference_variant_id,
                 'reference_name' => $v->reference_variant_id ? $v->reference?->displayName() : null,

@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\BillingController;
 use App\Http\Controllers\Api\BundleController;
 use App\Http\Controllers\Api\ClientErrorController;
+use App\Http\Controllers\Api\CostController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\ForecastAccuracyController;
 use App\Http\Controllers\Api\ForecastController;
@@ -80,6 +81,11 @@ Route::middleware('shopify.session')->group(function () {
     // Purchase plan: orders and spend week by week at the current sales rates (nothing saved).
     Route::get('/purchase-plan', [PurchasePlanController::class, 'show']);
     Route::get('/purchase-plan/export', [PurchasePlanController::class, 'export']);
+
+    // Unit costs entered in the app (win over Shopify's cost in money figures).
+    Route::get('/costs', [CostController::class, 'index']);
+    Route::put('/costs', [CostController::class, 'update'])->middleware('throttle:30,1');
+    Route::post('/costs/import', [CostController::class, 'import'])->middleware('throttle:10,1');
 
     // Orders placed outside Shopify ("mark as ordered"): counted as on the way.
     Route::get('/manual-orders', [ManualOrderController::class, 'index']);

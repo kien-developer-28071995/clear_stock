@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { MissingCostNote } from '@/components/ui/MissingCostNote';
 import type { Dashboard } from '@/features/dashboard/types';
 import { AbcBadge } from '@/features/forecasts/components/AbcBadge';
 import { formatMoney, formatNumber } from '@/utils/format';
@@ -56,7 +57,7 @@ export function AbcSummary({ dashboard }: { dashboard: Dashboard }) {
                     </s-table-body>
                 </s-table>
                 {abc.unclassified > 0 && <s-text color="subdued">{t('abc.unclassified', { count: abc.unclassified })}</s-text>}
-                {abc.missing_cost > 0 && <s-text color="subdued">{t('slow.missingCosts', { count: abc.missing_cost })}</s-text>}
+                <MissingCostNote count={abc.missing_cost} />
             </s-stack>
         </s-section>
     );
