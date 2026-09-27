@@ -146,8 +146,12 @@ class ExplanationFormatter
             $stock = $e['stock']['current'];
             $incoming = $e['stock']['incoming'] ?? 0; // absent in explanations computed before it existed
             $suggested = $e['reorder']['suggested_qty'];
-            if ($incoming > 0) {
-                $out[] = $this->line('incoming_stock', ['count' => $incoming]);
+            $ordered = $e['stock']['ordered'] ?? null; // placed outside Shopify (absent in older explanations)
+            if ($incoming - ($ordered['units'] ?? 0) > 0) {
+                $out[] = $this->line('incoming_stock', ['count' => $incoming - ($ordered['units'] ?? 0)]);
+            }
+            if ($ordered !== null) {
+                $out[] = $this->line('ordered_manual', ['count' => $ordered['units'], 'expected_date' => $ordered['expected_on']]);
             }
             $r = $e['reorder']['rounding'] ?? null; // absent in explanations computed before it existed
             if ($r !== null && $r['final'] !== $r['needed']) {

@@ -11,6 +11,8 @@ import { WhyThisNumber } from '@/features/forecasts/components/WhyThisNumber';
 import { AdjustForecastForm } from '@/features/forecasts/components/AdjustForecastForm';
 import { ProductSettingsForm } from '@/features/forecasts/components/ProductSettingsForm';
 import { LocationForecasts } from '@/features/forecasts/components/LocationForecasts';
+import { MarkOrderedModal } from '@/features/orders/components/MarkOrderedModal';
+import { useModal } from '@/hooks/useModal';
 
 export function ProductDetailPage() {
     const { t } = useTranslation();
@@ -18,6 +20,7 @@ export function ProductDetailPage() {
     const { data: f, isPending, error, refetch } = useForecast(variantId);
     const guide = useSetupGuide();
     const record = useRecordSetupEvent();
+    const markModal = useModal();
 
     // Setup guide step "See why a product needs reordering" completes on the first visit.
     const reviewed = guide.data?.steps.find((s) => s.key === 'review_forecast')?.done;
@@ -40,6 +43,16 @@ export function ProductDetailPage() {
     return (
         <s-page heading={f.name}>
             <s-link slot="breadcrumb-actions" href="/products">{t('nav.products')}</s-link>
+            {f.status !== 'discontinued' && (
+                <s-button slot="secondary-actions" onClick={() => markModal.open()}>
+                    {t('orders.mark')}
+                </s-button>
+            )}
+            <MarkOrderedModal
+                id="mark-ordered-product"
+                modalRef={markModal.ref}
+                items={[{ variant_id: f.variant_id, name: f.name, quantity: Math.max(1, f.suggested_qty) }]}
+            />
             <ForecastSummary f={f} />
             <LocationForecasts f={f} />
             <Tip id="product_explanation">{t('tips.product_explanation')}</Tip>

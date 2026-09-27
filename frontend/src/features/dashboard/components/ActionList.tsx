@@ -4,6 +4,8 @@ import type { ActionGroup, ActionItem, Dashboard } from '@/features/dashboard/ty
 import { ExportPurchaseOrderButton } from '@/features/forecasts/components/ExportPurchaseOrderButton';
 import { translateCode } from '@/i18n/codes';
 import { daysUntil, formatDate, formatNumber } from '@/utils/format';
+import { useModal } from '@/hooks/useModal';
+import { MarkOrderedModal } from '@/features/orders/components/MarkOrderedModal';
 
 const GROUPS: { key: ActionGroup; tone: 'critical' | 'warning' | 'neutral' }[] = [
     { key: 'out_of_stock', tone: 'critical' },
@@ -61,6 +63,12 @@ export function ActionList({ dashboard }: { dashboard: Dashboard }) {
     );
     const [selected, setSelected] = useState<Set<number>>(initial);
     const [expanded, setExpanded] = useState<Partial<Record<ActionGroup, boolean>>>({});
+    const markModal = useModal();
+    const all = useMemo(() => Object.values(actions).flat(), [actions]);
+    const toMark = useMemo(
+        () => all.filter((i) => selected.has(i.variant_id) && i.suggested_qty > 0).map((i) => ({ variant_id: i.variant_id, name: i.name, quantity: i.suggested_qty })),
+        [all, selected],
+    );
 
     const toggle = (id: number) => {
         const next = new Set(selected);
@@ -83,9 +91,15 @@ export function ActionList({ dashboard }: { dashboard: Dashboard }) {
             <s-box padding="base">
                 <s-stack direction="inline" gap="base" alignItems="center" justifyContent="space-between">
                     <s-text color="subdued">{t('actions.selected', { count: selected.size })}</s-text>
-                    <ExportPurchaseOrderButton variantIds={[...selected]} variant="primary" />
+                    <s-stack direction="inline" gap="small-200">
+                        <s-button disabled={toMark.length === 0 || undefined} onClick={() => markModal.open()}>
+                            {t('orders.markSelected')}
+                        </s-button>
+                        <ExportPurchaseOrderButton variantIds={[...selected]} variant="primary" />
+                    </s-stack>
                 </s-stack>
             </s-box>
+            <MarkOrderedModal id="mark-ordered-selected" modalRef={markModal.ref} items={toMark} onDone={() => setSelected(new Set())} />
             {groups.map((g) => {
                 const items = actions[g.key];
                 const shown = expanded[g.key] ? items : items.slice(0, VISIBLE);

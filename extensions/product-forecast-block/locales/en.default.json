@@ -176,6 +176,10 @@
         "event_upcoming_lower": {
             "one": "{{name}} ({{from_date}} – {{to_date}}, ×{{multiplier}}) takes {{count}} unit off what to order.",
             "other": "{{name}} ({{from_date}} – {{to_date}}, ×{{multiplier}}) takes {{count}} units off what to order."
+        },
+        "ordered_manual": {
+            "one": "You marked {{count}} unit as ordered (expected {{expected_date}}): counted as on the way.",
+            "other": "You marked {{count}} units as ordered (expected {{expected_date}}): counted as on the way."
         }
     }
 }

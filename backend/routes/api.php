@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\ForecastAccuracyController;
 use App\Http\Controllers\Api\ForecastController;
 use App\Http\Controllers\Api\GrowthScenarioController;
 use App\Http\Controllers\Api\ImportController;
+use App\Http\Controllers\Api\ManualOrderController;
 use App\Http\Controllers\Api\OnboardingController;
 use App\Http\Controllers\Api\ProductExtensionController;
 use App\Http\Controllers\Api\PurchaseOrderController;
@@ -79,6 +80,11 @@ Route::middleware('shopify.session')->group(function () {
     // Purchase plan: orders and spend week by week at the current sales rates (nothing saved).
     Route::get('/purchase-plan', [PurchasePlanController::class, 'show']);
     Route::get('/purchase-plan/export', [PurchasePlanController::class, 'export']);
+
+    // Orders placed outside Shopify ("mark as ordered"): counted as on the way.
+    Route::get('/manual-orders', [ManualOrderController::class, 'index']);
+    Route::post('/manual-orders', [ManualOrderController::class, 'store'])->middleware('throttle:30,1');
+    Route::patch('/manual-orders/{order}', [ManualOrderController::class, 'update'])->whereNumber('order');
 
     // Sales events (promotions, Black Friday): known changes in sales on set days.
     Route::get('/sales-events', [SalesEventController::class, 'index']);

@@ -297,7 +297,7 @@ describe('stock on the way (Shopify incoming)', function () {
 
         expect($with->suggestedQty)->toBe($without->suggestedQty - 50)
             ->and($with->incomingStock)->toBe(50)
-            ->and($with->explanation['stock'])->toBe(['current' => 20, 'incoming' => 50, 'position' => 70]);
+            ->and($with->explanation['stock'])->toBe(['current' => 20, 'incoming' => 50, 'position' => 70, 'ordered' => null]);
     });
 
     it('moves the reorder date by the stock position but keeps the stock-out date on hand only', function () {

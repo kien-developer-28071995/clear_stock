@@ -4,10 +4,12 @@ namespace App\Services\Forecast;
 
 use App\Enums\Feature;
 use App\Enums\OverrideField;
+use App\Models\ManualOrder;
 use App\Models\Shop;
 use App\Repositories\Contracts\DailySalesRepositoryInterface;
 use App\Repositories\Contracts\ForecastRepositoryInterface;
 use App\Repositories\Contracts\LocationSalesRepositoryInterface;
+use App\Repositories\Contracts\ManualOrderRepositoryInterface;
 use App\Services\App\SalesEventService;
 use App\Support\Entitlements;
 use Carbon\CarbonImmutable;
@@ -20,6 +22,7 @@ class ForecastInputBuilder
         private readonly DailySalesRepositoryInterface $sales,
         private readonly LocationSalesRepositoryInterface $locationSales,
         private readonly SalesEventService $salesEvents,
+        private readonly ManualOrderRepositoryInterface $manualOrders,
     ) {}
 
     /**
@@ -117,6 +120,8 @@ class ForecastInputBuilder
         $rows = $this->sales->rowsBetween($shop, array_values(array_unique([...$variantIds, ...$bundleIds])), $historyStart, $yesterday);
         $filterSpikes = $shop->filter_sales_spikes && Entitlements::for($shop)->has(Feature::SpikeFilter);
         $events = $this->salesEvents->matcher($shop, $asOf);
+        // Orders placed outside Shopify count as on the way, on top of Shopify's incoming.
+        $ordered = $this->manualOrders->onTheWay($shop, ManualOrder::countedFrom($asOf->toDateString()), $variantIds);
 
         $inputs = [];
         foreach ($variantIds as $id) {
@@ -151,7 +156,7 @@ class ForecastInputBuilder
                 supplierLeadTimeDays: $variant->supplier?->lead_time_days,
                 bundles: $bundleInputs,
                 overrides: $overrides[$id] ?? [],
-                incomingStock: $incoming[$id] ?? 0,
+                incomingStock: ($incoming[$id] ?? 0) + ($ordered[$id]['units'] ?? 0),
                 minOrderQty: $variant->effectiveMinOrderQty(),
                 packSize: $variant->effectivePackSize(),
                 // Named in the explanation when the rounding comes from the supplier's defaults.
@@ -170,6 +175,7 @@ class ForecastInputBuilder
                 discontinued: $variant->discontinued,
                 orderWeekdays: $variant->supplier?->order_weekdays,
                 events: $events->for($id, $variant->supplier_id),
+                ordered: $ordered[$id] ?? null,
             );
         }
 

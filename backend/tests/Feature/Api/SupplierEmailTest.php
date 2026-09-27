@@ -4,6 +4,7 @@ use App\Jobs\SendSupplierOrders;
 use App\Mail\SupplierOrderMail;
 use App\Models\AlertSetting;
 use App\Models\Location;
+use App\Models\ManualOrder;
 use App\Models\Shop;
 use App\Models\Supplier;
 use App\Models\SupplierEmail;
@@ -121,6 +122,9 @@ describe('automatic emails', function () {
         Mail::assertQueued(SupplierOrderMail::class, fn ($m) => $m->hasTo('orders@acme.test') && count($m->items) === 1);
         expect(SupplierEmail::first()->trigger)->toBe('auto');
 
+        // The email recorded the order as on the way; a week later it has arrived and more is due.
+        expect(ManualOrder::where('variant_id', $this->mug->id)->where('source', 'supplier_email')->value('quantity'))->toBeGreaterThan(0);
+        ManualOrder::query()->update(['status' => 'received']);
         $this->travelTo('2026-09-28 06:00:00');
         app(ForecastService::class)->runForShop($this->shop->fresh());
         expect($this->service->sendDue($this->shop->fresh(), ($this->at)('2026-09-28 09:00')))->toBe(1);
@@ -136,6 +140,7 @@ describe('automatic emails', function () {
             ->and($this->service->sendDue($this->shop->fresh(), ($this->at)('2026-09-21 15:00')))->toBe(0)   // already today
             ->and($this->service->sendDue($this->shop->fresh(), ($this->at)('2026-09-22 09:00')))->toBe(0);  // Tuesday
 
+        ManualOrder::query()->update(['status' => 'received']);
         $this->travelTo('2026-09-24 06:00:00');
         app(ForecastService::class)->runForShop($this->shop->fresh());
         expect($this->service->sendDue($this->shop->fresh(), ($this->at)('2026-09-24 09:00')))->toBe(1);    // Thursday, within the week

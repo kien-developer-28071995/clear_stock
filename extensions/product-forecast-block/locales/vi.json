@@ -149,6 +149,9 @@
         },
         "event_upcoming_lower": {
             "other": "{{name}} ({{from_date}} – {{to_date}}, ×{{multiplier}}) giảm {{count}} cái khỏi lượng cần đặt."
+        },
+        "ordered_manual": {
+            "other": "Bạn đã đánh dấu đặt {{count}} cái (dự kiến về {{expected_date}}): tính là hàng đang về."
         }
     }
 }

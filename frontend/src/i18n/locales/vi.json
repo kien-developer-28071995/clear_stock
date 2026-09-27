@@ -30,7 +30,8 @@
     "insights": "Phân tích",
     "whatIf": "Mô phỏng",
     "purchasePlan": "Kế hoạch nhập",
-    "events": "Sự kiện bán hàng"
+    "events": "Sự kiện bán hàng",
+    "orders": "Đơn đã đặt"
   },
   "notFound": {
     "heading": "Không tìm thấy trang",
@@ -613,7 +614,8 @@
     "order_weekday_moved": "Bạn đặt hàng {{supplier}} vào các ngày cố định trong tuần, nên cần đặt vào {{reorder_date}} thay vì {{due_date}}.",
     "event_past_other": "{{name}} (×{{multiplier}}): {{count}} ngày được tính theo mức bình thường.",
     "event_upcoming_other": "{{name}} ({{from_date}} – {{to_date}}, ×{{multiplier}}) cộng thêm {{count}} cái vào lượng cần đặt.",
-    "event_upcoming_lower_other": "{{name}} ({{from_date}} – {{to_date}}, ×{{multiplier}}) giảm {{count}} cái khỏi lượng cần đặt."
+    "event_upcoming_lower_other": "{{name}} ({{from_date}} – {{to_date}}, ×{{multiplier}}) giảm {{count}} cái khỏi lượng cần đặt.",
+    "ordered_manual_other": "Bạn đã đánh dấu đặt {{count}} cái (dự kiến về {{expected_date}}): tính là hàng đang về."
   },
   "import": {
     "fromStocky": "Nhập từ Stocky",
@@ -681,7 +683,8 @@
     "autoBadge": "Tự gửi email",
     "auto": "Tự động gửi đơn đặt hàng qua email",
     "autoHelp": "Khi sản phẩm của nhà cung cấp này cần nhập, app tự gửi email đơn đặt hàng cho họ (tối đa 1 lần mỗi tuần, từ 8 giờ sáng theo giờ cửa hàng). Phản hồi sẽ gửi về email cảnh báo của bạn.",
-    "autoPaused": "Tự gửi email tạm dừng (Growth)"
+    "autoPaused": "Tự gửi email tạm dừng (Growth)",
+    "recordsOrder": "Sau khi gửi, các số lượng này được tính là hàng đang về (xem Đơn đã đặt)."
   },
   "downgrade": {
     "heading": "Chuyển sang gói {{plan}}?",
@@ -1012,5 +1015,44 @@
     "emptyBody": "Sắp có Black Friday hay đợt sale? Thêm vào để đơn đặt hàng kịp đáp ứng nhu cầu tăng thêm.",
     "deleteHeading": "Xoá sự kiện?",
     "confirmDelete": "Xoá \"{{name}}\"? Dự báo sẽ được tính lại khi không có sự kiện này."
+  },
+  "orders": {
+    "mark": "Đánh dấu đã đặt",
+    "markSelected": "Đánh dấu đã đặt",
+    "markHeading": "Đánh dấu đã đặt hàng",
+    "markIntroOne": "Bạn đã đặt \"{{name}}\" ngoài Shopify (email, điện thoại, cổng của NCC)? Hàng sẽ được tính là đang về, nên không bị gợi ý đặt lại.",
+    "markIntro_other": "{{count}} sản phẩm ({{units}} cái, theo số lượng gợi ý) sẽ được tính là đang về, nên không bị gợi ý đặt lại.",
+    "markHelp": "Chỉ dùng cho đơn không nhập vào Shopify: đơn đặt hàng và phiếu chuyển kho trong Shopify đã tự hiện là hàng đang về.",
+    "quantity": "Số lượng",
+    "expected": "Dự kiến về",
+    "expectedHelp": "Để trống = hôm nay + lead time.",
+    "reference": "Mã đơn",
+    "status": "Trạng thái",
+    "recorded_other": "Đã đánh dấu {{count}} sản phẩm là đã đặt",
+    "intro": "Các đơn bạn đặt ngoài Shopify. Khi còn mở, chúng được tính là hàng đang về, và thêm vài ngày sau ngày dự kiến phòng khi giao trễ. Đánh dấu đã nhận khi hàng đã vào kho trên Shopify.",
+    "openHeading": "Đang về",
+    "closedHeading": "Đã đóng gần đây",
+    "orderedOn": "đặt {{date}}",
+    "viaEmail": "Đã gửi email cho NCC",
+    "receive": "Đã nhận",
+    "cancel": "Huỷ đơn",
+    "done": {
+      "received": "Đã đánh dấu đã nhận",
+      "cancelled": "Đã huỷ đơn",
+      "open": "Đã mở lại đơn"
+    },
+    "state": {
+      "open": "Đang về",
+      "late": "Trễ",
+      "overdue": "Quá hạn",
+      "received": "Đã nhận",
+      "cancelled": "Đã huỷ"
+    },
+    "emptyHeading": "Không có đơn nào đang mở",
+    "emptyBody": "Ở trang Cần nhập hàng, chọn sản phẩm rồi bấm \"Đánh dấu đã đặt\" sau khi đặt ngoài Shopify.",
+    "overdueHeading_other": "{{count}} đơn đã quá ngày dự kiến",
+    "overdueBody": "Các đơn này không còn được tính là đang về. Hãy đánh dấu đã nhận, hoặc huỷ nếu hàng sẽ không về.",
+    "review": "Xem các đơn",
+    "link_other": "Đơn đã đặt ({{count}})"
   }
 }

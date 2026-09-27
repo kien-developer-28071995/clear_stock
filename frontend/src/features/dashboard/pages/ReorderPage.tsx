@@ -7,6 +7,7 @@ import { Tip } from '@/features/setup/components/Tip';
 import { useTransfers } from '@/features/transfers/hooks/useTransfers';
 import { useEntitlements, useFeature } from '@/hooks/useEntitlements';
 import { NO_VALUE, fromOption, optionValue } from '@/utils/select';
+import { useManualOrders } from '@/features/orders/hooks/useManualOrders';
 
 /** Only the products of one vendor, to order everything from the same maker at once. */
 function forVendor(dashboard: Dashboard, vendor: string): Dashboard {
@@ -26,6 +27,9 @@ export function ReorderPage() {
     // Growth: stock that other locations can send, to move before ordering.
     const transfers = useTransfers(useEntitlements().transfers).data;
     const transferUnits = transfers?.routes.reduce((sum, r) => sum + r.total_units, 0) ?? 0;
+    // Orders marked as placed outside Shopify.
+    const orders = useManualOrders().data;
+    const overdue = orders?.open.filter((o) => o.state === 'overdue').length ?? 0;
 
     return (
         <DashboardGate heading={t('nav.reorder')}>
@@ -35,6 +39,15 @@ export function ReorderPage() {
                 return (
                     <s-page heading={t('nav.reorder')}>
                         <s-link slot="breadcrumb-actions" href="/">{t('nav.home')}</s-link>
+                        <s-button slot="secondary-actions" href="/orders">
+                            {t('orders.link', { count: orders?.open.length ?? 0 })}
+                        </s-button>
+                        {overdue > 0 && (
+                            <s-banner tone="warning" heading={t('orders.overdueHeading', { count: overdue })}>
+                                <s-paragraph>{t('orders.overdueBody')}</s-paragraph>
+                                <s-button slot="secondary-actions" href="/orders">{t('orders.review')}</s-button>
+                            </s-banner>
+                        )}
                         <Tip id="home_actions">{t(purchaseOrders ? 'tips.home_actions' : 'tips.home_actions_no_po')}</Tip>
                         {transferUnits > 0 && (
                             <s-banner tone="info" heading={t('transfers.beforeOrdering', { count: transferUnits, qty: transferUnits })}>
