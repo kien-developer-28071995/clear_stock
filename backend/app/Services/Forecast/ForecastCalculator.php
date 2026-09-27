@@ -35,6 +35,7 @@ class ForecastCalculator
     {
         $end = $in->asOf->subDay();                    // last complete day
         $series = $this->series($in, $end);
+        $pastEvents = $this->normalizePastEvents($series, $in->events);
         $spikes = $this->capSpikes($series, $end, $in->filterSpikes);
 
         // --- 2. Windowed averages -------------------------------------------------
@@ -68,7 +69,8 @@ class ForecastCalculator
 
         // --- 5. Reorder maths -----------------------------------------------------------
         $plan = $this->reorderPlan($in->asOf, $avg, $in->currentStock, $in->incomingStock, $leadTime['days'], $safety['days'],
-            $in->minStock, $in->maxStock, $in->minOrderQty, $in->packSize, $in->orderCycleDays, $in->orderWeekdays);
+            $in->minStock, $in->maxStock, $in->minOrderQty, $in->packSize, $in->orderCycleDays, $in->orderWeekdays,
+            $in->discontinued ? [] : $in->events);
         ['stock' => $stock, 'incoming' => $incoming, 'position' => $position, 'cycle' => $cycle, 'computed_point' => $computedPoint,
             'point' => $reorderPoint, 'target' => $targetStock, 'excess' => $excess, 'overstock' => $overstock, 'min' => $min, 'max' => $max,
             'rounding' => $rounding, 'suggested' => $suggested, 'days_of_cover' => $daysOfCover, 'stockout_date' => $stockoutDate,
@@ -107,6 +109,8 @@ class ForecastCalculator
                 'weight' => $w['weight_applied'],
             ], $windows),
             'spikes' => $spikes,
+            // Sales events: past event days counted at their normal level; upcoming ones added to the orders.
+            'events' => ['past' => $pastEvents, 'upcoming' => $plan['events']],
             'base_avg' => round($baseAvg, 2),
             'seasonality' => $seasonality,
             'bundles' => $this->bundleContributions($in, $series, $end),
@@ -220,16 +224,25 @@ class ForecastCalculator
     public function reorderPlan(
         CarbonImmutable $asOf, float $avg, int $stock, int $incoming, int $leadTimeDays, int $safetyDays,
         ?int $minStock = null, ?int $maxStock = null, ?int $minOrderQty = null, ?int $packSize = null, ?int $orderCycleDays = null,
-        ?array $orderWeekdays = null,
+        ?array $orderWeekdays = null, array $events = [],
     ): array {
         $incoming = max(0, $incoming);
         $position = $stock + $incoming;
         $cycle = $orderCycleDays ?? (int) $this->config['order_cycle_days'];
-        $computedPoint = (int) ceil($avg * ($leadTimeDays + $safetyDays) - 1e-9);
-        $computedTarget = $avg * ($leadTimeDays + $safetyDays + $cycle);
+        $cover = $leadTimeDays + $safetyDays;
+        // Expected demand over the next k days: the average, raised or lowered on sales event days.
+        $curve = $avg > 0 ? $this->eventCurve($asOf, $avg, $events, $cover + $cycle) : null;
+        $demand = fn (int $k): float => $curve === null ? $avg * $k : ($k <= count($curve) - 1 ? $curve[$k] : end($curve) + $avg * ($k - count($curve) + 1));
+        $computedPoint = (int) ceil($demand($cover) - 1e-9);
+        $computedTarget = $demand($cover + $cycle);
         // Manual min/max (Stocky style) replace the computed reorder point / order-up-to level.
         $min = $minStock;
         $max = $maxStock !== null && $maxStock > 0 ? $maxStock : null;
+        $pointAt = fn (int $k): int => $min ?? (function () use ($k, $demand, $cover, $max) {
+            $p = (int) ceil($demand($k + $cover) - $demand($k) - 1e-9);
+
+            return $max !== null ? min($p, $max) : $p;
+        })();
         $reorderPoint = $min ?? ($max !== null ? min($computedPoint, $max) : $computedPoint);
         $target = $max ?? max($computedTarget, (float) $reorderPoint);
         $needed = max(0, (int) ceil($target - $position - 1e-9));
@@ -244,10 +257,34 @@ class ForecastCalculator
             $stockoutDate = null;
             // Without sales only a manual minimum triggers a reorder.
             $reorderDate = $min !== null && $position <= $min ? $asOf->toDateString() : null;
-        } else {
+        } elseif ($curve === null) {
             $daysOfCover = $stock <= 0 ? 0.0 : round($stock / $avg, 1);
             $stockoutDate = $asOf->addDays($stock <= 0 ? 0 : (int) floor($stock / $avg))->toDateString();
             $reorderDate = $asOf->addDays($position <= $reorderPoint ? 0 : (int) floor(($position - $reorderPoint) / $avg))->toDateString();
+        } else {
+            // Same rules walking the event-adjusted demand day by day; past the events it is the plain average again.
+            $n = count($curve) - 1;
+            $full = 0;                                  // whole days the stock on hand covers
+            while ($full < $n && $curve[$full + 1] <= $stock + 1e-9) {
+                $full++;
+            }
+            if ($full === $n) {
+                $full += (int) floor(max(0.0, $stock - $curve[$n]) / $avg + 1e-9);
+            }
+            $next = $demand($full + 1) - $demand($full);
+            $daysOfCover = $stock <= 0 ? 0.0 : round($full + ($next > 0 ? max(0.0, $stock - $demand($full)) / $next : 0), 1);
+            $stockoutDate = $asOf->addDays($stock <= 0 ? 0 : $full)->toDateString();
+
+            $k = 0;                                     // last day the position is still above that day's reorder point
+            if ($position > $reorderPoint) {
+                while ($k < $n && $position - $demand($k + 1) >= $pointAt($k + 1)) {
+                    $k++;
+                }
+                if ($k === $n) {
+                    $k += (int) floor(max(0.0, $position - $demand($n) - $pointAt($n)) / $avg + 1e-9);
+                }
+            }
+            $reorderDate = $asOf->addDays($k)->toDateString();
         }
 
         // The supplier only takes orders on some weekdays: order on the last of them on or before the due date.
@@ -256,12 +293,90 @@ class ForecastCalculator
 
         return [
             'due_date' => $dueDate,
+            // What each upcoming sales event adds to (or takes from) the order-up-to level.
+            'events' => $curve === null ? [] : $this->eventEffects($asOf, $avg, $events, $cover, $cover + $cycle),
             'stock' => $stock, 'incoming' => $incoming, 'position' => $position, 'cycle' => $cycle,
             'computed_point' => $computedPoint, 'point' => $reorderPoint, 'target' => $targetStock,
             'excess' => $excess, 'overstock' => $overstock, 'min' => $min, 'max' => $max,
             'rounding' => $rounding, 'suggested' => $rounding['final'],
             'days_of_cover' => $daysOfCover, 'stockout_date' => $stockoutDate, 'reorder_date' => $reorderDate,
         ];
+    }
+
+    /**
+     * Demand multiplier of a date: the product of every sales event covering it (1 = a normal day).
+     *
+     * @param  array<int, array{name: string, from: string, to: string, multiplier: float}>  $events
+     */
+    public function multiplier(array $events, string $date): float
+    {
+        $m = 1.0;
+        foreach ($events as $e) {
+            if ($date >= $e['from'] && $date <= $e['to']) {
+                $m *= (float) $e['multiplier'];
+            }
+        }
+
+        return $m;
+    }
+
+    /**
+     * Cumulative expected demand from $asOf: [0, day 1, day 1+2, ...] up to the last event day plus $span
+     * days (after that every day is the plain average). Null when no event touches that window.
+     *
+     * @return ?array<int, float>
+     */
+    private function eventCurve(CarbonImmutable $asOf, float $avg, array $events, int $span): ?array
+    {
+        $today = $asOf->toDateString();
+        $last = null;
+        foreach ($events as $e) {
+            if ($e['to'] >= $today && (float) $e['multiplier'] !== 1.0) {
+                $last = max($last ?? $e['to'], $e['to']);
+            }
+        }
+        if ($last === null) {
+            return null;
+        }
+        $days = min(1100, (int) $asOf->diffInDays(CarbonImmutable::parse($last)) + 1 + $span);
+        $curve = [0.0];
+        for ($i = 0; $i < $days; $i++) {
+            $curve[] = $curve[$i] + $avg * $this->multiplier($events, $asOf->addDays($i)->toDateString());
+        }
+
+        return $curve;
+    }
+
+    /**
+     * Per event: its days inside the reorder window (lead time + safety) and the order window
+     * (+ order cycle), and the units it adds there (negative when it lowers demand).
+     *
+     * @return array<int, array{name: string, from: string, to: string, multiplier: float, days: int, units_lead: float, units_order: float}>
+     */
+    private function eventEffects(CarbonImmutable $asOf, float $avg, array $events, int $leadDays, int $orderDays): array
+    {
+        $out = [];
+        foreach ($events as $e) {
+            $inLead = 0;
+            $inOrder = 0;
+            for ($i = 0; $i < $orderDays; $i++) {
+                $d = $asOf->addDays($i)->toDateString();
+                if ($d >= $e['from'] && $d <= $e['to']) {
+                    $inOrder++;
+                    $inLead += $i < $leadDays ? 1 : 0;
+                }
+            }
+            if ($inOrder === 0) {
+                continue;
+            }
+            $extra = $avg * ((float) $e['multiplier'] - 1);
+            $out[] = [
+                'name' => $e['name'], 'from' => $e['from'], 'to' => $e['to'], 'multiplier' => (float) $e['multiplier'],
+                'days' => $inOrder, 'units_lead' => round($extra * $inLead, 1), 'units_order' => round($extra * $inOrder, 1),
+            ];
+        }
+
+        return $out;
     }
 
     /**
@@ -307,6 +422,36 @@ class ForecastCalculator
         }
 
         return $series;
+    }
+
+    /**
+     * Past event days (a promotion the merchant entered) are divided by the event's multiplier, so the
+     * average reflects a normal day. @return array<int, array{name: string, from: string, to: string, multiplier: float, days: int, units_removed: float}>
+     */
+    private function normalizePastEvents(array &$series, array $events): array
+    {
+        $out = [];
+        foreach ($events as $e) {
+            $m = (float) $e['multiplier'];
+            if ($m <= 0 || $m === 1.0) {
+                continue;
+            }
+            $days = 0;
+            $removed = 0.0;
+            foreach ($series as $date => $d) {
+                if ($date >= $e['from'] && $date <= $e['to']) {
+                    $normal = $d['demand'] / $m;
+                    $removed += $d['demand'] - $normal;
+                    $series[$date]['demand'] = $normal;
+                    $days++;
+                }
+            }
+            if ($days > 0) {
+                $out[] = ['name' => $e['name'], 'from' => $e['from'], 'to' => $e['to'], 'multiplier' => $m, 'days' => $days, 'units_removed' => round($removed, 1)];
+            }
+        }
+
+        return $out;
     }
 
     /**

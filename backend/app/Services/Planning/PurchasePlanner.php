@@ -26,7 +26,7 @@ class PurchasePlanner
         if ($avg <= 0 && $row['min_stock'] === null) {
             return [];
         }
-        $args = [$row['lead_time_days'], $row['safety_days'], $row['min_stock'], $row['max_stock'], $row['min_order_qty'], $row['pack_size'], $row['order_cycle_days'] ?? null, $row['order_weekdays'] ?? null];
+        $args = [$row['lead_time_days'], $row['safety_days'], $row['min_stock'], $row['max_stock'], $row['min_order_qty'], $row['pack_size'], $row['order_cycle_days'] ?? null, $row['order_weekdays'] ?? null, $row['events'] ?? []];
 
         $day = CarbonImmutable::parse($row['as_of']);
         $position = (float) ($row['stock'] + max(0, $row['incoming']));
@@ -37,7 +37,7 @@ class PurchasePlanner
                 $orders[] = ['date' => $day->toDateString(), 'qty' => $plan['suggested']];
                 $position += $plan['suggested'];
             }
-            $position = max(0.0, $position - $avg);
+            $position = max(0.0, $position - $avg * $this->calculator->multiplier($row['events'] ?? [], $day->toDateString()));
         }
 
         return $orders;

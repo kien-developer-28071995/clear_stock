@@ -12,6 +12,7 @@ export function AppNav() {
     const transfers = useFeature('transfers');
     const whatIf = useFeature('what_if');
     const purchasePlan = useFeature('purchase_plan');
+    const events = useFeature('sales_events');
 
     return (
         <AppNavEl>
@@ -24,6 +25,7 @@ export function AppNav() {
             <NavLink href="/insights">{t('nav.insights')}</NavLink>
             {purchasePlan && <NavLink href="/purchase-plan">{t('nav.purchasePlan')}</NavLink>}
             {whatIf && <NavLink href="/what-if">{t('nav.whatIf')}</NavLink>}
+            {events && <NavLink href="/events">{t('nav.events')}</NavLink>}
             <NavLink href="/suppliers">{t('nav.suppliers')}</NavLink>
             <NavLink href="/bundles">{t('nav.bundles')}</NavLink>
             <NavLink href="/settings">{t('nav.settings')}</NavLink>

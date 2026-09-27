@@ -38,6 +38,7 @@ return [
                 'lost_sales' => true,           // sales lost while out of stock
                 'purchase_plan' => false,       // 12-week order + spend plan
                 'accuracy' => true,             // forecast accuracy report
+                'sales_events' => true,         // promotions / Black Friday in the forecast
             ],
         ],
         'starter' => [
@@ -62,6 +63,7 @@ return [
                 'lost_sales' => true,
                 'purchase_plan' => true,
                 'accuracy' => true,
+                'sales_events' => true,
             ],
         ],
         'growth' => [
@@ -89,6 +91,7 @@ return [
                 'lost_sales' => true,
                 'purchase_plan' => true,
                 'accuracy' => true,
+                'sales_events' => true,
             ],
         ],
     ],

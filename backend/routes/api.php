@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\OnboardingController;
 use App\Http\Controllers\Api\ProductExtensionController;
 use App\Http\Controllers\Api\PurchaseOrderController;
 use App\Http\Controllers\Api\PurchasePlanController;
+use App\Http\Controllers\Api\SalesEventController;
 use App\Http\Controllers\Api\SettingsController;
 use App\Http\Controllers\Api\SetupGuideController;
 use App\Http\Controllers\Api\ShopController;
@@ -78,6 +79,12 @@ Route::middleware('shopify.session')->group(function () {
     // Purchase plan: orders and spend week by week at the current sales rates (nothing saved).
     Route::get('/purchase-plan', [PurchasePlanController::class, 'show']);
     Route::get('/purchase-plan/export', [PurchasePlanController::class, 'export']);
+
+    // Sales events (promotions, Black Friday): known changes in sales on set days.
+    Route::get('/sales-events', [SalesEventController::class, 'index']);
+    Route::post('/sales-events', [SalesEventController::class, 'store'])->middleware('throttle:30,1');
+    Route::put('/sales-events/{event}', [SalesEventController::class, 'update'])->whereNumber('event');
+    Route::delete('/sales-events/{event}', [SalesEventController::class, 'destroy'])->whereNumber('event');
 
     // Forecast accuracy: past forecasts next to what really sold.
     Route::get('/accuracy', ForecastAccuracyController::class);

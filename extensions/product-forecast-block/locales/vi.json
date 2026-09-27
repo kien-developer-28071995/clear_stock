@@ -140,6 +140,15 @@
             "other": "Ngừng nhập: còn {{count}} cái, gần đây chưa bán được."
         },
         "discontinued_sold_out": "Ngừng nhập: đã bán hết.",
-        "order_weekday_moved": "Bạn đặt hàng {{supplier}} vào các ngày cố định trong tuần, nên cần đặt vào {{reorder_date}} thay vì {{due_date}}."
+        "order_weekday_moved": "Bạn đặt hàng {{supplier}} vào các ngày cố định trong tuần, nên cần đặt vào {{reorder_date}} thay vì {{due_date}}.",
+        "event_past": {
+            "other": "{{name}} (×{{multiplier}}): {{count}} ngày được tính theo mức bình thường."
+        },
+        "event_upcoming": {
+            "other": "{{name}} ({{from_date}} – {{to_date}}, ×{{multiplier}}) cộng thêm {{count}} cái vào lượng cần đặt."
+        },
+        "event_upcoming_lower": {
+            "other": "{{name}} ({{from_date}} – {{to_date}}, ×{{multiplier}}) giảm {{count}} cái khỏi lượng cần đặt."
+        }
     }
 }

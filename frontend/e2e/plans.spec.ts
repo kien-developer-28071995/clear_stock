@@ -38,6 +38,7 @@ const PAGES: [string, string][] = [
     ['/suppliers/from-vendors', 'vendors'],
     ['/bundles', 'Bundles'],
     ['/settings', 'Settings'],
+    ['/events', 'Sales events'],
     ['/plans', 'Plans'],
 ];
 
@@ -204,6 +205,43 @@ for (const plan of ['free', 'starter', 'growth'] as PlanKey[]) {
                     expect(s.order_weekdays).toContain(iso);
                 }
             }
+        });
+
+        test('a sales event raises what to order and is explained, then removed', async ({ app }) => {
+            type Events = { data: { id: number; name: string }[] };
+            type Detail = { data: { explanation_lines: { code: string; params: { name?: string } }[] } };
+            const name = `E2E Promo ${plan}`;
+            const day = (offset: number) => new Date(Date.now() + offset * 86400000).toISOString().slice(0, 10);
+
+            await open(app, '/events');
+            await app.locator('s-button', { hasText: 'Add event' }).first().evaluate((el: HTMLElement) => el.click());
+            const modal = app.locator('s-modal#sales-event-modal');
+            await modal.getByRole('textbox', { name: 'Name' }).fill(name);
+            // Date fields are comboboxes (typed date + picker); the value is taken on blur.
+            for (const [label, value] of [['From', day(3)], ['To', day(7)]]) {
+                await modal.getByRole('combobox', { name: label, exact: true }).fill(value);
+                await modal.getByRole('combobox', { name: label, exact: true }).press('Tab');
+            }
+            await modal.getByRole('spinbutton', { name: 'Sales change' }).fill('200');
+            await modal.locator('s-button[slot="primary-action"]').click();
+            const row = app.locator('s-table-row', { hasText: name });
+            await expect(row).toContainText('+200%');
+            await expect(row).toContainText('Upcoming');
+
+            // The recompute is queued: poll a selling product's explanation.
+            await open(app, '/products?status=reorder_now');
+            await app.locator('s-table-body s-table-row s-link').first().click();
+            await settled(app);
+            const variantId = Number(app.url().split('/').pop());
+            await expect.poll(async () => (await api<Detail>(app, `/forecasts/${variantId}`)).data.explanation_lines.some((l) => l.code.startsWith('event_upcoming') && l.params.name === name), { timeout: 30_000 }).toBe(true);
+            await app.reload();
+            await expect(app.getByText(name).first()).toBeVisible();
+
+            await open(app, '/events');
+            await row.locator('s-button', { hasText: 'Delete' }).click();
+            await app.locator('s-modal s-button[slot="primary-action"]', { hasText: 'Delete' }).click();
+            await expect(row).toHaveCount(0);
+            expect((await api<Events>(app, '/sales-events')).data.some((e) => e.name === name)).toBe(false);
         });
 
         test('insights show forecast accuracy (or when it starts)', async ({ app }) => {

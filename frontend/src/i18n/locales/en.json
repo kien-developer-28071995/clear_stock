@@ -30,7 +30,8 @@
     "reorder": "Reorder",
     "insights": "Insights",
     "whatIf": "What-if",
-    "purchasePlan": "Purchase plan"
+    "purchasePlan": "Purchase plan",
+    "events": "Sales events"
   },
   "notFound": {
     "heading": "Page not found",
@@ -574,7 +575,10 @@
     "mapping_incomplete": "Choose the supplier column and a product column (SKU, variant ID or product name).",
     "max_below_min": "Max must be at least the min.",
     "no_items": "Add at least one product.",
-    "auto_email_needs_email": "Add the supplier email first."
+    "auto_email_needs_email": "Add the supplier email first.",
+    "event_too_long": "An event can last at most 3 months. For a lasting change, adjust the sales rate instead.",
+    "required_if": "This field is required.",
+    "not_in": "Choose a different value."
   },
   "explanation": {
     "unknown": "—",
@@ -653,7 +657,13 @@
     "discontinued_no_sales_one": "Not reordered (discontinued): {{count}} unit left, no recent sales.",
     "discontinued_no_sales_other": "Not reordered (discontinued): {{count}} units left, no recent sales.",
     "discontinued_sold_out": "Not reordered (discontinued): sold out.",
-    "order_weekday_moved": "You order from {{supplier}} on set weekdays, so order on {{reorder_date}} instead of {{due_date}}."
+    "order_weekday_moved": "You order from {{supplier}} on set weekdays, so order on {{reorder_date}} instead of {{due_date}}.",
+    "event_past_one": "{{name}} (×{{multiplier}}): {{count}} day counted at its normal level.",
+    "event_past_other": "{{name}} (×{{multiplier}}): {{count}} days counted at their normal level.",
+    "event_upcoming_one": "{{name}} ({{from_date}} – {{to_date}}, ×{{multiplier}}) adds {{count}} unit to what to order.",
+    "event_upcoming_other": "{{name}} ({{from_date}} – {{to_date}}, ×{{multiplier}}) adds {{count}} units to what to order.",
+    "event_upcoming_lower_one": "{{name}} ({{from_date}} – {{to_date}}, ×{{multiplier}}) takes {{count}} unit off what to order.",
+    "event_upcoming_lower_other": "{{name}} ({{from_date}} – {{to_date}}, ×{{multiplier}}) takes {{count}} units off what to order."
   },
   "import": {
     "fromStocky": "Import from Stocky",
@@ -1066,5 +1076,39 @@
     "difference": "Difference (units)",
     "perDay": "{{value}}/day",
     "product": "Forecast from {{from}} to {{to}}: {{predicted}}/day. Really sold: {{actual}}/day (in-stock days)."
+  },
+  "events": {
+    "intro": "Tell the forecast about promotions and other known changes in sales (Black Friday, a sale, a holiday closure). Upcoming events raise or lower what to order and when; days of past events count at their normal level, so a sale does not inflate the usual pace.",
+    "add": "Add event",
+    "edit": "Edit event",
+    "added": "Event added",
+    "updated": "Event updated",
+    "deleted": "Event deleted",
+    "name": "Name",
+    "namePlaceholder": "Black Friday",
+    "from": "From",
+    "to": "To",
+    "dates": "Dates",
+    "change": "Sales change",
+    "changeHelp": "+100% = double sales, −50% = half. Forecasts are recomputed after saving.",
+    "appliesTo": "Applies to",
+    "scope": {
+      "all": "All products",
+      "supplier": "One supplier's products",
+      "products": "Chosen products"
+    },
+    "pickSupplier": "Choose a supplier",
+    "pickProducts": "Choose products",
+    "productCount_one": "{{count}} product",
+    "productCount_other": "{{count}} products",
+    "status": {
+      "upcoming": "Upcoming",
+      "now": "Running",
+      "past": "Past"
+    },
+    "emptyHeading": "No sales events yet",
+    "emptyBody": "Planning a Black Friday or a sale? Add it so orders cover the extra demand in time.",
+    "deleteHeading": "Delete event?",
+    "confirmDelete": "Delete \"{{name}}\"? Forecasts will be recomputed without it."
   }
 }

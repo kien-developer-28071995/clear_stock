@@ -29,7 +29,8 @@
     "reorder": "Cần nhập hàng",
     "insights": "Phân tích",
     "whatIf": "Mô phỏng",
-    "purchasePlan": "Kế hoạch nhập"
+    "purchasePlan": "Kế hoạch nhập",
+    "events": "Sự kiện bán hàng"
   },
   "notFound": {
     "heading": "Không tìm thấy trang",
@@ -551,7 +552,10 @@
     "mapping_incomplete": "Hãy chọn cột nhà cung cấp và một cột sản phẩm (SKU, ID biến thể hoặc tên sản phẩm).",
     "max_below_min": "Max phải lớn hơn hoặc bằng Min.",
     "no_items": "Hãy thêm ít nhất một sản phẩm.",
-    "auto_email_needs_email": "Hãy nhập email nhà cung cấp trước."
+    "auto_email_needs_email": "Hãy nhập email nhà cung cấp trước.",
+    "event_too_long": "Sự kiện dài tối đa 3 tháng. Nếu thay đổi kéo dài, hãy chỉnh tốc độ bán.",
+    "required_if": "Vui lòng nhập ô này.",
+    "not_in": "Hãy chọn giá trị khác."
   },
   "explanation": {
     "unknown": "—",
@@ -606,7 +610,10 @@
     "discontinued_sells_through_other": "Ngừng nhập: {{count}} cái còn lại sẽ bán hết khoảng {{stockout_date}}.",
     "discontinued_no_sales_other": "Ngừng nhập: còn {{count}} cái, gần đây chưa bán được.",
     "discontinued_sold_out": "Ngừng nhập: đã bán hết.",
-    "order_weekday_moved": "Bạn đặt hàng {{supplier}} vào các ngày cố định trong tuần, nên cần đặt vào {{reorder_date}} thay vì {{due_date}}."
+    "order_weekday_moved": "Bạn đặt hàng {{supplier}} vào các ngày cố định trong tuần, nên cần đặt vào {{reorder_date}} thay vì {{due_date}}.",
+    "event_past_other": "{{name}} (×{{multiplier}}): {{count}} ngày được tính theo mức bình thường.",
+    "event_upcoming_other": "{{name}} ({{from_date}} – {{to_date}}, ×{{multiplier}}) cộng thêm {{count}} cái vào lượng cần đặt.",
+    "event_upcoming_lower_other": "{{name}} ({{from_date}} – {{to_date}}, ×{{multiplier}}) giảm {{count}} cái khỏi lượng cần đặt."
   },
   "import": {
     "fromStocky": "Nhập từ Stocky",
@@ -972,5 +979,38 @@
     "difference": "Chênh lệch (cái)",
     "perDay": "{{value}}/ngày",
     "product": "Dự báo từ {{from}} đến {{to}}: {{predicted}}/ngày. Thực tế bán: {{actual}}/ngày (ngày còn hàng)."
+  },
+  "events": {
+    "intro": "Báo cho dự báo biết các đợt khuyến mãi và thay đổi doanh số đã biết trước (Black Friday, đợt sale, nghỉ lễ). Sự kiện sắp tới làm tăng hoặc giảm lượng cần đặt và thời điểm đặt; các ngày của sự kiện đã qua được tính theo mức bình thường, để đợt sale không làm tốc độ bán thường ngày bị đẩy lên.",
+    "add": "Thêm sự kiện",
+    "edit": "Sửa sự kiện",
+    "added": "Đã thêm sự kiện",
+    "updated": "Đã cập nhật sự kiện",
+    "deleted": "Đã xoá sự kiện",
+    "name": "Tên",
+    "namePlaceholder": "Black Friday",
+    "from": "Từ ngày",
+    "to": "Đến ngày",
+    "dates": "Thời gian",
+    "change": "Doanh số thay đổi",
+    "changeHelp": "+100% = bán gấp đôi, −50% = bán một nửa. Dự báo được tính lại sau khi lưu.",
+    "appliesTo": "Áp dụng cho",
+    "scope": {
+      "all": "Tất cả sản phẩm",
+      "supplier": "Sản phẩm của một nhà cung cấp",
+      "products": "Sản phẩm được chọn"
+    },
+    "pickSupplier": "Chọn nhà cung cấp",
+    "pickProducts": "Chọn sản phẩm",
+    "productCount_other": "{{count}} sản phẩm",
+    "status": {
+      "upcoming": "Sắp tới",
+      "now": "Đang diễn ra",
+      "past": "Đã qua"
+    },
+    "emptyHeading": "Chưa có sự kiện bán hàng",
+    "emptyBody": "Sắp có Black Friday hay đợt sale? Thêm vào để đơn đặt hàng kịp đáp ứng nhu cầu tăng thêm.",
+    "deleteHeading": "Xoá sự kiện?",
+    "confirmDelete": "Xoá \"{{name}}\"? Dự báo sẽ được tính lại khi không có sự kiện này."
   }
 }

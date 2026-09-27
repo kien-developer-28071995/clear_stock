@@ -24,6 +24,7 @@ return [
     'spike_filter' => (bool) env('FEATURE_SPIKE_FILTER', true),       // cap one-off sales spikes
     'lost_sales' => (bool) env('FEATURE_LOST_SALES', true),           // sales lost while out of stock
     'accuracy' => (bool) env('FEATURE_ACCURACY', true),               // past forecasts vs what really sold
+    'sales_events' => (bool) env('FEATURE_SALES_EVENTS', true),       // promotions raising/lowering demand on set days
 
     // Ordering
     'purchase_orders' => (bool) env('FEATURE_PURCHASE_ORDERS', true),   // PO export (CSV)

@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Location;
+use App\Models\SalesEvent;
 use App\Models\Shop;
 use App\Models\Supplier;
 use App\Services\Forecast\ForecastService;
@@ -119,4 +120,11 @@ it('saves supplier order weekdays (sorted, every day = any day)', function () {
     $this->putJson("/api/suppliers/{$id}", ['name' => 'Acme', 'order_weekdays' => [1, 2, 3, 4, 5, 6, 7]], $this->auth)->assertOk()
         ->assertJsonPath('data.order_weekdays', null);
     $this->putJson("/api/suppliers/{$id}", ['name' => 'Acme', 'order_weekdays' => [8]], $this->auth)->assertUnprocessable();
+});
+
+it('plans more for an upcoming sales event', function () {
+    $before = collect(purchasePlan(['weeks' => 4])['items'])->firstWhere('name', 'Mug')['units'];
+    SalesEvent::factory()->for($this->shop)->create(['starts_on' => '2026-10-01', 'ends_on' => '2026-10-10', 'multiplier' => 3]);
+
+    expect(collect(purchasePlan(['weeks' => 4])['items'])->firstWhere('name', 'Mug')['units'])->toBeGreaterThan($before);
 });
