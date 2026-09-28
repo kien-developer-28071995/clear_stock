@@ -16,10 +16,11 @@ Embedded Shopify app that forecasts stock-outs per variant, suggests reorder poi
 3. In `shopify.app.toml`, set `client_id = "<your client id>"`.
 
 ### 2. Configure environment (1 min)
-Backend and frontend each have their own env file:
+Backend, frontend and website each have their own env file:
 ```bash
 cp backend/.env.example backend/.env
 cp frontend/.env.example frontend/.env
+cp website/.env.example website/.env
 ```
 In `backend/.env` fill in `SHOPIFY_API_KEY` (Client ID) and `SHOPIFY_API_SECRET` (Client secret). Everything else works as-is for dev (`make setup` also creates missing env files from the examples).
 
@@ -27,7 +28,7 @@ In `backend/.env` fill in `SHOPIFY_API_KEY` (Client ID) and `SHOPIFY_API_SECRET`
 ```bash
 make setup
 ```
-This builds images, installs Composer deps, generates `APP_KEY`, runs migrations and starts: `app` (PHP-FPM), `nginx` (:8080), `mysql`, `redis`, `horizon`, `scheduler`, `node` (Vite + HMR), `mailpit` (UI on http://localhost:8025).
+This builds images, installs Composer deps, generates `APP_KEY`, runs migrations and starts: `app` (PHP-FPM), `nginx` (:8080), `mysql`, `redis`, `horizon`, `scheduler`, `node` (Vite + HMR), `website` (marketing site, http://localhost:4321), `mailpit` (UI on http://localhost:8025).
 
 ### 4. Open a public HTTPS tunnel (30 s)
 ```bash
@@ -63,6 +64,7 @@ npx @shopify/cli@latest app deploy  # app config + the three admin extensions
 | `make migrate` / `make fresh` | Run migrations / rebuild the DB |
 | `make test` | Run the backend Pest test suite |
 | `make typecheck` | Type-check the frontend |
+| `make website-build` | Check and build the marketing website into `website/dist` (dev server: http://localhost:4321) |
 | `make logs` (`s=horizon`) | Tail logs (all or one service) |
 | `make tunnel` | Start HTTPS tunnel + write URL to both env files and `shopify.app.toml` |
 | `make extensions` | Install admin extension deps, copy the forecast translations into them, type-check |
@@ -198,7 +200,17 @@ API (session-token authenticated): `GET /api/dashboard`, `GET|POST /api/onboardi
 
 ---
 
-**Public pages** (`/privacy`, `/support`, the App Store listing URLs) are a second, small Vite entry: `src/public.tsx` with `src/features/legal`. They run outside the Shopify admin, so they load no App Bridge or Polaris CDN script. Laravel serves the shell `resources/views/public-app.blade.php` with the app name, support email (`SUPPORT_EMAIL`) and policy date. The text is translated like the app (`legal.*` in the locale files; `?lang=vi`, otherwise the browser language).
+**Public pages** (home, `/privacy`, `/support`, the App Store listing URLs) live on the marketing website, see [Website](#website). The app's own `/privacy` and `/support` answer `301` to `WEBSITE_URL` (keeping `?lang=vi` as `/vi/...`), and `/` without a `shop` redirects to the website home, so old links and sent emails keep working.
+
+## Website
+
+`website/` is the marketing site: an [Astro](https://astro.build) project that builds plain static HTML (no framework JavaScript, fast and indexable). Pages: home (features, how it works, screenshots, pricing, FAQ), `/privacy`, `/support` and a 404, each in the app's six languages (English at `/`, others under `/vi`, `/es`, `/de`, `/fr`, `/pt`), plus `sitemap.xml` and `robots.txt`.
+
+- **Text:** `website/src/i18n/locales/<lang>.json` (the privacy policy and support FAQ are the `legal` section). `npm run i18n:check` (part of `npm run build`) fails on a missing key or a lost `{{placeholder}}`. Bump `PRIVACY_UPDATED` in `website/src/config.ts` when the policy changes, and keep the policy true to what the backend stores.
+- **Settings** (`website/.env`, read at build time): `SITE_URL`, `APP_NAME`, `SUPPORT_EMAIL`, `INSTALL_URL` (the App Store listing, for every Install button), `GROWTH_OFFERED`. In production the Deploy workflow fills them from the same GitHub Variables as the app (`WEBSITE_URL`, `SHOPIFY_APP_NAME`, `SUPPORT_EMAIL`, `INSTALL_URL`, `BILLING_GROWTH_OFFERED`).
+- **Prices** shown on the site mirror `backend/config/billing.php` in `website/src/config.ts`: change both together.
+- **Screenshots** in `website/public/screenshots` are copies of `docs/listing/screenshots` (re-copy after `make listing-screenshots`).
+- **Run:** `make up` starts it with hot reload on http://localhost:4321 (or `cd website && npm install && npm run dev`); `make website-build` checks and builds `website/dist`. Production: Caddy serves the built files (deploy/Caddyfile, docs/DEPLOY.md).
 
 ## Languages
 
@@ -324,16 +336,19 @@ Backend and frontend are separate projects; the repo root only holds infra.
 │   │   ├── Observers/              cache invalidation
 │   │   └── Support/CacheKeys.php   every cache key lives here
 │   └── resources/views/app.blade.php   loads App Bridge, Polaris and the Vite bundle
-└── frontend/             React 19 + TypeScript + Vite (package.json, vite.config.ts, .env)
-    └── src/
-        ├── app/                    App, providers, router
-        ├── features/<module>/      api, hooks, components, pages, types.ts
-        └── components/ui|layout, lib/ (http client with session token, queryClient)
+├── frontend/             React 19 + TypeScript + Vite (package.json, vite.config.ts, .env)
+│   └── src/
+│       ├── app/                    App, providers, router
+│       ├── features/<module>/      api, hooks, components, pages, types.ts
+│       └── components/ui|layout, lib/ (http client with session token, queryClient)
+└── website/              Marketing site, static Astro (package.json, astro.config.mjs, .env): home, /privacy, /support
+    └── src/                        pages/[...lang]/, components/, layouts/, i18n/locales/, config.ts
 ```
 
 - **Separate env files:**
   - `backend/.env`: Laravel config (Shopify, DB, Redis, mail, `APP_URL`). The `mysql` container maps its `DB_*` values to `MYSQL_*`, and the named tunnel reads `TUNNEL_TOKEN` from it, so credentials are never duplicated.
   - `frontend/.env`: Vite only (`APP_URL` for the dev server/HMR origin). Only `VITE_*` variables reach browser code; never put secrets here.
+  - `website/.env`: build settings of the static website (all of it ends up in public HTML; never put secrets here).
   - Host ports use compose defaults (`8080`, `33060`, `8025`); override per run, e.g. `APP_PORT=8090 make up`.
 - The frontend builds into `backend/public/build`; in dev, Vite writes `backend/public/hot` so Laravel serves HMR assets.
 - Request flow in the backend: Controller → Service → Repository (Cache → Eloquent) → Model.

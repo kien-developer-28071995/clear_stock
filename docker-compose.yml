@@ -94,6 +94,20 @@ services:
     environment:
       npm_config_cache: /app/frontend/.npm-cache
 
+  # Marketing website (website/, reads website/.env): Astro dev server, http://localhost:4321.
+  # The app's /privacy and /support redirect here (WEBSITE_URL in backend/.env).
+  website:
+    image: node:22-alpine
+    working_dir: /app/website
+    user: "${UID:-1000}:${GID:-1000}"
+    command: ["sh", "-c", "npm install --no-audit --no-fund && npm run dev -- --port 4321"]
+    ports:
+      - "${FORWARD_WEBSITE_PORT:-4321}:4321"
+    volumes:
+      - ./website:/app/website
+    environment:
+      npm_config_cache: /app/website/.npm-cache
+
   mailpit:
     image: axllent/mailpit:latest
     ports:

@@ -1,0 +1,15 @@
+---
+import Home from '../../components/Home.astro';
+import Base from '../../layouts/Base.astro';
+import { site } from '../../config';
+import { localeFromParam, localeStaticPaths, translator } from '../../i18n';
+
+export const getStaticPaths = localeStaticPaths;
+
+const locale = localeFromParam(Astro.params.lang);
+const { t } = translator(locale);
+---
+
+<Base locale={locale} page="" title={t('meta.title', { app: site.appName })} description={t('meta.description')}>
+    <Home locale={locale} />
+</Base>

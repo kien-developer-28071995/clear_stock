@@ -1,0 +1,282 @@
+{
+  "meta": {
+    "title": "{{app}}: dự báo tồn kho cho Shopify",
+    "description": "Biết khi nào từng sản phẩm hết hàng và cần nhập bao nhiêu. Dự báo giải thích bằng lời dễ hiểu, hỗ trợ combo, giá cố định từ $0."
+  },
+  "nav": {
+    "features": "Tính năng",
+    "how": "Cách hoạt động",
+    "pricing": "Bảng giá",
+    "faq": "Hỏi đáp",
+    "support": "Hỗ trợ",
+    "install": "Cài trên Shopify",
+    "language": "Ngôn ngữ",
+    "skip": "Bỏ qua tới nội dung"
+  },
+  "hero": {
+    "eyebrow": "Dự báo tồn kho cho Shopify",
+    "title": "Biết khi nào từng sản phẩm hết hàng, và cần nhập bao nhiêu.",
+    "lead": "{{app}} dự báo ngày hết hàng của từng biến thể, cho bạn biết khi nào cần đặt và đặt bao nhiêu. Mỗi con số đều kèm cách tính, để bạn kiểm tra và tự chỉnh.",
+    "ctaPrimary": "Cài miễn phí trên Shopify",
+    "ctaSecondary": "Xem bảng giá",
+    "note": "Gói miễn phí tới 50 sản phẩm · Sẵn sàng trong khoảng 5 phút · Không hợp đồng"
+  },
+  "demo": {
+    "label": "Ví dụ một dự báo trong app",
+    "product": "Áo sơ mi linen · Be / M",
+    "badge": "Cần đặt ngay",
+    "confidence": "Độ tin cậy cao",
+    "inStock": "Tồn kho",
+    "perDay": "Bán mỗi ngày",
+    "runsOut": "Hết hàng",
+    "orderBy": "Đặt trước",
+    "suggested": "Gợi ý đặt",
+    "units": "{{count}} cái",
+    "why": "Vì sao là những con số này?",
+    "line1": "Bán {{rate}}/ngày trong 30 ngày qua (đã bỏ 3 ngày hết hàng).",
+    "line2": "Lead time {{lead}} ngày + {{safety}} ngày dự phòng → điểm đặt lại {{point}} cái.",
+    "line3": "Tồn {{stock}} cái, hết khoảng {{runsOut}} → đặt {{qty}} cái trước {{orderBy}}."
+  },
+  "pillars": {
+    "explained": {
+      "title": "Con số nào cũng giải thích được",
+      "body": "Các khoảng ngày bán, ngày hết hàng bị loại, mùa vụ, lead time và tồn an toàn, viết bằng lời dễ hiểu."
+    },
+    "price": {
+      "title": "Giá cố định, nhỏ",
+      "body": "Miễn phí, hoặc {{price}} mỗi tháng. Không lấy phần trăm doanh thu, không hợp đồng, giá không bao giờ tăng."
+    },
+    "quiet": {
+      "title": "Không làm phiền",
+      "body": "Tối đa một email mỗi ngày, chỉ khi có hàng cần đặt. Không pop-up mời nâng cấp."
+    },
+    "selfServe": {
+      "title": "Không cần gọi demo",
+      "body": "Cài app, trả lời hai câu hỏi, và thấy ngay việc cần nhập trong lúc lịch sử bán hàng được tải về."
+    }
+  },
+  "features": {
+    "heading": "Đủ mọi thứ để nhập hàng đúng lúc",
+    "lead": "Dành cho cửa hàng Shopify nhỏ và đang lớn, nhập hàng từ nhà cung cấp và không muốn bảng tính hay hợp đồng doanh nghiệp.",
+    "forecast": {
+      "title": "Ngày hết hàng của từng biến thể",
+      "body": "Kết hợp doanh số 7, 30 và 90 ngày gần nhất, bỏ các ngày hết hàng và tính đến mùa vụ năm trước."
+    },
+    "reorder": {
+      "title": "Khi nào đặt, đặt bao nhiêu",
+      "body": "Điểm đặt lại từ lead time và tồn an toàn, trừ hàng đang về, làm tròn theo số lượng tối thiểu và quy cách thùng."
+    },
+    "explain": {
+      "title": "“Vì sao là con số này?”",
+      "body": "Mỗi dự báo cho thấy những ngày bán được tính, ngày bị loại và cài đặt đang áp dụng. Không đồng ý? Chỉnh tốc độ bán, lead time hay tồn an toàn."
+    },
+    "bundles": {
+      "title": "Combo tính đúng",
+      "body": "Doanh số combo được cộng vào từng thành phần, nên những món bạn thực sự nhập kho được dự báo chính xác."
+    },
+    "suppliers": {
+      "title": "Nhà cung cấp và lead time",
+      "body": "Lead time, ngày đặt hàng và chu kỳ đặt theo từng nhà cung cấp. Tạo nhà cung cấp từ Vendor Shopify chỉ với một lần bấm."
+    },
+    "stocky": {
+      "title": "Chuyển từ Stocky?",
+      "body": "Nhập file CSV đơn đặt hàng: tạo nhà cung cấp, gán sản phẩm và đo lead time từ chính các đơn cũ của bạn."
+    },
+    "planning": {
+      "title": "Lên kế hoạch trước",
+      "body": "Kế hoạch nhập 12 tuần, ngân sách nhập hàng theo tháng, sự kiện bán hàng như Black Friday, và “nếu doanh số tăng 20% thì sao?”."
+    },
+    "insights": {
+      "title": "Thấy tiền đang kẹt ở đâu",
+      "body": "Hàng bán chậm và tồn thừa, phân loại ABC theo doanh thu, doanh thu mất do hết hàng, và độ chính xác của các dự báo trước."
+    }
+  },
+  "explain": {
+    "heading": "Dự báo đọc được, không phải hộp đen",
+    "lead": "Phần lớn công cụ dự báo chỉ đưa bạn một con số. {{app}} cho bạn biết con số đó từ đâu ra, bằng chính những từ bạn vẫn dùng.",
+    "point1": "Thấy những ngày bán nào được tính và ngày hết hàng nào bị loại ra.",
+    "point2": "Thấy lead time, tồn an toàn và quy tắc của nhà cung cấp đằng sau mỗi số lượng gợi ý.",
+    "point3": "Sắp khuyến mãi hay tháng vắng khách? Chỉnh tốc độ bán và xem gợi ý cập nhật ngay.",
+    "alt": "Dự báo sản phẩm kèm giải thích trong {{app}}"
+  },
+  "how": {
+    "heading": "Chạy được sau khoảng 5 phút",
+    "install": {
+      "title": "Cài từ Shopify App Store",
+      "body": "Không cần tạo tài khoản. App mở ngay trong trang quản trị Shopify."
+    },
+    "setup": {
+      "title": "Trả lời hai câu hỏi",
+      "body": "Lead time thường của nhà cung cấp (điền sẵn 14 ngày) và email nhận cảnh báo. Đơn hàng và tồn kho được tải về trong nền."
+    },
+    "reorder": {
+      "title": "Nhập hàng tự tin",
+      "body": "Trang chủ hiện năm sản phẩm cần đặt trước tiên và số tiền đang kẹt ở hàng bán chậm. Nhà cung cấp và combo chỉnh lúc nào cũng được."
+    }
+  },
+  "screens": {
+    "heading": "Bên trong app",
+    "home": "Trang chủ: cần đặt gì trước",
+    "reorder": "Danh sách cần nhập hàng, xuất đơn đặt hàng",
+    "insights": "Phân tích: hàng bán chậm, ABC, độ chính xác",
+    "alt": "Ảnh chụp {{app}}: {{caption}}"
+  },
+  "pricing": {
+    "heading": "Giá đơn giản, cố định",
+    "lead": "Trả tiền theo gói, không theo doanh số. Tính vào hóa đơn Shopify, hủy bất cứ lúc nào.",
+    "monthly": "Theo tháng",
+    "yearly": "Theo năm",
+    "save": "Tiết kiệm 20%",
+    "perMonth": "/tháng",
+    "perYear": "/năm",
+    "free": "Miễn phí",
+    "forever": "mãi mãi",
+    "trial": "Dùng thử miễn phí {{days}} ngày",
+    "cta": "Cài trên Shopify",
+    "popular": "Phổ biến nhất",
+    "priceLock": "Giữ giá: chừng nào bạn còn dùng gói hiện tại, giá không bao giờ tăng.",
+    "plans": {
+      "free": {
+        "tagline": "Cho danh mục nhỏ",
+        "items": [
+          "Dự báo 50 sản phẩm bán chạy nhất",
+          "Điểm đặt lại và số lượng gợi ý",
+          "Giải thích “Vì sao là con số này?”",
+          "Nhà cung cấp, lead time, số lượng tối thiểu và quy cách thùng",
+          "Nhập từ Stocky",
+          "Sự kiện bán hàng, phân loại ABC và hàng bán chậm"
+        ]
+      },
+      "starter": {
+        "tagline": "Cho cửa hàng đang lớn",
+        "items": [
+          "Mọi thứ của gói Miễn phí, không giới hạn sản phẩm",
+          "Combo tính vào từng thành phần",
+          "Một email cảnh báo mỗi ngày hoặc mỗi tuần",
+          "Xuất đơn đặt hàng (CSV hoặc mẫu PO của Shopify)",
+          "Kế hoạch nhập 12 tuần và ngân sách tháng",
+          "Mô phỏng “nếu doanh số tăng”",
+          "Dự báo sản phẩm mới theo sản phẩm tương tự"
+        ]
+      },
+      "growth": {
+        "tagline": "Cho nhiều chi nhánh",
+        "items": [
+          "Mọi thứ của gói Starter",
+          "Dự báo theo từng chi nhánh",
+          "Gợi ý chuyển kho giữa các chi nhánh",
+          "Tự động gửi đơn cho nhà cung cấp",
+          "Cảnh báo sắp hết hàng tức thì",
+          "Shopify Flow triggers"
+        ]
+      }
+    }
+  },
+  "faq": {
+    "heading": "Câu hỏi",
+    "data": {
+      "q": "App lưu những dữ liệu gì?",
+      "a": "Chỉ tổng doanh số theo ngày của từng sản phẩm, danh mục và tồn kho, cùng những gì bạn nhập. Không có tên, email hay địa chỉ khách hàng, và không lưu đơn hàng thô."
+    },
+    "languages": {
+      "q": "App có những ngôn ngữ nào?",
+      "a": "Tiếng Anh, tiếng Việt, tiếng Tây Ban Nha, tiếng Đức, tiếng Pháp và tiếng Bồ Đào Nha. App theo ngôn ngữ trang quản trị Shopify, hoặc bạn chọn trong Settings."
+    },
+    "more": "Xem thêm câu trả lời ở trang hỗ trợ"
+  },
+  "cta": {
+    "heading": "Thôi đoán mò chuyện nhập hàng",
+    "body": "Cài {{app}}, và dự báo đầu tiên sẵn sàng trước khi bạn pha xong ly cà phê.",
+    "button": "Cài miễn phí trên Shopify"
+  },
+  "footer": {
+    "tagline": "Dự báo tồn kho cho người bán trên Shopify.",
+    "product": "Sản phẩm",
+    "help": "Trợ giúp",
+    "contact": "Liên hệ",
+    "rights": "© {{year}} {{app}}. Shopify là nhãn hiệu của Shopify Inc."
+  },
+  "notFound": {
+    "title": "Không tìm thấy trang",
+    "body": "Trang này không tồn tại hoặc đã được chuyển đi.",
+    "home": "Về trang chủ"
+  },
+  "legal": {
+    "privacy": {
+      "title": "Chính sách quyền riêng tư",
+      "updated": "Cập nhật lần cuối: {{date}}",
+      "intro": "Chính sách này giải thích {{app}} (\"ứng dụng\") đọc gì từ cửa hàng Shopify của bạn, lưu gì và cách yêu cầu xóa. Ứng dụng dành cho chủ cửa hàng Shopify; ứng dụng không liên hệ với khách hàng của bạn.",
+      "reads": {
+        "heading": "Ứng dụng đọc gì từ Shopify",
+        "productsLabel": "Sản phẩm và biến thể",
+        "products": "tên, SKU, mã vạch, nhà sản xuất, loại sản phẩm, giá bán, giá vốn, trạng thái.",
+        "inventoryLabel": "Tồn kho",
+        "inventory": "số lượng còn và đang về theo từng chi nhánh, và danh sách chi nhánh.",
+        "ordersLabel": "Đơn hàng",
+        "orders": "chỉ số lượng bán và trả của từng biến thể, ngày đặt hàng và, với cửa hàng có nhiều chi nhánh, chi nhánh giao hàng, để tính tổng bán theo ngày. Ứng dụng không bao giờ lấy tên, email, địa chỉ, số điện thoại hay thông tin thanh toán của khách hàng.",
+        "storeLabel": "Thông tin cửa hàng",
+        "store": "tên miền, tên cửa hàng, đơn vị tiền tệ, múi giờ và email liên hệ (để gửi email cho bạn khi chưa đặt email nhận cảnh báo)."
+      },
+      "stores": {
+        "heading": "Ứng dụng lưu gì",
+        "sales": "Tổng bán theo ngày của từng biến thể (số bán, số trả, tồn cuối ngày) trong tối đa 400 ngày. Không lưu đơn hàng gốc.",
+        "catalog": "Thông tin sản phẩm nêu trên, tồn kho hiện tại và các dự báo tính từ đó.",
+        "entered": "Những gì bạn nhập trong ứng dụng: nhà cung cấp (tên, email, thời gian giao hàng), cài đặt, combo và điều chỉnh dự báo.",
+        "shop": "Tên miền cửa hàng, mã truy cập Shopify đã mã hóa, gói dịch vụ và email bạn chọn để nhận cảnh báo.",
+        "emails": "Nhật ký email ứng dụng gửi cho bạn (người nhận, tiêu đề, ngày, trạng thái gửi; không lưu nội dung), giữ 180 ngày, và với đơn đặt hàng bạn gửi cho nhà cung cấp, danh sách sản phẩm và số lượng đã đặt.",
+        "noCustomers": "Ứng dụng không lưu dữ liệu cá nhân nào của khách hàng của bạn.",
+        "noCustomersBody": "Vì vậy các yêu cầu Shopify chuyển tới thay mặt khách hàng (yêu cầu dữ liệu, yêu cầu xóa) không có gì để trả về hay xóa."
+      },
+      "use": {
+        "heading": "Dữ liệu được dùng thế nào",
+        "body": "Chỉ để cung cấp ứng dụng: dự báo, gợi ý nhập hàng, email bạn bật và hỗ trợ. Dữ liệu không được bán, không chia sẻ cho quảng cáo và không dùng để huấn luyện AI. Không dùng cookie theo dõi hay quảng cáo; ứng dụng chạy trong Shopify admin và xác thực bằng session token của Shopify."
+      },
+      "providers": {
+        "heading": "Nhà cung cấp dịch vụ",
+        "body": "Ứng dụng chạy trên một nhà cung cấp hosting (máy chủ và cơ sở dữ liệu), gửi email qua một dịch vụ gửi email và báo lỗi kỹ thuật (không có dữ liệu khách hàng, mã truy cập được che) về một kênh giám sát nội bộ. Họ chỉ xử lý dữ liệu thay mặt chúng tôi để vận hành ứng dụng."
+      },
+      "retention": {
+        "heading": "Lưu giữ và xóa dữ liệu",
+        "uninstall": "Khi bạn gỡ ứng dụng, mã truy cập bị xóa ngay và việc tính phí dừng lại.",
+        "erase": "48 giờ sau khi gỡ, Shopify yêu cầu ứng dụng xóa dữ liệu cửa hàng và toàn bộ bị xóa (tổng bán, sản phẩm, dự báo, nhà cung cấp, cài đặt, nhật ký email). Cài lại trong 48 giờ đó thì dữ liệu vẫn còn.",
+        "sooner": "Để xóa dữ liệu sớm hơn hoặc nhận một bản sao, gửi email tới"
+      },
+      "security": {
+        "heading": "Bảo mật",
+        "body": "Kết nối được mã hóa (HTTPS). Mã truy cập được mã hóa khi lưu. Webhook từ Shopify được xác thực bằng chữ ký."
+      },
+      "contact": {
+        "heading": "Liên hệ",
+        "body": "Câu hỏi hoặc yêu cầu về dữ liệu của bạn:"
+      }
+    },
+    "support": {
+      "title": "Hỗ trợ",
+      "contact": "Cần trợ giúp với {{app}}? Gửi email cho chúng tôi tại",
+      "reply": "Chúng tôi trả lời trong vòng một ngày làm việc.",
+      "faq": "Câu hỏi thường gặp",
+      "q": {
+        "forecast": {
+          "q": "Dự báo được tính thế nào?",
+          "a": "Mỗi sản phẩm có phần giải thích \"Vì sao ra con số này?\": các khoảng thời gian bán dùng để tính (7, 30 và 90 ngày), các ngày hết hàng bị loại bỏ, mùa vụ, combo, thời gian giao hàng và tồn kho an toàn. Bạn có thể tự điều chỉnh tốc độ bán, thời gian giao hàng và tồn kho an toàn."
+        },
+        "noForecast": {
+          "q": "Vì sao tôi chưa thấy dự báo?",
+          "a": "Ngay sau khi cài, ứng dụng nhập đơn hàng và tồn kho trong nền (có thanh tiến độ). Cửa hàng chưa có đơn sẽ có dự báo khi bắt đầu bán; sản phẩm chưa bán hiện \"chưa có doanh số\"."
+        },
+        "stocky": {
+          "q": "Tôi chuyển từ Stocky. Có giữ được nhà cung cấp không?",
+          "a": "Có. Xuất đơn đặt hàng từ Stocky dạng CSV rồi nhập ở Nhà cung cấp → Nhập từ Stocky. Ứng dụng tạo nhà cung cấp, gán sản phẩm và tính thời gian giao hàng của từng nhà cung cấp."
+        },
+        "billing": {
+          "q": "Tính phí thế nào? Có hủy bất cứ lúc nào được không?",
+          "a": "Gói có giá cố định theo tháng hoặc năm, tính vào hóa đơn Shopify: không lấy phần trăm doanh thu, không hợp đồng. Giá của bạn không bao giờ tăng khi bạn còn dùng gói đó. Gỡ ứng dụng sẽ tự động hủy thanh toán."
+        },
+        "uninstall": {
+          "q": "Gỡ ứng dụng thì dữ liệu của tôi ra sao?",
+          "a": "Dữ liệu bị xóa 48 giờ sau khi gỡ. Xem"
+        }
+      }
+    }
+  }
+}

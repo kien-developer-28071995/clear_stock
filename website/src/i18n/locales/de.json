@@ -1,0 +1,282 @@
+{
+  "meta": {
+    "title": "{{app}}: Bestandsprognose für Shopify",
+    "description": "Wisse, wann jedes Produkt ausverkauft ist und wie viel du nachbestellen musst. Verständlich erklärte Prognosen, inklusive Bundles, Festpreis ab 0 $."
+  },
+  "nav": {
+    "features": "Funktionen",
+    "how": "So funktioniert’s",
+    "pricing": "Preise",
+    "faq": "FAQ",
+    "support": "Support",
+    "install": "Auf Shopify installieren",
+    "language": "Sprache",
+    "skip": "Zum Inhalt springen"
+  },
+  "hero": {
+    "eyebrow": "Bestandsprognose für Shopify",
+    "title": "Wisse, wann jedes Produkt ausverkauft ist – und wie viel du nachbestellen musst.",
+    "lead": "{{app}} prognostiziert das Ausverkaufsdatum jeder Variante und sagt dir, wann und wie viel du bestellen solltest. Zu jeder Zahl gibt es die Rechnung dahinter – zum Prüfen und Anpassen.",
+    "ctaPrimary": "Kostenlos auf Shopify installieren",
+    "ctaSecondary": "Preise ansehen",
+    "note": "Gratis-Tarif für bis zu 50 Produkte · In etwa 5 Minuten startklar · Kein Vertrag"
+  },
+  "demo": {
+    "label": "Beispielprognose in der App",
+    "product": "Leinenhemd · Sand / M",
+    "badge": "Jetzt nachbestellen",
+    "confidence": "Hohe Zuverlässigkeit",
+    "inStock": "Auf Lager",
+    "perDay": "Verkauf pro Tag",
+    "runsOut": "Ausverkauft am",
+    "orderBy": "Bestellen bis",
+    "suggested": "Bestellvorschlag",
+    "units": "{{count}} Stück",
+    "why": "Warum diese Zahlen?",
+    "line1": "Verkauft {{rate}}/Tag in den letzten 30 Tagen (3 Tage ohne Bestand ausgelassen).",
+    "line2": "Lieferzeit {{lead}} Tage + {{safety}} Sicherheitstage → Meldebestand {{point}} Stück.",
+    "line3": "{{stock}} auf Lager reichen bis etwa {{runsOut}} → {{qty}} Stück bis {{orderBy}} bestellen."
+  },
+  "pillars": {
+    "explained": {
+      "title": "Jede Zahl erklärt",
+      "body": "Verkaufszeiträume, ausgelassene Tage ohne Bestand, Saisonalität, Lieferzeit und Sicherheitsbestand – in klaren Worten."
+    },
+    "price": {
+      "title": "Fester, kleiner Preis",
+      "body": "Gratis oder {{price}} im Monat. Nie ein Anteil an deinem Umsatz, kein Vertrag, und dein Preis steigt nie."
+    },
+    "quiet": {
+      "title": "Bewusst unaufdringlich",
+      "body": "Höchstens eine E-Mail pro Tag, nur wenn etwas bestellt werden muss. Keine Upsell-Pop-ups."
+    },
+    "selfServe": {
+      "title": "Kein Demo-Termin nötig",
+      "body": "Installieren, zwei Fragen beantworten und sehen, was nachzubestellen ist, während deine Historie importiert wird."
+    }
+  },
+  "features": {
+    "heading": "Alles, um rechtzeitig nachzubestellen",
+    "lead": "Für kleine und wachsende Shopify-Shops, die bei Lieferanten einkaufen und weder Tabellen noch Enterprise-Verträge wollen.",
+    "forecast": {
+      "title": "Ausverkaufsdatum je Variante",
+      "body": "Eine Mischung aus deinen Verkäufen der letzten 7, 30 und 90 Tage, ohne Tage ohne Bestand und mit der Saison des Vorjahres."
+    },
+    "reorder": {
+      "title": "Wann bestellen und wie viel",
+      "body": "Meldebestand aus Lieferzeit und Sicherheitsbestand, abzüglich eingehender Ware, gerundet auf Mindestmengen und Verpackungseinheiten."
+    },
+    "explain": {
+      "title": "„Warum diese Zahl?“",
+      "body": "Jede Prognose zeigt die verwendeten Verkaufstage, die ausgelassenen Tage und die aktiven Einstellungen. Anderer Meinung? Passe Verkaufsrate, Lieferzeit oder Sicherheitsbestand an."
+    },
+    "bundles": {
+      "title": "Bundles richtig gezählt",
+      "body": "Verkäufe eines Bundles zählen für jede Komponente – so wird prognostiziert, was du wirklich lagerst."
+    },
+    "suppliers": {
+      "title": "Lieferanten und Lieferzeiten",
+      "body": "Lieferzeit, Bestelltage und Bestellzyklus pro Lieferant. Lieferanten mit einem Klick aus deinen Shopify-Vendors anlegen."
+    },
+    "stocky": {
+      "title": "Umstieg von Stocky?",
+      "body": "Importiere deine Bestellungs-CSV: Lieferanten werden angelegt, Produkte verknüpft und Lieferzeiten aus echten Bestellungen gemessen."
+    },
+    "planning": {
+      "title": "Vorausplanen",
+      "body": "Ein 12-Wochen-Einkaufsplan, ein monatliches Einkaufsbudget, Verkaufsaktionen wie Black Friday und „Was, wenn der Umsatz um 20 % steigt?“."
+    },
+    "insights": {
+      "title": "Sieh, wo Geld feststeckt",
+      "body": "Langsamer und überschüssiger Bestand, ABC-Klassen nach Umsatz, entgangene Verkäufe bei Ausverkauf und die Genauigkeit früherer Prognosen."
+    }
+  },
+  "explain": {
+    "heading": "Eine Prognose zum Nachlesen, keine Blackbox",
+    "lead": "Die meisten Tools geben dir eine Zahl. {{app}} sagt dir, woher sie kommt – in den Worten, die du selbst verwenden würdest.",
+    "point1": "Sieh, welche Verkaufstage gezählt und welche Tage ohne Bestand ausgelassen wurden.",
+    "point2": "Sieh Lieferzeit, Sicherheitsbestand und Lieferantenregeln hinter jeder Bestellmenge.",
+    "point3": "Aktion geplant oder ein ruhiger Monat? Ändere die Verkaufsrate und der Vorschlag passt sich an.",
+    "alt": "Produktprognose mit Erklärung in {{app}}"
+  },
+  "how": {
+    "heading": "In etwa 5 Minuten einsatzbereit",
+    "install": {
+      "title": "Aus dem Shopify App Store installieren",
+      "body": "Kein Konto anlegen. Die App öffnet sich direkt in deinem Shopify-Admin."
+    },
+    "setup": {
+      "title": "Zwei Fragen beantworten",
+      "body": "Deine übliche Lieferzeit (14 Tage sind vorausgefüllt) und wohin Hinweise gehen sollen. Bestellungen und Bestand werden im Hintergrund importiert."
+    },
+    "reorder": {
+      "title": "Sicher nachbestellen",
+      "body": "Die Startseite zeigt die fünf Produkte, die zuerst bestellt werden sollten, und das in Ladenhütern gebundene Geld. Lieferanten und Bundles kannst du jederzeit anpassen."
+    }
+  },
+  "screens": {
+    "heading": "Ein Blick in die App",
+    "home": "Start: was zuerst bestellen",
+    "reorder": "Nachbestellliste mit Bestellungsexport",
+    "insights": "Analyse: Ladenhüter, ABC-Klassen, Genauigkeit",
+    "alt": "Screenshot von {{app}}: {{caption}}"
+  },
+  "pricing": {
+    "heading": "Einfache Festpreise",
+    "lead": "Du zahlst für den Tarif, nicht für deinen Umsatz. Abgerechnet über deine Shopify-Rechnung, jederzeit kündbar.",
+    "monthly": "Monatlich",
+    "yearly": "Jährlich",
+    "save": "20 % sparen",
+    "perMonth": "/Monat",
+    "perYear": "/Jahr",
+    "free": "Gratis",
+    "forever": "dauerhaft",
+    "trial": "{{days}} Tage kostenlos testen",
+    "cta": "Auf Shopify installieren",
+    "popular": "Beliebteste Wahl",
+    "priceLock": "Preisgarantie: Solange du in deinem Tarif bleibst, steigt dein Preis nie.",
+    "plans": {
+      "free": {
+        "tagline": "Für kleine Sortimente",
+        "items": [
+          "Prognosen für deine 50 meistverkauften Produkte",
+          "Meldebestand und Bestellvorschlag",
+          "Erklärungen „Warum diese Zahl?“",
+          "Lieferanten, Lieferzeiten, Mindestmengen und Verpackungseinheiten",
+          "Import aus Stocky",
+          "Verkaufsaktionen, ABC-Klassen und Ladenhüter"
+        ]
+      },
+      "starter": {
+        "tagline": "Für wachsende Shops",
+        "items": [
+          "Alles aus Gratis, für unbegrenzt viele Produkte",
+          "Bundles zählen für ihre Komponenten",
+          "Eine tägliche oder wöchentliche E-Mail",
+          "Bestellungsexport (CSV oder Shopify-Format)",
+          "12-Wochen-Einkaufsplan und Monatsbudget",
+          "Szenarien „Was, wenn der Umsatz wächst?“",
+          "Neue Produkte nach einem ähnlichen Produkt prognostizieren"
+        ]
+      },
+      "growth": {
+        "tagline": "Für mehrere Standorte",
+        "items": [
+          "Alles aus Starter",
+          "Prognosen pro Standort",
+          "Umlagerungsvorschläge zwischen Standorten",
+          "Automatische Bestellungen an Lieferanten",
+          "Sofortige Hinweise bei niedrigem Bestand",
+          "Shopify-Flow-Trigger"
+        ]
+      }
+    }
+  },
+  "faq": {
+    "heading": "Fragen",
+    "data": {
+      "q": "Welche Daten speichert die App?",
+      "a": "Nur tägliche Verkaufssummen pro Produkt, deinen Katalog und Lagerbestand sowie deine Eingaben. Keine Namen, E-Mails oder Adressen von Kunden, und Rohbestellungen werden nicht gespeichert."
+    },
+    "languages": {
+      "q": "Welche Sprachen spricht die App?",
+      "a": "Englisch, Vietnamesisch, Spanisch, Deutsch, Französisch und Portugiesisch. Sie folgt der Sprache deines Shopify-Admins, oder du wählst eine in den Einstellungen."
+    },
+    "more": "Weitere Antworten auf der Support-Seite"
+  },
+  "cta": {
+    "heading": "Schluss mit Raten beim Nachbestellen",
+    "body": "Installiere {{app}} – deine ersten Prognosen sind fertig, bevor dein Kaffee es ist.",
+    "button": "Kostenlos auf Shopify installieren"
+  },
+  "footer": {
+    "tagline": "Bestandsprognose für Shopify-Händler.",
+    "product": "Produkt",
+    "help": "Hilfe",
+    "contact": "Kontakt",
+    "rights": "© {{year}} {{app}}. Shopify ist eine Marke von Shopify Inc."
+  },
+  "notFound": {
+    "title": "Seite nicht gefunden",
+    "body": "Diese Seite gibt es nicht oder sie wurde verschoben.",
+    "home": "Zur Startseite"
+  },
+  "legal": {
+    "privacy": {
+      "title": "Datenschutzerklärung",
+      "updated": "Zuletzt aktualisiert: {{date}}",
+      "intro": "Diese Erklärung beschreibt, was {{app}} (die „App“) aus deinem Shopify-Shop liest, was sie speichert und wie du die Daten löschen lassen kannst. Die App wird von Shopify-Händlern genutzt; sie hat keinen Kontakt zu deinen Kunden.",
+      "reads": {
+        "heading": "Was die App aus Shopify liest",
+        "productsLabel": "Produkte und Varianten",
+        "products": "Titel, SKU, Barcode, Hersteller, Produkttyp, Preis, Stückkosten, Status.",
+        "inventoryLabel": "Lagerbestand",
+        "inventory": "verfügbare und eingehende Mengen pro Standort sowie deine Standorte.",
+        "ordersLabel": "Bestellungen",
+        "orders": "nur die verkaufte und zurückgegebene Menge jeder Variante, das Bestelldatum und bei Shops mit mehreren Standorten, welcher Standort sie ausgeführt hat, um tägliche Verkaufssummen zu bilden. Die App fragt nie Namen, E-Mail-Adressen, Adressen, Telefonnummern oder Zahlungsdaten von Kunden ab.",
+        "storeLabel": "Shop-Angaben",
+        "store": "Shop-Domain, Name, Währung, Zeitzone und Kontakt-E-Mail (um dir zu schreiben, wenn keine Warn-E-Mail festgelegt ist)."
+      },
+      "stores": {
+        "heading": "Was die App speichert",
+        "sales": "Tägliche Verkaufssummen pro Variante (verkaufte Stück, zurückgegebene Stück, Tagesendbestand) für bis zu 400 Tage. Rohe Bestellungen werden nicht gespeichert.",
+        "catalog": "Die oben genannten Katalogangaben, aktuelle Lagerbestände und die daraus berechneten Prognosen.",
+        "entered": "Was du in der App eingibst: Lieferanten (Name, E-Mail, Lieferzeit), Einstellungen, Bundles und Prognoseanpassungen.",
+        "shop": "Deine Shop-Domain, ein verschlüsseltes Shopify-Zugriffstoken, dein Tarif und die E-Mail-Adresse, die du für Warnungen wählst.",
+        "emails": "Ein Protokoll der E-Mails, die die App für dich gesendet hat (Empfänger, Betreff, Datum, Zustellstatus; nicht die Nachricht), 180 Tage aufbewahrt, und bei Bestellungen, die du an einen Lieferanten sendest, die bestellten Produkte und Mengen.",
+        "noCustomers": "Die App speichert keine personenbezogenen Daten deiner Kunden.",
+        "noCustomersBody": "Anfragen, die Shopify im Namen deiner Kunden weiterleitet (Auskunfts- und Löschanfragen), haben daher nichts zurückzugeben oder zu löschen."
+      },
+      "use": {
+        "heading": "Wie die Daten verwendet werden",
+        "body": "Nur zur Bereitstellung der App: Prognosen, Nachbestellvorschläge, die E-Mails, die du aktivierst, und Support. Die Daten werden nicht verkauft, nicht für Werbung weitergegeben und nicht zum Training von KI-Modellen verwendet. Es werden keine Tracking- oder Werbe-Cookies verwendet; die App läuft im Shopify-Adminbereich und signiert Anfragen mit Shopify-Sitzungstokens."
+      },
+      "providers": {
+        "heading": "Dienstleister",
+        "body": "Die App läuft bei einem Hosting-Anbieter (Server und Datenbank), versendet E-Mails über einen E-Mail-Zustelldienst und meldet technische Fehler (ohne Kundendaten; Zugriffstokens sind maskiert) an einen internen Überwachungskanal. Sie verarbeiten Daten nur in unserem Auftrag, um die App zu betreiben."
+      },
+      "retention": {
+        "heading": "Aufbewahrung und Löschung",
+        "uninstall": "Wenn du die App deinstallierst, wird ihr Zugriffstoken sofort entfernt und die Abrechnung beendet.",
+        "erase": "48 Stunden nach der Deinstallation fordert Shopify die App auf, die Daten deines Shops zu löschen, und alles wird gelöscht (Verkaufssummen, Katalog, Prognosen, Lieferanten, Einstellungen, E-Mail-Protokoll). Wenn du innerhalb dieser 48 Stunden neu installierst, bleiben deine Daten erhalten.",
+        "sooner": "Wenn deine Daten früher gelöscht werden sollen oder du eine Kopie möchtest, schreib an"
+      },
+      "security": {
+        "heading": "Sicherheit",
+        "body": "Der Datenverkehr ist verschlüsselt (HTTPS). Zugriffstokens werden verschlüsselt gespeichert. Webhooks von Shopify werden per Signatur geprüft."
+      },
+      "contact": {
+        "heading": "Kontakt",
+        "body": "Fragen oder Anfragen zu deinen Daten:"
+      }
+    },
+    "support": {
+      "title": "Support",
+      "contact": "Brauchst du Hilfe mit {{app}}? Schreib uns an",
+      "reply": "Wir antworten innerhalb eines Werktags.",
+      "faq": "Häufige Fragen",
+      "q": {
+        "forecast": {
+          "q": "Wie wird die Prognose berechnet?",
+          "a": "Jedes Produkt hat eine „Warum diese Zahl?“-Erklärung: die verwendeten Verkaufszeiträume (7, 30 und 90 Tage), ausgelassene ausverkaufte Tage, Saisonalität, Bundles, Lieferzeit und Sicherheitsbestand. Du kannst Verkaufsrate, Lieferzeit und Sicherheitsbestand selbst anpassen."
+        },
+        "noForecast": {
+          "q": "Warum sehe ich noch keine Prognosen?",
+          "a": "Direkt nach der Installation importiert die App deine Bestellungen und Bestände im Hintergrund (ein Fortschrittsbalken zeigt es an). Ein Shop ohne Bestellungen bekommt Prognosen, sobald er verkauft; Produkte ohne Verkäufe zeigen „noch keine Verkäufe“."
+        },
+        "stocky": {
+          "q": "Ich wechsle von Stocky. Kann ich meine Lieferanten behalten?",
+          "a": "Ja. Exportiere deine Bestellungen aus Stocky als CSV und importiere sie unter Lieferanten → Aus Stocky importieren. Die App legt deine Lieferanten an, verknüpft die Produkte und ermittelt die Lieferzeit jedes Lieferanten."
+        },
+        "billing": {
+          "q": "Wie funktioniert die Abrechnung? Kann ich jederzeit kündigen?",
+          "a": "Tarife haben einen festen Monats- oder Jahrespreis, abgerechnet über deine Shopify-Rechnung: keine Umsatzbeteiligung, kein Vertrag. Dein Preis steigt nie, solange du in deinem Tarif bleibst. Die Deinstallation der App beendet die Abrechnung automatisch."
+        },
+        "uninstall": {
+          "q": "Was passiert mit meinen Daten, wenn ich die App deinstalliere?",
+          "a": "Sie werden 48 Stunden nach der Deinstallation gelöscht. Siehe die"
+        }
+      }
+    }
+  }
+}

@@ -38,7 +38,7 @@ Files: `backend/.env.production.example` (all of the above as env), `shopify.app
 - [x] Production app config without `write_orders`, fulfillment scopes or optional scopes (`shopify.app.production.toml`). The dev app keeps them (`dev:fake-orders`).
 - [x] `SHOPIFY_BILLING_TEST=false` in the production env template; **development stores (the reviewer's) get test charges automatically** (`shop.plan.partnerDevelopment`), real stores are charged for real.
 - [x] `php artisan app:preflight`: fails on debug on, test billing, `write_orders`, tunnel URL, log mailer, example emails, impossible feature combinations.
-- [x] Privacy policy finalized (`/privacy`), support page with FAQ (`/support`): public React pages (`frontend/src/public.tsx`, `features/legal`), English, Vietnamese, Spanish, German, French and Portuguese (`?lang=vi`, `es`, `de`, `fr`, `pt`), no App Bridge. Text in `frontend/src/i18n/locales/*.json` under `legal`; bump `PublicPageController::PRIVACY_UPDATED` when the policy changes.
+- [x] Privacy policy finalized, support page with FAQ: on the marketing website (`website/`, static Astro), English, Vietnamese, Spanish, German, French and Portuguese (`/privacy`, `/vi/privacy`...). Text in `website/src/i18n/locales/*.json` under `legal`; bump `PRIVACY_UPDATED` in `website/src/config.ts` when the policy changes. The app's `/privacy` and `/support` redirect there (301), so either URL works in the listing; prefer the website ones.
 - [x] Mandatory compliance webhooks, HMAC, session tokens, uninstall cleanup (since Phase 2; tests).
 - [x] Dev-only commands refuse to run outside `APP_ENV=local`.
 - [x] Reviewer instructions and listing draft (below), sample CSV `docs/sample-purchase-orders.csv`.
@@ -46,6 +46,7 @@ Files: `backend/.env.production.example` (all of the above as env), `shopify.app
 ### Needs you
 - [ ] **Create the production app** in the Partner Dashboard, put its client id in `shopify.app.production.toml`, key/secret in the server `backend/.env`.
 - [ ] **Host production** (HTTPS domain): `backend/.env` from `backend/.env.production.example`, `make prod-build prod-up`, `make prod-migrate`, then `php artisan app:preflight` must pass.
+- [ ] **Website domain:** DNS for the website host, `WEBSITE_URL` Variable, Caddy block (docs/DEPLOY.md). Listing URLs: privacy `https://<website>/privacy`, support `https://<website>/support`. After the listing is live, set the `INSTALL_URL` Variable to it so the site's Install buttons point there.
 - [ ] **Email sending domain:** SPF + DKIM (+ DMARC) for the `MAIL_FROM_ADDRESS` domain at your email provider, a real `SUPPORT_EMAIL`.
 - [ ] **Deploy the app config:** `npx @shopify/cli@latest app deploy --config production`.
 - [ ] **Request `read_all_orders`** (Partner Dashboard → API access): text below.

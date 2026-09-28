@@ -10,6 +10,7 @@ function productionConfig(): void
         'shopify.api_key' => 'key', 'shopify.api_secret' => 'secret',
         'shopify.scopes' => 'read_products,read_inventory,read_locations,read_orders,read_all_orders',
         'shopify.support_email' => 'support@clearstock.app',
+        'shopify.website_url' => 'https://clearstock.example-host.net',
         'billing.test' => false,
         'billing.plans.growth.offered' => false,
         'mail.default' => 'smtp', 'mail.from.address' => 'alerts@clearstock.app',
@@ -38,5 +39,7 @@ it('fails on anything that would break review or production', function (array $b
     'tunnel url' => [['app.url' => 'https://abc.trycloudflare.com'], 'quick tunnel'],
     'log mailer' => [['mail.default' => 'log'], 'MAIL_MAILER is log'],
     'example support' => [['shopify.support_email' => 'support@example.com'], 'SUPPORT_EMAIL'],
+    'local website' => [['shopify.website_url' => 'http://localhost:4321'], 'WEBSITE_URL must be the https address'],
+    'website is the app' => [['shopify.website_url' => 'https://app.clearstock.example-host.net'], 'WEBSITE_URL must not be APP_URL'],
     'growth with nothing' => [['billing.plans.growth.offered' => true], 'features:status reported a problem'],
 ]);

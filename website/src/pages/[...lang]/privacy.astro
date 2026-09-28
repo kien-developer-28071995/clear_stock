@@ -1,0 +1,15 @@
+---
+import Privacy from '../../components/Privacy.astro';
+import Base from '../../layouts/Base.astro';
+import { site } from '../../config';
+import { localeFromParam, localeStaticPaths, translator } from '../../i18n';
+
+export const getStaticPaths = localeStaticPaths;
+
+const locale = localeFromParam(Astro.params.lang);
+const { t } = translator(locale);
+---
+
+<Base locale={locale} page="privacy" title={`${t('legal.privacy.title')} · ${site.appName}`} description={t('legal.privacy.intro', { app: site.appName })}>
+    <Privacy locale={locale} />
+</Base>

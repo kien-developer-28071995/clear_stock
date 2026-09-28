@@ -94,7 +94,7 @@ Ký hiệu: ✅ có · — không có. Cột **Công tắc** là biến `FEATURE
 | Cài đặt nhập hàng từ Shopify | Danh sách sản phẩm (chọn nhiều) **và trang sản phẩm**: NCC, lead time, tồn an toàn, **MOQ, quy cách thùng, ngừng nhập** | ✅ | ✅ | ✅ | — | Bật |
 | Onboarding 2 câu hỏi + setup guide | | ✅ | ✅ | ✅ | — | Bật |
 | **Ngôn ngữ** | EN, VI, **ES, DE, FR, PT**; theo ngôn ngữ admin hoặc chọn trong Settings (email vẫn tiếng Anh) | ✅ | ✅ | ✅ | — | Bật |
-| Trang công khai Privacy / Support | | ✅ | ✅ | ✅ | — | Bật |
+| Website giới thiệu (`website/`) | Trang chủ, bảng giá, Privacy, Support; 6 ngôn ngữ; `/privacy`, `/support` của app chuyển sang đây | ✅ | ✅ | ✅ | — | Bật |
 
 Tính năng in **đậm** là tính năng mới thêm ngày 2026-09-27; code đã merge vào `main` ở local và chưa deploy.
 

@@ -1,0 +1,282 @@
+{
+  "meta": {
+    "title": "{{app}} : prévision de stock pour Shopify",
+    "description": "Sachez quand chaque produit sera en rupture et combien recommander. Des prévisions expliquées simplement, lots inclus, prix fixe dès 0 $."
+  },
+  "nav": {
+    "features": "Fonctionnalités",
+    "how": "Fonctionnement",
+    "pricing": "Tarifs",
+    "faq": "FAQ",
+    "support": "Assistance",
+    "install": "Installer sur Shopify",
+    "language": "Langue",
+    "skip": "Aller au contenu"
+  },
+  "hero": {
+    "eyebrow": "Prévision de stock pour Shopify",
+    "title": "Sachez quand chaque produit sera en rupture, et combien recommander.",
+    "lead": "{{app}} prévoit la date de rupture de chaque variante et vous dit quand commander et combien. Chaque chiffre est accompagné de son calcul, pour que vous puissiez le vérifier et l’ajuster.",
+    "ctaPrimary": "Installer gratuitement sur Shopify",
+    "ctaSecondary": "Voir les tarifs",
+    "note": "Offre gratuite jusqu’à 50 produits · Prêt en 5 minutes environ · Sans engagement"
+  },
+  "demo": {
+    "label": "Exemple de prévision dans l’app",
+    "product": "Chemise en lin · Sable / M",
+    "badge": "À commander",
+    "confidence": "Fiabilité élevée",
+    "inStock": "En stock",
+    "perDay": "Ventes par jour",
+    "runsOut": "Rupture le",
+    "orderBy": "Commander avant le",
+    "suggested": "Commande suggérée",
+    "units": "{{count}} unités",
+    "why": "Pourquoi ces chiffres ?",
+    "line1": "Vend {{rate}}/jour sur les 30 derniers jours (3 jours de rupture écartés).",
+    "line2": "Délai {{lead}} jours + {{safety}} jours de sécurité → point de commande {{point}} unités.",
+    "line3": "{{stock}} en stock, rupture vers le {{runsOut}} → commander {{qty}} unités avant le {{orderBy}}."
+  },
+  "pillars": {
+    "explained": {
+      "title": "Chaque chiffre expliqué",
+      "body": "Périodes de ventes, jours de rupture écartés, saisonnalité, délai et stock de sécurité, en mots simples."
+    },
+    "price": {
+      "title": "Un petit prix fixe",
+      "body": "Gratuit, ou {{price}} par mois. Jamais un pourcentage de vos ventes, sans engagement, et votre prix n’augmente jamais."
+    },
+    "quiet": {
+      "title": "Discret par principe",
+      "body": "Au plus un e-mail par jour, seulement quand il faut commander. Pas de pop-ups pour vous vendre plus."
+    },
+    "selfServe": {
+      "title": "Pas besoin de démo",
+      "body": "Installez, répondez à deux questions et voyez quoi recommander pendant l’import de votre historique."
+    }
+  },
+  "features": {
+    "heading": "Tout pour recommander à temps",
+    "lead": "Conçu pour les petites boutiques Shopify en croissance qui achètent auprès de fournisseurs, sans tableur ni contrat d’entreprise.",
+    "forecast": {
+      "title": "Date de rupture par variante",
+      "body": "Un mélange de vos ventes des 7, 30 et 90 derniers jours, sans les jours de rupture et en tenant compte de la saison de l’an dernier."
+    },
+    "reorder": {
+      "title": "Quand commander, et combien",
+      "body": "Point de commande selon le délai et le stock de sécurité, stock entrant déduit, arrondi aux minimums de commande et aux colis."
+    },
+    "explain": {
+      "title": "« Pourquoi ce chiffre ? »",
+      "body": "Chaque prévision montre les jours de vente utilisés, ceux écartés et les réglages appliqués. Pas d’accord ? Ajustez le rythme de vente, le délai ou le stock de sécurité."
+    },
+    "bundles": {
+      "title": "Des lots bien comptés",
+      "body": "Les ventes d’un lot comptent pour chaque composant : ce que vous stockez vraiment est bien prévu."
+    },
+    "suppliers": {
+      "title": "Fournisseurs et délais",
+      "body": "Délai, jours de commande et cycle de commande par fournisseur. Créez vos fournisseurs à partir des vendors Shopify en un clic."
+    },
+    "stocky": {
+      "title": "Vous quittez Stocky ?",
+      "body": "Importez le CSV de vos bons de commande : fournisseurs créés, produits liés et délais mesurés sur vos vraies commandes."
+    },
+    "planning": {
+      "title": "Anticipez",
+      "body": "Un plan d’achat sur 12 semaines, un budget d’achat mensuel, des événements comme le Black Friday et « et si les ventes augmentaient de 20 % ? »."
+    },
+    "insights": {
+      "title": "Voyez où l’argent dort",
+      "body": "Stock lent et excédentaire, classes ABC par chiffre d’affaires, ventes perdues en rupture et précision des prévisions passées."
+    }
+  },
+  "explain": {
+    "heading": "Une prévision lisible, pas une boîte noire",
+    "lead": "La plupart des outils vous donnent un chiffre. {{app}} vous dit d’où il vient, avec les mots que vous utiliseriez.",
+    "point1": "Voyez quels jours de vente ont été comptés et quels jours de rupture ont été écartés.",
+    "point2": "Voyez le délai, le stock de sécurité et les règles fournisseur derrière chaque quantité suggérée.",
+    "point3": "Une promotion ou un mois calme en vue ? Modifiez le rythme de vente et la suggestion se met à jour.",
+    "alt": "Prévision d’un produit avec son explication dans {{app}}"
+  },
+  "how": {
+    "heading": "Opérationnel en 5 minutes environ",
+    "install": {
+      "title": "Installez depuis le Shopify App Store",
+      "body": "Aucun compte à créer. L’app s’ouvre dans votre admin Shopify."
+    },
+    "setup": {
+      "title": "Répondez à deux questions",
+      "body": "Le délai habituel de vos fournisseurs (14 jours pré-rempli) et l’adresse des alertes. Vos commandes et votre stock s’importent en arrière-plan."
+    },
+    "reorder": {
+      "title": "Recommandez sereinement",
+      "body": "L’accueil montre les cinq produits à commander en premier et l’argent immobilisé dans le stock lent. Réglez fournisseurs et lots quand vous voulez."
+    }
+  },
+  "screens": {
+    "heading": "Un aperçu de l’app",
+    "home": "Accueil : quoi commander en premier",
+    "reorder": "Liste de réapprovisionnement avec export des commandes",
+    "insights": "Analyses : stock lent, classes ABC, précision",
+    "alt": "Capture d’écran de {{app}} : {{caption}}"
+  },
+  "pricing": {
+    "heading": "Des tarifs simples et fixes",
+    "lead": "Vous payez l’offre, pas vos ventes. Facturé sur votre facture Shopify, résiliable à tout moment.",
+    "monthly": "Mensuel",
+    "yearly": "Annuel",
+    "save": "20 % d’économie",
+    "perMonth": "/mois",
+    "perYear": "/an",
+    "free": "Gratuit",
+    "forever": "pour toujours",
+    "trial": "Essai gratuit de {{days}} jours",
+    "cta": "Installer sur Shopify",
+    "popular": "Le plus choisi",
+    "priceLock": "Prix garanti : tant que vous gardez votre offre, votre prix n’augmente jamais.",
+    "plans": {
+      "free": {
+        "tagline": "Pour les petits catalogues",
+        "items": [
+          "Prévisions pour vos 50 produits les plus vendus",
+          "Point de commande et quantité suggérée",
+          "Explications « Pourquoi ce chiffre ? »",
+          "Fournisseurs, délais, minimums de commande et colis",
+          "Import depuis Stocky",
+          "Événements de vente, classes ABC et stock lent"
+        ]
+      },
+      "starter": {
+        "tagline": "Pour les boutiques en croissance",
+        "items": [
+          "Toute l’offre Gratuit, produits illimités",
+          "Lots comptés dans leurs composants",
+          "Une alerte e-mail quotidienne ou hebdomadaire",
+          "Export des bons de commande (CSV ou format Shopify)",
+          "Plan d’achat sur 12 semaines et budget mensuel",
+          "Scénarios « et si les ventes augmentaient ? »",
+          "Prévision des nouveaux produits d’après un produit similaire"
+        ]
+      },
+      "growth": {
+        "tagline": "Pour plusieurs emplacements",
+        "items": [
+          "Toute l’offre Starter",
+          "Prévisions par emplacement",
+          "Suggestions de transfert entre emplacements",
+          "Commandes automatiques aux fournisseurs",
+          "Alertes immédiates de stock bas",
+          "Déclencheurs Shopify Flow"
+        ]
+      }
+    }
+  },
+  "faq": {
+    "heading": "Questions",
+    "data": {
+      "q": "Quelles données l’app conserve-t-elle ?",
+      "a": "Seulement les totaux de ventes quotidiens par produit, votre catalogue, vos niveaux de stock et ce que vous saisissez. Aucun nom, e-mail ou adresse de client, et les commandes brutes ne sont pas conservées."
+    },
+    "languages": {
+      "q": "Dans quelles langues est l’app ?",
+      "a": "Anglais, vietnamien, espagnol, allemand, français et portugais. Elle suit la langue de votre admin Shopify, ou vous la choisissez dans les Réglages."
+    },
+    "more": "Plus de réponses sur la page d’assistance"
+  },
+  "cta": {
+    "heading": "Arrêtez de deviner quoi recommander",
+    "body": "Installez {{app}} : vos premières prévisions sont prêtes avant votre café.",
+    "button": "Installer gratuitement sur Shopify"
+  },
+  "footer": {
+    "tagline": "Prévision de stock pour les marchands Shopify.",
+    "product": "Produit",
+    "help": "Aide",
+    "contact": "Contact",
+    "rights": "© {{year}} {{app}}. Shopify est une marque de Shopify Inc."
+  },
+  "notFound": {
+    "title": "Page introuvable",
+    "body": "Cette page n’existe pas ou a été déplacée.",
+    "home": "Retour à l’accueil"
+  },
+  "legal": {
+    "privacy": {
+      "title": "Politique de confidentialité",
+      "updated": "Dernière mise à jour : {{date}}",
+      "intro": "Cette politique explique ce que {{app}} (l'« application ») lit dans votre boutique Shopify, ce qu'elle conserve et comment le faire supprimer. L'application est utilisée par des marchands Shopify ; elle n'a aucun contact avec vos clients.",
+      "reads": {
+        "heading": "Ce que l'application lit dans Shopify",
+        "productsLabel": "Produits et variantes",
+        "products": "titres, SKU, code-barres, marque, type de produit, prix, coût unitaire, statut.",
+        "inventoryLabel": "Stock",
+        "inventory": "quantités disponibles et entrantes par emplacement, et vos emplacements.",
+        "ordersLabel": "Commandes",
+        "orders": "uniquement la quantité vendue et retournée de chaque variante, la date de commande et, pour les boutiques à plusieurs emplacements, l'emplacement qui l'a expédiée, afin de calculer les totaux de ventes quotidiens. L'application ne demande jamais les noms, e-mails, adresses, numéros de téléphone ni données de paiement des clients.",
+        "storeLabel": "Informations sur la boutique",
+        "store": "domaine, nom, devise, fuseau horaire et e-mail de contact de la boutique (utilisé pour vous écrire lorsqu'aucun e-mail d'alerte n'est défini)."
+      },
+      "stores": {
+        "heading": "Ce que l'application conserve",
+        "sales": "Les totaux de ventes quotidiens par variante (unités vendues, unités retournées, stock en fin de journée) sur 400 jours au maximum. Les commandes brutes ne sont pas conservées.",
+        "catalog": "Les informations de catalogue indiquées ci-dessus, les niveaux de stock actuels et les prévisions calculées à partir d'eux.",
+        "entered": "Ce que vous saisissez dans l'application : fournisseurs (nom, e-mail, délai), paramètres, lots et ajustements de prévision.",
+        "shop": "Le domaine de votre boutique, un jeton d'accès Shopify chiffré, votre forfait et l'adresse e-mail choisie pour les alertes.",
+        "emails": "Un journal des e-mails envoyés par l'application pour vous (destinataire, objet, date, statut de remise ; pas le message), conservé 180 jours, et pour les bons de commande envoyés à un fournisseur, les produits et quantités commandés.",
+        "noCustomers": "L'application ne conserve aucune donnée personnelle de vos clients.",
+        "noCustomersBody": "Les demandes que Shopify transmet au nom de vos clients (demandes d'accès, d'effacement) n'ont donc rien à renvoyer ni à supprimer."
+      },
+      "use": {
+        "heading": "Utilisation",
+        "body": "Uniquement pour fournir l'application : prévisions, suggestions de réassort, les e-mails que vous activez et le support. Les données ne sont pas vendues, ni partagées à des fins publicitaires, ni utilisées pour entraîner des modèles d'IA. Aucun cookie de suivi ou publicitaire n'est utilisé ; l'application fonctionne dans l'admin Shopify et signe les requêtes avec des jetons de session Shopify."
+      },
+      "providers": {
+        "heading": "Prestataires",
+        "body": "L'application fonctionne chez un hébergeur (serveurs et base de données), envoie les e-mails via un prestataire d'envoi d'e-mails et signale les erreurs techniques (sans données clients ; les jetons d'accès sont masqués) à un canal de surveillance interne. Ils ne traitent les données que pour notre compte, pour faire fonctionner l'application."
+      },
+      "retention": {
+        "heading": "Conservation et suppression",
+        "uninstall": "Lorsque vous désinstallez l'application, son jeton d'accès est supprimé immédiatement et la facturation s'arrête.",
+        "erase": "48 heures après la désinstallation, Shopify demande à l'application d'effacer les données de votre boutique et tout est supprimé (totaux de ventes, catalogue, prévisions, fournisseurs, paramètres, journal des e-mails). Une réinstallation dans ces 48 heures conserve vos données.",
+        "sooner": "Pour faire supprimer vos données plus tôt, ou en obtenir une copie, écrivez à"
+      },
+      "security": {
+        "heading": "Sécurité",
+        "body": "Le trafic est chiffré (HTTPS). Les jetons d'accès sont chiffrés au repos. Les webhooks de Shopify sont vérifiés par signature."
+      },
+      "contact": {
+        "heading": "Contact",
+        "body": "Questions ou demandes concernant vos données :"
+      }
+    },
+    "support": {
+      "title": "Support",
+      "contact": "Besoin d'aide avec {{app}} ? Écrivez-nous à",
+      "reply": "Nous répondons sous un jour ouvré.",
+      "faq": "Questions fréquentes",
+      "q": {
+        "forecast": {
+          "q": "Comment la prévision est-elle calculée ?",
+          "a": "Chaque produit a une explication « Pourquoi ce chiffre ? » : les périodes de ventes utilisées (7, 30 et 90 jours), les jours de rupture exclus, la saisonnalité, les lots, le délai de livraison et le stock de sécurité. Vous pouvez ajuster vous-même le rythme de ventes, le délai et le stock de sécurité."
+        },
+        "noForecast": {
+          "q": "Pourquoi je ne vois pas encore de prévisions ?",
+          "a": "Juste après l'installation, l'application importe vos commandes et votre stock en arrière-plan (une barre de progression l'indique). Une boutique sans commandes obtient des prévisions dès qu'elle commence à vendre ; les produits sans ventes affichent « pas encore de ventes »."
+        },
+        "stocky": {
+          "q": "Je quitte Stocky. Puis-je garder mes fournisseurs ?",
+          "a": "Oui. Exportez vos bons de commande depuis Stocky en CSV et importez-les dans Fournisseurs → Importer depuis Stocky. L'application crée vos fournisseurs, relie les produits et calcule le délai de livraison de chaque fournisseur."
+        },
+        "billing": {
+          "q": "Comment fonctionne la facturation ? Puis-je résilier à tout moment ?",
+          "a": "Les forfaits ont un prix mensuel ou annuel fixe facturé sur votre facture Shopify : aucun pourcentage sur vos ventes, sans engagement. Votre prix n'augmente jamais tant que vous restez sur votre forfait. Désinstaller l'application arrête automatiquement la facturation."
+        },
+        "uninstall": {
+          "q": "Que deviennent mes données si je désinstalle ?",
+          "a": "Elles sont supprimées 48 heures après la désinstallation. Voir la"
+        }
+      }
+    }
+  }
+}

@@ -3,6 +3,7 @@
 namespace App\Mail;
 
 use App\Models\Shop;
+use App\Support\Website;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 
@@ -32,7 +33,7 @@ class SyncFailingMail extends QueuedMailable
                 default => 'An unexpected error stopped the sync.',
             },
             'reauthorize' => $code === 'reauthorize',
-            'supportUrl' => route('support'),
+            'supportUrl' => Website::url('support'),
         ]);
     }
 }

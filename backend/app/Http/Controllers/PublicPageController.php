@@ -2,34 +2,30 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Contracts\View\View;
+use App\Support\Website;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 
 /**
- * Public privacy policy and support pages (App Store listing URLs). The content is the
- * React bundle frontend/src/public.tsx (translated like the app); this only serves the shell.
+ * The privacy policy and support pages live on the marketing website (website/). These app
+ * URLs stay valid (App Store listing, sent emails) and redirect there, keeping ?lang=.
  */
 class PublicPageController extends Controller
 {
-    /** Bump when the privacy policy text changes (frontend/src/i18n/locales, legal.privacy). */
-    private const PRIVACY_UPDATED = '2026-09-26';
-
-    public function privacy(): View
+    public function privacy(Request $request): RedirectResponse
     {
-        return $this->page('Privacy policy');
+        return $this->website('privacy', $request);
     }
 
-    public function support(): View
+    public function support(Request $request): RedirectResponse
     {
-        return $this->page('Support');
+        return $this->website('support', $request);
     }
 
-    private function page(string $title): View
+    private function website(string $page, Request $request): RedirectResponse
     {
-        return view('public-app', [
-            'title' => $title,
-            'appName' => config('shopify.app_name'),
-            'supportEmail' => config('shopify.support_email'),
-            'privacyUpdated' => self::PRIVACY_UPDATED,
-        ]);
+        $lang = $request->query('lang');
+
+        return redirect()->away(Website::url($page, is_string($lang) ? $lang : null), 301);
     }
 }

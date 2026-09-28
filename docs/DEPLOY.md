@@ -44,7 +44,9 @@ APP_PORT=127.0.0.1:8080
 sudo apt install -y caddy
 ```
 
-Chép `deploy/Caddyfile` vào `/etc/caddy/Caddyfile`, đổi `app.example.com` thành domain của bạn (DNS bản ghi A đã trỏ về IP server), rồi chạy `sudo systemctl reload caddy`. Caddy tự lấy và gia hạn chứng chỉ Let's Encrypt.
+Chép `deploy/Caddyfile` vào `/etc/caddy/Caddyfile`, đổi `app.example.com` thành domain của app và `www.example.com` thành domain của website (DNS bản ghi A của cả hai đã trỏ về IP server), rồi chạy `sudo systemctl reload caddy`. Caddy tự lấy và gia hạn chứng chỉ Let's Encrypt.
+
+**Website** (`website/`, trang giới thiệu + `/privacy` + `/support`): là file HTML tĩnh, Caddy phục vụ thẳng từ `/opt/clear_stock/website` (không qua Docker). Workflow Deploy build website bằng chính các Variable của app rồi upload và đổi thư mục một lần (không có lúc nửa cũ nửa mới). Website phải là domain **khác** `APP_URL`: app chuyển `/privacy`, `/support` của nó sang `WEBSITE_URL`.
 
 **Tường lửa**: chỉ mở 22, 80, 443.
 
@@ -87,8 +89,9 @@ ssh-keygen -t ed25519 -f clear_stock_deploy -N "" -C "github-actions-deploy"
 Mỗi lần deploy, workflow chạy `deploy/envtool.py render`: lấy khung `backend/.env.production.example`, key nào có **Secret** hoặc **Variable** cùng tên trong environment `production` thì dùng giá trị đó, còn lại giữ mặc định của khung. File được copy lên server (`chmod 600`) và `deploy.sh` mới đổi sang nó; nếu deploy dừng trước khi đổi container thì file cũ được trả lại (`backend/.env.previous` giữ bản trước).
 
 - **Secret** (ẩn, không đọc lại được): `APP_KEY`, `SHOPIFY_API_SECRET`, `DB_PASSWORD`, `DB_ROOT_PASSWORD`, `HORIZON_BASIC_AUTH_USER`, `HORIZON_BASIC_AUTH_PASSWORD`, `MAIL_USERNAME`, `MAIL_PASSWORD`, `MONITORING_SLACK_WEBHOOK_URL`, `MONITORING_SLACK_EVENTS_WEBHOOK_URL`.
-- **Variable** (xem/sửa trên giao diện GitHub): `APP_URL`, `SHOPIFY_API_KEY` (client ID, vốn công khai), `MAIL_HOST`, `MAIL_PORT`, `MAIL_FROM_ADDRESS`, `SUPPORT_EMAIL`, `LOG_LEVEL`, mọi `FEATURE_*`, `BILLING_GROWTH_OFFERED`...
-- **Bắt buộc** (thiếu là deploy dừng, báo rõ key nào): `APP_KEY`, `APP_URL`, `SHOPIFY_API_KEY`, `SHOPIFY_API_SECRET`, `DB_PASSWORD`, `DB_ROOT_PASSWORD` (không được là `secret`/`root`), `HORIZON_BASIC_AUTH_*`, `MAIL_HOST`, `MAIL_FROM_ADDRESS`, `SUPPORT_EMAIL`. Sau đó `app:preflight` vẫn kiểm tra như trước.
+- **Variable** (xem/sửa trên giao diện GitHub): `APP_URL`, `WEBSITE_URL`, `SHOPIFY_API_KEY` (client ID, vốn công khai), `MAIL_HOST`, `MAIL_PORT`, `MAIL_FROM_ADDRESS`, `SUPPORT_EMAIL`, `LOG_LEVEL`, mọi `FEATURE_*`, `BILLING_GROWTH_OFFERED`...
+- **Chỉ cho website** (Variable, không vào `backend/.env`): `INSTALL_URL` = link App Store listing cho mọi nút "Cài trên Shopify" (chưa có listing thì bỏ trống, nút trỏ tới apps.shopify.com). Website lấy thêm `WEBSITE_URL`, `SHOPIFY_APP_NAME`, `SUPPORT_EMAIL`, `BILLING_GROWTH_OFFERED`. Chưa đặt `WEBSITE_URL` thì workflow bỏ qua bước website.
+- **Bắt buộc** (thiếu là deploy dừng, báo rõ key nào): `APP_KEY`, `APP_URL`, `SHOPIFY_API_KEY`, `SHOPIFY_API_SECRET`, `DB_PASSWORD`, `DB_ROOT_PASSWORD` (không được là `secret`/`root`), `HORIZON_BASIC_AUTH_*`, `MAIL_HOST`, `MAIL_FROM_ADDRESS`, `SUPPORT_EMAIL`, `WEBSITE_URL`. Sau đó `app:preflight` vẫn kiểm tra như trước.
 - **Key không có trong khung**: thêm Secret/Variable cùng tên và liệt kê tên đó trong Variable `EXTRA_ENV_KEYS` (cách nhau bằng dấu phẩy).
 - **Chưa có Secret `APP_KEY`** = chưa bật cách này: server giữ nguyên `backend/.env` tự tạo (cách cũ vẫn chạy).
 
@@ -113,7 +116,7 @@ python3 deploy/envtool.py push --from server.env && rm server.env
 
 1. Push lên `main` → CI chạy → Deploy tự chạy: tạo bảng (database trống, toàn migration thêm), bật app và kiểm tra `/up`.
 2. Nếu deploy dừng ở bước migration (có migration xóa/đổi): Actions → **Deploy** → *Run workflow* → tick **migrate** → Run.
-3. Mở `https://<domain>/support`: trang hỗ trợ hiện lên là app đã chạy.
+3. Mở `https://<domain>/up` (200 là app đã chạy) và `https://<website>/support` (trang hỗ trợ trên website). `https://<domain>/support` chuyển sang website.
 4. Đẩy cấu hình app lên Shopify, từ máy bạn: `npx @shopify/cli@latest app deploy --config production`. Việc này chỉ cần khi đổi scope, webhook hoặc extension, không cần mỗi lần deploy code.
 
 ## 4. Hằng ngày
@@ -164,7 +167,8 @@ Nên chép backup ra nơi khác (S3, Backblaze...) để không mất khi server
 
 ## 6. Kiểm tra nhanh sau khi setup
 
-- [ ] `https://<domain>/up` trả 200, `/privacy` và `/support` hiện nội dung
+- [ ] `https://<domain>/up` trả 200; `https://<domain>/privacy` chuyển sang `https://<website>/privacy` và hiện nội dung, `/support` cũng vậy
+- [ ] `https://<website>/` hiện trang giới thiệu, `/vi` bản tiếng Việt, `/sitemap.xml` có đủ trang
 - [ ] `docker compose -f docker-compose.prod.yml run --rm --no-deps app php artisan app:preflight` pass
 - [ ] `https://<domain>/horizon` đòi mật khẩu, Horizon đang chạy
 - [ ] Cài app production lên một development store: onboarding → đồng bộ → Home có dữ liệu
