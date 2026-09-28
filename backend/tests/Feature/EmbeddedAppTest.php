@@ -27,9 +27,11 @@ it('serves client-side routes through the same shell', function () {
     $this->get('/settings?shop=demo.myshopify.com&embedded=1')->assertOk()->assertSee('id="root"', false);
 });
 
-it('shows a landing page without a shop and forbids framing', function () {
+it('sends visitors without a shop to the website and forbids framing', function () {
+    config(['shopify.website_url' => 'https://clearstock.test']);
+
     $this->get('/')
-        ->assertOk()
+        ->assertRedirect('https://clearstock.test/')
         ->assertHeader('Content-Security-Policy', "frame-ancestors 'none';");
 });
 
@@ -52,12 +54,14 @@ it('still renders the shell when the id_token is invalid', function () {
     expect(Shop::count())->toBe(0);
 });
 
-it('serves public privacy and support pages as the public React bundle, without App Bridge', function (string $path) {
-    config(['shopify.support_email' => 'help@clearstock.test']);
+it('redirects the old privacy and support URLs to the website, in the requested language', function (string $path, string $website) {
+    config(['shopify.website_url' => 'https://clearstock.test']);
 
-    $this->get($path)->assertOk()
-        ->assertSee('window.__PUBLIC_CONFIG__', false)
-        ->assertSee('<div id="root"></div>', false)
-        ->assertSee('help@clearstock.test', false)
-        ->assertDontSee('app-bridge.js', false);
-})->with(['/privacy', '/support']);
+    $this->get($path)->assertStatus(301)->assertRedirect($website);
+})->with([
+    ['/privacy', 'https://clearstock.test/privacy'],
+    ['/support', 'https://clearstock.test/support'],
+    ['/support?lang=vi', 'https://clearstock.test/vi/support'],
+    ['/privacy?lang=en', 'https://clearstock.test/privacy'],
+    ['/privacy?lang=xx', 'https://clearstock.test/privacy'],
+]);

@@ -1,0 +1,67 @@
+---
+import SupportEmail from './SupportEmail.astro';
+import { PRIVACY_UPDATED, site } from '../config';
+import { formatters, localePath, translator, type Locale } from '../i18n';
+
+/** Privacy policy (App Store listing URL). Keep it true to what the backend stores. */
+interface Props {
+    locale: Locale;
+}
+
+const { locale } = Astro.props;
+const { t } = translator(locale);
+const app = site.appName;
+
+/** Keys under legal.privacy.<section>.<item>. */
+const READS = ['products', 'inventory', 'orders', 'store'];
+const STORES = ['sales', 'catalog', 'entered', 'shop', 'emails'];
+const RETENTION = ['uninstall', 'erase', 'sooner'];
+---
+
+<article class="container prose">
+    <h1>{t('legal.privacy.title')}</h1>
+    <p class="updated">{t('legal.privacy.updated', { date: formatters(locale).longDate(PRIVACY_UPDATED) })}</p>
+    <p>{t('legal.privacy.intro', { app })}</p>
+
+    <h2>{t('legal.privacy.reads.heading')}</h2>
+    <ul>
+        {READS.map((k) => <li><strong>{t(`legal.privacy.reads.${k}Label`)}:</strong> {t(`legal.privacy.reads.${k}`)}</li>)}
+    </ul>
+
+    <h2>{t('legal.privacy.stores.heading')}</h2>
+    <ul>
+        {STORES.map((k) => <li>{t(`legal.privacy.stores.${k}`)}</li>)}
+    </ul>
+    <p><strong>{t('legal.privacy.stores.noCustomers')}</strong> {t('legal.privacy.stores.noCustomersBody')}</p>
+
+    <h2>{t('legal.privacy.use.heading')}</h2>
+    <p>{t('legal.privacy.use.body')}</p>
+
+    <h2>{t('legal.privacy.providers.heading')}</h2>
+    <p>{t('legal.privacy.providers.body')}</p>
+
+    <h2>{t('legal.privacy.retention.heading')}</h2>
+    <ul>
+        {
+            RETENTION.map((k) => (
+                <li>
+                    {t(`legal.privacy.retention.${k}`)}
+                    {k === 'sooner' && (
+                        <>
+                            {' '}
+                            <SupportEmail />.
+                        </>
+                    )}
+                </li>
+            ))
+        }
+    </ul>
+
+    <h2>{t('legal.privacy.security.heading')}</h2>
+    <p>{t('legal.privacy.security.body')}</p>
+
+    <h2>{t('legal.privacy.contact.heading')}</h2>
+    <p>{t('legal.privacy.contact.body')} <SupportEmail /></p>
+
+    <p><a href={localePath(locale, 'support')}>{t('legal.support.title')} →</a></p>
+</article>

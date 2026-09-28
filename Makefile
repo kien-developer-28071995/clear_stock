@@ -7,7 +7,7 @@ export GID := $(shell id -g)
 
 .DEFAULT_GOAL := help
 .PHONY: help setup up down restart build shell migrate fresh test e2e extensions logs tunnel tunnel-url tunnel-down e2e-features-off listing-screenshots listing-video \
-        app-url webhook artisan composer npm typecheck prod-build prod-up prod-down prod-migrate prod-logs
+        app-url webhook artisan composer npm typecheck website website-build prod-build prod-up prod-down prod-migrate prod-logs
 
 help: ## List available commands
 	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-14s\033[0m %s\n", $$1, $$2}'
@@ -15,6 +15,7 @@ help: ## List available commands
 setup: ## First run: env files, build images, install deps, app key, migrate
 	@test -f backend/.env || cp backend/.env.example backend/.env
 	@test -f frontend/.env || cp frontend/.env.example frontend/.env
+	@test -f website/.env || cp website/.env.example website/.env
 	$(DC) build
 	$(DC) run --rm --no-deps app composer install
 	@grep -qE '^APP_KEY=.+' backend/.env || $(DC) run --rm --no-deps app php artisan key:generate --ansi
@@ -92,6 +93,12 @@ npm: ## Run npm in frontend/ (node container): make npm c="install x"
 
 typecheck: ## Type-check the frontend
 	$(DC) exec node npx tsc --noEmit
+
+website: ## Open the marketing website (dev server of website/, started by make up)
+	@echo "http://localhost:$${FORWARD_WEBSITE_PORT:-4321}"
+
+website-build: ## Check translations + types and build the static website into website/dist
+	$(DC) run --rm --no-deps website sh -c "npm install --no-audit --no-fund && npm run check && npm run build"
 
 tunnel: ## Start the HTTPS tunnel, print its URL and write it into backend/.env, frontend/.env, shopify.app.toml
 	@if grep -qE '^TUNNEL_TOKEN=.+' backend/.env; then \

@@ -8,6 +8,9 @@
 #   or tag = "current" to only apply changed Secrets/Variables (backend/.env) to the running version.
 # - backend/.env is built from GitHub Secrets/Variables of the `production` environment
 #   (deploy/envtool.py) once APP_KEY is a Secret; until then the server keeps its own file.
+# - The website (website/) is built here from the same Variables (WEBSITE_URL, SUPPORT_EMAIL, ...)
+#   and uploaded to <deploy dir>/website, which Caddy serves (deploy/Caddyfile). Skipped until the
+#   WEBSITE_URL Variable is set, and on rollbacks (tag input).
 name: Deploy
 
 on:
@@ -86,6 +89,8 @@ jobs:
     environment: production
     steps:
       - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
       - name: Build backend/.env from Secrets and Variables
         id: env
         env:
@@ -113,3 +118,27 @@ jobs:
         run: |
           ssh -i ~/.ssh/id_deploy -p "${{ secrets.DEPLOY_PORT || 22 }}" "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}" \
             "cd '${{ secrets.DEPLOY_PATH }}' && IMAGE_PREFIX='${{ env.IMAGE_PREFIX }}' bash deploy.sh '${{ inputs.tag || needs.build.outputs.tag }}' ${{ inputs.migrate && '--migrate' || (vars.AUTO_MIGRATE != 'false' && '--migrate=auto' || '') }}"
+      - uses: actions/setup-node@v5
+        if: inputs.tag == '' && vars.WEBSITE_URL != ''
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: website/package-lock.json
+      - name: Build the website
+        if: inputs.tag == '' && vars.WEBSITE_URL != ''
+        working-directory: website
+        env:
+          SITE_URL: ${{ vars.WEBSITE_URL }}
+          APP_NAME: ${{ vars.SHOPIFY_APP_NAME || 'Clear Stock' }}
+          SUPPORT_EMAIL: ${{ vars.SUPPORT_EMAIL }}
+          INSTALL_URL: ${{ vars.INSTALL_URL }}
+          GROWTH_OFFERED: ${{ vars.BILLING_GROWTH_OFFERED || 'false' }}
+        run: npm ci && npm run build
+      - name: Publish the website (swapped in whole, so visitors never see half a site)
+        if: inputs.tag == '' && vars.WEBSITE_URL != ''
+        run: |
+          tar -C website/dist -czf "$RUNNER_TEMP/website.tgz" .
+          scp -i ~/.ssh/id_deploy -P "${{ secrets.DEPLOY_PORT || 22 }}" "$RUNNER_TEMP/website.tgz" \
+            "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:${{ secrets.DEPLOY_PATH }}/website.tgz"
+          ssh -i ~/.ssh/id_deploy -p "${{ secrets.DEPLOY_PORT || 22 }}" "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}" \
+            "cd '${{ secrets.DEPLOY_PATH }}' && rm -rf website.new website.old && mkdir website.new && tar -xzf website.tgz -C website.new && rm website.tgz && chmod -R a+rX website.new && { [ ! -d website ] || mv website website.old; } && mv website.new website && rm -rf website.old"

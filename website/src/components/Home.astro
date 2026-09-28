@@ -1,0 +1,225 @@
+---
+import Icon from './Icon.astro';
+import Pricing from './Pricing.astro';
+import { site } from '../config';
+import { formatters, localePath, translator, type Locale } from '../i18n';
+
+interface Props {
+    locale: Locale;
+}
+
+const { locale } = Astro.props;
+const { t } = translator(locale);
+const f = formatters(locale);
+const app = site.appName;
+
+// Hero example, dated from the build day: 3.9/day × (14 + 7 days) ≈ reorder point 82 > 50 in stock → order today.
+const DAY = 86_400_000;
+const today = Math.floor(Date.now() / DAY) * DAY;
+const demo = {
+    rate: f.number(3.9, 1),
+    stock: 50,
+    lead: 14,
+    safety: 7,
+    point: 82,
+    qty: 144,
+    runsOut: f.dayMonth(new Date(today + 13 * DAY)),
+    orderBy: f.dayMonth(new Date(today)),
+};
+
+const pillars = [
+    ['explained', 'explain'],
+    ['price', 'price'],
+    ['quiet', 'bell'],
+    ['selfServe', 'bolt'],
+] as const;
+
+const features = [
+    ['forecast', 'calendar'],
+    ['reorder', 'cart'],
+    ['explain', 'explain'],
+    ['bundles', 'bundle'],
+    ['suppliers', 'truck'],
+    ['stocky', 'import'],
+    ['planning', 'plan'],
+    ['insights', 'insights'],
+] as const;
+
+const screens = [
+    ['01-home.png', 'home'],
+    ['04-reorder.png', 'reorder'],
+    ['05-insights.png', 'insights'],
+] as const;
+
+// Home FAQ: two site questions + three of the support page's.
+const faq = [
+    [t('legal.support.q.forecast.q'), t('legal.support.q.forecast.a')],
+    [t('faq.data.q'), t('faq.data.a')],
+    [t('legal.support.q.stocky.q'), t('legal.support.q.stocky.a')],
+    [t('legal.support.q.billing.q'), t('legal.support.q.billing.a')],
+    [t('faq.languages.q'), t('faq.languages.a')],
+];
+---
+
+<section class="hero">
+    <div class="container">
+        <div>
+            <span class="eyebrow">{t('hero.eyebrow')}</span>
+            <h1>{t('hero.title')}</h1>
+            <p class="lead">{t('hero.lead', { app })}</p>
+            <div class="actions">
+                <a class="btn btn-primary" href={site.installUrl}>{t('hero.ctaPrimary')}</a>
+                <a class="btn btn-ghost" href="#pricing">{t('hero.ctaSecondary')}</a>
+            </div>
+            <p class="note">{t('hero.note')}</p>
+        </div>
+
+        <figure class="forecast-card" aria-label={t('demo.label')} style="margin:0">
+            <p class="product">{t('demo.product')}</p>
+            <div class="badges">
+                <span class="badge badge-warn">{t('demo.badge')}</span>
+                <span class="badge badge-ok">{t('demo.confidence')}</span>
+            </div>
+            <dl class="stats">
+                <div><dt>{t('demo.inStock')}</dt><dd>{f.number(demo.stock)}</dd></div>
+                <div><dt>{t('demo.perDay')}</dt><dd>{demo.rate}</dd></div>
+                <div><dt>{t('demo.runsOut')}</dt><dd>{demo.runsOut}</dd></div>
+                <div><dt>{t('demo.orderBy')}</dt><dd>{demo.orderBy}</dd></div>
+                <div><dt>{t('demo.suggested')}</dt><dd>{t('demo.units', { count: f.number(demo.qty) })}</dd></div>
+            </dl>
+            <div class="why">
+                <h3>{t('demo.why')}</h3>
+                <ul>
+                    <li>{t('demo.line1', { rate: demo.rate })}</li>
+                    <li>{t('demo.line2', { lead: demo.lead, safety: demo.safety, point: f.number(demo.point) })}</li>
+                    <li>{t('demo.line3', { stock: f.number(demo.stock), runsOut: demo.runsOut, qty: f.number(demo.qty), orderBy: demo.orderBy })}</li>
+                </ul>
+            </div>
+        </figure>
+    </div>
+</section>
+
+<section class="pillars">
+    <div class="container pillar-grid">
+        {
+            pillars.map(([key, icon]) => (
+                <div class="pillar">
+                    <span class="icon"><Icon name={icon} /></span>
+                    <h3>{t(`pillars.${key}.title`)}</h3>
+                    <p>{t(`pillars.${key}.body`, { price: f.money(4, 'USD') })}</p>
+                </div>
+            ))
+        }
+    </div>
+</section>
+
+<section id="features" class="alt">
+    <div class="container">
+        <div class="section-head">
+            <h2>{t('features.heading')}</h2>
+            <p>{t('features.lead')}</p>
+        </div>
+        <div class="feature-grid">
+            {
+                features.map(([key, icon]) => (
+                    <article class="feature">
+                        <span class="icon"><Icon name={icon} /></span>
+                        <h3>{t(`features.${key}.title`)}</h3>
+                        <p>{t(`features.${key}.body`)}</p>
+                    </article>
+                ))
+            }
+        </div>
+    </div>
+</section>
+
+<section>
+    <div class="container spotlight">
+        <div>
+            <h2>{t('explain.heading')}</h2>
+            <p>{t('explain.lead', { app })}</p>
+            <ul class="checks">
+                {
+                    ['point1', 'point2', 'point3'].map((key) => (
+                        <li>
+                            <Icon name="check" />
+                            <span>{t(`explain.${key}`)}</span>
+                        </li>
+                    ))
+                }
+            </ul>
+        </div>
+        <div class="shot">
+            <img src="/screenshots/03-product-explanation.png" width="1600" height="900" loading="lazy" alt={t('explain.alt', { app })} />
+        </div>
+    </div>
+</section>
+
+<section id="how" class="alt">
+    <div class="container">
+        <div class="section-head">
+            <h2>{t('how.heading')}</h2>
+        </div>
+        <ol class="steps">
+            {
+                ['install', 'setup', 'reorder'].map((key) => (
+                    <li>
+                        <h3>{t(`how.${key}.title`)}</h3>
+                        <p>{t(`how.${key}.body`)}</p>
+                    </li>
+                ))
+            }
+        </ol>
+    </div>
+</section>
+
+<section>
+    <div class="container">
+        <div class="section-head">
+            <h2>{t('screens.heading')}</h2>
+        </div>
+        <div class="gallery">
+            {
+                screens.map(([file, key]) => (
+                    <figure>
+                        <div class="shot">
+                            <img src={`/screenshots/${file}`} width="1600" height="900" loading="lazy" alt={t('screens.alt', { app, caption: t(`screens.${key}`) })} />
+                        </div>
+                        <figcaption>{t(`screens.${key}`)}</figcaption>
+                    </figure>
+                ))
+            }
+        </div>
+    </div>
+</section>
+
+<Pricing locale={locale} />
+
+<section id="faq">
+    <div class="container">
+        <div class="section-head">
+            <h2>{t('faq.heading')}</h2>
+        </div>
+        <div class="faq">
+            {
+                faq.map(([q, a]) => (
+                    <details>
+                        <summary>{q}</summary>
+                        <p>{a}</p>
+                    </details>
+                ))
+            }
+        </div>
+        <p class="faq-more"><a href={localePath(locale, 'support')}>{t('faq.more')} →</a></p>
+    </div>
+</section>
+
+<section style="padding-top:0">
+    <div class="container">
+        <div class="cta-band">
+            <h2>{t('cta.heading')}</h2>
+            <p>{t('cta.body', { app })}</p>
+            <a class="btn" href={site.installUrl}>{t('cta.button')}</a>
+        </div>
+    </div>
+</section>

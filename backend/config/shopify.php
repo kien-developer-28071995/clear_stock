@@ -22,4 +22,8 @@ return [
     'http_timeout' => 30,
 
     'support_email' => env('SUPPORT_EMAIL', 'support@example.com'),
+
+    // Marketing website (website/ in the repo): home, /privacy, /support. The app's own
+    // /privacy and /support redirect there. Dev: the website's `npm run dev`.
+    'website_url' => rtrim((string) env('WEBSITE_URL', 'http://localhost:4321'), '/'),
 ];

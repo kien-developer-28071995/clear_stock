@@ -1,0 +1,282 @@
+{
+  "meta": {
+    "title": "{{app}}: inventory forecasting for Shopify",
+    "description": "Know when every product runs out and how many to reorder. Forecasts explained in plain words, bundles included, flat price from $0."
+  },
+  "nav": {
+    "features": "Features",
+    "how": "How it works",
+    "pricing": "Pricing",
+    "faq": "FAQ",
+    "support": "Support",
+    "install": "Install on Shopify",
+    "language": "Language",
+    "skip": "Skip to content"
+  },
+  "hero": {
+    "eyebrow": "Inventory forecasting for Shopify",
+    "title": "Know when every product runs out, and how many to reorder.",
+    "lead": "{{app}} forecasts the stock-out date of every variant and tells you when to order and how much. Every number comes with the math behind it, so you can check it and change it.",
+    "ctaPrimary": "Install free on Shopify",
+    "ctaSecondary": "See pricing",
+    "note": "Free plan for up to 50 products · Ready in about 5 minutes · No contract"
+  },
+  "demo": {
+    "label": "Example forecast in the app",
+    "product": "Linen shirt · Sand / M",
+    "badge": "Reorder now",
+    "confidence": "High confidence",
+    "inStock": "In stock",
+    "perDay": "Sells per day",
+    "runsOut": "Runs out",
+    "orderBy": "Order by",
+    "suggested": "Suggested order",
+    "units": "{{count}} units",
+    "why": "Why these numbers?",
+    "line1": "Sells {{rate}}/day over the last 30 days (3 out-of-stock days left out).",
+    "line2": "Lead time {{lead}} days + {{safety}} safety days → reorder point {{point}} units.",
+    "line3": "{{stock}} in stock runs out around {{runsOut}} → order {{qty}} units by {{orderBy}}."
+  },
+  "pillars": {
+    "explained": {
+      "title": "Every number explained",
+      "body": "Sales windows, out-of-stock days left out, seasonality, lead time and safety stock, in plain words."
+    },
+    "price": {
+      "title": "Flat, small price",
+      "body": "Free, or {{price}} a month. Never a share of your sales, no contract, and your price never goes up."
+    },
+    "quiet": {
+      "title": "Quiet by design",
+      "body": "At most one email a day, only when something needs ordering. No upsell pop-ups."
+    },
+    "selfServe": {
+      "title": "No demo call needed",
+      "body": "Install, answer two questions, and see what to reorder while your history imports."
+    }
+  },
+  "features": {
+    "heading": "Everything you need to reorder on time",
+    "lead": "Built for small and growing Shopify stores that buy from suppliers and don't want a spreadsheet or an enterprise contract.",
+    "forecast": {
+      "title": "Stock-out date for every variant",
+      "body": "A blend of your last 7, 30 and 90 days of sales, with out-of-stock days removed and last year's season taken into account."
+    },
+    "reorder": {
+      "title": "When to order, and how many",
+      "body": "Reorder point from lead time and safety stock, incoming stock subtracted, rounded to minimum orders and case packs."
+    },
+    "explain": {
+      "title": "“Why this number?”",
+      "body": "Each forecast shows the sales days used, the days left out and the settings applied. Disagree? Adjust the sales rate, lead time or safety stock."
+    },
+    "bundles": {
+      "title": "Bundles that make sense",
+      "body": "Sales of a bundle count toward each component, so the parts you actually stock are forecast correctly."
+    },
+    "suppliers": {
+      "title": "Suppliers and lead times",
+      "body": "Lead time, order days and order cycle per supplier. Create suppliers from your Shopify vendors in one click."
+    },
+    "stocky": {
+      "title": "Moving from Stocky?",
+      "body": "Import your purchase order CSV: suppliers are created, products linked and lead times measured from your real orders."
+    },
+    "planning": {
+      "title": "Plan ahead",
+      "body": "A 12-week purchase plan, a monthly buying budget, sales events like Black Friday, and “what if sales grow 20%?”."
+    },
+    "insights": {
+      "title": "See where money is stuck",
+      "body": "Slow and excess stock, ABC classes by revenue, sales lost while out of stock, and how accurate past forecasts were."
+    }
+  },
+  "explain": {
+    "heading": "A forecast you can read, not a black box",
+    "lead": "Most forecasting tools give you a number. {{app}} tells you where it comes from, in the same words you would use.",
+    "point1": "See which sales days were counted and which out-of-stock days were left out.",
+    "point2": "See the lead time, safety stock and supplier rules behind every reorder quantity.",
+    "point3": "Expecting a promotion or a quiet month? Change the sales rate and watch the suggestion update.",
+    "alt": "Product forecast with its explanation in {{app}}"
+  },
+  "how": {
+    "heading": "Up and running in about 5 minutes",
+    "install": {
+      "title": "Install from the Shopify App Store",
+      "body": "No account to create. The app opens inside your Shopify admin."
+    },
+    "setup": {
+      "title": "Answer two questions",
+      "body": "Your usual supplier lead time (14 days is filled in) and where to send alerts. Your orders and stock import in the background."
+    },
+    "reorder": {
+      "title": "Reorder with confidence",
+      "body": "Home shows the five products to order first and the money tied up in slow stock. Fine-tune suppliers and bundles whenever you like."
+    }
+  },
+  "screens": {
+    "heading": "A look inside",
+    "home": "Home: what to order first",
+    "reorder": "Reorder list with purchase order export",
+    "insights": "Insights: slow stock, ABC classes, accuracy",
+    "alt": "Screenshot of {{app}}: {{caption}}"
+  },
+  "pricing": {
+    "heading": "Simple, flat pricing",
+    "lead": "Pay for the plan, not for your sales. Billed on your Shopify invoice, cancel anytime.",
+    "monthly": "Monthly",
+    "yearly": "Yearly",
+    "save": "Save 20%",
+    "perMonth": "/month",
+    "perYear": "/year",
+    "free": "Free",
+    "forever": "forever",
+    "trial": "{{days}}-day free trial",
+    "cta": "Install on Shopify",
+    "popular": "Most popular",
+    "priceLock": "Price lock: while you stay on your plan, your price never goes up.",
+    "plans": {
+      "free": {
+        "tagline": "For small catalogs",
+        "items": [
+          "Forecasts for your 50 best-selling products",
+          "Reorder point and suggested quantity",
+          "“Why this number?” explanations",
+          "Suppliers, lead times, minimum orders and case packs",
+          "Import from Stocky",
+          "Sales events, ABC classes and slow stock"
+        ]
+      },
+      "starter": {
+        "tagline": "For growing stores",
+        "items": [
+          "Everything in Free, for unlimited products",
+          "Bundles counted toward their components",
+          "One daily or weekly email alert",
+          "Purchase order export (CSV or Shopify PO format)",
+          "12-week purchase plan and monthly budget",
+          "“What if sales grow?” scenarios",
+          "New products forecast from a similar product"
+        ]
+      },
+      "growth": {
+        "tagline": "For several locations",
+        "items": [
+          "Everything in Starter",
+          "Forecasts per location",
+          "Transfer suggestions between locations",
+          "Automatic orders to suppliers",
+          "Instant low-stock alerts",
+          "Shopify Flow triggers"
+        ]
+      }
+    }
+  },
+  "faq": {
+    "heading": "Questions",
+    "data": {
+      "q": "What data does the app keep?",
+      "a": "Only daily sales totals per product, your catalog and stock levels, and what you enter. No customer names, emails or addresses, and raw orders are not stored."
+    },
+    "languages": {
+      "q": "Which languages does the app speak?",
+      "a": "English, Vietnamese, Spanish, German, French and Portuguese. It follows your Shopify admin language, or you can pick one in Settings."
+    },
+    "more": "More answers on the support page"
+  },
+  "cta": {
+    "heading": "Stop guessing what to reorder",
+    "body": "Install {{app}}, and your first forecasts are ready before your coffee is.",
+    "button": "Install free on Shopify"
+  },
+  "footer": {
+    "tagline": "Inventory forecasting for Shopify merchants.",
+    "product": "Product",
+    "help": "Help",
+    "contact": "Contact",
+    "rights": "© {{year}} {{app}}. Shopify is a trademark of Shopify Inc."
+  },
+  "notFound": {
+    "title": "Page not found",
+    "body": "This page doesn't exist or has moved.",
+    "home": "Back to the home page"
+  },
+  "legal": {
+    "privacy": {
+      "title": "Privacy policy",
+      "updated": "Last updated: {{date}}",
+      "intro": "This policy explains what {{app}} (the \"app\") reads from your Shopify store, what it keeps, and how to have it deleted. The app is used by Shopify merchants; it has no contact with your customers.",
+      "reads": {
+        "heading": "What the app reads from Shopify",
+        "productsLabel": "Products and variants",
+        "products": "titles, SKU, barcode, vendor, product type, price, unit cost, status.",
+        "inventoryLabel": "Inventory",
+        "inventory": "available and incoming quantities per location, and your locations.",
+        "ordersLabel": "Orders",
+        "orders": "only the quantity sold and returned of each variant, the order date and, for stores with several locations, which location fulfilled it, to build daily sales totals. The app never requests customer names, emails, addresses, phone numbers or payment details.",
+        "storeLabel": "Store details",
+        "store": "shop domain, name, currency, time zone and contact email (used to email you when no alert email is set)."
+      },
+      "stores": {
+        "heading": "What the app stores",
+        "sales": "Daily sales totals per variant (units sold, units returned, end-of-day stock) for up to 400 days. Raw orders are not stored.",
+        "catalog": "Your product catalog details listed above, current stock levels, and the forecasts computed from them.",
+        "entered": "What you enter in the app: suppliers (name, email, lead time), settings, bundles and forecast adjustments.",
+        "shop": "Your shop domain, an encrypted Shopify access token, your plan and the email address you choose for alerts.",
+        "emails": "A log of emails the app sent for you (recipient, subject, date, delivery status; not the message), kept 180 days, and for purchase orders you email to a supplier, the products and quantities ordered.",
+        "noCustomers": "The app stores no personal data of your customers.",
+        "noCustomersBody": "Requests Shopify forwards on behalf of your customers (data requests, erasure requests) therefore have nothing to return or delete."
+      },
+      "use": {
+        "heading": "How it is used",
+        "body": "Only to provide the app: forecasting, reorder suggestions, the emails you turn on, and support. The data is not sold, shared for advertising, or used to train AI models. No tracking or advertising cookies are used; the app runs inside the Shopify admin and signs requests with Shopify session tokens."
+      },
+      "providers": {
+        "heading": "Service providers",
+        "body": "The app runs on a hosting provider (servers and database), sends email through an email delivery provider, and reports technical errors (without customer data; access tokens are masked) to an internal monitoring channel. They process data only on our behalf to run the app."
+      },
+      "retention": {
+        "heading": "Retention and deletion",
+        "uninstall": "When you uninstall the app, its access token is removed immediately and billing stops.",
+        "erase": "48 hours after uninstall, Shopify asks the app to erase your shop's data and everything is deleted (sales totals, catalog, forecasts, suppliers, settings, email log). Reinstalling within those 48 hours keeps your data.",
+        "sooner": "To have your data deleted sooner, or for a copy of it, email"
+      },
+      "security": {
+        "heading": "Security",
+        "body": "Traffic is encrypted (HTTPS). Access tokens are encrypted at rest. Webhooks from Shopify are verified by signature."
+      },
+      "contact": {
+        "heading": "Contact",
+        "body": "Questions or requests about your data:"
+      }
+    },
+    "support": {
+      "title": "Support",
+      "contact": "Need help with {{app}}? Email us at",
+      "reply": "We reply within one business day.",
+      "faq": "Common questions",
+      "q": {
+        "forecast": {
+          "q": "How is the forecast calculated?",
+          "a": "Every product has a \"Why this number?\" explanation: the sales windows used (7, 30 and 90 days), the out-of-stock days left out, seasonality, bundles, lead time and safety stock. You can adjust the sales rate, lead time and safety stock yourself."
+        },
+        "noForecast": {
+          "q": "Why don't I see forecasts yet?",
+          "a": "Right after install the app imports your orders and stock in the background (a progress bar shows it). A store without orders gets forecasts once it starts selling; products without sales show \"no sales yet\"."
+        },
+        "stocky": {
+          "q": "I'm moving from Stocky. Can I keep my suppliers?",
+          "a": "Yes. Export your purchase orders from Stocky as CSV and import them in Suppliers → Import from Stocky. The app creates your suppliers, links products and works out each supplier's lead time."
+        },
+        "billing": {
+          "q": "How does billing work? Can I cancel anytime?",
+          "a": "Plans are a flat monthly or yearly price billed on your Shopify invoice: no share of your sales, no contract. Your price never goes up while you stay on your plan. Uninstalling the app cancels billing automatically."
+        },
+        "uninstall": {
+          "q": "What happens to my data if I uninstall?",
+          "a": "It is deleted 48 hours after uninstall. See the"
+        }
+      }
+    }
+  }
+}

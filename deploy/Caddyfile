@@ -1,8 +1,27 @@
-# HTTPS in front of the "web" container (Let's Encrypt certificates, automatic renewal).
-# Install Caddy on the server, copy this to /etc/caddy/Caddyfile, replace the domain, then:
+# HTTPS in front of the "web" container and the static website (Let's Encrypt certificates,
+# automatic renewal). Install Caddy on the server, copy this to /etc/caddy/Caddyfile, replace
+# both domains, then:
 #   sudo systemctl reload caddy
 # The web container listens on 127.0.0.1:8080 (APP_PORT in the deploy dir's .env).
 app.example.com {
     encode zstd gzip
     reverse_proxy 127.0.0.1:8080
+}
+
+# Marketing website (website/): static files the Deploy workflow uploads to <deploy dir>/website.
+# Pages are built as privacy.html, vi/support.html...: try_files serves them at /privacy, /vi/support.
+www.example.com {
+    encode zstd gzip
+    root * /opt/clear_stock/website
+    try_files {path} {path}.html {path}/index.html
+    file_server
+    handle_errors {
+        @notFound expression {err.status_code} == 404
+        handle @notFound {
+            rewrite * /404.html
+            file_server
+        }
+    }
+    header /_astro/* Cache-Control "public, max-age=31536000, immutable"
+    header /screenshots/* Cache-Control "public, max-age=86400"
 }

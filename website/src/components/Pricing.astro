@@ -1,0 +1,85 @@
+---
+import Icon from './Icon.astro';
+import { pricing, site } from '../config';
+import { formatters, translator, type Locale } from '../i18n';
+
+interface Props {
+    locale: Locale;
+}
+
+const { locale } = Astro.props;
+const { t, list } = translator(locale);
+const f = formatters(locale);
+const money = (value: number) => f.money(value, pricing.currency);
+
+const plans = [
+    { key: 'free', name: 'Free', prices: null, featured: false },
+    { key: 'starter', name: 'Starter', prices: pricing.starter, featured: true },
+    ...(site.growthOffered ? [{ key: 'growth', name: 'Growth', prices: pricing.growth, featured: false }] : []),
+];
+---
+
+<section id="pricing" class="pricing alt">
+    <div class="container">
+        <div class="section-head">
+            <h2>{t('pricing.heading')}</h2>
+            <p>{t('pricing.lead')}</p>
+        </div>
+
+        <div class="billing-toggle">
+            <fieldset>
+                <legend>{t('pricing.heading')}</legend>
+                <input type="radio" name="billing" id="billing-monthly" checked />
+                <label for="billing-monthly">{t('pricing.monthly')}</label>
+                <input type="radio" name="billing" id="billing-yearly" />
+                <label for="billing-yearly">{t('pricing.yearly')}<span class="save">{t('pricing.save')}</span></label>
+            </fieldset>
+        </div>
+
+        <div class="plans">
+            {
+                plans.map((plan) => (
+                    <article class:list={['plan', { featured: plan.featured }]}>
+                        {plan.featured && <span class="ribbon">{t('pricing.popular')}</span>}
+                        <h3>{plan.key === 'free' ? t('pricing.free') : plan.name}</h3>
+                        <p class="tagline">{t(`pricing.plans.${plan.key}.tagline`)}</p>
+                        {plan.prices ? (
+                            <>
+                                <div class="price monthly-price">
+                                    {money(plan.prices.monthly)}
+                                    <small>{t('pricing.perMonth')}</small>
+                                </div>
+                                <div class="price yearly-price">
+                                    {money(plan.prices.annual)}
+                                    <small>{t('pricing.perYear')}</small>
+                                </div>
+                                <p class="trial">{t('pricing.trial', { days: pricing.trialDays })}</p>
+                            </>
+                        ) : (
+                            <>
+                                <div class="price">
+                                    {money(0)}
+                                    <small> {t('pricing.forever')}</small>
+                                </div>
+                                <p class="trial" />
+                            </>
+                        )}
+                        <ul>
+                            {list(`pricing.plans.${plan.key}.items`).map((item) => (
+                                <li>
+                                    <Icon name="check" />
+                                    <span>{item}</span>
+                                </li>
+                            ))}
+                        </ul>
+                        <a class:list={['btn', plan.featured ? 'btn-primary' : 'btn-ghost']} href={site.installUrl}>
+                            {t('pricing.cta')}
+                        </a>
+                    </article>
+                ))
+            }
+        </div>
+
+        <p class="price-lock">{t('pricing.priceLock')}</p>
+    </div>
+</section>

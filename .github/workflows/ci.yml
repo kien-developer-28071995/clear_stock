@@ -58,6 +58,27 @@ jobs:
         run: npm run build
         working-directory: frontend
 
+  # Marketing website (website/): translations, types and the static build.
+  website:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: website
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: website/package-lock.json
+      - run: npm ci
+      - name: Translations and type check
+        run: npm run check
+      - name: Build
+        run: npm run build
+        env:
+          SITE_URL: https://www.ci.example.test
+
   # Production images build on every push and pull request (not pushed anywhere), so a broken
   # Dockerfile shows up before merge. Deploy (deploy.yml) builds and pushes them from main,
   # sharing this layer cache.
@@ -86,5 +107,5 @@ jobs:
       - name: Render with placeholder values
         env:
           SECRETS_JSON: '{"APP_KEY":"base64:ci","SHOPIFY_API_KEY":"k","SHOPIFY_API_SECRET":"s","DB_PASSWORD":"p","DB_ROOT_PASSWORD":"r","HORIZON_BASIC_AUTH_USER":"u","HORIZON_BASIC_AUTH_PASSWORD":"p"}'
-          VARS_JSON: '{"APP_URL":"https://ci.example.test","MAIL_HOST":"smtp.ci.test","MAIL_FROM_ADDRESS":"a@ci.test","SUPPORT_EMAIL":"s@ci.test"}'
+          VARS_JSON: '{"APP_URL":"https://ci.example.test","MAIL_HOST":"smtp.ci.test","MAIL_FROM_ADDRESS":"a@ci.test","SUPPORT_EMAIL":"s@ci.test","WEBSITE_URL":"https://www.ci.example.test"}'
         run: python3 deploy/envtool.py render --out "$RUNNER_TEMP/backend.env"

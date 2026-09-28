@@ -1,0 +1,15 @@
+---
+import Base from '../layouts/Base.astro';
+import { site } from '../config';
+import { translator } from '../i18n';
+
+const { t } = translator('en');
+---
+
+<Base locale="en" page="" title={`${t('notFound.title')} · ${site.appName}`} description={t('notFound.body')}>
+    <div class="container not-found">
+        <h1>{t('notFound.title')}</h1>
+        <p>{t('notFound.body')}</p>
+        <a class="btn btn-primary" href="/">{t('notFound.home')}</a>
+    </div>
+</Base>

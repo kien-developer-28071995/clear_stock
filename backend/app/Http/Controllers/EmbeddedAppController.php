@@ -7,6 +7,7 @@ use App\Exceptions\ShopifyApiException;
 use App\Services\ShopAuthService;
 use App\Support\Monitor;
 use App\Support\ShopDomain;
+use App\Support\Website;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -27,8 +28,9 @@ class EmbeddedAppController extends Controller
             return redirect()->away('https://'.$shop.'/admin/apps/'.config('shopify.api_key').'/'.ltrim($request->path(), '/'));
         }
 
+        // Not opened by Shopify (someone typed the app's address): the website introduces the app.
         if ($shop === null) {
-            return response()->view('landing');
+            return redirect()->away(Website::url());
         }
 
         // Install/refresh tokens immediately on load when Shopify hands us an ID token.

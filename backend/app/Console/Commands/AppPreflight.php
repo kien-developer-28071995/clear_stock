@@ -44,7 +44,13 @@ class AppPreflight extends Command
         $mailer = (string) config('mail.default');
         $this->check(! in_array($mailer, ['log', 'array'], true), "MAIL_MAILER is {$mailer}: emails would never be delivered.");
         $this->check(! str_contains((string) config('mail.from.address'), 'example.com'), 'MAIL_FROM_ADDRESS is still an example address.');
-        $this->check(! str_contains((string) config('shopify.support_email'), 'example.com'), 'SUPPORT_EMAIL is still an example address (shown on /support and /privacy).');
+        $this->check(! str_contains((string) config('shopify.support_email'), 'example.com'), 'SUPPORT_EMAIL is still an example address (shown on the website\'s /support and /privacy).');
+        $website = (string) config('shopify.website_url');
+        $this->check(
+            str_starts_with($website, 'https://') && ! preg_match('/REPLACE|example\.com|localhost/', $website),
+            'WEBSITE_URL must be the https address of the website (its /privacy and /support are the App Store listing URLs).',
+        );
+        $this->check(parse_url($website, PHP_URL_HOST) !== parse_url((string) config('app.url'), PHP_URL_HOST), 'WEBSITE_URL must not be APP_URL: the app redirects /privacy and /support to the website.');
         $this->check(config('queue.default') === 'redis', 'QUEUE_CONNECTION should be redis (Horizon).');
         $this->check(config('cache.default') === 'redis', 'CACHE_STORE should be redis.');
 

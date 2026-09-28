@@ -1,0 +1,44 @@
+---
+import Icon from './Icon.astro';
+import SupportEmail from './SupportEmail.astro';
+import { site } from '../config';
+import { localePath, translator, type Locale } from '../i18n';
+
+/** Support page (App Store listing URL). */
+interface Props {
+    locale: Locale;
+}
+
+const { locale } = Astro.props;
+const { t } = translator(locale);
+const QUESTIONS = ['forecast', 'noForecast', 'stocky', 'billing', 'uninstall'];
+---
+
+<article class="container prose">
+    <h1>{t('legal.support.title')}</h1>
+    <div class="contact-card">
+        <p>
+            <Icon name="mail" class="inline-icon" />
+            {t('legal.support.contact', { app: site.appName })} <SupportEmail />. {t('legal.support.reply')}
+        </p>
+    </div>
+
+    <h2>{t('legal.support.faq')}</h2>
+    {
+        QUESTIONS.map((k) => (
+            <section style="padding:0">
+                <h3>{t(`legal.support.q.${k}.q`)}</h3>
+                <p>
+                    {t(`legal.support.q.${k}.a`)}
+                    {k === 'uninstall' && (
+                        <>
+                            {' '}
+                            <a href={localePath(locale, 'privacy')}>{t('legal.privacy.title')}</a>.
+                        </>
+                    )}
+                </p>
+            </section>
+        ))
+    }
+</article>
+

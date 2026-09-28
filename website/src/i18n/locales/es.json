@@ -1,0 +1,282 @@
+{
+  "meta": {
+    "title": "{{app}}: previsión de inventario para Shopify",
+    "description": "Sabe cuándo se agota cada producto y cuánto reponer. Previsiones explicadas con palabras claras, packs incluidos, precio fijo desde $0."
+  },
+  "nav": {
+    "features": "Funciones",
+    "how": "Cómo funciona",
+    "pricing": "Precios",
+    "faq": "Preguntas",
+    "support": "Soporte",
+    "install": "Instalar en Shopify",
+    "language": "Idioma",
+    "skip": "Ir al contenido"
+  },
+  "hero": {
+    "eyebrow": "Previsión de inventario para Shopify",
+    "title": "Sabe cuándo se agota cada producto y cuánto volver a pedir.",
+    "lead": "{{app}} prevé la fecha de agotamiento de cada variante y te dice cuándo pedir y cuánto. Cada número muestra su cálculo, para que puedas revisarlo y ajustarlo.",
+    "ctaPrimary": "Instalar gratis en Shopify",
+    "ctaSecondary": "Ver precios",
+    "note": "Plan gratuito hasta 50 productos · Listo en unos 5 minutos · Sin contrato"
+  },
+  "demo": {
+    "label": "Ejemplo de previsión en la app",
+    "product": "Camisa de lino · Arena / M",
+    "badge": "Pedir ya",
+    "confidence": "Confianza alta",
+    "inStock": "En stock",
+    "perDay": "Ventas al día",
+    "runsOut": "Se agota",
+    "orderBy": "Pedir antes del",
+    "suggested": "Pedido sugerido",
+    "units": "{{count}} uds.",
+    "why": "¿Por qué estos números?",
+    "line1": "Vende {{rate}}/día en los últimos 30 días (3 días sin stock excluidos).",
+    "line2": "Plazo de entrega {{lead}} días + {{safety}} días de seguridad → punto de pedido {{point}} uds.",
+    "line3": "{{stock}} en stock se agotan hacia el {{runsOut}} → pide {{qty}} uds. antes del {{orderBy}}."
+  },
+  "pillars": {
+    "explained": {
+      "title": "Cada número explicado",
+      "body": "Periodos de ventas, días sin stock excluidos, estacionalidad, plazo de entrega y stock de seguridad, con palabras claras."
+    },
+    "price": {
+      "title": "Precio fijo y bajo",
+      "body": "Gratis, o {{price}} al mes. Nunca un porcentaje de tus ventas, sin contrato, y tu precio nunca sube."
+    },
+    "quiet": {
+      "title": "Sin molestias",
+      "body": "Como mucho un email al día, solo cuando hay algo que pedir. Sin ventanas para venderte más."
+    },
+    "selfServe": {
+      "title": "Sin llamadas de demo",
+      "body": "Instala, responde dos preguntas y ve qué reponer mientras se importa tu historial."
+    }
+  },
+  "features": {
+    "heading": "Todo lo necesario para reponer a tiempo",
+    "lead": "Pensado para tiendas Shopify pequeñas y en crecimiento que compran a proveedores y no quieren hojas de cálculo ni contratos empresariales.",
+    "forecast": {
+      "title": "Fecha de agotamiento por variante",
+      "body": "Combina tus ventas de los últimos 7, 30 y 90 días, excluye los días sin stock y tiene en cuenta la temporada del año pasado."
+    },
+    "reorder": {
+      "title": "Cuándo pedir y cuánto",
+      "body": "Punto de pedido según plazo de entrega y stock de seguridad, restando lo que está en camino, redondeado a pedidos mínimos y cajas."
+    },
+    "explain": {
+      "title": "«¿Por qué este número?»",
+      "body": "Cada previsión muestra los días de venta usados, los excluidos y los ajustes aplicados. ¿No estás de acuerdo? Ajusta el ritmo de ventas, el plazo o el stock de seguridad."
+    },
+    "bundles": {
+      "title": "Packs bien contados",
+      "body": "Las ventas de un pack cuentan para cada componente, así lo que realmente almacenas se prevé bien."
+    },
+    "suppliers": {
+      "title": "Proveedores y plazos",
+      "body": "Plazo de entrega, días de pedido y ciclo de pedido por proveedor. Crea proveedores desde tus vendors de Shopify con un clic."
+    },
+    "stocky": {
+      "title": "¿Vienes de Stocky?",
+      "body": "Importa tu CSV de órdenes de compra: se crean los proveedores, se vinculan los productos y se miden los plazos con tus pedidos reales."
+    },
+    "planning": {
+      "title": "Planifica con tiempo",
+      "body": "Plan de compras a 12 semanas, presupuesto mensual, eventos de venta como el Black Friday y «¿y si las ventas crecen un 20 %?»."
+    },
+    "insights": {
+      "title": "Mira dónde está el dinero parado",
+      "body": "Stock lento y sobrante, clases ABC por ingresos, ventas perdidas por falta de stock y la precisión de las previsiones pasadas."
+    }
+  },
+  "explain": {
+    "heading": "Una previsión que se lee, no una caja negra",
+    "lead": "La mayoría de herramientas te dan un número. {{app}} te dice de dónde sale, con las mismas palabras que usarías tú.",
+    "point1": "Mira qué días de venta se contaron y qué días sin stock se excluyeron.",
+    "point2": "Mira el plazo, el stock de seguridad y las reglas del proveedor detrás de cada cantidad sugerida.",
+    "point3": "¿Esperas una promoción o un mes tranquilo? Cambia el ritmo de ventas y la sugerencia se actualiza.",
+    "alt": "Previsión de un producto con su explicación en {{app}}"
+  },
+  "how": {
+    "heading": "Funcionando en unos 5 minutos",
+    "install": {
+      "title": "Instala desde la Shopify App Store",
+      "body": "Sin cuentas que crear. La app se abre dentro de tu admin de Shopify."
+    },
+    "setup": {
+      "title": "Responde dos preguntas",
+      "body": "El plazo habitual de tus proveedores (14 días ya rellenado) y dónde enviar los avisos. Tus pedidos y stock se importan en segundo plano."
+    },
+    "reorder": {
+      "title": "Repón con confianza",
+      "body": "El inicio muestra los cinco productos que pedir primero y el dinero parado en stock lento. Ajusta proveedores y packs cuando quieras."
+    }
+  },
+  "screens": {
+    "heading": "Un vistazo por dentro",
+    "home": "Inicio: qué pedir primero",
+    "reorder": "Lista de reposición con exportación de pedidos",
+    "insights": "Análisis: stock lento, clases ABC, precisión",
+    "alt": "Captura de {{app}}: {{caption}}"
+  },
+  "pricing": {
+    "heading": "Precios simples y fijos",
+    "lead": "Pagas por el plan, no por tus ventas. Se cobra en tu factura de Shopify, cancela cuando quieras.",
+    "monthly": "Mensual",
+    "yearly": "Anual",
+    "save": "Ahorra un 20 %",
+    "perMonth": "/mes",
+    "perYear": "/año",
+    "free": "Gratis",
+    "forever": "para siempre",
+    "trial": "Prueba gratis de {{days}} días",
+    "cta": "Instalar en Shopify",
+    "popular": "El más elegido",
+    "priceLock": "Precio garantizado: mientras sigas en tu plan, tu precio nunca sube.",
+    "plans": {
+      "free": {
+        "tagline": "Para catálogos pequeños",
+        "items": [
+          "Previsiones para tus 50 productos más vendidos",
+          "Punto de pedido y cantidad sugerida",
+          "Explicaciones «¿Por qué este número?»",
+          "Proveedores, plazos, pedidos mínimos y cajas",
+          "Importación desde Stocky",
+          "Eventos de venta, clases ABC y stock lento"
+        ]
+      },
+      "starter": {
+        "tagline": "Para tiendas en crecimiento",
+        "items": [
+          "Todo lo de Gratis, con productos ilimitados",
+          "Packs contados en sus componentes",
+          "Un aviso por email diario o semanal",
+          "Exportación de órdenes de compra (CSV o formato de Shopify)",
+          "Plan de compras a 12 semanas y presupuesto mensual",
+          "Escenarios «¿y si las ventas crecen?»",
+          "Previsión de productos nuevos a partir de uno similar"
+        ]
+      },
+      "growth": {
+        "tagline": "Para varias ubicaciones",
+        "items": [
+          "Todo lo de Starter",
+          "Previsiones por ubicación",
+          "Sugerencias de traslado entre ubicaciones",
+          "Pedidos automáticos a proveedores",
+          "Avisos inmediatos de stock bajo",
+          "Disparadores de Shopify Flow"
+        ]
+      }
+    }
+  },
+  "faq": {
+    "heading": "Preguntas",
+    "data": {
+      "q": "¿Qué datos guarda la app?",
+      "a": "Solo totales de ventas diarias por producto, tu catálogo y niveles de stock, y lo que introduces. Ni nombres, emails ni direcciones de clientes, y no se guardan los pedidos originales."
+    },
+    "languages": {
+      "q": "¿En qué idiomas está la app?",
+      "a": "Inglés, vietnamita, español, alemán, francés y portugués. Sigue el idioma de tu admin de Shopify, o puedes elegir uno en Ajustes."
+    },
+    "more": "Más respuestas en la página de soporte"
+  },
+  "cta": {
+    "heading": "Deja de adivinar qué reponer",
+    "body": "Instala {{app}} y tus primeras previsiones estarán listas antes que tu café.",
+    "button": "Instalar gratis en Shopify"
+  },
+  "footer": {
+    "tagline": "Previsión de inventario para comerciantes de Shopify.",
+    "product": "Producto",
+    "help": "Ayuda",
+    "contact": "Contacto",
+    "rights": "© {{year}} {{app}}. Shopify es una marca de Shopify Inc."
+  },
+  "notFound": {
+    "title": "Página no encontrada",
+    "body": "Esta página no existe o se ha movido.",
+    "home": "Volver al inicio"
+  },
+  "legal": {
+    "privacy": {
+      "title": "Política de privacidad",
+      "updated": "Última actualización: {{date}}",
+      "intro": "Esta política explica qué lee {{app}} (la «app») de tu tienda Shopify, qué conserva y cómo pedir que se elimine. La app la usan comerciantes de Shopify; no tiene contacto con tus clientes.",
+      "reads": {
+        "heading": "Qué lee la app de Shopify",
+        "productsLabel": "Productos y variantes",
+        "products": "títulos, SKU, código de barras, marca, tipo de producto, precio, costo unitario, estado.",
+        "inventoryLabel": "Inventario",
+        "inventory": "cantidades disponibles y entrantes por ubicación, y tus ubicaciones.",
+        "ordersLabel": "Pedidos",
+        "orders": "solo la cantidad vendida y devuelta de cada variante, la fecha del pedido y, en tiendas con varias ubicaciones, qué ubicación lo preparó, para calcular los totales de ventas diarias. La app nunca solicita nombres, correos, direcciones, teléfonos ni datos de pago de los clientes.",
+        "storeLabel": "Datos de la tienda",
+        "store": "dominio, nombre, moneda, zona horaria y correo de contacto de la tienda (para escribirte cuando no hay un correo de alertas)."
+      },
+      "stores": {
+        "heading": "Qué guarda la app",
+        "sales": "Totales de ventas diarias por variante (unidades vendidas, unidades devueltas, stock al final del día) durante un máximo de 400 días. No se guardan los pedidos en bruto.",
+        "catalog": "Los datos de tu catálogo indicados arriba, los niveles de stock actuales y las previsiones calculadas a partir de ellos.",
+        "entered": "Lo que introduces en la app: proveedores (nombre, correo, plazo de entrega), configuración, paquetes y ajustes de previsión.",
+        "shop": "El dominio de tu tienda, un token de acceso de Shopify cifrado, tu plan y el correo que elijas para las alertas.",
+        "emails": "Un registro de los correos que la app envió por ti (destinatario, asunto, fecha, estado de entrega; no el mensaje), conservado 180 días y, para las órdenes de compra que envías a un proveedor, los productos y cantidades pedidos.",
+        "noCustomers": "La app no guarda datos personales de tus clientes.",
+        "noCustomersBody": "Por eso, las solicitudes que Shopify reenvía en nombre de tus clientes (solicitudes de datos, de supresión) no tienen nada que devolver ni eliminar."
+      },
+      "use": {
+        "heading": "Cómo se usan",
+        "body": "Solo para prestar la app: previsiones, sugerencias de reposición, los correos que actives y el soporte. Los datos no se venden, no se comparten con fines publicitarios ni se usan para entrenar modelos de IA. No se usan cookies de seguimiento ni de publicidad; la app funciona dentro del admin de Shopify y firma las solicitudes con tokens de sesión de Shopify."
+      },
+      "providers": {
+        "heading": "Proveedores de servicios",
+        "body": "La app funciona en un proveedor de alojamiento (servidores y base de datos), envía correos a través de un proveedor de envío de correo e informa de errores técnicos (sin datos de clientes; los tokens de acceso van ocultos) a un canal de supervisión interno. Solo tratan datos en nuestro nombre para que la app funcione."
+      },
+      "retention": {
+        "heading": "Conservación y eliminación",
+        "uninstall": "Al desinstalar la app, su token de acceso se elimina de inmediato y se detiene la facturación.",
+        "erase": "48 horas después de desinstalarla, Shopify pide a la app que borre los datos de tu tienda y se elimina todo (totales de ventas, catálogo, previsiones, proveedores, configuración, registro de correos). Si la reinstalas en esas 48 horas, conservas tus datos.",
+        "sooner": "Para que eliminemos tus datos antes, o para obtener una copia, escribe a"
+      },
+      "security": {
+        "heading": "Seguridad",
+        "body": "El tráfico está cifrado (HTTPS). Los tokens de acceso se guardan cifrados. Los webhooks de Shopify se verifican por firma."
+      },
+      "contact": {
+        "heading": "Contacto",
+        "body": "Preguntas o solicitudes sobre tus datos:"
+      }
+    },
+    "support": {
+      "title": "Soporte",
+      "contact": "¿Necesitas ayuda con {{app}}? Escríbenos a",
+      "reply": "Respondemos en un día hábil.",
+      "faq": "Preguntas frecuentes",
+      "q": {
+        "forecast": {
+          "q": "¿Cómo se calcula la previsión?",
+          "a": "Cada producto tiene una explicación «¿Por qué este número?»: los periodos de ventas usados (7, 30 y 90 días), los días sin stock excluidos, la estacionalidad, los paquetes, el plazo de entrega y el stock de seguridad. Puedes ajustar tú mismo el ritmo de ventas, el plazo de entrega y el stock de seguridad."
+        },
+        "noForecast": {
+          "q": "¿Por qué aún no veo previsiones?",
+          "a": "Justo después de instalarla, la app importa tus pedidos y tu stock en segundo plano (lo verás en una barra de progreso). Una tienda sin pedidos tendrá previsiones cuando empiece a vender; los productos sin ventas muestran «aún sin ventas»."
+        },
+        "stocky": {
+          "q": "Vengo de Stocky. ¿Puedo conservar mis proveedores?",
+          "a": "Sí. Exporta tus órdenes de compra de Stocky como CSV e impórtalas en Proveedores → Importar desde Stocky. La app crea tus proveedores, vincula los productos y calcula el plazo de entrega de cada proveedor."
+        },
+        "billing": {
+          "q": "¿Cómo funciona la facturación? ¿Puedo cancelar cuando quiera?",
+          "a": "Los planes tienen un precio fijo mensual o anual que se cobra en tu factura de Shopify: sin porcentaje de tus ventas, sin contrato. Tu precio nunca sube mientras sigas en tu plan. Desinstalar la app cancela la facturación automáticamente."
+        },
+        "uninstall": {
+          "q": "¿Qué pasa con mis datos si desinstalo la app?",
+          "a": "Se eliminan 48 horas después de desinstalarla. Consulta la"
+        }
+      }
+    }
+  }
+}

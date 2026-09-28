@@ -24,9 +24,10 @@ Backend và frontend tách riêng, mỗi bên tự quản lý dependency:
 ```
 /                     docker-compose*.yml, Dockerfile, Makefile, shopify.app.toml, docker/
 ├── backend/          Laravel (composer.json, artisan, tests/, .env) — API, webhook, trang shell nhúng
-└── frontend/         React + Vite (package.json, vite.config.ts, .env) — build ra backend/public/build
+├── frontend/         React + Vite (package.json, vite.config.ts, .env) — build ra backend/public/build
+└── website/          Website giới thiệu, Astro tĩnh (package.json, .env) — trang chủ, /privacy, /support
 ```
-Mỗi bên có file env riêng: `backend/.env` (Laravel; container mysql và tunnel cũng đọc file này) và `frontend/.env` (Vite, chỉ biến `VITE_*` lộ ra trình duyệt). Không có `.env` ở root.
+Mỗi bên có file env riêng: `backend/.env` (Laravel; container mysql và tunnel cũng đọc file này), `frontend/.env` (Vite, chỉ biến `VITE_*` lộ ra trình duyệt) và `website/.env` (lúc build, mọi giá trị lộ ra HTML). Không có `.env` ở root.
 
 ## Cấu trúc backend (backend/)
 ```
@@ -106,7 +107,7 @@ Hiển thị trạng thái đồng bộ cho merchant (lần sync cuối, lỗi n
 - Mọi khoản thu qua Billing API, có nâng/hạ gói và gói năm
 - UI theo Polaris, có empty state, loading, thông báo lỗi rõ ràng
 - Phản hồi API nhanh; việc nặng đưa vào queue
-- Route public: /privacy, /support
+- Route public: /privacy, /support (nằm trên website `website/`; app redirect 301 sang `WEBSITE_URL`)
 
 ## Docker
 Thiết lập môi trường bằng Docker Compose cho cả dev và production.
@@ -199,6 +200,7 @@ Yêu cầu chung:
 - [x] Thêm ngôn ngữ ES/DE/FR/PT (roadmap #29): file locale đủ khoá + extension + backend `supported_locales`, 480 test + 90 E2E
 - [x] ABC tính doanh thu combo cho thành phần + xuất CSV kịch bản what-if (roadmap #30), 484 test + 90 E2E. Toàn bộ vòng này chỉ merge local, chưa deploy
 - [x] Tính năng trên trang sản phẩm Shopify (roadmap #31): khối dự báo trên trang biến thể, extension `product-order-action` (đánh dấu đã đặt), cài đặt nhập hàng trên trang sản phẩm + MOQ/thùng/ngừng nhập, 486 test + 93 E2E. Chỉ merge local, chưa deploy (cần `shopify app deploy` cho extension)
+- [x] Website giới thiệu (`website/`, Astro tĩnh, 6 ngôn ngữ, sáng/tối): trang chủ (tính năng, giải thích dự báo, cách hoạt động, ảnh chụp, bảng giá tháng/năm, FAQ), `/privacy`, `/support` chuyển từ React bundle của frontend sang (key `legal` chuyển sang `website/src/i18n/locales`); app `/privacy`, `/support` → 301 `WEBSITE_URL` (giữ `?lang`), `/` không có shop → website; preflight bắt `WEBSITE_URL` https và khác `APP_URL`; dev: service `website` :4321; prod: Deploy build từ Variables + Caddy phục vụ tĩnh; 491 test
 - [ ] Việc sắp tới: xem mục "Việc sắp tới" trong `docs/ROADMAP.md`
 - [x] CI/CD cấu hình: `backend/.env` production dựng từ GitHub Secrets/Variables (`deploy/envtool.py render` trong Deploy, `push` để nhập qua `gh`), đổi file an toàn trong `deploy.sh` (trả lại bản cũ nếu dừng trước khi đổi container), tag `current` = chỉ áp dụng config; CI build thử 2 image Docker + kiểm tra template `.env`; xoay `APP_KEY` qua `APP_PREVIOUS_KEYS` + `app:reencrypt-secrets`, mất key thì token exchange cấp token mới (không coi là cài lại), 442 test
 - [ ] Phase 7: Chuẩn bị nộp App Store. Phần làm trong repo đã xong (xem `docs/APP_STORE.md`): bộ tính năng v1 (Free + Starter; tắt NCC email, chi nhánh, chuyển kho, cảnh báo tức thời, Flow), `shopify.app.production.toml` (5 scope, không write_orders), `backend/.env.production.example`, billing tự dùng test charge trên dev store, `app:preflight`, privacy/support hoàn chỉnh, hướng dẫn reviewer + listing nháp. Còn lại là việc của chủ app (Partner Dashboard, hosting, SPF/DKIM, icon/ảnh/screencast, nộp)

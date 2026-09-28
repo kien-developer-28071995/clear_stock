@@ -1,0 +1,130 @@
+---
+import '../styles/global.css';
+import Icon from '../components/Icon.astro';
+import { site } from '../config';
+import { LANGUAGE_NAMES, LOCALES, localePath, translator, type Locale } from '../i18n';
+
+interface Props {
+    locale: Locale;
+    /** Page slug without language ('' = home, 'privacy', 'support'): for alternates and the language menu. */
+    page: string;
+    title: string;
+    description: string;
+}
+
+const { locale, page, title, description } = Astro.props;
+const { t } = translator(locale);
+const app = site.appName;
+const home = localePath(locale, '');
+const canonical = new URL(localePath(locale, page), Astro.site);
+const section = (id: string) => `${home}#${id}`;
+---
+
+<!doctype html>
+<html lang={locale}>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>{title}</title>
+        <meta name="description" content={description} />
+        <link rel="canonical" href={canonical} />
+        {LOCALES.map((l) => <link rel="alternate" hreflang={l} href={new URL(localePath(l, page), Astro.site)} />)}
+        <link rel="alternate" hreflang="x-default" href={new URL(localePath('en', page), Astro.site)} />
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+        <meta name="theme-color" content="#0f7a52" />
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content={app} />
+        <meta property="og:title" content={title} />
+        <meta property="og:description" content={description} />
+        <meta property="og:url" content={canonical} />
+        <meta property="og:image" content={new URL('/screenshots/03-product-explanation.png', Astro.site)} />
+        <meta name="twitter:card" content="summary_large_image" />
+    </head>
+    <body>
+        <a class="skip" href="#main">{t('nav.skip')}</a>
+        <header class="site-header">
+            <div class="container">
+                <a class="brand" href={home}><Icon name="logo" />{app}</a>
+                <nav class="main-nav" aria-label={app}>
+                    <a href={section('features')}>{t('nav.features')}</a>
+                    <a href={section('how')}>{t('nav.how')}</a>
+                    <a href={section('pricing')}>{t('nav.pricing')}</a>
+                    <a href={localePath(locale, 'support')}>{t('nav.support')}</a>
+                </nav>
+                <details class="dropdown">
+                    <summary aria-label={t('nav.language')}><Icon name="globe" />{locale.toUpperCase()}</summary>
+                    <div class="dropdown-panel">
+                        {
+                            LOCALES.map((l) => (
+                                <a href={localePath(l, page)} hreflang={l} lang={l} aria-current={l === locale ? 'true' : undefined}>
+                                    {LANGUAGE_NAMES[l]}
+                                </a>
+                            ))
+                        }
+                    </div>
+                </details>
+                <details class="dropdown menu-toggle">
+                    <summary aria-label="Menu"><Icon name="menu" /></summary>
+                    <div class="dropdown-panel">
+                        <a href={section('features')}>{t('nav.features')}</a>
+                        <a href={section('how')}>{t('nav.how')}</a>
+                        <a href={section('pricing')}>{t('nav.pricing')}</a>
+                        <a href={section('faq')}>{t('nav.faq')}</a>
+                        <a href={localePath(locale, 'support')}>{t('nav.support')}</a>
+                        <a href={site.installUrl}>{t('nav.install')}</a>
+                    </div>
+                </details>
+                <a class="btn btn-primary header-install" href={site.installUrl}>{t('nav.install')}</a>
+            </div>
+        </header>
+
+        <main id="main">
+            <slot />
+        </main>
+
+        <footer class="site-footer">
+            <div class="container">
+                <div class="footer-grid">
+                    <div>
+                        <a class="brand" href={home}><Icon name="logo" />{app}</a>
+                        <p>{t('footer.tagline')}</p>
+                    </div>
+                    <div>
+                        <h2>{t('footer.product')}</h2>
+                        <ul>
+                            <li><a href={section('features')}>{t('nav.features')}</a></li>
+                            <li><a href={section('pricing')}>{t('nav.pricing')}</a></li>
+                            <li><a href={site.installUrl}>{t('nav.install')}</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h2>{t('footer.help')}</h2>
+                        <ul>
+                            <li><a href={localePath(locale, 'support')}>{t('legal.support.title')}</a></li>
+                            <li><a href={localePath(locale, 'privacy')}>{t('legal.privacy.title')}</a></li>
+                            <li><a href={section('faq')}>{t('nav.faq')}</a></li>
+                        </ul>
+                    </div>
+                    {
+                        site.supportEmail && (
+                            <div>
+                                <h2>{t('footer.contact')}</h2>
+                                <ul>
+                                    <li><a href={`mailto:${site.supportEmail}`}>{site.supportEmail}</a></li>
+                                </ul>
+                            </div>
+                        )
+                    }
+                </div>
+                <p class="footer-bottom">{t('footer.rights', { year: new Date().getFullYear(), app })}</p>
+            </div>
+        </footer>
+        <script>
+            // Close an open dropdown on outside click or Escape (works without this, just less tidy).
+            const close = (except?: Element) =>
+                document.querySelectorAll('details.dropdown[open]').forEach((d) => d !== except && d.removeAttribute('open'));
+            document.addEventListener('click', (e) => close((e.target as Element).closest('details.dropdown') ?? undefined));
+            document.addEventListener('keydown', (e) => e.key === 'Escape' && close());
+        </script>
+    </body>
+</html>
