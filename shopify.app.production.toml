@@ -9,9 +9,9 @@
 #  - only the three product-page extensions: Flow triggers are switched off (FEATURE_FLOW_TRIGGERS=false)
 # Switching one of those features on later = add its scope / extension here and deploy again.
 
-client_id = "REPLACE_WITH_PRODUCTION_CLIENT_ID"
+client_id = "585d48be540225310586b5df5dc1348e"
 name = "Clear Stock"
-application_url = "https://REPLACE_WITH_PRODUCTION_HOST"
+application_url = "https://clear-stock.techfoxify.com"
 embedded = true
 extension_directories = [ "extensions/product-forecast-block", "extensions/product-settings-action", "extensions/product-order-action" ]
 
@@ -24,7 +24,7 @@ scopes = "read_products,read_inventory,read_locations,read_orders,read_all_order
 use_legacy_install_flow = false
 
 [auth]
-redirect_urls = [ "https://REPLACE_WITH_PRODUCTION_HOST/auth/callback" ]
+redirect_urls = [ "https://clear-stock.techfoxify.com/auth/callback" ]
 
 [webhooks]
 api_version = "2026-07"
