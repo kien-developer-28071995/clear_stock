@@ -42,7 +42,7 @@ Route::middleware('shopify.session')->group(function () {
     // Errors from the embedded app, reported to Slack like server errors.
     Route::post('/client-errors', [ClientErrorController::class, 'store'])->middleware('throttle:20,1');
     // Web vitals measured in the admin (App Bridge), for the owner's reports.
-    Route::post('/web-vitals', [WebVitalController::class, 'store'])->middleware('throttle:60,1');
+    Route::post('/web-vitals', [WebVitalController::class, 'store'])->middleware('throttle:30,1');
 
     Route::get('/sync', [SyncController::class, 'show']);
     Route::post('/sync', [SyncController::class, 'store'])->middleware('throttle:10,1');

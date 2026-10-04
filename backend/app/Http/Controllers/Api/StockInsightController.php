@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Services\App\StockInsightService;
+use App\Support\Csv;
 use App\Support\ShopContext;
 use Illuminate\Http\JsonResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -27,7 +28,7 @@ class StockInsightController extends Controller
             $out = fopen('php://output', 'w');
             fwrite($out, "\xEF\xBB\xBF");
             foreach ($rows as $row) {
-                fputcsv($out, $row, escape: '');
+                fputcsv($out, Csv::safe($row), escape: '');
             }
             fclose($out);
         }, 'clearance-'.now($shop->timezone)->toDateString().'.csv', ['Content-Type' => 'text/csv; charset=UTF-8']);

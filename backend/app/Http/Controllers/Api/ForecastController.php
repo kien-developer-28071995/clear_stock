@@ -16,6 +16,7 @@ use App\Services\App\AlternateSupplierService;
 use App\Services\App\ForecastAccuracyService;
 use App\Services\App\ForecastAdjustmentService;
 use App\Services\App\ForecastQueryService;
+use App\Support\Csv;
 use App\Support\Entitlements;
 use App\Support\Features;
 use App\Support\ShopContext;
@@ -81,7 +82,7 @@ class ForecastController extends Controller
             $out = fopen('php://output', 'w');
             fwrite($out, "\xEF\xBB\xBF"); // UTF-8 BOM so Excel opens accents correctly
             foreach ($rows as $row) {
-                fputcsv($out, $row, escape: '');
+                fputcsv($out, Csv::safe($row), escape: '');
             }
             fclose($out);
         }, 'products-'.$this->query->today($shop).'.csv', ['Content-Type' => 'text/csv; charset=UTF-8']);

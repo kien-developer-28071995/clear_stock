@@ -58,7 +58,8 @@ class ReportsTest extends TestCase
         }
         $this->post('/sync')->assertRedirect('/login');
         $this->get('/register')->assertNotFound();
-        $this->get('/login')->assertOk()->assertSee('Sign in');
+        $this->get('/login')->assertOk()->assertSee('Sign in')
+            ->assertHeader('X-Frame-Options', 'DENY')->assertHeader('X-Content-Type-Options', 'nosniff');
     }
 
     public function test_login_checks_the_password_and_locks_after_repeated_failures(): void
@@ -134,6 +135,10 @@ class ReportsTest extends TestCase
         $this->assertStringContainsString('"Mugs & Co",mugs.myshopify.com,installed,starter,monthly,4', $csv);
         $this->assertStringContainsString('suppliers', $csv);
         $this->assertStringNotContainsString('Left Shop', $csv);
+
+        // A shop name that a spreadsheet would run as a formula is neutralised.
+        ShopRecord::query()->where('name', 'Mugs & Co')->update(['name' => '=HYPERLINK("http://evil.test","x")']);
+        $this->assertStringContainsString('"\'=HYPERLINK(', $this->actingAs($this->owner)->get('/shops/export?status=installed')->streamedContent());
     }
 
     public function test_a_shop_page_shows_its_history_live_numbers_and_features(): void

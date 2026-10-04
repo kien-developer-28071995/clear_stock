@@ -43,15 +43,17 @@ class ShopController extends Controller
 
         return response()->streamDownload(function () use ($query, $all) {
             $out = fopen('php://output', 'w');
+            // A shop name is the merchant's text: one starting with = + - @ must not run as a formula in a spreadsheet.
+            $safe = fn ($cell) => is_string($cell) && $cell !== '' && ! is_numeric($cell) && strpbrk($cell[0], "=+-@\t\r") !== false ? "'".$cell : $cell;
             fputcsv($out, ['Shop', 'Domain', 'Status', 'Plan', 'Billing', 'MRR', 'Installed', 'Uninstalled', 'Days installed', 'Plan at uninstall', 'Onboarded', 'Features used'], escape: '');
-            $query->chunk(500, function ($shops) use ($out, $all) {
+            $query->chunk(500, function ($shops) use ($out, $all, $safe) {
                 foreach ($shops as $s) {
                     $used = array_keys(array_filter($all, fn ($f) => in_array($s->app_shop_id, $f['shop_ids'], true)));
-                    fputcsv($out, [
+                    fputcsv($out, array_map($safe, [
                         $s->label(), $s->domain, $s->status(), $s->plan, $s->plan_interval, Pricing::mrr($s->plan, $s->plan_interval),
                         $s->installed_at?->toDateString(), $s->uninstalled_at?->toDateString(), $s->daysInstalled(), $s->plan_at_uninstall,
                         $s->onboarded_at?->toDateString(), implode(' | ', $used),
-                    ], escape: '');
+                    ]), escape: '');
                 }
             });
             fclose($out);
