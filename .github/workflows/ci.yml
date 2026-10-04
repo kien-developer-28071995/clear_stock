@@ -99,6 +99,30 @@ jobs:
           cache-from: type=gha,scope=${{ matrix.target }}
           cache-to: type=gha,scope=${{ matrix.target }},mode=max
 
+  # Owner reports (admin/): plain Laravel, its own dependencies; tests use SQLite in memory.
+  admin:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: admin
+    steps:
+      - uses: actions/checkout@v5
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: intl, pdo_sqlite
+          coverage: none
+      - name: Cache Composer
+        uses: actions/cache@v4
+        with:
+          path: ~/.composer/cache
+          key: composer-admin-${{ hashFiles('admin/composer.lock') }}
+      - run: composer install --no-interaction --prefer-dist --no-progress
+      - name: Code style (Pint)
+        run: vendor/bin/pint --test
+      - name: Tests
+        run: php artisan test
+
   # backend/.env template renders (deploy/envtool.py) with every required value present.
   env-template:
     runs-on: ubuntu-latest
