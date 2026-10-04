@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\InventoryLevel;
 use App\Models\InventorySnapshot;
 use App\Models\Location;
 use App\Models\Shop;

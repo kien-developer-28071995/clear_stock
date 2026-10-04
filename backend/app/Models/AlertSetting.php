@@ -7,10 +7,10 @@ use App\Enums\RealtimeAlertMode;
 use App\Models\Concerns\BelongsToShop;
 use App\Observers\AlertSettingObserver;
 use Illuminate\Contracts\Encryption\DecryptException;
-use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id

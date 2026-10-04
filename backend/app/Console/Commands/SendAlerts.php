@@ -6,9 +6,9 @@ use App\Enums\Feature;
 use App\Jobs\SendAlertDigest;
 use App\Jobs\SendRealtimeAlerts;
 use App\Jobs\SendWeeklySummary;
-use App\Support\Features;
 use App\Models\AlertSetting;
 use App\Repositories\Contracts\RealtimeAlertRepositoryInterface;
+use App\Support\Features;
 use Illuminate\Console\Command;
 
 /**

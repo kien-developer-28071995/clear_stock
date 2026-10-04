@@ -4,8 +4,8 @@ namespace App\Services\App;
 
 use App\Models\Forecast;
 use App\Models\Shop;
-use App\Support\ForecastStatusResolver;
 use App\Repositories\Contracts\ForecastQueryRepositoryInterface;
+use App\Support\ForecastStatusResolver;
 use Carbon\CarbonImmutable;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
