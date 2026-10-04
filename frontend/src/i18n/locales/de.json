@@ -17,7 +17,9 @@
     "saved": "Einstellungen gespeichert",
     "dayCount_one": "{{count}} Tag",
     "dayCount_other": "{{count}} Tage",
-    "discard": "Verwerfen"
+    "discard": "Verwerfen",
+    "more": "Mehr",
+    "showAll": "Alle {{count}} anzeigen"
   },
   "nav": {
     "transfers": "Umlagerungen",
@@ -34,7 +36,8 @@
     "events": "Verkaufsaktionen",
     "orders": "Aufgegebene Bestellungen",
     "costs": "Stückkosten",
-    "budget": "Einkaufsbudget"
+    "budget": "Einkaufsbudget",
+    "planning": "Planung"
   },
   "notFound": {
     "heading": "Seite nicht gefunden",
@@ -291,7 +294,10 @@
     "onTheWay": "Unterwegs",
     "incomingShort": "+{{qty}} unterwegs",
     "rateUp": "Gestiegen von {{previous}}/Tag in der Prognose der Woche vom {{date}} (jetzt {{current}}/Tag).",
-    "rateDown": "Gesunken von {{previous}}/Tag in der Prognose der Woche vom {{date}} (jetzt {{current}}/Tag)."
+    "rateDown": "Gesunken von {{previous}}/Tag in der Prognose der Woche vom {{date}} (jetzt {{current}}/Tag).",
+    "headlineOrder_one": "{{qty}} Stück bis {{date}} bestellen",
+    "headlineOrder_other": "{{qty}} Stück bis {{date}} bestellen",
+    "headlineOk": "Aktuell nichts zu bestellen"
   },
   "why": {
     "heading": "Warum diese Zahlen?",
@@ -368,7 +374,15 @@
     "referencePercent": "Anteil seiner Verkaufsrate",
     "referenceLocked": "Erstelle Prognosen für neue Produkte anhand eines ähnlichen Produkts, bis sie eine eigene Verkaufshistorie haben.",
     "supplierSku": "Artikelnummer des Lieferanten",
-    "supplierSkuHelp": "Optional. Steht auf Bestellungen und Bestell-E-Mails, damit der Lieferant das Produkt erkennt."
+    "supplierSkuHelp": "Optional. Steht auf Bestellungen und Bestell-E-Mails, damit der Lieferant das Produkt erkennt.",
+    "groups": {
+      "supplier": "Lieferant und Lieferzeit",
+      "orderRules": "Bestellregeln",
+      "limits": "Bestandsgrenzen",
+      "cost": "Kosten",
+      "forecast": "Prognose",
+      "status": "Status und Benachrichtigungen"
+    }
   },
   "products": {
     "freeLimit_one": "Der Free-Tarif erstellt eine Prognose für deinen Bestseller.",
@@ -394,7 +408,8 @@
     "allVendors": "Alle Hersteller",
     "productType": "Produkttyp",
     "allTypes": "Alle Produkttypen",
-    "exportCsv": "Liste exportieren (CSV)"
+    "exportCsv": "Liste exportieren (CSV)",
+    "moreFilters": "Weitere Filter"
   },
   "settings": {
     "defaultsHeading": "Prognose-Standards",
@@ -481,7 +496,8 @@
     "landedCostHelp": "Wird in Lagerwert und Ausgaben zu den Stückkosten addiert. Bestellungen behalten den Lieferantenpreis.",
     "due_one": "{{count}} Produkt jetzt zu bestellen · {{cost}}",
     "due_other": "{{count}} Produkte jetzt zu bestellen · {{cost}}",
-    "belowMinimum": "Unter dem Minimum von {{minimum}}"
+    "belowMinimum": "Unter dem Minimum von {{minimum}}",
+    "moreActions": "Weitere Aktionen für {{name}}"
   },
   "bundles": {
     "add": "Bundle hinzufügen",
@@ -560,7 +576,8 @@
     "choose": "{{plan}} wählen",
     "lockedHint": "In {{plan}} enthalten",
     "priceLockBadge": "Preisgarantie",
-    "priceLock": "Der Preis, zu dem du abonnierst, steigt nie, solange du in diesem Tarif bleibst. Wenn unsere Preise steigen, behältst du deinen."
+    "priceLock": "Der Preis, zu dem du abonnierst, steigt nie, solange du in diesem Tarif bleibst. Wenn unsere Preise steigen, behältst du deinen.",
+    "everythingIn": "Alles aus {{plan}}, plus:"
   },
   "apiErrors": {
     "scope_required": "Clear Stock braucht die Berechtigung, Umlagerungen in Shopify zu erstellen. Klicke erneut auf die Schaltfläche und bestätige sie.",
@@ -1373,5 +1390,9 @@
       "alerts": "Benachrichtigungen und E-Mails",
       "general": "Allgemein"
     }
+  },
+  "sections": {
+    "toOrder": "Zu bestellen",
+    "allProducts": "Alle Produkte"
   }
 }

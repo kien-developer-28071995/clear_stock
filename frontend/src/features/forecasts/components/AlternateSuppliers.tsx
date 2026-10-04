@@ -83,7 +83,7 @@ export function AlternateSuppliers({ f }: { f: ForecastDetail }) {
                     </s-table>
                 )}
                 {options.length > 0 && (
-                    <s-grid gridTemplateColumns="@container (inline-size > 600px) 2fr 1fr 1fr 1fr auto, 1fr" gap="small-200" alignItems="end">
+                    <s-query-container><s-grid gridTemplateColumns="@container (inline-size > 600px) 2fr 1fr 1fr 1fr auto, 1fr" gap="small-200" alignItems="end">
                         <s-select label={t('alternates.add')} value={optionValue(supplierId)} onChange={(e) => setSupplierId(fromOption(e.currentTarget.value))}>
                             <s-option value={NO_VALUE}>{t('alternates.choose')}</s-option>
                             {options.map((s) => (
@@ -94,7 +94,7 @@ export function AlternateSuppliers({ f }: { f: ForecastDetail }) {
                         <s-number-field label={t('suppliers.leadTime')} min={0} suffix={t('common.daysSuffix')} value={lead} onInput={(e) => setLead(e.currentTarget.value)} />
                         <s-text-field label={t('productSettings.supplierSku')} value={sku} onInput={(e) => setSku(e.currentTarget.value)} />
                         <s-button disabled={!supplierId || undefined} loading={save.isPending || undefined} onClick={add}>{t('alternates.addButton')}</s-button>
-                    </s-grid>
+                    </s-grid></s-query-container>
                 )}
             </s-stack>
         </s-section>

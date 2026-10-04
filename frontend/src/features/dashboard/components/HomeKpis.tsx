@@ -23,7 +23,7 @@ export function HomeKpis({ dashboard }: { dashboard: Dashboard }) {
     const tiedUp = slow.value + overstock.value;
 
     return (
-        <s-grid gridTemplateColumns="@container (inline-size > 600px) 1fr 1fr 1fr 1fr, 1fr 1fr" gap="base">
+        <s-query-container><s-grid gridTemplateColumns="@container (inline-size > 600px) 1fr 1fr 1fr 1fr, 1fr 1fr" gap="base">
             <Kpi
                 label={t('status.out_of_stock')}
                 value={formatNumber(counts.out_of_stock, 0)}
@@ -46,6 +46,6 @@ export function HomeKpis({ dashboard }: { dashboard: Dashboard }) {
                 hint={t('home.kpi.tiedUpHint', { slow: slow.count, overstock: overstock.count })}
                 href="/insights"
             />
-        </s-grid>
+        </s-grid></s-query-container>
     );
 }

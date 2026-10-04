@@ -44,7 +44,7 @@ export function AdjustForecastForm({ f }: { f: ForecastDetail }) {
             <SaveBar id="adjust-forecast-save-bar" dirty={dirty} saving={save.isPending} onSave={submit} onDiscard={discard} />
             <s-stack gap="base">
                 <s-paragraph>{t('adjust.intro', { rate: formatNumber(f.computed_avg, 2) })}</s-paragraph>
-                <s-grid gridTemplateColumns="@container (inline-size > 500px) 1fr 1fr, 1fr" gap="base">
+                <s-query-container><s-grid gridTemplateColumns="@container (inline-size > 500px) 1fr 1fr, 1fr" gap="base">
                     <s-number-field
                         label={t('product.sellsPerDay')}
                         min={0}
@@ -60,7 +60,7 @@ export function AdjustForecastForm({ f }: { f: ForecastDetail }) {
                         error={fieldError(save.error, 'avg_daily_sales.expires_at')}
                         onChange={(e) => setUntil(e.currentTarget.value)}
                     />
-                </s-grid>
+                </s-grid></s-query-container>
                 <s-text-field
                     label={t('adjust.note')}
                     placeholder={t('adjust.notePlaceholder')}

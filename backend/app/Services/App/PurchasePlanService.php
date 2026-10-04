@@ -6,8 +6,11 @@ use App\Enums\Feature;
 use App\Models\Shop;
 use App\Repositories\Contracts\ForecastQueryRepositoryInterface;
 use App\Services\Planning\PurchasePlanner;
+use App\Support\CacheKeys;
+use App\Support\CacheVersion;
 use App\Support\Entitlements;
 use Carbon\CarbonImmutable;
+use Illuminate\Support\Facades\Cache;
 
 /**
  * Purchase plan: what to order and how much it costs, week by week over the next weeks, if every
@@ -17,6 +20,8 @@ class PurchasePlanService
 {
     /** Products listed; totals always cover every product. */
     private const ITEM_LIMIT = 200;
+
+    private const CALENDAR_LIMIT = 100;
 
     public function __construct(
         private readonly ForecastQueryRepositoryInterface $forecasts,
@@ -72,6 +77,26 @@ class PurchasePlanService
         Entitlements::for($shop)->require(Feature::PurchasePlan);
 
         $today = CarbonImmutable::now($shop->timezone)->startOfDay();
+        // Walking every product is the slow part (seconds on a large shop). Everything it reads
+        // bumps the forecast or catalog version when it changes, so the result is kept until then.
+        $used = array_filter($filters, fn ($v) => $v !== null && $v !== '');
+        ksort($used);
+        $key = CacheKeys::forecastPage(
+            $shop->id,
+            CacheVersion::current(CacheKeys::forecastVersion($shop->id)),
+            CacheVersion::catalog($shop->id),
+            $today->toDateString(),
+            'purchase-plan-'.md5(json_encode([$weeks, $used])),
+        );
+        $plan = Cache::remember($key, CacheKeys::TTL_DASHBOARD, fn () => $this->compute($shop, $today, $weeks, $filters));
+
+        // Spend per calendar month sits next to the monthly budget (Starter, null when none is set).
+        return $plan + ['budget' => Entitlements::for($shop)->has(Feature::OrderBudget) && $shop->order_budget !== null ? (float) $shop->order_budget : null];
+    }
+
+    /** @param array{supplier_id?: ?int, vendor?: ?string} $filters */
+    private function compute(Shop $shop, CarbonImmutable $today, int $weeks, array $filters): array
+    {
         $until = $today->addWeeks($weeks)->toDateString();
 
         $weekRows = [];
@@ -162,11 +187,11 @@ class PurchasePlanService
             'totals' => $money($totals),
             'by_week' => array_map($money, array_values($weekRows)),
             'by_supplier' => array_map($money, $suppliers),
-            // Spend per calendar month next to the monthly budget (Starter, null when none is set).
             'by_month' => array_map($money, array_values($months)),
-            'budget' => Entitlements::for($shop)->has(Feature::OrderBudget) && $shop->order_budget !== null ? (float) $shop->order_budget : null,
             // When to order from whom (products without a supplier: supplier null, listed last on a day).
-            'calendar' => array_map($money, $calendar),
+            // The next order days only: a large shop has thousands of day x supplier entries.
+            'calendar' => array_map($money, array_slice($calendar, 0, self::CALENDAR_LIMIT)),
+            'calendar_total' => count($calendar),
             'items' => array_slice($items, 0, self::ITEM_LIMIT),
             'items_total' => count($items),
         ];

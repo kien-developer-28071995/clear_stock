@@ -18,7 +18,9 @@
     "dayCount_one": "{{count}} día",
     "dayCount_other": "{{count}} días",
     "dayCount_many": "{{count}} días",
-    "discard": "Descartar"
+    "discard": "Descartar",
+    "more": "Más",
+    "showAll": "Ver los {{count}}"
   },
   "nav": {
     "transfers": "Transferencias",
@@ -35,7 +37,8 @@
     "events": "Eventos de venta",
     "orders": "Pedidos realizados",
     "costs": "Costos unitarios",
-    "budget": "Presupuesto de compras"
+    "budget": "Presupuesto de compras",
+    "planning": "Planificación"
   },
   "notFound": {
     "heading": "Página no encontrada",
@@ -307,7 +310,11 @@
     "onTheWay": "En camino",
     "incomingShort": "+{{qty}} en camino",
     "rateUp": "Sube desde {{previous}}/día en la previsión de la semana del {{date}} (ahora {{current}}/día).",
-    "rateDown": "Baja desde {{previous}}/día en la previsión de la semana del {{date}} (ahora {{current}}/día)."
+    "rateDown": "Baja desde {{previous}}/día en la previsión de la semana del {{date}} (ahora {{current}}/día).",
+    "headlineOrder_one": "Pide {{qty}} unidad antes del {{date}}",
+    "headlineOrder_other": "Pide {{qty}} unidades antes del {{date}}",
+    "headlineOrder_many": "Pide {{qty}} unidades antes del {{date}}",
+    "headlineOk": "Nada que pedir por ahora"
   },
   "why": {
     "heading": "¿Por qué estos números?",
@@ -385,7 +392,15 @@
     "referencePercent": "Porcentaje de su ritmo de ventas",
     "referenceLocked": "Haz la previsión de productos nuevos a partir de un producto similar hasta que tengan su propio historial de ventas.",
     "supplierSku": "Código de producto del proveedor",
-    "supplierSkuHelp": "Opcional. Aparece en los pedidos de compra y en los correos para que el proveedor reconozca el producto."
+    "supplierSkuHelp": "Opcional. Aparece en los pedidos de compra y en los correos para que el proveedor reconozca el producto.",
+    "groups": {
+      "supplier": "Proveedor y plazo de entrega",
+      "orderRules": "Reglas de pedido",
+      "limits": "Límites de stock",
+      "cost": "Coste",
+      "forecast": "Previsión",
+      "status": "Estado y alertas"
+    }
   },
   "products": {
     "freeLimit_one": "El plan Free hace la previsión de tu producto más vendido.",
@@ -413,7 +428,8 @@
     "allVendors": "Todas las marcas",
     "productType": "Tipo de producto",
     "allTypes": "Todos los tipos de producto",
-    "exportCsv": "Exportar lista (CSV)"
+    "exportCsv": "Exportar lista (CSV)",
+    "moreFilters": "Más filtros"
   },
   "settings": {
     "defaultsHeading": "Valores predeterminados de la previsión",
@@ -505,7 +521,8 @@
     "due_one": "{{count}} producto por pedir ahora · {{cost}}",
     "due_other": "{{count}} productos por pedir ahora · {{cost}}",
     "due_many": "{{count}} productos por pedir ahora · {{cost}}",
-    "belowMinimum": "Por debajo del mínimo de {{minimum}}"
+    "belowMinimum": "Por debajo del mínimo de {{minimum}}",
+    "moreActions": "Más acciones para {{name}}"
   },
   "bundles": {
     "add": "Añadir paquete",
@@ -587,7 +604,8 @@
     "choose": "Elegir {{plan}}",
     "lockedHint": "Incluido en {{plan}}",
     "priceLockBadge": "Precio garantizado",
-    "priceLock": "El precio con el que te suscribes nunca sube mientras sigas en ese plan. Si nuestros precios suben, tú mantienes el tuyo."
+    "priceLock": "El precio con el que te suscribes nunca sube mientras sigas en ese plan. Si nuestros precios suben, tú mantienes el tuyo.",
+    "everythingIn": "Todo lo de {{plan}}, más:"
   },
   "apiErrors": {
     "scope_required": "Clear Stock necesita permiso para crear transferencias en Shopify. Vuelve a hacer clic en el botón y apruébalo.",
@@ -1510,5 +1528,9 @@
       "alerts": "Alertas y correos",
       "general": "General"
     }
+  },
+  "sections": {
+    "toOrder": "Por pedir",
+    "allProducts": "Todos los productos"
   }
 }

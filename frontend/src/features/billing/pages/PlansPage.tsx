@@ -126,7 +126,12 @@ export function PlansPage() {
                 {/* @container columns only work under a query container. */}
                 <s-query-container>
                     <s-grid gridTemplateColumns="@container (inline-size > 760px) 1fr 1fr 1fr, 1fr" gap="base">
-                        {data.plans.filter((plan) => plan.offered || plan.key === data.plan).map((plan) => {
+                        {data.plans.filter((plan) => plan.offered || plan.key === data.plan).map((plan, index, shown) => {
+                            // Each plan lists what it adds to the one before it, not the whole list again.
+                            const previous = index > 0 ? shown[index - 1] : null;
+                            const features = FEATURES.filter((f) => !f.feature || data.entitlements.features[f.feature]).filter(
+                                (f) => f.included(plan) && (!previous || !f.included(previous) || f.label(plan, t) !== f.label(previous, t)),
+                            );
                             const current = plan.key === data.plan && (plan.key === 'free' || data.interval === interval);
                             const price = plan.prices?.[interval];
 
@@ -144,14 +149,14 @@ export function PlansPage() {
                                             <s-text color="subdued">{t('plans.billedYearly', { price: formatMoney(Math.round((price / 12) * 100) / 100, plan.currency) })}</s-text>
                                         )}
                                         {price && data.trial_days_left > 0 && data.plan === 'free' && <s-text color="subdued">{t('plans.trialNote', { count: data.trial_days_left })}</s-text>}
-                                        <s-unordered-list>
-                                            {FEATURES.filter((f) => !f.feature || data.entitlements.features[f.feature]).map((f) => (
-                                                <s-list-item key={f.key}>
-                                                    {f.included(plan) ? '✓ ' : '— '}
-                                                    {f.label(plan, t)}
-                                                </s-list-item>
-                                            ))}
-                                        </s-unordered-list>
+                                        <s-stack gap="small-200">
+                                            {previous && <s-text type="strong">{t('plans.everythingIn', { plan: planName(previous.key) })}</s-text>}
+                                            <s-unordered-list>
+                                                {features.map((f) => (
+                                                    <s-list-item key={f.key}>{f.label(plan, t)}</s-list-item>
+                                                ))}
+                                            </s-unordered-list>
+                                        </s-stack>
                                         <s-button
                                             variant={plan.key === 'free' ? 'secondary' : 'primary'}
                                             disabled={current || undefined}

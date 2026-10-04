@@ -1,3 +1,4 @@
+import { SectionTabs } from '@/components/layout/SectionTabs';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router';
@@ -8,8 +9,9 @@ import { useShop } from '@/features/shop/hooks/useShop';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useFeature } from '@/hooks/useEntitlements';
 import { SavedViews } from '@/features/forecasts/components/SavedViews';
+import { useIsNarrow } from '@/hooks/useIsNarrow';
 import { AbcBadge } from '@/features/forecasts/components/AbcBadge';
-import { useFacets, useForecastList, useLocations } from '@/features/forecasts/hooks/useForecasts';
+import { useFacets, useForecastList, useLocations, useSavedViews } from '@/features/forecasts/hooks/useForecasts';
 import { TREND_THRESHOLD, type ForecastFilters } from '@/features/forecasts/types';
 import { formatDate, formatNumber } from '@/utils/format';
 import { NO_VALUE, fromOption, optionValue } from '@/utils/select';
@@ -45,7 +47,12 @@ export function ProductsPage() {
     const showTypes = (facets?.product_types.length ?? 0) > 1;
     const abc = useFeature('abc');
     const sortOptions = SORT_OPTIONS.filter((o) => abc || o !== 'revenue');
-    const selects = (abc ? 4 : 3) + [showLocations, showVendors, showTypes].filter(Boolean).length;
+    const narrow = useIsNarrow();
+    const views = useSavedViews();
+    // Search, status and sort are always there; the other filters open on demand (or when one is in use).
+    const extraActive = [filters.location_id, filters.vendor, filters.product_type, filters.abc, filters.trend].some((v) => v !== '' && v !== undefined);
+    const [moreOpen, setMoreOpen] = useState(false);
+    const showMore = moreOpen || extraActive;
 
     const update = (patch: Partial<ForecastFilters>) => {
         const next = { ...filters, page: 1, ...patch };
@@ -77,7 +84,7 @@ export function ProductsPage() {
     const meta = data?.meta;
 
     return (
-        <s-page heading={t('nav.products')} inlineSize="large">
+        <s-page heading={t('nav.products')} inlineSize="large"><SectionTabs group="products" />
             <s-stack slot="secondary-actions">
                 <ExportPurchaseOrderButton locationId={filters.location_id || undefined} />
                 <s-button icon="export" loading={exporting || undefined} onClick={exportList}>{t('products.exportCsv')}</s-button>
@@ -89,10 +96,6 @@ export function ProductsPage() {
                     {t('products.freeLimit', { count: limit })} <s-link href="/plans">{t('upgrade.upgrade')}</s-link>
                 </s-banner>
             )}
-            <SavedViews
-                current={Object.fromEntries(params.entries())}
-                onApply={(view) => setParams(view)}
-            />
             <s-section padding="none">
                 <s-table
                     loading={isPending || isFetching || undefined}
@@ -103,7 +106,7 @@ export function ProductsPage() {
                     onNextPage={() => update({ page: (filters.page ?? 1) + 1 })}
                 >
                     {/* All filters on one line: search takes the remaining width. */}
-                    <s-grid slot="filters" gap="small-200" alignItems="center" gridTemplateColumns={`minmax(0, 1fr)${' auto'.repeat(selects)}`}>
+                    <s-grid slot="filters" gap="small-200" alignItems="center" gridTemplateColumns="minmax(0, 1fr) auto auto auto">
                         <s-search-field
                             label={t('products.search')}
                             labelAccessibilityVisibility="exclusive"
@@ -111,66 +114,6 @@ export function ProductsPage() {
                             value={search}
                             onInput={(e) => setSearch(e.currentTarget.value)}
                         />
-                        {showLocations && (
-                            <s-select
-                                label={t('locations.location')}
-                                labelAccessibilityVisibility="exclusive"
-                                value={optionValue(filters.location_id)}
-                                onChange={(e) => update({ location_id: fromOption(e.currentTarget.value) ? Number(e.currentTarget.value) : '' })}
-                            >
-                                <s-option value={NO_VALUE}>{t('products.allLocations')}</s-option>
-                                {locations.data?.map((l) => (
-                                    <s-option key={l.id} value={String(l.id)}>{l.name}</s-option>
-                                ))}
-                            </s-select>
-                        )}
-                        {showVendors && (
-                            <s-select
-                                label={t('products.vendor')}
-                                labelAccessibilityVisibility="exclusive"
-                                value={optionValue(filters.vendor)}
-                                onChange={(e) => update({ vendor: fromOption(e.currentTarget.value) })}
-                            >
-                                <s-option value={NO_VALUE}>{t('products.allVendors')}</s-option>
-                                {facets?.vendors.map((v) => (
-                                    <s-option key={v} value={v}>{v}</s-option>
-                                ))}
-                            </s-select>
-                        )}
-                        {showTypes && (
-                            <s-select
-                                label={t('products.productType')}
-                                labelAccessibilityVisibility="exclusive"
-                                value={optionValue(filters.product_type)}
-                                onChange={(e) => update({ product_type: fromOption(e.currentTarget.value) })}
-                            >
-                                <s-option value={NO_VALUE}>{t('products.allTypes')}</s-option>
-                                {facets?.product_types.map((v) => (
-                                    <s-option key={v} value={v}>{v}</s-option>
-                                ))}
-                            </s-select>
-                        )}
-                        {abc && (<s-select
-                            label={t('abc.filter')}
-                            labelAccessibilityVisibility="exclusive"
-                            value={optionValue(filters.abc)}
-                            onChange={(e) => update({ abc: fromOption(e.currentTarget.value) as ForecastFilters['abc'] })}
-                        >
-                            <s-option value={NO_VALUE}>{t('abc.allClasses')}</s-option>
-                            {ABC_OPTIONS.map((value) => (
-                                <s-option key={value} value={value}>{t(`abc.option${value}`)}</s-option>
-                            ))}
-                        </s-select>)}
-                        <s-select
-                            label={t('trend.filter')}
-                            labelAccessibilityVisibility="exclusive"
-                            value={optionValue(filters.trend)}
-                            onChange={(e) => update({ trend: fromOption(e.currentTarget.value) as ForecastFilters['trend'] })}
-                        >
-                            <s-option value={NO_VALUE}>{t('trend.all')}</s-option>
-                            <s-option value="up">{t('trend.up')}</s-option>
-                            <s-option value="down">{t('trend.down')}</s-option>
-                        </s-select>
                         <s-select
                             label={t('products.status')}
                             labelAccessibilityVisibility="exclusive"
@@ -192,14 +135,88 @@ export function ProductsPage() {
                                 <s-option key={value} value={value}>{t(`products.sorts.${value}`)}</s-option>
                             ))}
                         </s-select>
+                        <s-press-button pressed={showMore || undefined} disabled={extraActive || undefined} onClick={() => setMoreOpen(!moreOpen)}>
+                            {t('products.moreFilters')}
+                        </s-press-button>
+                        {(showMore || (views.data?.length ?? 0) > 0) && (
+                            <s-grid-item gridColumn="span 4">
+                                <SavedViews current={Object.fromEntries(params.entries())} onApply={(view) => setParams(view)} canSave={showMore} />
+                            </s-grid-item>
+                        )}
+                        {showMore && (
+                            <s-grid-item gridColumn="span 4">
+                                <s-stack direction="inline" gap="small-200">
+                                {showLocations && (
+                                    <s-select
+                                        label={t('locations.location')}
+                                        labelAccessibilityVisibility="exclusive"
+                                        value={optionValue(filters.location_id)}
+                                        onChange={(e) => update({ location_id: fromOption(e.currentTarget.value) ? Number(e.currentTarget.value) : '' })}
+                                    >
+                                        <s-option value={NO_VALUE}>{t('products.allLocations')}</s-option>
+                                        {locations.data?.map((l) => (
+                                            <s-option key={l.id} value={String(l.id)}>{l.name}</s-option>
+                                        ))}
+                                    </s-select>
+                                )}
+                                {showVendors && (
+                                    <s-select
+                                        label={t('products.vendor')}
+                                        labelAccessibilityVisibility="exclusive"
+                                        value={optionValue(filters.vendor)}
+                                        onChange={(e) => update({ vendor: fromOption(e.currentTarget.value) })}
+                                    >
+                                        <s-option value={NO_VALUE}>{t('products.allVendors')}</s-option>
+                                        {facets?.vendors.map((v) => (
+                                            <s-option key={v} value={v}>{v}</s-option>
+                                        ))}
+                                    </s-select>
+                                )}
+                                {showTypes && (
+                                    <s-select
+                                        label={t('products.productType')}
+                                        labelAccessibilityVisibility="exclusive"
+                                        value={optionValue(filters.product_type)}
+                                        onChange={(e) => update({ product_type: fromOption(e.currentTarget.value) })}
+                                    >
+                                        <s-option value={NO_VALUE}>{t('products.allTypes')}</s-option>
+                                        {facets?.product_types.map((v) => (
+                                            <s-option key={v} value={v}>{v}</s-option>
+                                        ))}
+                                    </s-select>
+                                )}
+                                {abc && (<s-select
+                                    label={t('abc.filter')}
+                                    labelAccessibilityVisibility="exclusive"
+                                    value={optionValue(filters.abc)}
+                                    onChange={(e) => update({ abc: fromOption(e.currentTarget.value) as ForecastFilters['abc'] })}
+                                >
+                                    <s-option value={NO_VALUE}>{t('abc.allClasses')}</s-option>
+                                    {ABC_OPTIONS.map((value) => (
+                                        <s-option key={value} value={value}>{t(`abc.option${value}`)}</s-option>
+                                    ))}
+                                </s-select>)}
+                                <s-select
+                                    label={t('trend.filter')}
+                                    labelAccessibilityVisibility="exclusive"
+                                    value={optionValue(filters.trend)}
+                                    onChange={(e) => update({ trend: fromOption(e.currentTarget.value) as ForecastFilters['trend'] })}
+                                >
+                                    <s-option value={NO_VALUE}>{t('trend.all')}</s-option>
+                                    <s-option value="up">{t('trend.up')}</s-option>
+                                    <s-option value="down">{t('trend.down')}</s-option>
+                                </s-select>
+                                </s-stack>
+                            </s-grid-item>
+                        )}
                     </s-grid>
 
                     <s-table-header-row>
                         <s-table-header listSlot="primary">{t('table.product')}</s-table-header>
                         <s-table-header listSlot="inline">{t('products.status')}</s-table-header>
-                        {abc && <s-table-header>{t('abc.column')}</s-table-header>}
+                        {abc && !narrow && <s-table-header>{t('abc.column')}</s-table-header>}
                         <s-table-header format="numeric">{t('table.inStock')}</s-table-header>
-                        <s-table-header format="numeric">{t('table.perDay')}</s-table-header>
+                        {!narrow && <s-table-header format="numeric">{t('table.perDay')}</s-table-header>}
                         <s-table-header format="numeric">{t('table.daysLeft')}</s-table-header>
                         <s-table-header>{t('table.orderBy')}</s-table-header>
                         <s-table-header format="numeric">{t('table.suggestedOrder')}</s-table-header>
@@ -218,21 +235,22 @@ export function ProductsPage() {
                                 <s-table-cell>
                                     <StatusBadge status={row.status} />
                                 </s-table-cell>
-                                {abc && (
+                                {abc && !narrow && (
                                     <s-table-cell>
                                         {row.abc_class ? <AbcBadge abc={row.abc_class} /> : <s-text color="subdued">—</s-text>}
                                     </s-table-cell>
                                 )}
                                 <s-table-cell>
-                                    <s-stack gap="small-100">
+                                    <s-stack gap="small-100" alignItems="end">
                                         <s-text>{formatNumber(row.current_stock, 0)}</s-text>
                                         {row.incoming_stock > 0 && (
                                             <s-text color="subdued">{t('product.incomingShort', { qty: formatNumber(row.incoming_stock, 0) })}</s-text>
                                         )}
                                     </s-stack>
                                 </s-table-cell>
+                                {!narrow && (
                                 <s-table-cell>
-                                    <s-stack gap="small-100">
+                                    <s-stack gap="small-100" alignItems="end">
                                         <s-text>{formatNumber(row.avg_daily_sales, 2)}</s-text>
                                         {row.trend_percent !== null && Math.abs(row.trend_percent) >= TREND_THRESHOLD && (
                                             <s-text color="subdued">
@@ -243,6 +261,7 @@ export function ProductsPage() {
                                         )}
                                     </s-stack>
                                 </s-table-cell>
+                                )}
                                 <s-table-cell>{row.days_of_cover === null ? '∞' : formatNumber(row.days_of_cover, 0)}</s-table-cell>
                                 <s-table-cell>{row.avg_daily_sales > 0 ? formatDate(row.reorder_date) : '—'}</s-table-cell>
                                 <s-table-cell>{formatNumber(row.suggested_qty, 0)}</s-table-cell>

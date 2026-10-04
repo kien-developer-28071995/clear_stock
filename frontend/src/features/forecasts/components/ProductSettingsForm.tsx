@@ -109,6 +109,7 @@ export function ProductSettingsForm({ f }: { f: ForecastDetail }) {
         <s-section heading={t('productSettings.heading')}>
             <SaveBar id="product-settings-save-bar" dirty={dirty} saving={update.isPending} onSave={submit} onDiscard={reset} />
             <s-stack gap="base">
+                <s-heading>{t('productSettings.groups.supplier')}</s-heading>
                 <s-select
                     label={t('table.supplier')}
                     value={optionValue(supplierId)}
@@ -130,7 +131,7 @@ export function ProductSettingsForm({ f }: { f: ForecastDetail }) {
                     error={fieldError(update.error, 'supplier_sku')}
                     onInput={(e) => setSupplierSku(e.currentTarget.value)}
                 />
-                <s-grid gridTemplateColumns="@container (inline-size > 500px) 1fr 1fr, 1fr" gap="base">
+                <s-query-container><s-grid gridTemplateColumns="@container (inline-size > 500px) 1fr 1fr, 1fr" gap="base">
                     <s-number-field
                         label={t('productSettings.leadTime')}
                         suffix={t('common.daysSuffix')}
@@ -150,8 +151,10 @@ export function ProductSettingsForm({ f }: { f: ForecastDetail }) {
                         error={fieldError(update.error, 'safety_days')}
                         onInput={(e) => setSafety(e.currentTarget.value)}
                     />
-                </s-grid>
-                <s-grid gridTemplateColumns="@container (inline-size > 500px) 1fr 1fr, 1fr" gap="base">
+                </s-grid></s-query-container>
+                <s-divider />
+                <s-heading>{t('productSettings.groups.orderRules')}</s-heading>
+                <s-query-container><s-grid gridTemplateColumns="@container (inline-size > 500px) 1fr 1fr, 1fr" gap="base">
                     <s-number-field
                         label={t('productSettings.minOrder')}
                         min={1}
@@ -170,8 +173,10 @@ export function ProductSettingsForm({ f }: { f: ForecastDetail }) {
                         error={fieldError(update.error, 'pack_size')}
                         onInput={(e) => setPack(e.currentTarget.value)}
                     />
-                </s-grid>
-                <s-grid gridTemplateColumns="@container (inline-size > 500px) 1fr 1fr, 1fr" gap="base">
+                </s-grid></s-query-container>
+                <s-divider />
+                <s-heading>{t('productSettings.groups.limits')}</s-heading>
+                <s-query-container><s-grid gridTemplateColumns="@container (inline-size > 500px) 1fr 1fr, 1fr" gap="base">
                     <s-number-field
                         label={t('productSettings.minStock')}
                         min={0}
@@ -190,7 +195,9 @@ export function ProductSettingsForm({ f }: { f: ForecastDetail }) {
                         error={fieldError(update.error, 'max_stock')}
                         onInput={(e) => setMaxStock(e.currentTarget.value)}
                     />
-                </s-grid>
+                </s-grid></s-query-container>
+                <s-divider />
+                <s-heading>{t('productSettings.groups.cost')}</s-heading>
                 <s-box maxInlineSize="240px">
                     <s-number-field
                         label={t('costs.productField')}
@@ -203,6 +210,8 @@ export function ProductSettingsForm({ f }: { f: ForecastDetail }) {
                         onInput={(e) => setCost(e.currentTarget.value)}
                     />
                 </s-box>
+                <s-divider />
+                <s-heading>{t('productSettings.groups.forecast')}</s-heading>
                 <s-select
                     label={t('forecastProfile.productLabel')}
                     details={t('forecastProfile.productHelp')}
@@ -246,6 +255,8 @@ export function ProductSettingsForm({ f }: { f: ForecastDetail }) {
                     {fieldError(update.error, 'reference_variant') && <s-text tone="critical">{fieldError(update.error, 'reference_variant')}</s-text>}
                     <s-text color="subdued">{t('productSettings.referenceHelp', { count: REFERENCE_FULL_AFTER_DAYS })}</s-text>
                 </s-stack>)}
+                <s-divider />
+                <s-heading>{t('productSettings.groups.status')}</s-heading>
                 <s-checkbox
                     label={t('productSettings.discontinued')}
                     details={t('productSettings.discontinuedHelp')}

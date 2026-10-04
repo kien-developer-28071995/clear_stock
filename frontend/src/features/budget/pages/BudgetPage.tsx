@@ -1,3 +1,4 @@
+import { SectionTabs } from '@/components/layout/SectionTabs';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ErrorBanner } from '@/components/ui/ErrorBanner';
@@ -25,8 +26,7 @@ export function BudgetPage() {
     const { t } = useTranslation();
     if (!useEntitlements().order_budget) {
         return (
-            <s-page heading={t('nav.budget')}>
-                <s-link slot="breadcrumb-actions" href="/reorder">{t('nav.reorder')}</s-link>
+            <s-page heading={t('nav.planning')}><SectionTabs group="planning" />
                 <UpgradePrompt id="order-budget" plan="starter">{t('budget.locked')}</UpgradePrompt>
                 <s-section><s-paragraph>{t('budget.intro')}</s-paragraph></s-section>
             </s-page>
@@ -46,19 +46,18 @@ function BudgetView() {
     useEffect(() => setValue(saved), [saved]);
     const inBudget = useMemo(() => (data?.items ?? []).filter((i) => i.in_budget), [data]);
 
-    if (!data) return error ? <s-page heading={t('nav.budget')}><ErrorBanner error={error} onRetry={() => refetch()} /></s-page> : <LoadingPage heading={t('nav.budget')} />;
+    if (!data) return error ? <s-page heading={t('nav.planning')}><SectionTabs group="planning" /><ErrorBanner error={error} onRetry={() => refetch()} /></s-page> : <LoadingPage heading={t('nav.planning')} group="planning" />;
 
     const money = (v: number | null) => (v === null ? '—' : formatMoney(v, data.currency));
     const submit = () => save.mutate(value.trim() === '' ? null : Number(value.replace(',', '.')), { onSuccess: () => shopify.toast.show(t('common.saved')) });
 
     return (
-        <s-page heading={t('nav.budget')}>
-            <s-link slot="breadcrumb-actions" href="/reorder">{t('nav.reorder')}</s-link>
+        <s-page heading={t('nav.planning')}><SectionTabs group="planning" />
             <SaveBar id="budget-save-bar" dirty={value !== saved} saving={save.isPending} onSave={submit} onDiscard={() => setValue(saved)} />
             <s-section>
                 <s-stack gap="base">
                     <s-paragraph>{t('budget.intro')}</s-paragraph>
-                    <s-grid gridTemplateColumns="@container (inline-size > 600px) 1fr 1fr 1fr, 1fr" gap="base" alignItems="end">
+                    <s-query-container><s-grid gridTemplateColumns="@container (inline-size > 600px) 1fr 1fr 1fr, 1fr" gap="base" alignItems="start">
                         <s-number-field
                             label={t('budget.monthly')}
                             min={0}
@@ -78,7 +77,7 @@ function BudgetView() {
                             <s-text color="subdued">{t('budget.remaining')}</s-text>
                             <s-heading>{money(data.remaining)}</s-heading>
                         </s-stack>
-                    </s-grid>
+                    </s-grid></s-query-container>
                     <s-text color="subdued">{t('budget.how')}</s-text>
                 </s-stack>
             </s-section>
@@ -87,7 +86,7 @@ function BudgetView() {
                 <s-section><s-paragraph>{t('budget.nothingDue')}</s-paragraph></s-section>
             ) : (
                 <s-section heading={t('budget.dueHeading')} padding="none">
-                    <s-box padding="base">
+                    <s-box padding="none base base">
                         <s-stack gap="small-200">
                             <s-text>
                                 {data.budget === null
@@ -136,6 +135,11 @@ function BudgetView() {
                             ))}
                         </s-table-body>
                     </s-table>
+                    {data.items_total > data.items.length && (
+                        <s-box padding="base">
+                            <s-text color="subdued">{t('whatIf.truncated', { shown: data.items.length, count: data.items_total })}</s-text>
+                        </s-box>
+                    )}
                 </s-section>
             )}
             <MarkOrderedModal id="mark-ordered-budget" modalRef={markModal.ref} items={inBudget.map((i) => ({ variant_id: i.variant_id, name: i.name, quantity: i.quantity }))} />

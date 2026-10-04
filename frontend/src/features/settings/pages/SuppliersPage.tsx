@@ -98,10 +98,10 @@ export function SuppliersPage() {
                                         </s-stack>
                                     </s-table-cell>
                                     <s-table-cell>
-                                        <s-stack gap="small-100">
+                                        <s-stack gap="small-100" alignItems="end">
                                             <s-text>{s.lead_time_days == null ? t('suppliers.storeDefault') : t('common.dayCount', { count: s.lead_time_days })}</s-text>
                                             {s.actual_lead_time && s.actual_lead_time.median_days !== s.lead_time_days && (
-                                                <s-stack gap="small-100">
+                                                <s-stack gap="small-100" alignItems="end">
                                                     <s-text color="subdued">{t('suppliers.actualLeadTime', { count: s.actual_lead_time.orders, days: s.actual_lead_time.median_days })}</s-text>
                                                     <s-link onClick={() => applyActualLeadTime(s, s.actual_lead_time!.median_days)}>{t('suppliers.useActual', { count: s.actual_lead_time.median_days })}</s-link>
                                                 </s-stack>
@@ -110,7 +110,7 @@ export function SuppliersPage() {
                                         </s-stack>
                                     </s-table-cell>
                                     <s-table-cell>
-                                        <s-stack gap="small-100">
+                                        <s-stack gap="small-100" alignItems="end">
                                             <s-text>{s.variants_count ?? 0}</s-text>
                                             {s.due && (
                                                 <s-text color="subdued">{t('suppliers.due', { count: s.due.products, cost: formatMoney(s.due.cost, currency) })}</s-text>
@@ -121,22 +121,22 @@ export function SuppliersPage() {
                                         </s-stack>
                                     </s-table-cell>
                                     <s-table-cell>
-                                        <s-button-group>
-                                            <s-button slot="secondary-actions" onClick={() => assignProducts(s)}>{t('suppliers.assign')}</s-button>
+                                        <s-stack direction="inline" gap="small-200" alignItems="center">
+                                            <s-button onClick={() => openEdit(s)}>{t('common.edit')}</s-button>
                                             <ExportPurchaseOrderButton supplierId={s.id} label={t('po.short')} />
+                                            <s-button accessibilityLabel={t('suppliers.moreActions', { name: s.name })} commandFor={`supplier-menu-${s.id}`} command="--toggle">
+                                                {t('common.more')}
+                                            </s-button>
+                                        </s-stack>
+                                        <s-menu id={`supplier-menu-${s.id}`} accessibilityLabel={t('suppliers.moreActions', { name: s.name })}>
+                                            <s-button onClick={() => assignProducts(s)}>{t('suppliers.assign')}</s-button>
                                             {emailsExist && (
-                                                <s-button
-                                                    slot="secondary-actions"
-                                                    icon={canEmail ? 'email' : 'lock'}
-                                                    disabled={!canEmail || !s.email || undefined}
-                                                    onClick={() => openEmail(s)}
-                                                >
+                                                <s-button icon={canEmail ? 'email' : 'lock'} disabled={!canEmail || !s.email || undefined} onClick={() => openEmail(s)}>
                                                     {t('supplierEmail.button')}
                                                 </s-button>
                                             )}
-                                            <s-button slot="secondary-actions" onClick={() => openEdit(s)}>{t('common.edit')}</s-button>
-                                            <s-button slot="secondary-actions" tone="critical" onClick={() => confirmDelete(s)}>{t('common.delete')}</s-button>
-                                        </s-button-group>
+                                            <s-button tone="critical" onClick={() => confirmDelete(s)}>{t('common.delete')}</s-button>
+                                        </s-menu>
                                     </s-table-cell>
                                 </s-table-row>
                             ))}

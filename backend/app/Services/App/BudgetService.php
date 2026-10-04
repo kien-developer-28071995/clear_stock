@@ -20,6 +20,9 @@ use Carbon\CarbonImmutable;
  */
 class BudgetService
 {
+    /** Rows sent to the page (a shop with thousands of products due would get a huge response). */
+    private const ITEM_LIMIT = 300;
+
     public function __construct(
         private readonly ForecastQueryRepositoryInterface $forecasts,
         private readonly ManualOrderRepositoryInterface $orders,
@@ -99,7 +102,9 @@ class BudgetService
             'spent' => $spent,
             'remaining' => $budget !== null ? round(max(0.0, $budget - $spent['cost']), 2) : null,
             'totals' => array_map(fn ($v) => is_float($v) ? round($v, 2) : $v, $totals),
-            'items' => $items,
+            // The first rows by priority; the totals above cover every product.
+            'items' => array_slice($items, 0, self::ITEM_LIMIT),
+            'items_total' => count($items),
         ];
     }
 

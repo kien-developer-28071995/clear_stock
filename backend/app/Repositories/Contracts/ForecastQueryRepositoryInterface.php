@@ -33,6 +33,14 @@ interface ForecastQueryRepositoryInterface
     /** @param array<int, int>|null $variantIds only these (any reorder date), e.g. rows picked on the home screen */
     public function reorderList(Shop $shop, string $today, ?int $supplierId, ?int $locationId = null, ?array $variantIds = null): Collection;
 
+    /**
+     * What is due to reorder now, summed per supplier at the supplier's price (without the
+     * landed cost share).
+     *
+     * @return array<int, array{products: int, units: int, cost: float}>
+     */
+    public function dueBySupplier(Shop $shop, string $today): array;
+
     /** @return array{total: int, tracked: int, reorder_now: int, out_of_stock: int, slow: int, healthy: int} total = forecasted, tracked = forecastable products */
     public function counts(Shop $shop, string $today): array;
 

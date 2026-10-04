@@ -1,3 +1,4 @@
+import { SectionTabs } from '@/components/layout/SectionTabs';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ErrorBanner } from '@/components/ui/ErrorBanner';
@@ -43,8 +44,7 @@ export function CostsPage() {
     const importError = importCsv.error instanceof ApiError ? fieldError(importCsv.error, 'file') ?? errorMessage(importCsv.error) : undefined;
 
     return (
-        <s-page heading={t('nav.costs')}>
-            <s-link slot="breadcrumb-actions" href="/settings">{t('nav.settings')}</s-link>
+        <s-page heading={t('nav.products')}><SectionTabs group="products" />
             <SaveBar id="costs-save-bar" dirty={dirty} saving={update.isPending} onSave={save} onDiscard={() => setEdits({})} />
             {error && <ErrorBanner error={error} onRetry={() => refetch()} />}
 
@@ -76,7 +76,7 @@ export function CostsPage() {
 
             <s-section padding="none">
                 <s-box padding="base">
-                    <s-grid gridTemplateColumns="@container (inline-size > 500px) 1fr auto, 1fr" gap="base" alignItems="end">
+                    <s-query-container><s-grid gridTemplateColumns="@container (inline-size > 500px) 1fr auto, 1fr" gap="base" alignItems="end">
                         <s-search-field
                             label={t('products.search')}
                             labelAccessibilityVisibility="exclusive"
@@ -86,7 +86,7 @@ export function CostsPage() {
                             onChange={() => setTerm(search.trim())}
                         />
                         <s-checkbox label={t('costs.missingOnly')} checked={missing || undefined} onChange={(e) => setMissing(e.currentTarget.checked)} />
-                    </s-grid>
+                    </s-grid></s-query-container>
                 </s-box>
                 {data && data.items.length === 0 ? (
                     <s-box padding="base"><s-paragraph>{missing ? t('costs.noneMissing') : t('products.noMatch')}</s-paragraph></s-box>

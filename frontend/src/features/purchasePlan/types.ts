@@ -61,6 +61,8 @@ export interface PurchasePlan {
     budget: number | null;
     /** When to order from whom, by date. */
     calendar: PurchasePlanCalendarEntry[];
+    /** Every order day x supplier in the plan (the list holds the first ones). */
+    calendar_total: number;
     /** First 200 products, biggest spend first. */
     items: PurchasePlanItem[];
     items_total: number;

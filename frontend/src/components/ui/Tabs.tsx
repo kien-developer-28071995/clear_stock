@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import { useSearchParams } from 'react-router';
 
 interface Tab<T extends string> {
@@ -26,23 +26,31 @@ export function useTab<T extends string>(ids: readonly T[]): [T, (tab: T) => voi
 /** Tabs of a long page. Polaris web components have no tabs: a row of toggle buttons, one pressed. */
 export function Tabs<T extends string>({ tabs, value, onChange, label }: { tabs: Tab<T>[]; value: T; onChange: (tab: T) => void; label: string }) {
     return (
-        <div role="tablist" aria-label={label} style={{ paddingBlockEnd: 8 }}>
-            <s-stack direction="inline" gap="small-200">
+        // Room below: the first card or banner of the tab must not touch the buttons.
+        <s-box paddingBlockEnd="base">
+            {/* One line, always: on a narrow screen the row scrolls sideways instead of wrapping. */}
+            <div role="tablist" aria-label={label} style={{ display: 'flex', gap: 8, flexWrap: 'nowrap', overflowX: 'auto', whiteSpace: 'nowrap' }}>
                 {tabs.map((tab) => (
-                    <s-press-button key={tab.id} variant="tertiary" pressed={tab.id === value || undefined} onClick={() => onChange(tab.id)}>
-                        {tab.label}
-                    </s-press-button>
+                    <div key={tab.id} style={{ flex: 'none' }}>
+                        <s-press-button variant="tertiary" pressed={tab.id === value || undefined} onClick={() => onChange(tab.id)}>
+                            {tab.label}
+                        </s-press-button>
+                    </div>
                 ))}
-            </s-stack>
-        </div>
+            </div>
+        </s-box>
     );
 }
 
 /**
- * The content of one tab. Hidden rather than unmounted when another tab is open, so a
- * half-filled form (and its save bar) survives switching tabs.
+ * The content of one tab. Mounted the first time its tab is opened (so a hidden tab loads no
+ * data), then kept and only hidden: a half-filled form and its save bar survive switching tabs.
  */
 export function TabPanel({ active, children }: { active: boolean; children: ReactNode }) {
+    const [opened, setOpened] = useState(active);
+    if (active && !opened) setOpened(true);
+    if (!opened) return null;
+
     return (
         <s-stack gap="base" display={active ? 'auto' : 'none'}>
             {children}

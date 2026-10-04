@@ -26,4 +26,6 @@ export interface BudgetPlan {
     remaining: number | null;
     totals: { products: number; cost: number; in_budget: number; in_budget_cost: number; waiting: number; waiting_cost: number; missing_cost: number };
     items: BudgetItem[];
+    /** Every product due (the list holds the first ones by priority; totals cover all). */
+    items_total: number;
 }

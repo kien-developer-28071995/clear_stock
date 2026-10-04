@@ -39,6 +39,29 @@
         </div>
     </div>
 
+    @if ($web_vitals !== null)
+        <div class="card flush">
+            <h2>App speed in the Shopify admin (75th percentile, 28 days)</h2>
+            <table>
+                <tr><th>Metric</th><th class="num">Measured</th><th class="num">Built for Shopify limit</th><th class="num">Measurements</th><th></th></tr>
+                @foreach ($web_vitals as $v)
+                    <tr>
+                        <td>{{ $v['metric'] }}</td>
+                        <td class="num {{ $v['ok'] === false ? 'bad' : '' }}">{{ $v['p75'] === null ? '—' : ($v['metric'] === 'CLS' ? number_format($v['p75'], 3) : number_format($v['p75']).' ms') }}</td>
+                        <td class="num">{{ $v['metric'] === 'CLS' ? $v['limit'] : number_format($v['limit']).' ms' }}</td>
+                        <td class="num">{{ number_format($v['samples']) }}</td>
+                        <td>
+                            @if ($v['p75'] === null)<span class="muted">No data yet</span>
+                            @elseif (! $v['enough'])<span class="badge warn">Under 100 measurements: not judged yet</span>
+                            @elseif ($v['ok'])<span class="badge good">Within the limit</span>
+                            @else<span class="badge bad">Over the limit</span>@endif
+                        </td>
+                    </tr>
+                @endforeach
+            </table>
+        </div>
+    @endif
+
     <div class="cols">
         <div class="card flush">
             <h2>Sync runs</h2>

@@ -7,7 +7,7 @@ export function ColumnMapping({ columns, mapping, onChange }: { columns: string[
     const { t } = useTranslation();
 
     return (
-        <s-grid gridTemplateColumns="@container (inline-size > 500px) 1fr 1fr 1fr, 1fr" gap="base">
+        <s-query-container><s-grid gridTemplateColumns="@container (inline-size > 500px) 1fr 1fr 1fr, 1fr" gap="base">
             {IMPORT_FIELDS.map((field: ImportField) => (
                 <s-select
                     key={field}
@@ -21,6 +21,6 @@ export function ColumnMapping({ columns, mapping, onChange }: { columns: string[
                     ))}
                 </s-select>
             ))}
-        </s-grid>
+        </s-grid></s-query-container>
     );
 }

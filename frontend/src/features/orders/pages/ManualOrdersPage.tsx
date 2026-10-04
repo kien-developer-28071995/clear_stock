@@ -1,3 +1,4 @@
+import { SectionTabs } from '@/components/layout/SectionTabs';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ErrorBanner } from '@/components/ui/ErrorBanner';
@@ -15,15 +16,18 @@ const TONE: Record<ManualOrderState, 'info' | 'warning' | 'critical' | 'success'
     cancelled: 'neutral',
 };
 
+const CLOSED_SHOWN = 8;
+
 /** Orders placed outside Shopify: counted as on the way until received, cancelled or overdue. */
 export function ManualOrdersPage() {
     const { t } = useTranslation();
     const { data, error, refetch } = useManualOrders();
     const update = useUpdateManualOrder();
+    const [showClosed, setShowClosed] = useState(false);
     // Partial delivery: the row being edited and the units received so far.
     const [part, setPart] = useState<{ id: number; value: string } | null>(null);
 
-    if (!data) return error ? <s-page heading={t('nav.orders')}><ErrorBanner error={error} onRetry={() => refetch()} /></s-page> : <LoadingPage heading={t('nav.orders')} />;
+    if (!data) return error ? <s-page heading={t('nav.reorder')}><SectionTabs group="reorder" /><ErrorBanner error={error} onRetry={() => refetch()} /></s-page> : <LoadingPage heading={t('nav.reorder')} group="reorder" />;
 
     const act = (o: ManualOrder, status: 'received' | 'cancelled' | 'open') =>
         update.mutate({ id: o.id, status }, { onSuccess: () => shopify.toast.show(t(`orders.done.${status}`)) });
@@ -57,9 +61,9 @@ export function ManualOrdersPage() {
                             </s-stack>
                         </s-table-cell>
                         <s-table-cell>
-                            <s-stack gap="small-100">
+                            <s-stack gap="small-100" alignItems="end">
                                 <s-text>{formatNumber(o.quantity, 0)}</s-text>
-                                {o.state !== 'received' && o.received_quantity > 0 && (
+                                {(o.state === 'open' || o.state === 'late' || o.state === 'overdue') && o.received_quantity > 0 && (
                                     <s-text color="subdued">{t('orders.partReceived', { received: formatNumber(o.received_quantity, 0) })}</s-text>
                                 )}
                             </s-stack>
@@ -99,8 +103,7 @@ export function ManualOrdersPage() {
     );
 
     return (
-        <s-page heading={t('nav.orders')}>
-            <s-link slot="breadcrumb-actions" href="/reorder">{t('nav.reorder')}</s-link>
+        <s-page heading={t('nav.reorder')}><SectionTabs group="reorder" />
             {overdue.length > 0 && (
                 <s-banner tone="warning" heading={t('orders.overdueHeading', { count: overdue.length })}>
                     <s-paragraph>{t('orders.overdueBody')}</s-paragraph>
@@ -120,7 +123,16 @@ export function ManualOrdersPage() {
                 <s-section heading={t('orders.openHeading')} padding="none">{table(data.open, true)}</s-section>
             )}
             <ShopifyPurchaseOrders />
-            {data.closed.length > 0 && <s-section heading={t('orders.closedHeading')} padding="none">{table(data.closed, false)}</s-section>}
+            {data.closed.length > 0 && (
+                <s-section heading={t('orders.closedHeading')} padding="none">
+                    {table(showClosed ? data.closed : data.closed.slice(0, CLOSED_SHOWN), false)}
+                    {data.closed.length > CLOSED_SHOWN && !showClosed && (
+                        <s-box padding="base">
+                            <s-button variant="tertiary" onClick={() => setShowClosed(true)}>{t('actions.showMore', { count: data.closed.length - CLOSED_SHOWN })}</s-button>
+                        </s-box>
+                    )}
+                </s-section>
+            )}
         </s-page>
     );
 }

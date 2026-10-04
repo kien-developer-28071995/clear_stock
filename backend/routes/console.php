@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\EmailLog;
+use App\Models\WebVital;
 use Illuminate\Support\Facades\Schedule;
 
 // withoutOverlapping() locks expire after N minutes (default 24h): a scheduler killed mid-run (every
@@ -16,4 +17,4 @@ Schedule::command('sync:maintenance')->everyThirtyMinutes()->withoutOverlapping(
 // Missed app_subscriptions/update webhooks: the plan is re-read from Shopify once a day.
 Schedule::command('billing:reconcile')->dailyAt('04:20')->withoutOverlapping(120)->onOneServer();
 Schedule::command('horizon:snapshot')->everyFiveMinutes();
-Schedule::command('model:prune', ['--model' => [EmailLog::class]])->dailyAt('03:10')->onOneServer();
+Schedule::command('model:prune', ['--model' => [EmailLog::class, WebVital::class]])->dailyAt('03:10')->onOneServer();

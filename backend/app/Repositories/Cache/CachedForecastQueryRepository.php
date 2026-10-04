@@ -69,6 +69,14 @@ class CachedForecastQueryRepository implements ForecastQueryRepositoryInterface
         return $this->inner->reorderList($shop, $today, $supplierId, $locationId, $variantIds);
     }
 
+    public function dueBySupplier(Shop $shop, string $today): array
+    {
+        // Costs and supplier assignments belong to the catalog, quantities to the forecast.
+        $key = CacheKeys::forecastPage($shop->id, $this->forecastVersion($shop), CacheVersion::catalog($shop->id), $today, 'due-by-supplier');
+
+        return $this->cache->remember($key, CacheKeys::TTL_DASHBOARD, fn () => $this->inner->dueBySupplier($shop, $today));
+    }
+
     public function counts(Shop $shop, string $today): array
     {
         return $this->remember($shop, $today, 'counts', fn () => $this->inner->counts($shop, $today));

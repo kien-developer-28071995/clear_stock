@@ -1,6 +1,6 @@
 import type { ElementType } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useFeature } from '@/hooks/useEntitlements';
+import { useSectionTabs } from '@/components/layout/SectionTabs';
 
 // App Bridge elements not (yet) in the React JSX typings we use.
 const AppNavEl = 's-app-nav' as unknown as ElementType;
@@ -9,10 +9,7 @@ const NavLink = 's-link' as unknown as ElementType;
 /** App navigation in the Shopify admin sidebar (App Bridge s-app-nav, rendered outside the iframe). */
 export function AppNav() {
     const { t } = useTranslation();
-    const transfers = useFeature('transfers');
-    const whatIf = useFeature('what_if');
-    const purchasePlan = useFeature('purchase_plan');
-    const events = useFeature('sales_events');
+    const planning = useSectionTabs('planning').length > 0;
 
     return (
         <AppNavEl>
@@ -20,14 +17,10 @@ export function AppNav() {
                 {t('nav.home')}
             </NavLink>
             <NavLink href="/reorder">{t('nav.reorder')}</NavLink>
-            {transfers && <NavLink href="/transfers">{t('nav.transfers')}</NavLink>}
             <NavLink href="/products">{t('nav.products')}</NavLink>
             <NavLink href="/insights">{t('nav.insights')}</NavLink>
-            {purchasePlan && <NavLink href="/purchase-plan">{t('nav.purchasePlan')}</NavLink>}
-            {whatIf && <NavLink href="/what-if">{t('nav.whatIf')}</NavLink>}
-            {events && <NavLink href="/events">{t('nav.events')}</NavLink>}
+            {planning && <NavLink href="/planning">{t('nav.planning')}</NavLink>}
             <NavLink href="/suppliers">{t('nav.suppliers')}</NavLink>
-            <NavLink href="/bundles">{t('nav.bundles')}</NavLink>
             <NavLink href="/settings">{t('nav.settings')}</NavLink>
             <NavLink href="/plans">{t('nav.plans')}</NavLink>
         </AppNavEl>

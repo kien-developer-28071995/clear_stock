@@ -16,7 +16,9 @@
     "daysSuffix": "ngày",
     "saved": "Đã lưu cài đặt",
     "dayCount_other": "{{count}} ngày",
-    "discard": "Hủy thay đổi"
+    "discard": "Hủy thay đổi",
+    "more": "Thêm",
+    "showAll": "Hiện tất cả {{count}}"
   },
   "nav": {
     "transfers": "Chuyển kho",
@@ -33,7 +35,8 @@
     "events": "Sự kiện bán hàng",
     "orders": "Đơn đã đặt",
     "costs": "Giá vốn",
-    "budget": "Ngân sách nhập hàng"
+    "budget": "Ngân sách nhập hàng",
+    "planning": "Kế hoạch"
   },
   "notFound": {
     "heading": "Không tìm thấy trang",
@@ -275,7 +278,9 @@
     "onTheWay": "Đang về",
     "incomingShort": "+{{qty}} đang về",
     "rateUp": "Tăng từ {{previous}}/ngày ở dự báo tuần {{date}} (nay {{current}}/ngày).",
-    "rateDown": "Giảm từ {{previous}}/ngày ở dự báo tuần {{date}} (nay {{current}}/ngày)."
+    "rateDown": "Giảm từ {{previous}}/ngày ở dự báo tuần {{date}} (nay {{current}}/ngày).",
+    "headlineOrder_other": "Đặt {{qty}} cái trước {{date}}",
+    "headlineOk": "Chưa cần đặt hàng"
   },
   "why": {
     "heading": "Vì sao ra các con số này?",
@@ -351,7 +356,15 @@
     "referencePercent": "Tỷ lệ tốc độ bán",
     "referenceLocked": "Dự báo sản phẩm mới theo một sản phẩm tương tự cho tới khi có lịch sử bán riêng.",
     "supplierSku": "Mã hàng của nhà cung cấp",
-    "supplierSkuHelp": "Không bắt buộc. In trên đơn đặt hàng và email đặt hàng để nhà cung cấp nhận ra sản phẩm."
+    "supplierSkuHelp": "Không bắt buộc. In trên đơn đặt hàng và email đặt hàng để nhà cung cấp nhận ra sản phẩm.",
+    "groups": {
+      "supplier": "Nhà cung cấp và lead time",
+      "orderRules": "Quy tắc đặt hàng",
+      "limits": "Giới hạn tồn kho",
+      "cost": "Giá vốn",
+      "forecast": "Dự báo",
+      "status": "Trạng thái và cảnh báo"
+    }
   },
   "products": {
     "freeLimit_other": "Gói Miễn phí dự báo {{count}} sản phẩm bán chạy nhất.",
@@ -375,7 +388,8 @@
     "allVendors": "Tất cả vendor",
     "productType": "Loại sản phẩm",
     "allTypes": "Tất cả loại sản phẩm",
-    "exportCsv": "Xuất danh sách (CSV)"
+    "exportCsv": "Xuất danh sách (CSV)",
+    "moreFilters": "Thêm bộ lọc"
   },
   "settings": {
     "defaultsHeading": "Mặc định cho dự báo",
@@ -457,7 +471,8 @@
     "landedCost": "Phí vận chuyển và thuế nhập",
     "landedCostHelp": "Cộng vào giá vốn khi tính giá trị tồn và chi phí. Đơn đặt hàng vẫn dùng giá của nhà cung cấp.",
     "due_other": "{{count}} sản phẩm cần đặt ngay · {{cost}}",
-    "belowMinimum": "Dưới mức tối thiểu {{minimum}}"
+    "belowMinimum": "Dưới mức tối thiểu {{minimum}}",
+    "moreActions": "Thao tác khác với {{name}}"
   },
   "bundles": {
     "add": "Thêm combo",
@@ -533,7 +548,8 @@
     "choose": "Chọn gói {{plan}}",
     "lockedHint": "Có trong gói {{plan}}",
     "priceLockBadge": "Giữ giá",
-    "priceLock": "Giá lúc bạn đăng ký không bao giờ tăng khi bạn còn dùng gói đó. Nếu chúng tôi tăng giá, bạn vẫn giữ giá cũ."
+    "priceLock": "Giá lúc bạn đăng ký không bao giờ tăng khi bạn còn dùng gói đó. Nếu chúng tôi tăng giá, bạn vẫn giữ giá cũ.",
+    "everythingIn": "Mọi thứ của gói {{plan}}, thêm:"
   },
   "apiErrors": {
     "scope_required": "Clear Stock cần được cấp quyền tạo phiếu chuyển kho trong Shopify. Hãy bấm lại nút và chấp thuận.",
@@ -1236,5 +1252,9 @@
       "alerts": "Cảnh báo và email",
       "general": "Chung"
     }
+  },
+  "sections": {
+    "toOrder": "Cần đặt",
+    "allProducts": "Tất cả sản phẩm"
   }
 }

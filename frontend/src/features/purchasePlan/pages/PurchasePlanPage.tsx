@@ -1,3 +1,4 @@
+import { SectionTabs } from '@/components/layout/SectionTabs';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MissingCostNote } from '@/components/ui/MissingCostNote';
@@ -6,6 +7,7 @@ import { ErrorBanner } from '@/components/ui/ErrorBanner';
 import { LoadingPage } from '@/components/ui/LoadingPage';
 import { UpgradePrompt } from '@/components/ui/UpgradePrompt';
 import { useEntitlements, useFeature } from '@/hooks/useEntitlements';
+import { useIsNarrow } from '@/hooks/useIsNarrow';
 import { ApiError, errorMessage } from '@/lib/http';
 import { purchasePlanApi } from '@/features/purchasePlan/api/purchasePlanApi';
 import { useFacets } from '@/features/forecasts/hooks/useForecasts';
@@ -19,11 +21,15 @@ import { NO_VALUE, fromOption, optionValue } from '@/utils/select';
 const WEEKS: Weeks[] = [4, 8, 12];
 
 /** Purchase plan (Starter and up): orders and spend week by week at the current sales rates. */
+/** Rows shown before "Show all": a phone turns each row into a tall card, so fewer there. */
+const SHOWN_WIDE = 10;
+const SHOWN_NARROW = 4;
+
 export function PurchasePlanPage() {
     const { t } = useTranslation();
     if (!useEntitlements().purchase_plan) {
         return (
-            <s-page heading={t('nav.purchasePlan')}>
+            <s-page heading={t('nav.planning')}><SectionTabs group="planning" />
                 <UpgradePrompt id="purchase-plan" plan="starter">{t('purchasePlan.locked')}</UpgradePrompt>
                 <s-section>
                     <s-paragraph>{t('purchasePlan.intro')}</s-paragraph>
@@ -37,6 +43,10 @@ export function PurchasePlanPage() {
 
 function PurchasePlanView() {
     const { t } = useTranslation();
+    // Long tables start short: the first rows answer "what is next", the rest is one click away.
+    const [allCalendar, setAllCalendar] = useState(false);
+    const [allItems, setAllItems] = useState(false);
+    const SHOWN = useIsNarrow() ? SHOWN_NARROW : SHOWN_WIDE;
     const [search, setSearch] = useSearchParams();
     const weeksParam = Number(search.get('weeks'));
     const params: PurchasePlanParams = {
@@ -70,19 +80,18 @@ function PurchasePlanView() {
 
     if (!data) {
         return error ? (
-            <s-page heading={t('nav.purchasePlan')}>
+            <s-page heading={t('nav.planning')}><SectionTabs group="planning" />
                 <ErrorBanner error={error} onRetry={() => refetch()} />
             </s-page>
         ) : (
-            <LoadingPage heading={t('nav.purchasePlan')} />
+            <LoadingPage heading={t('nav.planning')} group="planning" />
         );
     }
 
     const money = (v: number | null, missing = 0) => (v === null || (v === 0 && missing > 0) ? '—' : formatMoney(v, data?.currency ?? null));
 
     return (
-        <s-page heading={t('nav.purchasePlan')}>
-            <s-link slot="breadcrumb-actions" href="/reorder">{t('nav.reorder')}</s-link>
+        <s-page heading={t('nav.planning')}><SectionTabs group="planning" />
             {canExport && data.totals.orders > 0 && (
                 <s-button slot="secondary-actions" icon="export" loading={exporting || undefined} onClick={exportCsv}>
                     {t('purchasePlan.export')}
@@ -91,7 +100,7 @@ function PurchasePlanView() {
             <s-section>
                 <s-stack gap="base">
                     <s-paragraph>{t('purchasePlan.intro')}</s-paragraph>
-                    <s-grid gridTemplateColumns="@container (inline-size > 600px) 1fr 1fr 1fr, 1fr" gap="base">
+                    <s-query-container><s-grid gridTemplateColumns="@container (inline-size > 600px) 1fr 1fr 1fr, 1fr" gap="base">
                         <s-select label={t('purchasePlan.period')} value={String(params.weeks)} onChange={(e) => update({ weeks: Number(e.currentTarget.value) as Weeks })}>
                             {WEEKS.map((w) => (
                                 <s-option key={w} value={String(w)}>{t('purchasePlan.weeks', { count: w })}</s-option>
@@ -117,7 +126,7 @@ function PurchasePlanView() {
                                 ))}
                             </s-select>
                         )}
-                    </s-grid>
+                    </s-grid></s-query-container>
                 </s-stack>
             </s-section>
 
@@ -133,7 +142,7 @@ function PurchasePlanView() {
                 <>
                     <s-section heading={t('purchasePlan.summaryHeading', { from: formatDate(data.today), to: formatDate(data.until) })}>
                         <s-stack gap="base">
-                            <s-grid gridTemplateColumns="@container (inline-size > 600px) 1fr 1fr 1fr 1fr, 1fr 1fr" gap="base">
+                            <s-query-container><s-grid gridTemplateColumns="@container (inline-size > 600px) 1fr 1fr 1fr 1fr, 1fr 1fr" gap="base">
                                 <s-stack gap="small-100">
                                     <s-text color="subdued">{t('purchasePlan.totalCost')}</s-text>
                                     <s-heading>{money(data.totals.cost, data.totals.missing_cost)}</s-heading>
@@ -150,7 +159,7 @@ function PurchasePlanView() {
                                     <s-text color="subdued">{t('purchasePlan.products')}</s-text>
                                     <s-heading>{formatNumber(data.totals.products, 0)}</s-heading>
                                 </s-stack>
-                            </s-grid>
+                            </s-grid></s-query-container>
                             <WeeklySpendChart weeks={data.by_week} currency={data.currency} />
                             <s-text color="subdued">{t('purchasePlan.how')}</s-text>
                             <MissingCostNote count={data.totals.missing_cost} text={t('whatIf.missingCost', { count: data.totals.missing_cost })} />
@@ -184,7 +193,7 @@ function PurchasePlanView() {
                                 <s-table-header format="currency">{t('purchasePlan.cost')}</s-table-header>
                             </s-table-header-row>
                             <s-table-body>
-                                {data.calendar.map((c) => (
+                                {(allCalendar ? data.calendar : data.calendar.slice(0, SHOWN)).map((c) => (
                                     <s-table-row key={`${c.date}-${c.supplier_id ?? 0}`}>
                                         <s-table-cell>{c.date === data.today ? t('purchasePlan.today') : formatDateWithWeekday(c.date)}</s-table-cell>
                                         <s-table-cell>{c.supplier ?? t('purchasePlan.noSupplier')}</s-table-cell>
@@ -195,6 +204,16 @@ function PurchasePlanView() {
                                 ))}
                             </s-table-body>
                         </s-table>
+                        {!allCalendar && data.calendar.length > SHOWN && (
+                            <s-box padding="base">
+                                <s-button variant="tertiary" onClick={() => setAllCalendar(true)}>{t('common.showAll', { count: data.calendar.length })}</s-button>
+                            </s-box>
+                        )}
+                        {data.calendar_total > data.calendar.length && (
+                            <s-box padding="base">
+                                <s-text color="subdued">{t('whatIf.truncated', { shown: data.calendar.length, count: data.calendar_total })}</s-text>
+                            </s-box>
+                        )}
                     </s-section>
 
                     {data.by_supplier.length > 1 && (
@@ -232,7 +251,7 @@ function PurchasePlanView() {
                                 <s-table-header format="currency">{t('purchasePlan.cost')}</s-table-header>
                             </s-table-header-row>
                             <s-table-body>
-                                {data.items.map((item) => (
+                                {(allItems ? data.items : data.items.slice(0, SHOWN)).map((item) => (
                                     <s-table-row key={item.variant_id}>
                                         <s-table-cell>
                                             <s-stack gap="small-100">
@@ -248,6 +267,11 @@ function PurchasePlanView() {
                                 ))}
                             </s-table-body>
                         </s-table>
+                        {!allItems && data.items.length > SHOWN && (
+                            <s-box padding="base">
+                                <s-button variant="tertiary" onClick={() => setAllItems(true)}>{t('common.showAll', { count: data.items.length })}</s-button>
+                            </s-box>
+                        )}
                     </s-section>
                     {data.items_total > data.items.length && (
                         <s-text color="subdued">{t('whatIf.truncated', { shown: data.items.length, count: data.items_total })}</s-text>

@@ -4,8 +4,10 @@ import { App } from '@/app/App';
 import { ErrorBoundary } from '@/components/layout/ErrorBoundary';
 import { initI18n } from '@/i18n';
 import { installErrorReporting } from '@/lib/errorReporting';
+import { installWebVitals } from '@/lib/webVitals';
 
 installErrorReporting();
+installWebVitals();
 
 // Speak the merchant's Shopify admin language (falls back to English).
 await initI18n(shopify.config.locale);

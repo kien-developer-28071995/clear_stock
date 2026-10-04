@@ -10,7 +10,7 @@ function Row({ item }: { item: ActionItem }) {
 
     return (
         <s-box padding="small-200 base" borderWidth="small none none none" borderColor="base">
-            <s-grid gridTemplateColumns="@container (inline-size > 500px) minmax(0, 1fr) auto, 1fr" gap="small-200" alignItems="center">
+            <s-query-container><s-grid gridTemplateColumns="@container (inline-size > 500px) 1fr auto, 1fr" gap="small-200" alignItems="center">
                 <s-stack gap="small-100">
                     <s-link href={`/products/${item.variant_id}`}>{item.name}</s-link>
                     <s-text color="subdued">
@@ -21,7 +21,7 @@ function Row({ item }: { item: ActionItem }) {
                     {item.current_stock <= 0 && <s-badge tone="critical">{t('status.out_of_stock')}</s-badge>}
                     <s-text type="strong">{t('actions.order', { qty: formatNumber(item.suggested_qty, 0) })}</s-text>
                 </s-stack>
-            </s-grid>
+            </s-grid></s-query-container>
         </s-box>
     );
 }

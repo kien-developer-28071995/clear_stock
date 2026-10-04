@@ -11,6 +11,7 @@ const GRID = '#e3e3e3';
 const WIDTH = 600;
 const HEIGHT = 160;
 const PERIODS = [30, 90, 180, 365] as const;
+const DEFAULT_PERIOD = 90;
 
 /**
  * Inventory value at cost over time (units when no product has a cost). Recorded once a day
@@ -18,7 +19,7 @@ const PERIODS = [30, 90, 180, 365] as const;
  */
 export function StockHistoryChart() {
     const { t } = useTranslation();
-    const [days, setDays] = useState<number>(90);
+    const [days, setDays] = useState<number>(DEFAULT_PERIOD);
     const { data } = useStockHistory(days);
     const currency = useShop().data?.currency ?? null;
     if (!data || !data.latest) return null;
@@ -78,13 +79,15 @@ export function StockHistoryChart() {
                 ) : (
                     <s-text color="subdued">{t('stockHistory.collecting', { date: formatDate(data.latest.date) })}</s-text>
                 )}
-                <s-box maxInlineSize="200px">
-                    <s-select label={t('stockHistory.periodLabel')} value={String(days)} onChange={(e) => setDays(Number(e.currentTarget.value))}>
-                        {PERIODS.map((p) => (
-                            <s-option key={p} value={String(p)}>{t('stockHistory.period', { count: p })}</s-option>
-                        ))}
-                    </s-select>
-                </s-box>
+                {(data.points.length > 1 || days !== DEFAULT_PERIOD) && (
+                    <s-box maxInlineSize="200px">
+                        <s-select label={t('stockHistory.periodLabel')} value={String(days)} onChange={(e) => setDays(Number(e.currentTarget.value))}>
+                            {PERIODS.map((p) => (
+                                <s-option key={p} value={String(p)}>{t('stockHistory.period', { count: p })}</s-option>
+                            ))}
+                        </s-select>
+                    </s-box>
+                )}
                 <s-text color="subdued">{t('stockHistory.how')}</s-text>
             </s-stack>
         </s-section>

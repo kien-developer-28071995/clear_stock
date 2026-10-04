@@ -1,5 +1,6 @@
 import { lazy, Suspense } from 'react';
-import { Route, Routes } from 'react-router';
+import { Navigate, Route, Routes, useLocation } from 'react-router';
+import { useSectionTabs } from '@/components/layout/SectionTabs';
 import { HomeRoute } from '@/app/HomeRoute';
 import { LoadingPage } from '@/components/ui/LoadingPage';
 import { NotFoundPage } from '@/components/layout/NotFoundPage';
@@ -37,6 +38,33 @@ function FeatureRoute({ feature, children }: { feature: FeatureSwitch; children:
     return useFeature(feature) ? children : <NotFoundPage />;
 }
 
+const MOVED: Record<string, string> = {
+    '/orders': '/reorder/orders',
+    '/transfers': '/reorder/transfers',
+    '/bundles': '/products/bundles',
+    '/costs': '/products/costs',
+    '/purchase-plan': '/planning',
+    '/budget': '/planning/budget',
+    '/what-if': '/planning/what-if',
+    '/events': '/planning/events',
+};
+
+/** Redirect that keeps the query string (filters, ?tab=). */
+function Moved({ to }: { to: string }) {
+    const { search } = useLocation();
+
+    return <Navigate to={to + search} replace />;
+}
+
+/** Planning opens on the purchase plan, or on the first planning page that is switched on. */
+function PlanningIndex() {
+    const tabs = useSectionTabs('planning');
+    const purchasePlan = useFeature('purchase_plan');
+    if (purchasePlan) return <PurchasePlanPage />;
+
+    return tabs.length > 0 ? <Navigate to={tabs[0].path} replace /> : <NotFoundPage />;
+}
+
 export function AppRouter() {
     useShopifyNavigation();
 
@@ -45,23 +73,27 @@ export function AppRouter() {
             <Routes>
                 <Route path="/" element={<HomeRoute />} />
                 <Route path="/reorder" element={<ReorderPage />} />
-                <Route path="/orders" element={<ManualOrdersPage />} />
-                <Route path="/budget" element={<FeatureRoute feature="order_budget"><BudgetPage /></FeatureRoute>} />
-                <Route path="/transfers" element={<FeatureRoute feature="transfers"><TransfersPage /></FeatureRoute>} />
-                <Route path="/insights" element={<InsightsPage />} />
-                <Route path="/purchase-plan" element={<FeatureRoute feature="purchase_plan"><PurchasePlanPage /></FeatureRoute>} />
-                <Route path="/what-if" element={<FeatureRoute feature="what_if"><WhatIfPage /></FeatureRoute>} />
-                <Route path="/events" element={<FeatureRoute feature="sales_events"><SalesEventsPage /></FeatureRoute>} />
+                <Route path="/reorder/orders" element={<ManualOrdersPage />} />
+                <Route path="/reorder/transfers" element={<FeatureRoute feature="transfers"><TransfersPage /></FeatureRoute>} />
                 <Route path="/products" element={<ProductsPage />} />
+                <Route path="/products/bundles" element={<BundlesPage />} />
+                <Route path="/products/costs" element={<CostsPage />} />
                 <Route path="/products/:variantId" element={<ProductDetailPage />} />
+                <Route path="/insights" element={<InsightsPage />} />
+                <Route path="/planning" element={<PlanningIndex />} />
+                <Route path="/planning/budget" element={<FeatureRoute feature="order_budget"><BudgetPage /></FeatureRoute>} />
+                <Route path="/planning/what-if" element={<FeatureRoute feature="what_if"><WhatIfPage /></FeatureRoute>} />
+                <Route path="/planning/events" element={<FeatureRoute feature="sales_events"><SalesEventsPage /></FeatureRoute>} />
                 <Route path="/suppliers" element={<SuppliersPage />} />
                 <Route path="/suppliers/import" element={<PurchaseOrderImportPage />} />
                 <Route path="/suppliers/from-vendors" element={<VendorSuppliersPage />} />
-                <Route path="/bundles" element={<BundlesPage />} />
                 <Route path="/settings" element={<SettingsPage />} />
-                <Route path="/costs" element={<CostsPage />} />
                 <Route path="/data-health" element={<DataHealthPage />} />
                 <Route path="/plans" element={<PlansPage />} />
+                {/* Paths from before the pages were grouped (links in emails, bookmarks). */}
+                {Object.entries(MOVED).map(([from, to]) => (
+                    <Route key={from} path={from} element={<Moved to={to} />} />
+                ))}
                 <Route path="*" element={<NotFoundPage />} />
             </Routes>
         </Suspense>

@@ -18,7 +18,9 @@
     "dayCount_one": "{{count}} jour",
     "dayCount_other": "{{count}} jours",
     "dayCount_many": "{{count}} jours",
-    "discard": "Ignorer"
+    "discard": "Ignorer",
+    "more": "Plus",
+    "showAll": "Tout afficher ({{count}})"
   },
   "nav": {
     "transfers": "Transferts",
@@ -35,7 +37,8 @@
     "events": "Événements commerciaux",
     "orders": "Commandes passées",
     "costs": "Coûts unitaires",
-    "budget": "Budget d'achat"
+    "budget": "Budget d'achat",
+    "planning": "Planification"
   },
   "notFound": {
     "heading": "Page introuvable",
@@ -307,7 +310,11 @@
     "onTheWay": "En cours d'acheminement",
     "incomingShort": "+{{qty}} en route",
     "rateUp": "En hausse depuis {{previous}}/jour dans la prévision de la semaine du {{date}} (maintenant {{current}}/jour).",
-    "rateDown": "En baisse depuis {{previous}}/jour dans la prévision de la semaine du {{date}} (maintenant {{current}}/jour)."
+    "rateDown": "En baisse depuis {{previous}}/jour dans la prévision de la semaine du {{date}} (maintenant {{current}}/jour).",
+    "headlineOrder_one": "Commander {{qty}} unité avant le {{date}}",
+    "headlineOrder_other": "Commander {{qty}} unités avant le {{date}}",
+    "headlineOrder_many": "Commander {{qty}} unités avant le {{date}}",
+    "headlineOk": "Rien à commander pour le moment"
   },
   "why": {
     "heading": "Pourquoi ces chiffres ?",
@@ -385,7 +392,15 @@
     "referencePercent": "Part de son rythme de ventes",
     "referenceLocked": "Prévoyez les nouveaux produits à partir d'un produit similaire jusqu'à ce qu'ils aient leur propre historique de ventes.",
     "supplierSku": "Référence du fournisseur",
-    "supplierSkuHelp": "Facultatif. Figure sur les bons de commande et les e-mails pour que le fournisseur reconnaisse le produit."
+    "supplierSkuHelp": "Facultatif. Figure sur les bons de commande et les e-mails pour que le fournisseur reconnaisse le produit.",
+    "groups": {
+      "supplier": "Fournisseur et délai",
+      "orderRules": "Règles de commande",
+      "limits": "Limites de stock",
+      "cost": "Coût",
+      "forecast": "Prévision",
+      "status": "Statut et alertes"
+    }
   },
   "products": {
     "freeLimit_one": "Le forfait Free établit la prévision de votre meilleure vente.",
@@ -413,7 +428,8 @@
     "allVendors": "Toutes les marques",
     "productType": "Type de produit",
     "allTypes": "Tous les types de produits",
-    "exportCsv": "Exporter la liste (CSV)"
+    "exportCsv": "Exporter la liste (CSV)",
+    "moreFilters": "Plus de filtres"
   },
   "settings": {
     "defaultsHeading": "Valeurs par défaut des prévisions",
@@ -505,7 +521,8 @@
     "due_one": "{{count}} produit à commander maintenant · {{cost}}",
     "due_other": "{{count}} produits à commander maintenant · {{cost}}",
     "due_many": "{{count}} produits à commander maintenant · {{cost}}",
-    "belowMinimum": "Sous le minimum de {{minimum}}"
+    "belowMinimum": "Sous le minimum de {{minimum}}",
+    "moreActions": "Autres actions pour {{name}}"
   },
   "bundles": {
     "add": "Ajouter un lot",
@@ -587,7 +604,8 @@
     "choose": "Choisir {{plan}}",
     "lockedHint": "Inclus dans {{plan}}",
     "priceLockBadge": "Prix garanti",
-    "priceLock": "Le prix auquel vous vous abonnez n'augmente jamais tant que vous restez sur ce forfait. Si nos prix augmentent, vous gardez le vôtre."
+    "priceLock": "Le prix auquel vous vous abonnez n'augmente jamais tant que vous restez sur ce forfait. Si nos prix augmentent, vous gardez le vôtre.",
+    "everythingIn": "Tout ce qui est dans {{plan}}, plus :"
   },
   "apiErrors": {
     "scope_required": "Clear Stock a besoin d'une autorisation pour créer des transferts dans Shopify. Cliquez à nouveau sur le bouton et approuvez-la.",
@@ -1510,5 +1528,9 @@
       "alerts": "Alertes et e-mails",
       "general": "Général"
     }
+  },
+  "sections": {
+    "toOrder": "À commander",
+    "allProducts": "Tous les produits"
   }
 }

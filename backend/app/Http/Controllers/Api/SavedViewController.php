@@ -20,7 +20,7 @@ class SavedViewController extends Controller
 
     public function store(Request $request, ShopContext $context): JsonResponse
     {
-        $data = $request->validate(['name' => ['required', 'string', 'max:60'], 'filters' => ['present', 'array']]);
+        $data = $request->validate(['name' => ['required', 'string', 'max:60'], 'filters' => ['present', 'array', 'max:20'], 'filters.*' => ['nullable', 'max:255', fn (string $attr, mixed $value, \Closure $fail) => is_scalar($value) || $fail('invalid')]]);
 
         return response()->json(['data' => $this->views->save($context->shop(), trim($data['name']), $data['filters'])], 201);
     }
