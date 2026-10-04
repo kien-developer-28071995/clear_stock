@@ -37,7 +37,7 @@ export function SavedViews({ current, onApply }: Props) {
                         <s-button slot="secondary-actions" icon="x" accessibilityLabel={t('views.delete', { name: v.name })} onClick={() => remove.mutate(v.id)} />
                     </s-button-group>
                 ))}
-                <s-box maxInlineSize="220px">
+                <s-box minInlineSize="220px">
                     <s-text-field
                         label={t('views.name')}
                         labelAccessibilityVisibility="exclusive"
