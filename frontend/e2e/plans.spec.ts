@@ -835,6 +835,7 @@ for (const plan of ['free', 'starter', 'growth'] as PlanKey[]) {
         test('location filter follows the plan', async ({ app }) => {
             await open(app, '/products');
             const locations = await api<{ data: unknown[] }>(app, '/locations');
+            await app.locator('s-press-button', { hasText: 'More filters' }).click();
             await expect(app.getByRole('combobox', { name: 'Location' })).toHaveCount(has.locations && locations.data.length > 1 ? 1 : 0);
         });
 
