@@ -20,6 +20,7 @@ use Illuminate\Support\Carbon;
  * @property ?string $title
  * @property ?string $sku
  * @property ?string $barcode
+ * @property ?string $supplier_sku the supplier's own code for this product (purchase orders)
  * @property ?string $unit_cost cost used everywhere: cost_override, else Shopify's cost
  * @property ?string $shopify_unit_cost cost in Shopify (from the sync)
  * @property ?string $cost_override cost entered in the app (wins over Shopify's)
@@ -52,7 +53,7 @@ class Variant extends Model
 
     protected $fillable = [
         'shop_id', 'shopify_variant_id', 'shopify_product_id', 'inventory_item_id',
-        'product_title', 'vendor', 'product_type', 'title', 'sku', 'barcode', 'unit_cost', 'shopify_unit_cost', 'cost_override', 'price', 'tracked', 'is_active',
+        'product_title', 'vendor', 'product_type', 'title', 'sku', 'barcode', 'supplier_sku', 'unit_cost', 'shopify_unit_cost', 'cost_override', 'price', 'tracked', 'is_active',
         'supplier_id', 'lead_time_override', 'safety_days', 'min_order_qty', 'pack_size', 'min_stock', 'max_stock', 'alerts_muted', 'discontinued', 'forecast_profile', 'reference_variant_id', 'reference_percent', 'is_bundle', 'shopify_created_at',
     ];
 

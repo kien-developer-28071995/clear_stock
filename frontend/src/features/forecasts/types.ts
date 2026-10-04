@@ -136,6 +136,8 @@ export interface ForecastDetail extends ForecastRow {
         discontinued: boolean;
         /** Window mix for this product; null = the store's. */
         forecast_profile: ForecastProfile | null;
+        /** The supplier's own code for this product (purchase orders). */
+        supplier_sku: string | null;
         /** Unit cost entered in the app (wins), and Shopify's. */
         cost_override: number | null;
         shopify_cost: number | null;
@@ -203,6 +205,7 @@ export interface VariantSettingsInput {
     alerts_muted?: boolean;
     discontinued?: boolean;
     forecast_profile?: ForecastProfile | null;
+    supplier_sku?: string | null;
     cost_override?: number | null;
     /** Local id or Shopify variant gid (resource picker); null removes it. */
     reference_variant?: number | string | null;

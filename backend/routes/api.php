@@ -53,6 +53,7 @@ Route::middleware('shopify.session')->group(function () {
     Route::post('/setup-guide/tips', [SetupGuideController::class, 'dismissTip']);
 
     Route::get('/forecasts', [ForecastController::class, 'index']);
+    Route::get('/forecasts/export', [ForecastController::class, 'export']);
     Route::get('/locations', [ForecastController::class, 'locations']);
     Route::get('/facets', [ForecastController::class, 'facets']);
     Route::get('/forecasts/{variant}', [ForecastController::class, 'show'])->whereNumber('variant');
@@ -64,6 +65,9 @@ Route::middleware('shopify.session')->group(function () {
 
     Route::get('/settings', [SettingsController::class, 'show']);
     Route::put('/settings', [SettingsController::class, 'update']);
+    // Locations whose stock is not for sale (returns, damaged goods): left out of the forecast's stock.
+    Route::get('/settings/locations', [SettingsController::class, 'locations']);
+    Route::put('/settings/locations', [SettingsController::class, 'updateLocations']);
 
     Route::get('/suppliers', [SupplierController::class, 'index']);
     Route::get('/suppliers/from-vendors', [VendorSupplierController::class, 'show']);

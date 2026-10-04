@@ -364,7 +364,9 @@
     "referenceClear": "Remove",
     "referenceNone": "None",
     "referencePercent": "Share of its sales rate",
-    "referenceLocked": "Forecast new products from a similar product until they have their own sales history."
+    "referenceLocked": "Forecast new products from a similar product until they have their own sales history.",
+    "supplierSku": "Supplier's product code",
+    "supplierSkuHelp": "Optional. Printed on purchase orders and order emails so the supplier recognises the product."
   },
   "products": {
     "freeLimit_one": "The Free plan forecasts your best seller.",
@@ -389,7 +391,8 @@
     "vendor": "Vendor",
     "allVendors": "All vendors",
     "productType": "Product type",
-    "allTypes": "All product types"
+    "allTypes": "All product types",
+    "exportCsv": "Export list (CSV)"
   },
   "settings": {
     "defaultsHeading": "Forecast defaults",
@@ -428,7 +431,10 @@
     "summaryHeading": "Weekly summary",
     "summaryEnabled": "Email me a summary once a week",
     "summaryHelp": "What to order first, products out of stock, cash tied up in slow stock, sales missed and your inventory value. One email a week, on every plan.",
-    "summaryEmail": "Send it to"
+    "summaryEmail": "Send it to",
+    "locationsHeading": "Locations counted as stock",
+    "locationsIntro": "Untick a location whose stock is not for sale (returns, damaged goods, a showroom). Its units are left out of days of stock and order suggestions; sales shipped from it still count as demand.",
+    "locationsSaved": "Saved. Forecasts are being updated."
   },
   "suppliers": {
     "add": "Add supplier",
@@ -455,7 +461,11 @@
     "orderCycleHelp": "How often you order from this supplier. Each suggested order covers this many days of sales on top of lead time and safety stock.",
     "orderDays": "Order days",
     "orderDaysHelp": "Days you place orders with this supplier. A product due in between is ordered on the order day before it, so nothing runs out. None ticked = any day.",
-    "ordersOn": "Orders on {{days}}"
+    "ordersOn": "Orders on {{days}}",
+    "actualLeadTime_one": "Your last {{count}} delivery took {{days}} days (median)",
+    "actualLeadTime_other": "Your last {{count}} deliveries took {{days}} days (median)",
+    "useActual_one": "Use {{count}} day",
+    "useActual_other": "Use {{count}} days"
   },
   "bundles": {
     "add": "Add bundle",
@@ -595,7 +605,8 @@
     "event_too_long": "An event can last at most 3 months. For a lasting change, adjust the sales rate instead.",
     "required_if": "This field is required.",
     "not_in": "Choose a different value.",
-    "cost_columns_missing": "The file needs a SKU or barcode column and a cost column."
+    "cost_columns_missing": "The file needs a SKU or barcode column and a cost column.",
+    "keep_one_location": "At least one location must count as stock."
   },
   "explanation": {
     "unknown": "—",
@@ -690,7 +701,9 @@
     "trend_up_one": "Selling {{percent}}% faster in the last {{count}} day ({{recent}}/day) than in the {{days}} days before ({{baseline}}/day).",
     "trend_up_other": "Selling {{percent}}% faster in the last {{count}} days ({{recent}}/day) than in the {{days}} days before ({{baseline}}/day).",
     "trend_down_one": "Selling {{percent}}% slower in the last {{count}} day ({{recent}}/day) than in the {{days}} days before ({{baseline}}/day).",
-    "trend_down_other": "Selling {{percent}}% slower in the last {{count}} days ({{recent}}/day) than in the {{days}} days before ({{baseline}}/day)."
+    "trend_down_other": "Selling {{percent}}% slower in the last {{count}} days ({{recent}}/day) than in the {{days}} days before ({{baseline}}/day).",
+    "backorder_included_one": "{{count}} unit is already sold on backorder (stock below zero) and is included in the order.",
+    "backorder_included_other": "{{count}} units are already sold on backorder (stock below zero) and are included in the order."
   },
   "import": {
     "fromStocky": "Import from Stocky",
@@ -1092,7 +1105,8 @@
     "done": {
       "received": "Marked as received",
       "cancelled": "Order cancelled",
-      "open": "Order reopened"
+      "open": "Order reopened",
+      "part": "Saved: the rest still counts as on the way"
     },
     "state": {
       "open": "On the way",
@@ -1108,7 +1122,10 @@
     "overdueBody": "They no longer count as on the way. Mark them received, or cancel them if they will not come.",
     "review": "Review orders",
     "link_one": "Orders placed ({{count}})",
-    "link_other": "Orders placed ({{count}})"
+    "link_other": "Orders placed ({{count}})",
+    "receivePart": "Part received",
+    "receivedSoFar": "Received so far",
+    "partReceived": "{{received}} received, the rest is on the way"
   },
   "costs": {
     "intro": "Stock value, cash tied up, purchase order and plan totals need each product's unit cost. Enter costs here for products without one in Shopify, or to use your real landed cost. They win over Shopify's cost in the app; Shopify itself is not changed.",

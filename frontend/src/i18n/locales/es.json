@@ -381,7 +381,9 @@
     "referenceClear": "Quitar",
     "referenceNone": "Ninguno",
     "referencePercent": "Porcentaje de su ritmo de ventas",
-    "referenceLocked": "Haz la previsión de productos nuevos a partir de un producto similar hasta que tengan su propio historial de ventas."
+    "referenceLocked": "Haz la previsión de productos nuevos a partir de un producto similar hasta que tengan su propio historial de ventas.",
+    "supplierSku": "Código de producto del proveedor",
+    "supplierSkuHelp": "Opcional. Aparece en los pedidos de compra y en los correos para que el proveedor reconozca el producto."
   },
   "products": {
     "freeLimit_one": "El plan Free hace la previsión de tu producto más vendido.",
@@ -408,7 +410,8 @@
     "vendor": "Marca",
     "allVendors": "Todas las marcas",
     "productType": "Tipo de producto",
-    "allTypes": "Todos los tipos de producto"
+    "allTypes": "Todos los tipos de producto",
+    "exportCsv": "Exportar lista (CSV)"
   },
   "settings": {
     "defaultsHeading": "Valores predeterminados de la previsión",
@@ -447,7 +450,10 @@
     "summaryHeading": "Resumen semanal",
     "summaryEnabled": "Enviarme un resumen una vez por semana",
     "summaryHelp": "Qué pedir primero, productos agotados, dinero inmovilizado en stock lento, ventas perdidas y el valor de tu inventario. Un correo a la semana, en todos los planes.",
-    "summaryEmail": "Enviar a"
+    "summaryEmail": "Enviar a",
+    "locationsHeading": "Ubicaciones que cuentan como stock",
+    "locationsIntro": "Desmarca una ubicación cuyo stock no está a la venta (devoluciones, productos dañados, un showroom). Sus unidades no cuentan en los días de stock ni en las sugerencias; las ventas enviadas desde ella siguen contando como demanda.",
+    "locationsSaved": "Guardado. Las previsiones se están actualizando."
   },
   "suppliers": {
     "add": "Añadir proveedor",
@@ -476,7 +482,13 @@
     "orderCycleHelp": "Cada cuánto haces pedidos a este proveedor. Cada pedido sugerido cubre estos días de ventas, además del plazo de entrega y el stock de seguridad.",
     "orderDays": "Días de pedido",
     "orderDaysHelp": "Los días en que haces pedidos a este proveedor. Un producto que vence entre medias se pide el día de pedido anterior, para que nada se agote. Ninguno marcado = cualquier día.",
-    "ordersOn": "Pedidos: {{days}}"
+    "ordersOn": "Pedidos: {{days}}",
+    "actualLeadTime_one": "Tu última {{count}} entrega tardó {{days}} días (mediana)",
+    "actualLeadTime_other": "Tus últimas {{count}} entregas tardaron {{days}} días (mediana)",
+    "actualLeadTime_many": "Tus últimas {{count}} entregas tardaron {{days}} días (mediana)",
+    "useActual_one": "Usar {{count}} día",
+    "useActual_other": "Usar {{count}} días",
+    "useActual_many": "Usar {{count}} días"
   },
   "bundles": {
     "add": "Añadir paquete",
@@ -618,7 +630,8 @@
     "event_too_long": "Un evento puede durar como máximo 3 meses. Para un cambio duradero, ajusta el ritmo de ventas.",
     "required_if": "Este campo es obligatorio.",
     "not_in": "Elige otro valor.",
-    "cost_columns_missing": "El archivo necesita una columna de SKU o código de barras y una columna de costo."
+    "cost_columns_missing": "El archivo necesita una columna de SKU o código de barras y una columna de costo.",
+    "keep_one_location": "Al menos una ubicación debe contar como stock."
   },
   "explanation": {
     "unknown": "—",
@@ -743,7 +756,10 @@
     "trend_up_many": "Se vende un {{percent}}% más rápido en los últimos {{count}} días ({{recent}}/día) que en los {{days}} días anteriores ({{baseline}}/día).",
     "trend_down_one": "Se vende un {{percent}}% más lento en el último día ({{recent}}/día) que en los {{days}} días anteriores ({{baseline}}/día).",
     "trend_down_other": "Se vende un {{percent}}% más lento en los últimos {{count}} días ({{recent}}/día) que en los {{days}} días anteriores ({{baseline}}/día).",
-    "trend_down_many": "Se vende un {{percent}}% más lento en los últimos {{count}} días ({{recent}}/día) que en los {{days}} días anteriores ({{baseline}}/día)."
+    "trend_down_many": "Se vende un {{percent}}% más lento en los últimos {{count}} días ({{recent}}/día) que en los {{days}} días anteriores ({{baseline}}/día).",
+    "backorder_included_one": "{{count}} unidad ya está vendida sin stock (stock bajo cero) y se incluye en el pedido.",
+    "backorder_included_other": "{{count}} unidades ya están vendidas sin stock (stock bajo cero) y se incluyen en el pedido.",
+    "backorder_included_many": "{{count}} unidades ya están vendidas sin stock (stock bajo cero) y se incluyen en el pedido."
   },
   "import": {
     "fromStocky": "Importar desde Stocky",
@@ -1195,7 +1211,8 @@
     "done": {
       "received": "Marcado como recibido",
       "cancelled": "Pedido cancelado",
-      "open": "Pedido reabierto"
+      "open": "Pedido reabierto",
+      "part": "Guardado: el resto sigue contando como en camino"
     },
     "state": {
       "open": "En camino",
@@ -1213,7 +1230,10 @@
     "review": "Revisar pedidos",
     "link_one": "Pedidos realizados ({{count}})",
     "link_other": "Pedidos realizados ({{count}})",
-    "link_many": "Pedidos realizados ({{count}})"
+    "link_many": "Pedidos realizados ({{count}})",
+    "receivePart": "Recibido en parte",
+    "receivedSoFar": "Recibido hasta ahora",
+    "partReceived": "{{received}} recibidas, el resto está en camino"
   },
   "costs": {
     "intro": "El valor del stock, el dinero inmovilizado y los totales de órdenes de compra y del plan necesitan el costo unitario de cada producto. Introduce aquí los costos de los productos que no lo tienen en Shopify, o para usar tu costo real con envío. Tienen prioridad sobre el costo de Shopify en la app; Shopify no cambia.",

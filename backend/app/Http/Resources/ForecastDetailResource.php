@@ -46,6 +46,7 @@ class ForecastDetailResource extends ForecastResource
                 'alerts_muted' => $v->alerts_muted,
                 'discontinued' => $v->discontinued,
                 'forecast_profile' => $v->forecast_profile,
+                'supplier_sku' => $v->supplier_sku,
                 // Cost entered in the app (wins) and Shopify's own.
                 'cost_override' => $v->cost_override !== null ? (float) $v->cost_override : null,
                 'shopify_cost' => $v->shopify_unit_cost !== null ? (float) $v->shopify_unit_cost : null,

@@ -39,7 +39,7 @@ it('drafts an email with the supplier products that are due', function () {
         ->assertOk()
         ->assertJsonPath('data.to', 'orders@acme.test')
         ->assertJsonPath('data.reply_to', 'owner@demo.test')
-        ->assertJsonPath('data.items', [['variant_id' => $this->mug->id, 'name' => 'Mug', 'sku' => 'MUG-1', 'quantity' => 194]])
+        ->assertJsonPath('data.items', [['variant_id' => $this->mug->id, 'name' => 'Mug', 'sku' => 'MUG-1', 'supplier_sku' => null, 'quantity' => 194]])
         ->assertJsonPath('data.last_emailed_at', null);
 
     // Only the picked products (with something to order: Plate has plenty of stock).

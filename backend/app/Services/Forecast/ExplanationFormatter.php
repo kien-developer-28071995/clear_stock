@@ -160,6 +160,10 @@ class ExplanationFormatter
             $incoming = $e['stock']['incoming'] ?? 0; // absent in explanations computed before it existed
             $suggested = $e['reorder']['suggested_qty'];
             $ordered = $e['stock']['ordered'] ?? null; // placed outside Shopify (absent in older explanations)
+            // Oversold (negative stock): those units are already promised to customers.
+            if ($stock < 0 && $suggested > 0) {
+                $out[] = $this->line('backorder_included', ['count' => -$stock]);
+            }
             if ($incoming - ($ordered['units'] ?? 0) > 0) {
                 $out[] = $this->line('incoming_stock', ['count' => $incoming - ($ordered['units'] ?? 0)]);
             }

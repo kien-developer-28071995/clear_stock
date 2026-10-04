@@ -381,7 +381,9 @@
     "referenceClear": "Remover",
     "referenceNone": "Nenhum",
     "referencePercent": "Parcela do ritmo de vendas dele",
-    "referenceLocked": "Faça a previsão de produtos novos a partir de um produto semelhante até eles terem histórico de vendas próprio."
+    "referenceLocked": "Faça a previsão de produtos novos a partir de um produto semelhante até eles terem histórico de vendas próprio.",
+    "supplierSku": "Código do produto no fornecedor",
+    "supplierSkuHelp": "Opcional. Aparece nos pedidos de compra e nos e-mails para o fornecedor reconhecer o produto."
   },
   "products": {
     "freeLimit_one": "O plano Free faz a previsão do seu produto mais vendido.",
@@ -408,7 +410,8 @@
     "vendor": "Marca",
     "allVendors": "Todas as marcas",
     "productType": "Tipo de produto",
-    "allTypes": "Todos os tipos de produto"
+    "allTypes": "Todos os tipos de produto",
+    "exportCsv": "Exportar lista (CSV)"
   },
   "settings": {
     "defaultsHeading": "Padrões da previsão",
@@ -447,7 +450,10 @@
     "summaryHeading": "Resumo semanal",
     "summaryEnabled": "Enviar-me um resumo uma vez por semana",
     "summaryHelp": "O que pedir primeiro, produtos esgotados, dinheiro parado em estoque lento, vendas perdidas e o valor do seu estoque. Um e-mail por semana, em todos os planos.",
-    "summaryEmail": "Enviar para"
+    "summaryEmail": "Enviar para",
+    "locationsHeading": "Locais contados como estoque",
+    "locationsIntro": "Desmarque um local cujo estoque não está à venda (devoluções, itens danificados, showroom). As unidades dele ficam fora dos dias de estoque e das sugestões; as vendas enviadas de lá continuam contando como demanda.",
+    "locationsSaved": "Salvo. As previsões estão sendo atualizadas."
   },
   "suppliers": {
     "add": "Adicionar fornecedor",
@@ -476,7 +482,13 @@
     "orderCycleHelp": "Com que frequência você pede a este fornecedor. Cada pedido sugerido cobre esses dias de vendas, além do prazo de entrega e do estoque de segurança.",
     "orderDays": "Dias de pedido",
     "orderDaysHelp": "Os dias em que você faz pedidos a este fornecedor. Um produto que vence entre eles é pedido no dia de pedido anterior, para nada acabar. Nenhum marcado = qualquer dia.",
-    "ordersOn": "Pedidos: {{days}}"
+    "ordersOn": "Pedidos: {{days}}",
+    "actualLeadTime_one": "Sua última {{count}} entrega levou {{days}} dias (mediana)",
+    "actualLeadTime_other": "Suas últimas {{count}} entregas levaram {{days}} dias (mediana)",
+    "actualLeadTime_many": "Suas últimas {{count}} entregas levaram {{days}} dias (mediana)",
+    "useActual_one": "Usar {{count}} dia",
+    "useActual_other": "Usar {{count}} dias",
+    "useActual_many": "Usar {{count}} dias"
   },
   "bundles": {
     "add": "Adicionar kit",
@@ -618,7 +630,8 @@
     "event_too_long": "Um evento pode durar no máximo 3 meses. Para uma mudança duradoura, ajuste o ritmo de vendas.",
     "required_if": "Este campo é obrigatório.",
     "not_in": "Escolha outro valor.",
-    "cost_columns_missing": "O arquivo precisa de uma coluna de SKU ou código de barras e de uma coluna de custo."
+    "cost_columns_missing": "O arquivo precisa de uma coluna de SKU ou código de barras e de uma coluna de custo.",
+    "keep_one_location": "Pelo menos um local deve contar como estoque."
   },
   "explanation": {
     "unknown": "—",
@@ -743,7 +756,10 @@
     "trend_up_many": "Vende {{percent}}% mais rápido nos últimos {{count}} dias ({{recent}}/dia) do que nos {{days}} dias anteriores ({{baseline}}/dia).",
     "trend_down_one": "Vende {{percent}}% mais devagar no último dia ({{recent}}/dia) do que nos {{days}} dias anteriores ({{baseline}}/dia).",
     "trend_down_other": "Vende {{percent}}% mais devagar nos últimos {{count}} dias ({{recent}}/dia) do que nos {{days}} dias anteriores ({{baseline}}/dia).",
-    "trend_down_many": "Vende {{percent}}% mais devagar nos últimos {{count}} dias ({{recent}}/dia) do que nos {{days}} dias anteriores ({{baseline}}/dia)."
+    "trend_down_many": "Vende {{percent}}% mais devagar nos últimos {{count}} dias ({{recent}}/dia) do que nos {{days}} dias anteriores ({{baseline}}/dia).",
+    "backorder_included_one": "{{count}} unidade já foi vendida sem estoque (estoque abaixo de zero) e está incluída no pedido.",
+    "backorder_included_other": "{{count}} unidades já foram vendidas sem estoque (estoque abaixo de zero) e estão incluídas no pedido.",
+    "backorder_included_many": "{{count}} unidades já foram vendidas sem estoque (estoque abaixo de zero) e estão incluídas no pedido."
   },
   "import": {
     "fromStocky": "Importar do Stocky",
@@ -1195,7 +1211,8 @@
     "done": {
       "received": "Marcado como recebido",
       "cancelled": "Pedido cancelado",
-      "open": "Pedido reaberto"
+      "open": "Pedido reaberto",
+      "part": "Salvo: o restante ainda conta como a caminho"
     },
     "state": {
       "open": "A caminho",
@@ -1213,7 +1230,10 @@
     "review": "Revisar pedidos",
     "link_one": "Pedidos feitos ({{count}})",
     "link_other": "Pedidos feitos ({{count}})",
-    "link_many": "Pedidos feitos ({{count}})"
+    "link_many": "Pedidos feitos ({{count}})",
+    "receivePart": "Recebido em parte",
+    "receivedSoFar": "Recebido até agora",
+    "partReceived": "{{received}} recebidas, o restante está a caminho"
   },
   "costs": {
     "intro": "O valor do estoque, o dinheiro parado e os totais de pedidos de compra e do plano precisam do custo unitário de cada produto. Informe aqui os custos dos produtos que não têm custo na Shopify, ou para usar seu custo real com frete. Eles têm prioridade sobre o custo da Shopify no app; a Shopify não é alterada.",

@@ -208,6 +208,25 @@
             "one": "Vous avez marqué {{count}} unité comme commandée (attendue le {{expected_date}}) : comptée comme en route.",
             "other": "Vous avez marqué {{count}} unités comme commandées (attendues le {{expected_date}}) : comptées comme en route.",
             "many": "Vous avez marqué {{count}} unités comme commandées (attendues le {{expected_date}}) : comptées comme en route."
+        },
+        "profile_recent": "Réglage de la boutique « Suivre les ventes récentes » : les 7 derniers jours comptent le plus.",
+        "profile_recent_product": "Ce produit suit les ventes récentes : les 7 derniers jours comptent le plus.",
+        "profile_steady": "Réglage de la boutique « Stable » : le rythme est calculé sur un an au maximum.",
+        "profile_steady_product": "Ce produit est réglé sur « Stable » : le rythme est calculé sur un an au maximum.",
+        "trend_up": {
+            "one": "Se vend {{percent}} % plus vite sur le dernier jour ({{recent}}/jour) que sur les {{days}} jours précédents ({{baseline}}/jour).",
+            "other": "Se vend {{percent}} % plus vite sur les {{count}} derniers jours ({{recent}}/jour) que sur les {{days}} jours précédents ({{baseline}}/jour).",
+            "many": "Se vend {{percent}} % plus vite sur les {{count}} derniers jours ({{recent}}/jour) que sur les {{days}} jours précédents ({{baseline}}/jour)."
+        },
+        "trend_down": {
+            "one": "Se vend {{percent}} % moins vite sur le dernier jour ({{recent}}/jour) que sur les {{days}} jours précédents ({{baseline}}/jour).",
+            "other": "Se vend {{percent}} % moins vite sur les {{count}} derniers jours ({{recent}}/jour) que sur les {{days}} jours précédents ({{baseline}}/jour).",
+            "many": "Se vend {{percent}} % moins vite sur les {{count}} derniers jours ({{recent}}/jour) que sur les {{days}} jours précédents ({{baseline}}/jour)."
+        },
+        "backorder_included": {
+            "one": "{{count}} unité est déjà vendue en rupture (stock inférieur à zéro) et incluse dans la commande.",
+            "other": "{{count}} unités sont déjà vendues en rupture (stock inférieur à zéro) et incluses dans la commande.",
+            "many": "{{count}} unités sont déjà vendues en rupture (stock inférieur à zéro) et incluses dans la commande."
         }
     },
     "ordered": "{{qty}} marquées comme commandées"

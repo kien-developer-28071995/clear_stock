@@ -8,6 +8,8 @@ export interface ManualOrder {
     sku: string | null;
     supplier: string | null;
     quantity: number;
+    /** Units already delivered (partial delivery); the rest is still on the way. */
+    received_quantity: number;
     ordered_on: string;
     expected_on: string;
     reference: string | null;

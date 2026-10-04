@@ -32,6 +32,7 @@ export function ProductSettingsForm({ f }: { f: ForecastDetail }) {
     const [discontinued, setDiscontinued] = useState(false);
     const [cost, setCost] = useState('');
     const [profile, setProfile] = useState('');
+    const [supplierSku, setSupplierSku] = useState('');
     // Similar product: local id (saved) or Shopify gid (just picked); null = none.
     const [reference, setReference] = useState<{ id: number | string; name: string } | null>(null);
     const [referencePercent, setReferencePercent] = useState('');
@@ -50,6 +51,7 @@ export function ProductSettingsForm({ f }: { f: ForecastDetail }) {
         discontinued: f.settings.discontinued,
         cost: f.settings.cost_override?.toString() ?? '',
         profile: f.settings.forecast_profile ?? '',
+        supplierSku: f.settings.supplier_sku ?? '',
         reference: f.settings.reference_variant_id ? { id: f.settings.reference_variant_id, name: f.settings.reference_name ?? '' } : null,
         referencePercent: f.settings.reference_percent?.toString() ?? '',
     };
@@ -65,12 +67,13 @@ export function ProductSettingsForm({ f }: { f: ForecastDetail }) {
         setDiscontinued(saved.discontinued);
         setCost(saved.cost);
         setProfile(saved.profile);
+        setSupplierSku(saved.supplierSku);
         setReference(saved.reference);
         setReferencePercent(saved.referencePercent);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(reset, [f.settings]);
-    const current = { supplierId, leadTime, safety, minOrder, pack, minStock, maxStock, muted, discontinued, cost, profile, reference, referencePercent };
+    const current = { supplierId, leadTime, safety, minOrder, pack, minStock, maxStock, muted, discontinued, cost, profile, supplierSku, reference, referencePercent };
     const pickReference = async () => {
         const [picked] = await pickVariants();
         if (picked) setReference({ id: picked.gid, name: picked.name });
@@ -93,6 +96,7 @@ export function ProductSettingsForm({ f }: { f: ForecastDetail }) {
                 alerts_muted: muted,
                 discontinued,
                 forecast_profile: (profile || null) as ForecastProfile | null,
+                supplier_sku: supplierSku.trim() || null,
                 ...(cost !== saved.cost ? { cost_override: cost.trim() === '' ? null : Number(cost.replace(',', '.')) } : {}),
                 // Only sent when changed: a Free shop can still save its other settings.
                 ...(reference?.id !== saved.reference?.id ? { reference_variant: reference?.id ?? null } : {}),
@@ -119,6 +123,13 @@ export function ProductSettingsForm({ f }: { f: ForecastDetail }) {
                         </s-option>
                     ))}
                 </s-select>
+                <s-text-field
+                    label={t('productSettings.supplierSku')}
+                    details={t('productSettings.supplierSkuHelp')}
+                    value={supplierSku}
+                    error={fieldError(update.error, 'supplier_sku')}
+                    onInput={(e) => setSupplierSku(e.currentTarget.value)}
+                />
                 <s-grid gridTemplateColumns="@container (inline-size > 500px) 1fr 1fr, 1fr" gap="base">
                     <s-number-field
                         label={t('productSettings.leadTime')}

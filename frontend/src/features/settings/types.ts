@@ -29,11 +29,20 @@ export interface Settings {
     flow: { available: boolean; active: boolean };
 }
 
+/** A location and whether its stock is left out of the forecasts (returns, damaged goods, showroom). */
+export interface StockLocation {
+    id: number;
+    name: string;
+    excluded: boolean;
+}
+
 export interface Supplier {
     id: number;
     name: string;
     email: string | null;
     lead_time_days: number | null;
+    /** Median days real deliveries took (orders marked as ordered, then received); null with too few. */
+    actual_lead_time?: { median_days: number; orders: number } | null;
     /** Defaults for this supplier's products (a product's own setting wins). */
     min_order_qty: number | null;
     pack_size: number | null;

@@ -16,6 +16,7 @@ use Illuminate\Support\Carbon;
  * @property int $variant_id
  * @property ?int $supplier_id
  * @property int $quantity
+ * @property int $received_quantity units already delivered (partial delivery); the rest is still on the way
  * @property Carbon $ordered_on
  * @property Carbon $expected_on
  * @property ?string $reference
@@ -37,11 +38,17 @@ class ManualOrder extends Model
 
     public const SOURCE_SUPPLIER_EMAIL = 'supplier_email';
 
-    protected $fillable = ['shop_id', 'variant_id', 'supplier_id', 'quantity', 'ordered_on', 'expected_on', 'reference', 'source', 'status', 'closed_at'];
+    protected $fillable = ['shop_id', 'variant_id', 'supplier_id', 'quantity', 'received_quantity', 'ordered_on', 'expected_on', 'reference', 'source', 'status', 'closed_at'];
 
     protected function casts(): array
     {
-        return ['quantity' => 'integer', 'ordered_on' => 'date', 'expected_on' => 'date', 'closed_at' => 'datetime', 'supplier_id' => 'integer'];
+        return ['quantity' => 'integer', 'received_quantity' => 'integer', 'ordered_on' => 'date', 'expected_on' => 'date', 'closed_at' => 'datetime', 'supplier_id' => 'integer'];
+    }
+
+    /** Units still to come. */
+    public function outstanding(): int
+    {
+        return max(0, $this->quantity - $this->received_quantity);
     }
 
     public function variant(): BelongsTo

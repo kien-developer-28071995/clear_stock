@@ -15,7 +15,7 @@ Hello {{ $supplierName }},
 | SKU | Product | Quantity |
 |:----|:--------|---------:|
 @foreach ($items as $item)
-| {{ $item['sku'] ?: '—' }} | {{ $item['name'] }} | **{{ $item['quantity'] }}** |
+| {{ ($item['supplier_sku'] ?? null) ?: ($item['sku'] ?: '—') }} | {{ $item['name'] }} | **{{ $item['quantity'] }}** |
 @endforeach
 | | **Total** | **{{ $totalUnits }}** |
 </x-mail::table>

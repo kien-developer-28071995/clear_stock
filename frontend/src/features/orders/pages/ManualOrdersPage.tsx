@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ErrorBanner } from '@/components/ui/ErrorBanner';
 import { LoadingPage } from '@/components/ui/LoadingPage';
@@ -18,11 +19,21 @@ export function ManualOrdersPage() {
     const { t } = useTranslation();
     const { data, error, refetch } = useManualOrders();
     const update = useUpdateManualOrder();
+    // Partial delivery: the row being edited and the units received so far.
+    const [part, setPart] = useState<{ id: number; value: string } | null>(null);
 
     if (!data) return error ? <s-page heading={t('nav.orders')}><ErrorBanner error={error} onRetry={() => refetch()} /></s-page> : <LoadingPage heading={t('nav.orders')} />;
 
     const act = (o: ManualOrder, status: 'received' | 'cancelled' | 'open') =>
         update.mutate({ id: o.id, status }, { onSuccess: () => shopify.toast.show(t(`orders.done.${status}`)) });
+    const savePart = (o: ManualOrder) => {
+        const received = Number(part?.value);
+        if (!Number.isFinite(received) || received < 0) return;
+        update.mutate(
+            { id: o.id, received_quantity: received },
+            { onSuccess: (saved) => { setPart(null); shopify.toast.show(t(saved.state === 'received' ? 'orders.done.received' : 'orders.done.part')); } },
+        );
+    };
     const overdue = data.open.filter((o) => o.state === 'overdue');
 
     const table = (rows: ManualOrder[], open: boolean) => (
@@ -44,16 +55,40 @@ export function ManualOrdersPage() {
                                 <s-text color="subdued">{[o.sku, o.supplier, t('orders.orderedOn', { date: formatDate(o.ordered_on) })].filter(Boolean).join(' · ')}</s-text>
                             </s-stack>
                         </s-table-cell>
-                        <s-table-cell>{formatNumber(o.quantity, 0)}</s-table-cell>
+                        <s-table-cell>
+                            <s-stack gap="small-100">
+                                <s-text>{formatNumber(o.quantity, 0)}</s-text>
+                                {o.state !== 'received' && o.received_quantity > 0 && (
+                                    <s-text color="subdued">{t('orders.partReceived', { received: formatNumber(o.received_quantity, 0) })}</s-text>
+                                )}
+                            </s-stack>
+                        </s-table-cell>
                         <s-table-cell>{formatDate(o.expected_on)}</s-table-cell>
                         <s-table-cell>{o.source === 'supplier_email' ? t('orders.viaEmail') : o.reference ?? '—'}</s-table-cell>
                         <s-table-cell><s-badge tone={TONE[o.state]}>{t(`orders.state.${o.state}`)}</s-badge></s-table-cell>
                         {open && (
                             <s-table-cell>
+                                {part?.id === o.id ? (
+                                    <s-stack direction="inline" gap="small-200" alignItems="end">
+                                        <s-box maxInlineSize="120px">
+                                            <s-number-field
+                                                label={t('orders.receivedSoFar')}
+                                                min={0}
+                                                max={o.quantity}
+                                                value={part.value}
+                                                onInput={(e) => setPart({ id: o.id, value: e.currentTarget.value })}
+                                            />
+                                        </s-box>
+                                        <s-button variant="primary" loading={update.isPending || undefined} onClick={() => savePart(o)}>{t('common.save')}</s-button>
+                                        <s-button variant="tertiary" onClick={() => setPart(null)}>{t('common.cancel')}</s-button>
+                                    </s-stack>
+                                ) : (
                                 <s-button-group>
                                     <s-button slot="secondary-actions" onClick={() => act(o, 'received')}>{t('orders.receive')}</s-button>
+                                    <s-button slot="secondary-actions" onClick={() => setPart({ id: o.id, value: String(o.received_quantity || '') })}>{t('orders.receivePart')}</s-button>
                                     <s-button slot="secondary-actions" tone="critical" onClick={() => act(o, 'cancelled')}>{t('orders.cancel')}</s-button>
                                 </s-button-group>
+                                )}
                             </s-table-cell>
                         )}
                     </s-table-row>

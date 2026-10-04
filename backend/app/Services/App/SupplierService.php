@@ -6,14 +6,44 @@ use App\Enums\Feature;
 use App\Jobs\Forecast\RecomputeForecasts;
 use App\Models\Shop;
 use App\Models\Supplier;
+use App\Repositories\Contracts\ManualOrderRepositoryInterface;
 use App\Repositories\Contracts\SupplierRepositoryInterface;
 use App\Support\Entitlements;
+use Carbon\CarbonImmutable;
 use Illuminate\Support\Collection;
 use Illuminate\Validation\ValidationException;
 
 class SupplierService
 {
-    public function __construct(private readonly SupplierRepositoryInterface $suppliers) {}
+    /** Fewer received orders than this say too little about a supplier's real lead time. */
+    private const MIN_DELIVERIES = 3;
+
+    public function __construct(
+        private readonly SupplierRepositoryInterface $suppliers,
+        private readonly ManualOrderRepositoryInterface $orders,
+    ) {}
+
+    /**
+     * How long deliveries really took: the median days from "marked as ordered" to "received"
+     * over the last year, per supplier with enough received orders.
+     *
+     * @return array<int, array{median_days: int, orders: int}>
+     */
+    public function actualLeadTimes(Shop $shop): array
+    {
+        $out = [];
+        foreach ($this->orders->deliveryDays($shop, CarbonImmutable::now($shop->timezone)->subYear()->toDateString()) as $supplierId => $days) {
+            if (count($days) < self::MIN_DELIVERIES) {
+                continue;
+            }
+            sort($days);
+            $mid = intdiv(count($days), 2);
+            $median = count($days) % 2 === 1 ? $days[$mid] : (int) round(($days[$mid - 1] + $days[$mid]) / 2);
+            $out[$supplierId] = ['median_days' => $median, 'orders' => count($days)];
+        }
+
+        return $out;
+    }
 
     public function list(Shop $shop): Collection
     {

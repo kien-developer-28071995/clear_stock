@@ -23,6 +23,8 @@ class SupplierResource extends JsonResource
             'order_weekdays' => $this->order_weekdays,
             'auto_email' => $this->auto_email,
             'last_emailed_at' => $this->last_emailed_at ? Carbon::parse($this->last_emailed_at)->toIso8601String() : null,
+            // Median days real deliveries took ({median_days, orders}); null with too few received orders.
+            'actual_lead_time' => $request->attributes->get('actual_lead_times', [])[$this->id] ?? null,
             'variants_count' => $this->variants_count ?? null,
         ];
     }

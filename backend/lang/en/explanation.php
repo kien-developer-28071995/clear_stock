@@ -32,6 +32,7 @@ return [
     'below_min_order' => ':stock in stock (with stock on the way) is at or below your minimum → order :count unit today.|:stock in stock (with stock on the way) is at or below your minimum → order :count units today.',
     'above_min' => ':stock in stock (with stock on the way) is above your minimum; no sales yet, so nothing to order.',
     'no_order_needed' => 'Nothing to order right now.',
+    'backorder_included' => ':count unit is already sold on backorder (stock below zero) and is included in the order.|:count units are already sold on backorder (stock below zero) and are included in the order.',
     'ordered_manual' => 'You marked :count unit as ordered (expected :expected_date): counted as on the way.|You marked :count units as ordered (expected :expected_date): counted as on the way.',
     'event_past' => ':name (×:multiplier): :count day counted at its normal level.|:name (×:multiplier): :count days counted at their normal level.',
     'event_upcoming' => ':name (:from_date – :to_date, ×:multiplier) adds :count unit to what to order.|:name (:from_date – :to_date, ×:multiplier) adds :count units to what to order.',

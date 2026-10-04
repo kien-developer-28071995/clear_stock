@@ -347,7 +347,9 @@
     "referenceClear": "Bỏ",
     "referenceNone": "Chưa chọn",
     "referencePercent": "Tỷ lệ tốc độ bán",
-    "referenceLocked": "Dự báo sản phẩm mới theo một sản phẩm tương tự cho tới khi có lịch sử bán riêng."
+    "referenceLocked": "Dự báo sản phẩm mới theo một sản phẩm tương tự cho tới khi có lịch sử bán riêng.",
+    "supplierSku": "Mã hàng của nhà cung cấp",
+    "supplierSkuHelp": "Không bắt buộc. In trên đơn đặt hàng và email đặt hàng để nhà cung cấp nhận ra sản phẩm."
   },
   "products": {
     "freeLimit_other": "Gói Miễn phí dự báo {{count}} sản phẩm bán chạy nhất.",
@@ -370,7 +372,8 @@
     "vendor": "Vendor",
     "allVendors": "Tất cả vendor",
     "productType": "Loại sản phẩm",
-    "allTypes": "Tất cả loại sản phẩm"
+    "allTypes": "Tất cả loại sản phẩm",
+    "exportCsv": "Xuất danh sách (CSV)"
   },
   "settings": {
     "defaultsHeading": "Mặc định cho dự báo",
@@ -409,7 +412,10 @@
     "summaryHeading": "Tóm tắt hằng tuần",
     "summaryEnabled": "Gửi cho tôi email tóm tắt mỗi tuần một lần",
     "summaryHelp": "Cần đặt gì trước, sản phẩm hết hàng, tiền kẹt ở hàng bán chậm, doanh thu mất và giá trị tồn kho. Một email mỗi tuần, có ở mọi gói.",
-    "summaryEmail": "Gửi tới"
+    "summaryEmail": "Gửi tới",
+    "locationsHeading": "Chi nhánh được tính tồn kho",
+    "locationsIntro": "Bỏ chọn chi nhánh có hàng không để bán (hàng trả về, hàng lỗi, showroom). Tồn ở đó không tính vào số ngày còn hàng và gợi ý đặt hàng; đơn giao từ đó vẫn tính là nhu cầu.",
+    "locationsSaved": "Đã lưu. Dự báo đang được cập nhật."
   },
   "suppliers": {
     "add": "Thêm nhà cung cấp",
@@ -434,7 +440,9 @@
     "orderCycleHelp": "Bao lâu bạn đặt hàng NCC này một lần. Mỗi đơn gợi ý đủ bán ngần ấy ngày, cộng thêm lead time và tồn an toàn.",
     "orderDays": "Ngày đặt hàng",
     "orderDaysHelp": "Những ngày bạn đặt hàng với nhà cung cấp này. Sản phẩm đến hạn vào giữa hai ngày sẽ được đặt vào ngày đặt hàng liền trước, để không bị hết hàng. Không chọn ngày nào = ngày nào cũng được.",
-    "ordersOn": "Đặt hàng: {{days}}"
+    "ordersOn": "Đặt hàng: {{days}}",
+    "actualLeadTime_other": "{{count}} lần giao gần đây mất {{days}} ngày (trung vị)",
+    "useActual_other": "Dùng {{count}} ngày"
   },
   "bundles": {
     "add": "Thêm combo",
@@ -572,7 +580,8 @@
     "event_too_long": "Sự kiện dài tối đa 3 tháng. Nếu thay đổi kéo dài, hãy chỉnh tốc độ bán.",
     "required_if": "Vui lòng nhập ô này.",
     "not_in": "Hãy chọn giá trị khác.",
-    "cost_columns_missing": "File cần có cột SKU hoặc barcode và cột giá vốn."
+    "cost_columns_missing": "File cần có cột SKU hoặc barcode và cột giá vốn.",
+    "keep_one_location": "Phải có ít nhất một chi nhánh được tính tồn kho."
   },
   "explanation": {
     "unknown": "—",
@@ -637,7 +646,8 @@
     "profile_steady": "Cài đặt cửa hàng \"Ổn định\": tốc độ bán lấy trung bình tới một năm.",
     "profile_steady_product": "Sản phẩm này đặt \"Ổn định\": tốc độ bán lấy trung bình tới một năm.",
     "trend_up_other": "{{count}} ngày gần đây bán nhanh hơn {{percent}}% ({{recent}}/ngày) so với {{days}} ngày trước đó ({{baseline}}/ngày).",
-    "trend_down_other": "{{count}} ngày gần đây bán chậm hơn {{percent}}% ({{recent}}/ngày) so với {{days}} ngày trước đó ({{baseline}}/ngày)."
+    "trend_down_other": "{{count}} ngày gần đây bán chậm hơn {{percent}}% ({{recent}}/ngày) so với {{days}} ngày trước đó ({{baseline}}/ngày).",
+    "backorder_included_other": "{{count}} cái đã bán vượt tồn (tồn kho âm) và được cộng vào lượng cần đặt."
   },
   "import": {
     "fromStocky": "Nhập từ Stocky",
@@ -989,7 +999,8 @@
     "done": {
       "received": "Đã đánh dấu đã nhận",
       "cancelled": "Đã huỷ đơn",
-      "open": "Đã mở lại đơn"
+      "open": "Đã mở lại đơn",
+      "part": "Đã lưu: phần còn lại vẫn tính là đang về"
     },
     "state": {
       "open": "Đang về",
@@ -1003,7 +1014,10 @@
     "overdueHeading_other": "{{count}} đơn đã quá ngày dự kiến",
     "overdueBody": "Các đơn này không còn được tính là đang về. Hãy đánh dấu đã nhận, hoặc huỷ nếu hàng sẽ không về.",
     "review": "Xem các đơn",
-    "link_other": "Đơn đã đặt ({{count}})"
+    "link_other": "Đơn đã đặt ({{count}})",
+    "receivePart": "Nhận một phần",
+    "receivedSoFar": "Đã nhận",
+    "partReceived": "Đã nhận {{received}}, phần còn lại đang về"
   },
   "costs": {
     "intro": "Giá trị tồn kho, tiền kẹt, tổng tiền đơn đặt hàng và kế hoạch nhập đều cần giá vốn của từng sản phẩm. Nhập ở đây cho các sản phẩm chưa có giá vốn trên Shopify, hoặc để dùng giá vốn thực tế (gồm vận chuyển). Giá vốn nhập trong app được ưu tiên hơn giá trên Shopify; Shopify không bị thay đổi.",

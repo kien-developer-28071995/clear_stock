@@ -524,6 +524,66 @@ for (const plan of ['free', 'starter', 'growth'] as PlanKey[]) {
             await api(app, '/settings', { method: 'PUT', body: { alerts: { slack_webhook_url: null, cover_days: null } } });
         });
 
+        test('a partly delivered order keeps the rest on the way', async ({ app }) => {
+            type Orders = { data: { open: { id: number; variant_id: number; quantity: number; received_quantity: number; state: string }[] } };
+            await open(app, '/orders');
+            // A product with a forecast (untracked ones, like gift cards, have none).
+            const variant = { id: (await api<{ data: { variant_id: number }[] }>(app, '/forecasts')).data[0].variant_id };
+            const incoming = async () => (await api<{ data: { incoming_stock: number } }>(app, `/forecasts/${variant.id}`)).data?.incoming_stock ?? 0;
+            const before = await incoming();
+            await api(app, '/manual-orders', { method: 'POST', body: { items: [{ variant_id: variant.id, quantity: 40 }], reference: 'E2E-PART' } });
+            const order = (await api<Orders>(app, '/manual-orders')).data.open.find((o) => o.variant_id === variant.id && o.quantity === 40)!;
+
+            await open(app, '/orders');
+            const row = app.locator('s-table-row', { hasText: 'E2E-PART' }).first();
+            await row.locator('s-button', { hasText: 'Part received' }).click();
+            await row.getByRole('spinbutton', { name: 'Received so far' }).fill('15');
+            await row.locator('s-button', { hasText: 'Save' }).click();
+            await expect.poll(async () => (await api<Orders>(app, '/manual-orders')).data.open.find((o) => o.id === order.id)?.received_quantity).toBe(15);
+            await expect(row).toContainText('15 received');
+            expect(await incoming()).toBe(before + 25);
+
+            await api(app, `/manual-orders/${order.id}`, { method: 'PATCH', body: { status: 'cancelled' } });
+            expect(await incoming()).toBe(before);
+        });
+
+        test('supplier product code is saved on the product and exported', async ({ app }) => {
+            await open(app, '/products');
+            await app.locator('s-table-body s-table-row s-link').first().click();
+            await settled(app);
+            const variantId = Number(app.url().split('/').pop());
+            await app.getByRole('textbox', { name: "Supplier's product code" }).fill('E2E-SUP-1');
+            await saveBar(app, 'product-settings-save-bar');
+            expect((await api<{ data: { settings: { supplier_sku: string | null } } }>(app, `/forecasts/${variantId}`)).data.settings.supplier_sku).toBe('E2E-SUP-1');
+            await api(app, `/variants/${variantId}/settings`, { method: 'PUT', body: { supplier_sku: null } });
+        });
+
+        test('the product list exports as CSV with the current filters', async ({ app }) => {
+            await open(app, '/products?status=reorder_now');
+            const total = (await api<{ meta: { total: number } }>(app, '/forecasts?status=reorder_now')).meta.total;
+            // The button sits in the page's title bar, which only the Shopify admin renders: ask the API as the button does.
+            const csv = (await app.evaluate(async () => {
+                const res = await fetch('/api/forecasts/export?status=reorder_now', { headers: { Authorization: `Bearer ${await window.shopify.idToken()}` } });
+                return res.ok ? await res.text() : `HTTP ${res.status}`;
+            })).trim().split('\n');
+            expect(csv[0]).toContain('Product,SKU,Vendor,Supplier,Status');
+            expect(csv).toHaveLength(total + 1);
+        });
+
+        test('locations can be left out of the stock the forecast counts', async ({ app }) => {
+            type Loc = { id: number; name: string; excluded: boolean };
+            await open(app, '/settings');
+            const locations = (await api<{ data: Loc[] }>(app, '/settings/locations')).data;
+            const section = app.locator('s-section[heading="Locations counted as stock"]');
+            test.skip(locations.length < 2, 'dev store has a single location');
+            await expect(section.locator('s-checkbox')).toHaveCount(locations.length);
+
+            const target = locations.find((l) => !l.excluded)!;
+            await api(app, '/settings/locations', { method: 'PUT', body: { excluded_ids: [target.id] } });
+            expect((await api<{ data: Loc[] }>(app, '/settings/locations')).data.find((l) => l.id === target.id)?.excluded).toBe(true);
+            await api(app, '/settings/locations', { method: 'PUT', body: { excluded_ids: locations.filter((l) => l.excluded).map((l) => l.id) } });
+        });
+
         test('default lead time is saved and used by forecasts', async ({ app }) => {
             await open(app, '/settings');
             const lead = app.getByRole('spinbutton', { name: /lead time/i });

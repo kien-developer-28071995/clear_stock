@@ -75,7 +75,7 @@ class EloquentForecastQueryRepository implements ForecastQueryRepositoryInterfac
 
         return DB::table('locations')
             ->leftJoin('inventory_levels', fn ($j) => $j->on('inventory_levels.location_id', '=', 'locations.id')->where('inventory_levels.variant_id', $variantId))
-            ->where('locations.shop_id', $shop->id)->where('locations.is_active', true)
+            ->where('locations.shop_id', $shop->id)->where('locations.is_active', true)->where('locations.excluded', false)
             ->orderBy('locations.name')
             ->get(['locations.id', 'locations.name', 'inventory_levels.available'])
             ->filter(fn ($r) => $r->available !== null || $forecasts->has($r->id))
@@ -89,7 +89,7 @@ class EloquentForecastQueryRepository implements ForecastQueryRepositoryInterfac
 
     public function activeLocations(Shop $shop): array
     {
-        return DB::table('locations')->where('shop_id', $shop->id)->where('is_active', true)->orderBy('name')
+        return DB::table('locations')->where('shop_id', $shop->id)->where('is_active', true)->where('excluded', false)->orderBy('name')
             ->get(['id', 'name'])->map(fn ($r) => ['id' => (int) $r->id, 'name' => $r->name])->all();
     }
 

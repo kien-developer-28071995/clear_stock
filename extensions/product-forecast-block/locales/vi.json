@@ -152,6 +152,19 @@
         },
         "ordered_manual": {
             "other": "Bạn đã đánh dấu đặt {{count}} cái (dự kiến về {{expected_date}}): tính là hàng đang về."
+        },
+        "profile_recent": "Cài đặt cửa hàng \"Theo doanh số gần đây\": 7 ngày gần nhất tính nhiều nhất.",
+        "profile_recent_product": "Sản phẩm này tính theo doanh số gần đây: 7 ngày gần nhất tính nhiều nhất.",
+        "profile_steady": "Cài đặt cửa hàng \"Ổn định\": tốc độ bán lấy trung bình tới một năm.",
+        "profile_steady_product": "Sản phẩm này đặt \"Ổn định\": tốc độ bán lấy trung bình tới một năm.",
+        "trend_up": {
+            "other": "{{count}} ngày gần đây bán nhanh hơn {{percent}}% ({{recent}}/ngày) so với {{days}} ngày trước đó ({{baseline}}/ngày)."
+        },
+        "trend_down": {
+            "other": "{{count}} ngày gần đây bán chậm hơn {{percent}}% ({{recent}}/ngày) so với {{days}} ngày trước đó ({{baseline}}/ngày)."
+        },
+        "backorder_included": {
+            "other": "{{count}} cái đã bán vượt tồn (tồn kho âm) và được cộng vào lượng cần đặt."
         }
     },
     "ordered": "đã đặt {{qty}}"

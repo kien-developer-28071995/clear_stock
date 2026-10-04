@@ -20,7 +20,7 @@ class DataHealthService
     {
         $tracked = fn (): Builder => Variant::query()->forShop($shop)->where('is_active', true)->where('tracked', true);
         $stock = DB::table('inventory_levels')->join('locations', 'locations.id', '=', 'inventory_levels.location_id')
-            ->where('inventory_levels.shop_id', $shop->id)->where('locations.is_active', true)
+            ->where('inventory_levels.shop_id', $shop->id)->where('locations.is_active', true)->where('locations.excluded', false)
             ->groupBy('inventory_levels.variant_id')->havingRaw('SUM(inventory_levels.available) < 0')->select('inventory_levels.variant_id');
         $duplicateSkus = DB::table('variants')->where('shop_id', $shop->id)->where('is_active', true)->where('tracked', true)
             ->whereNotNull('sku')->where('sku', '!=', '')->groupBy('sku')->havingRaw('COUNT(*) > 1')->select('sku');

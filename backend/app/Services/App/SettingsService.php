@@ -7,11 +7,14 @@ use App\Enums\Feature;
 use App\Enums\RealtimeAlertMode;
 use App\Jobs\Forecast\RecomputeForecasts;
 use App\Jobs\SyncRealtimeWebhook;
+use App\Models\Location;
 use App\Models\Shop;
 use App\Repositories\Contracts\AlertSettingRepositoryInterface;
 use App\Repositories\Contracts\FlowRepositoryInterface;
 use App\Repositories\Contracts\ShopRepositoryInterface;
+use App\Support\CacheVersion;
 use App\Support\Entitlements;
+use Illuminate\Validation\ValidationException;
 
 /** Store-wide defaults and alert preferences. */
 class SettingsService
@@ -83,6 +86,37 @@ class SettingsService
         }
 
         return $this->get($shop);
+    }
+
+    /** @return array<int, array{id: int, name: string, excluded: bool}> active locations */
+    public function locations(Shop $shop): array
+    {
+        return Location::query()->forShop($shop)->where('is_active', true)->orderBy('name')->get(['id', 'name', 'excluded'])
+            ->map(fn (Location $l) => ['id' => $l->id, 'name' => $l->name, 'excluded' => $l->excluded])->all();
+    }
+
+    /**
+     * Stock at these locations is no longer counted (the others are counted again). At least
+     * one location must stay: with none there would be no stock to forecast from.
+     *
+     * @param  array<int, int>  $excludedIds
+     */
+    public function excludeLocations(Shop $shop, array $excludedIds): array
+    {
+        $active = Location::query()->forShop($shop)->where('is_active', true)->pluck('id')->all();
+        $excluded = array_values(array_intersect($active, array_map('intval', $excludedIds)));
+        if ($active !== [] && count($excluded) >= count($active)) {
+            throw ValidationException::withMessages(['excluded_ids' => 'keep_one_location']);
+        }
+
+        $changed = Location::query()->forShop($shop)->whereIn('id', $excluded)->where('excluded', false)->update(['excluded' => true])
+            + Location::query()->forShop($shop)->whereNotIn('id', $excluded)->where('excluded', true)->update(['excluded' => false]);
+        if ($changed > 0) {
+            CacheVersion::bumpCatalog($shop->id);
+            RecomputeForecasts::dispatch($shop->id);
+        }
+
+        return $this->locations($shop);
     }
 
     private function realtimeWanted(Shop $shop): bool

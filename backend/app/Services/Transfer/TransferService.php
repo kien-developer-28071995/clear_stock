@@ -138,7 +138,7 @@ class TransferService
     {
         $this->authorize($shop);
 
-        $locations = Location::query()->forShop($shop)->where('is_active', true)->whereIn('id', [$originId, $destinationId])->get()->keyBy('id');
+        $locations = Location::query()->forShop($shop)->where('is_active', true)->where('excluded', false)->whereIn('id', [$originId, $destinationId])->get()->keyBy('id');
         if ($originId === $destinationId || ! $locations->has($originId) || ! $locations->has($destinationId)) {
             throw new ApiException('invalid_location', 422);
         }

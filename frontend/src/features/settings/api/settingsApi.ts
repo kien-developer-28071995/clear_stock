@@ -1,9 +1,11 @@
 import { http } from '@/lib/http';
-import type { Bundle, BundleInput, Settings, Supplier, SupplierEmailDraft, SupplierEmailInput, SupplierInput, VendorCandidate, VendorImportResult } from '@/features/settings/types';
+import type { Bundle, BundleInput, Settings, StockLocation, Supplier, SupplierEmailDraft, SupplierEmailInput, SupplierInput, VendorCandidate, VendorImportResult } from '@/features/settings/types';
 
 export const settingsApi = {
     get: async () => (await http.get<{ data: Settings }>('/settings')).data,
     update: async (body: Partial<Settings>) => (await http.put<{ data: Settings }>('/settings', body)).data,
+    locations: async () => (await http.get<{ data: StockLocation[] }>('/settings/locations')).data,
+    excludeLocations: async (excluded_ids: number[]) => (await http.put<{ data: StockLocation[] }>('/settings/locations', { excluded_ids })).data,
 };
 
 export const supplierApi = {

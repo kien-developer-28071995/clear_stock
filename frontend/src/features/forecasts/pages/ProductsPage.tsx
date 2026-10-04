@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router';
 import { ErrorBanner } from '@/components/ui/ErrorBanner';
+import { ApiError, errorMessage, http } from '@/lib/http';
 import { ExportPurchaseOrderButton } from '@/features/forecasts/components/ExportPurchaseOrderButton';
 import { useShop } from '@/features/shop/hooks/useShop';
 import { StatusBadge } from '@/components/ui/StatusBadge';
@@ -58,12 +59,27 @@ export function ProductsPage() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [search]);
 
+    // The whole list with the current filters (not just this page) as a CSV file.
+    const [exporting, setExporting] = useState(false);
+    const exportList = async () => {
+        setExporting(true);
+        try {
+            const query = new URLSearchParams(Object.entries(filters).filter(([k, v]) => k !== 'page' && v !== '' && v !== undefined).map(([k, v]) => [k, String(v)]));
+            await http.download(`/forecasts/export${query.size ? `?${query}` : ''}`);
+        } catch (e) {
+            shopify.toast.show(e instanceof ApiError ? errorMessage(e) : t('errors.exportFailed'), { isError: true });
+        } finally {
+            setExporting(false);
+        }
+    };
+
     const meta = data?.meta;
 
     return (
         <s-page heading={t('nav.products')} inlineSize="large">
             <s-stack slot="secondary-actions">
                 <ExportPurchaseOrderButton locationId={filters.location_id || undefined} />
+                <s-button icon="export" loading={exporting || undefined} onClick={exportList}>{t('products.exportCsv')}</s-button>
             </s-stack>
             {error && <ErrorBanner error={error} onRetry={() => refetch()} />}
             {/* Free plan: the list is capped at the plan's best sellers. */}

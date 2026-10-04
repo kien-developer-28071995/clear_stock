@@ -11,6 +11,7 @@ import { useFeature } from '@/hooks/useEntitlements';
 import { useDismissSetupGuide, useSetupGuide } from '@/features/setup/hooks/useSetupGuide';
 import { SaveBar } from '@/components/ui/SaveBar';
 import { SyncStatusCard } from '@/features/sync/components/SyncStatusCard';
+import { StockLocationsSection } from '@/features/settings/components/StockLocationsSection';
 import { FlowSection } from '@/features/settings/components/FlowSection';
 import { useSettings, useUpdateSettings } from '@/features/settings/hooks/useSettings';
 import type { RealtimeAlertMode, Settings } from '@/features/settings/types';
@@ -109,6 +110,8 @@ export function SettingsPage() {
                     )}
                 </s-stack>
             </s-section>
+
+            <StockLocationsSection />
 
             <s-section heading={t('costs.settingsHeading')}>
                 <s-stack gap="small-200">

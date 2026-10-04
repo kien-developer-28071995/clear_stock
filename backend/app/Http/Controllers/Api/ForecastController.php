@@ -20,6 +20,7 @@ use App\Support\Features;
 use App\Support\ShopContext;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ForecastController extends Controller
 {
@@ -61,6 +62,27 @@ class ForecastController extends Controller
                 'total' => $page->total(),
             ],
         ]);
+    }
+
+    /** The product list with the current filters as a CSV file (every plan: it is the merchant's own data). */
+    public function export(ForecastIndexRequest $request, ShopContext $context): StreamedResponse
+    {
+        $shop = $context->shop();
+        $filters = $request->safe()->only(['status', 'search', 'sort', 'vendor', 'product_type', 'abc', 'trend']);
+        if ($request->filled('location_id')) {
+            Entitlements::for($shop)->require(Feature::Locations);
+            $filters['location_id'] = (int) $request->validated('location_id');
+        }
+        $rows = $this->query->exportRows($shop, $filters);
+
+        return response()->streamDownload(function () use ($rows) {
+            $out = fopen('php://output', 'w');
+            fwrite($out, "\xEF\xBB\xBF"); // UTF-8 BOM so Excel opens accents correctly
+            foreach ($rows as $row) {
+                fputcsv($out, $row, escape: '');
+            }
+            fclose($out);
+        }, 'products-'.$this->query->today($shop).'.csv', ['Content-Type' => 'text/csv; charset=UTF-8']);
     }
 
     /** Vendors and product types of tracked products, for the list filters. */
