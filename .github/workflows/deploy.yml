@@ -79,6 +79,14 @@ jobs:
           tags: ${{ env.IMAGE_PREFIX }}-web:${{ steps.tag.outputs.tag }},${{ env.IMAGE_PREFIX }}-web:latest
           cache-from: type=gha,scope=web
           cache-to: type=gha,scope=web,mode=max
+      - name: Build and push admin (owner reports)
+        uses: docker/build-push-action@v6
+        with:
+          context: admin
+          push: true
+          tags: ${{ env.IMAGE_PREFIX }}-admin:${{ steps.tag.outputs.tag }},${{ env.IMAGE_PREFIX }}-admin:latest
+          cache-from: type=gha,scope=admin
+          cache-to: type=gha,scope=admin,mode=max
 
   deploy:
     needs: build
@@ -106,7 +114,7 @@ jobs:
       - name: Copy compose file and deploy script
         run: |
           scp -i ~/.ssh/id_deploy -P "${{ secrets.DEPLOY_PORT || 22 }}" \
-            docker-compose.prod.yml deploy/deploy.sh \
+            docker-compose.prod.yml deploy/deploy.sh deploy/admin-setup.sh \
             "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:${{ secrets.DEPLOY_PATH }}/"
       - name: Copy backend/.env (deploy.sh switches to it)
         if: steps.env.outputs.managed == 'true'

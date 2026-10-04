@@ -74,6 +74,32 @@ services:
       start_interval: 2s
     logging: *logging
 
+  # Owner reports (admin/): started by deploy.sh only once admin/.env exists (deploy/admin-setup.sh).
+  # Listens on this machine only: reach it through an SSH tunnel, or put Caddy in front of it
+  # (deploy/Caddyfile) with REPORT_ALLOWED_IPS set. Its SQLite file lives on the admin-data volume.
+  admin:
+    image: ${ADMIN_IMAGE:-clear_stock-admin:latest}
+    build:
+      context: admin
+    env_file:
+      - path: admin/.env
+        required: false
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${ADMIN_PORT:-8090}:8090"
+    volumes:
+      - admin-data:/var/www/admin/database/data
+    depends_on:
+      mysql:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:8090/up"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    logging: *logging
+
   mysql:
     image: mysql:8.4
     restart: unless-stopped
@@ -111,3 +137,4 @@ services:
 volumes:
   mysql-data:
   redis-data:
+  admin-data:

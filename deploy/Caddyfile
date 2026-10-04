@@ -8,6 +8,15 @@ app.example.com {
     reverse_proxy 127.0.0.1:8080
 }
 
+# Owner reports (admin/), only if you want them on a domain instead of an SSH tunnel
+# (ssh -L 8090:127.0.0.1:8090 user@server, then http://localhost:8090). Set REPORT_ALLOWED_IPS in
+# admin/.env first, and let Caddy refuse every other address as well:
+# admin.example.com {
+#     @denied not remote_ip 203.0.113.7
+#     respond @denied 404
+#     reverse_proxy 127.0.0.1:8090
+# }
+
 # Marketing website (website/): static files the Deploy workflow uploads to <deploy dir>/website.
 # Pages are built as privacy.html, vi/support.html...: try_files serves them at /privacy, /vi/support.
 www.example.com {

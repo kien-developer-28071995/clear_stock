@@ -122,6 +122,14 @@ jobs:
         run: vendor/bin/pint --test
       - name: Tests
         run: php artisan test
+      - uses: docker/setup-buildx-action@v3
+      - name: Build the admin image
+        uses: docker/build-push-action@v6
+        with:
+          context: admin
+          push: false
+          cache-from: type=gha,scope=admin
+          cache-to: type=gha,scope=admin,mode=max
 
   # backend/.env template renders (deploy/envtool.py) with every required value present.
   env-template:

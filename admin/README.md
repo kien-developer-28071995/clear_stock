@@ -50,20 +50,35 @@ Không có trang đăng ký. Tài khoản chỉ tạo bằng `admin:user`; chạ
 make admin-test
 ```
 
-## Xem dữ liệu production
+## Production
 
-Chưa nối vào `docker-compose.prod.yml` và pipeline deploy: đây là quyết định của chủ app. Hai cách:
+Chạy cạnh app trên server, trong container `admin` của `docker-compose.prod.yml` (image `…/clear_stock-admin`, build từ thư mục này). Container chỉ mở cổng `127.0.0.1:8090` trên server, không ra Internet. File SQLite nằm trên volume `admin-data`, nên deploy lại không mất sổ cài/gỡ. `report:sync` chạy mỗi 15 phút trong chính container đó.
 
-**1. Chạy trên máy cá nhân, nối qua SSH tunnel (đơn giản, không mở gì ra Internet).** MySQL production không mở cổng ra ngoài, nên cần tunnel tới container. Trong `admin/.env` đặt `APPDB_HOST`, `APPDB_PORT` trỏ vào đầu tunnel và dùng **user MySQL chỉ có quyền SELECT**:
+**Cài lần đầu (một lần, trên server, trong thư mục deploy):**
 
-```sql
-CREATE USER 'report'@'%' IDENTIFIED BY '...';
-GRANT SELECT ON clear_stock.* TO 'report'@'%';
+```bash
+bash admin-setup.sh
 ```
 
-Nhược điểm: máy tắt thì `report:sync` không chạy. Shop gỡ rồi bị xoá sau 48 giờ; nếu máy tắt lâu hơn thế, lần chạy sau vẫn ghi được "đã gỡ" nhưng ngày gỡ là ngày chạy lại, không phải ngày gỡ thật.
+Script tạo `admin/.env` (APP_KEY riêng) và một user MySQL `report` **chỉ có quyền SELECT** trên database của app. Từ lần deploy kế tiếp, `deploy.sh` tự kéo image và bật container (chưa có `admin/.env` thì bỏ qua; admin lỗi cũng không ảnh hưởng app).
 
-**2. Chạy trên server cạnh app.** Thêm một service dùng image PHP, mount `admin/`, đặt sau Caddy ở một subdomain riêng. Khi đó bắt buộc: `APP_DEBUG=false`, `REPORT_ALLOWED_IPS` (IP của bạn), HTTPS, user MySQL chỉ đọc, và `php artisan schedule:work` chạy liên tục.
+**Tạo tài khoản của bạn (trên server):**
+
+```bash
+docker compose -f docker-compose.prod.yml exec admin php artisan admin:user you@example.com
+```
+
+**Mở từ máy cá nhân qua SSH tunnel:**
+
+```bash
+ssh -N -L 8090:127.0.0.1:8090 user@server
+```
+
+Rồi mở http://localhost:8090.
+
+**Muốn có domain riêng** (không bắt buộc): thêm bản ghi DNS, bỏ comment khối `admin.example.com` trong `deploy/Caddyfile` (đã có sẵn luật chỉ cho IP của bạn), đặt `REPORT_ALLOWED_IPS` và `APP_URL=https://…` trong `admin/.env`, rồi `bash deploy.sh current`.
+
+Chạy trên máy cá nhân với dữ liệu production cũng được (tunnel tới MySQL, điền `APPDB_*`), nhưng máy tắt thì `report:sync` không chạy: shop gỡ rồi bị xoá sau 48 giờ sẽ bị ghi ngày gỡ muộn.
 
 ## Bảo mật
 

@@ -13,6 +13,7 @@
 # backend/.env.incoming (written by the workflow from GitHub Secrets/Variables) replaces backend/.env;
 # if the deploy stops before switching, the previous file is put back.
 # Tag "current" = the version that is running (apply config changes only).
+# The owner reports ("admin" service) start too once admin/.env exists (deploy/admin-setup.sh).
 set -euo pipefail
 cd "$(dirname "$0")"
 
@@ -103,6 +104,17 @@ echo "==> Switching containers"
 SWITCHED=1
 # New config: recreate so every container re-reads backend/.env (config:cache runs on start).
 $DC up -d --no-build --remove-orphans $([ "${ENV_CHANGED}" = 1 ] && echo --force-recreate) app horizon scheduler web
+
+# Owner reports: separate from the app. A failure here is reported, never stops or rolls back the deploy.
+if [ -f admin/.env ]; then
+    export ADMIN_IMAGE="${IMAGE_PREFIX}-admin:${TAG}"
+    echo "==> Owner reports (admin)"
+    if $DC pull admin && $DC up -d --no-build admin; then
+        echo "    running on 127.0.0.1:${ADMIN_PORT:-8090}"
+    else
+        echo "!! The owner reports did not start (no admin image for ${TAG}?). The app is not affected."
+    fi
+fi
 
 echo "==> Health check"
 for i in $(seq 1 30); do
