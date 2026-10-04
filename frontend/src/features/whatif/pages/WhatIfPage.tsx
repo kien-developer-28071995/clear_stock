@@ -124,7 +124,7 @@ function WhatIfView() {
             <s-section heading={t('whatIf.scenario')}>
                 <s-stack gap="base">
                     <s-paragraph>{t('whatIf.intro')}</s-paragraph>
-                    <s-grid gridTemplateColumns="@container (inline-size > 600px) 200px 1fr, 1fr" gap="base" alignItems="end">
+                    <s-query-container><s-grid gridTemplateColumns="@container (inline-size > 600px) 200px 1fr, 1fr" gap="base" alignItems="end">
                         <s-number-field
                             label={t('whatIf.growth')}
                             suffix="%"
@@ -141,8 +141,8 @@ function WhatIfView() {
                                 </s-button>
                             ))}
                         </s-stack>
-                    </s-grid>
-                    <s-grid gridTemplateColumns="@container (inline-size > 600px) 1fr 1fr 1fr 1fr, 1fr 1fr" gap="base">
+                    </s-grid></s-query-container>
+                    <s-query-container><s-grid gridTemplateColumns="@container (inline-size > 600px) 1fr 1fr 1fr 1fr, 1fr 1fr" gap="base">
                         <s-select label={t('whatIf.horizon')} value={String(params.horizon)} onChange={(e) => update({ horizon: Number(e.currentTarget.value) as Horizon })}>
                             {HORIZONS.map((h) => (
                                 <s-option key={h} value={String(h)}>{t(`whatIf.horizons.h${h}`)}</s-option>
@@ -178,7 +178,7 @@ function WhatIfView() {
                                 <s-option key={c} value={c}>{t(`abc.option${c}`)}</s-option>
                             ))}
                         </s-select>)}
-                    </s-grid>
+                    </s-grid></s-query-container>
                 </s-stack>
             </s-section>
 
@@ -187,7 +187,7 @@ function WhatIfView() {
             {data && (
                 <s-section heading={t('whatIf.resultHeading', { growth: signed(data.growth_percent), factor: formatNumber(data.factor, 2) })}>
                     <s-stack gap="base">
-                        <s-grid gridTemplateColumns="@container (inline-size > 600px) 1fr 1fr 1fr 1fr, 1fr 1fr" gap="base">
+                        <s-query-container><s-grid gridTemplateColumns="@container (inline-size > 600px) 1fr 1fr 1fr 1fr, 1fr 1fr" gap="base">
                             <Metric
                                 label={t(`whatIf.productsToOrder.h${data.horizon_days}`)}
                                 now={formatNumber(data.totals.now.products, 0)}
@@ -200,7 +200,7 @@ function WhatIfView() {
                                 now={formatNumber(data.totals.now.stockout_risk, 0)}
                                 scenario={formatNumber(data.totals.scenario.stockout_risk, 0)}
                             />
-                        </s-grid>
+                        </s-grid></s-query-container>
                         <s-text color="subdued">{t('whatIf.legend')}</s-text>
                         <MissingCostNote count={data.totals.scenario.missing_cost} text={t('whatIf.missingCost', { count: data.totals.scenario.missing_cost })} />
                     </s-stack>

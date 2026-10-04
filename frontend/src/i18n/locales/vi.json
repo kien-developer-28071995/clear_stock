@@ -16,7 +16,9 @@
     "daysSuffix": "ngày",
     "saved": "Đã lưu cài đặt",
     "dayCount_other": "{{count}} ngày",
-    "discard": "Hủy thay đổi"
+    "discard": "Hủy thay đổi",
+    "more": "Thêm",
+    "showAll": "Hiện tất cả {{count}}"
   },
   "nav": {
     "transfers": "Chuyển kho",
@@ -354,7 +356,15 @@
     "referencePercent": "Tỷ lệ tốc độ bán",
     "referenceLocked": "Dự báo sản phẩm mới theo một sản phẩm tương tự cho tới khi có lịch sử bán riêng.",
     "supplierSku": "Mã hàng của nhà cung cấp",
-    "supplierSkuHelp": "Không bắt buộc. In trên đơn đặt hàng và email đặt hàng để nhà cung cấp nhận ra sản phẩm."
+    "supplierSkuHelp": "Không bắt buộc. In trên đơn đặt hàng và email đặt hàng để nhà cung cấp nhận ra sản phẩm.",
+    "groups": {
+      "supplier": "Nhà cung cấp và lead time",
+      "orderRules": "Quy tắc đặt hàng",
+      "limits": "Giới hạn tồn kho",
+      "cost": "Giá vốn",
+      "forecast": "Dự báo",
+      "status": "Trạng thái và cảnh báo"
+    }
   },
   "products": {
     "freeLimit_other": "Gói Miễn phí dự báo {{count}} sản phẩm bán chạy nhất.",
@@ -538,7 +548,8 @@
     "choose": "Chọn gói {{plan}}",
     "lockedHint": "Có trong gói {{plan}}",
     "priceLockBadge": "Giữ giá",
-    "priceLock": "Giá lúc bạn đăng ký không bao giờ tăng khi bạn còn dùng gói đó. Nếu chúng tôi tăng giá, bạn vẫn giữ giá cũ."
+    "priceLock": "Giá lúc bạn đăng ký không bao giờ tăng khi bạn còn dùng gói đó. Nếu chúng tôi tăng giá, bạn vẫn giữ giá cũ.",
+    "everythingIn": "Mọi thứ của gói {{plan}}, thêm:"
   },
   "apiErrors": {
     "scope_required": "Clear Stock cần được cấp quyền tạo phiếu chuyển kho trong Shopify. Hãy bấm lại nút và chấp thuận.",

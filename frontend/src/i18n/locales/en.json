@@ -17,7 +17,9 @@
     "saved": "Settings saved",
     "dayCount_one": "{{count}} day",
     "dayCount_other": "{{count}} days",
-    "discard": "Discard"
+    "discard": "Discard",
+    "more": "More",
+    "showAll": "Show all {{count}}"
   },
   "nav": {
     "transfers": "Transfers",
@@ -372,7 +374,15 @@
     "referencePercent": "Share of its sales rate",
     "referenceLocked": "Forecast new products from a similar product until they have their own sales history.",
     "supplierSku": "Supplier's product code",
-    "supplierSkuHelp": "Optional. Printed on purchase orders and order emails so the supplier recognises the product."
+    "supplierSkuHelp": "Optional. Printed on purchase orders and order emails so the supplier recognises the product.",
+    "groups": {
+      "supplier": "Supplier and lead time",
+      "orderRules": "Order rules",
+      "limits": "Stock limits",
+      "cost": "Cost",
+      "forecast": "Forecast",
+      "status": "Status and alerts"
+    }
   },
   "products": {
     "freeLimit_one": "The Free plan forecasts your best seller.",
@@ -566,7 +576,8 @@
     "choose": "Choose {{plan}}",
     "lockedHint": "Included in {{plan}}",
     "priceLockBadge": "Price lock",
-    "priceLock": "The price you subscribe at never goes up while you stay on that plan. If our prices rise, you keep yours."
+    "priceLock": "The price you subscribe at never goes up while you stay on that plan. If our prices rise, you keep yours.",
+    "everythingIn": "Everything in {{plan}}, plus:"
   },
   "apiErrors": {
     "scope_required": "Clear Stock needs permission to create transfers in Shopify. Click the button again and approve it.",

@@ -18,7 +18,9 @@
     "dayCount_one": "{{count}} jour",
     "dayCount_other": "{{count}} jours",
     "dayCount_many": "{{count}} jours",
-    "discard": "Ignorer"
+    "discard": "Ignorer",
+    "more": "Plus",
+    "showAll": "Tout afficher ({{count}})"
   },
   "nav": {
     "transfers": "Transferts",
@@ -390,7 +392,15 @@
     "referencePercent": "Part de son rythme de ventes",
     "referenceLocked": "Prévoyez les nouveaux produits à partir d'un produit similaire jusqu'à ce qu'ils aient leur propre historique de ventes.",
     "supplierSku": "Référence du fournisseur",
-    "supplierSkuHelp": "Facultatif. Figure sur les bons de commande et les e-mails pour que le fournisseur reconnaisse le produit."
+    "supplierSkuHelp": "Facultatif. Figure sur les bons de commande et les e-mails pour que le fournisseur reconnaisse le produit.",
+    "groups": {
+      "supplier": "Fournisseur et délai",
+      "orderRules": "Règles de commande",
+      "limits": "Limites de stock",
+      "cost": "Coût",
+      "forecast": "Prévision",
+      "status": "Statut et alertes"
+    }
   },
   "products": {
     "freeLimit_one": "Le forfait Free établit la prévision de votre meilleure vente.",
@@ -594,7 +604,8 @@
     "choose": "Choisir {{plan}}",
     "lockedHint": "Inclus dans {{plan}}",
     "priceLockBadge": "Prix garanti",
-    "priceLock": "Le prix auquel vous vous abonnez n'augmente jamais tant que vous restez sur ce forfait. Si nos prix augmentent, vous gardez le vôtre."
+    "priceLock": "Le prix auquel vous vous abonnez n'augmente jamais tant que vous restez sur ce forfait. Si nos prix augmentent, vous gardez le vôtre.",
+    "everythingIn": "Tout ce qui est dans {{plan}}, plus :"
   },
   "apiErrors": {
     "scope_required": "Clear Stock a besoin d'une autorisation pour créer des transferts dans Shopify. Cliquez à nouveau sur le bouton et approuvez-la.",

@@ -17,7 +17,9 @@
     "saved": "Einstellungen gespeichert",
     "dayCount_one": "{{count}} Tag",
     "dayCount_other": "{{count}} Tage",
-    "discard": "Verwerfen"
+    "discard": "Verwerfen",
+    "more": "Mehr",
+    "showAll": "Alle {{count}} anzeigen"
   },
   "nav": {
     "transfers": "Umlagerungen",
@@ -372,7 +374,15 @@
     "referencePercent": "Anteil seiner Verkaufsrate",
     "referenceLocked": "Erstelle Prognosen für neue Produkte anhand eines ähnlichen Produkts, bis sie eine eigene Verkaufshistorie haben.",
     "supplierSku": "Artikelnummer des Lieferanten",
-    "supplierSkuHelp": "Optional. Steht auf Bestellungen und Bestell-E-Mails, damit der Lieferant das Produkt erkennt."
+    "supplierSkuHelp": "Optional. Steht auf Bestellungen und Bestell-E-Mails, damit der Lieferant das Produkt erkennt.",
+    "groups": {
+      "supplier": "Lieferant und Lieferzeit",
+      "orderRules": "Bestellregeln",
+      "limits": "Bestandsgrenzen",
+      "cost": "Kosten",
+      "forecast": "Prognose",
+      "status": "Status und Benachrichtigungen"
+    }
   },
   "products": {
     "freeLimit_one": "Der Free-Tarif erstellt eine Prognose für deinen Bestseller.",
@@ -566,7 +576,8 @@
     "choose": "{{plan}} wählen",
     "lockedHint": "In {{plan}} enthalten",
     "priceLockBadge": "Preisgarantie",
-    "priceLock": "Der Preis, zu dem du abonnierst, steigt nie, solange du in diesem Tarif bleibst. Wenn unsere Preise steigen, behältst du deinen."
+    "priceLock": "Der Preis, zu dem du abonnierst, steigt nie, solange du in diesem Tarif bleibst. Wenn unsere Preise steigen, behältst du deinen.",
+    "everythingIn": "Alles aus {{plan}}, plus:"
   },
   "apiErrors": {
     "scope_required": "Clear Stock braucht die Berechtigung, Umlagerungen in Shopify zu erstellen. Klicke erneut auf die Schaltfläche und bestätige sie.",

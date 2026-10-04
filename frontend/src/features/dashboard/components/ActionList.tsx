@@ -30,7 +30,7 @@ function Row({ item, today, checked, onToggle }: { item: ActionItem; today: stri
             <s-grid gridTemplateColumns="auto minmax(0, 1fr)" gap="base" alignItems="center">
                 <s-checkbox label={t('actions.select')} labelAccessibilityVisibility="exclusive" checked={checked || undefined} onChange={onToggle} />
                 {/* Narrow screens: stock and order quantity move under the product name. */}
-                <s-grid gridTemplateColumns="@container (inline-size > 460px) minmax(0, 1fr) auto, 1fr" gap="small-200" alignItems="center">
+                <s-query-container><s-grid gridTemplateColumns="@container (inline-size > 460px) 1fr auto, 1fr" gap="small-200" alignItems="center">
                     <s-stack gap="small-100">
                         <s-link href={`/products/${item.variant_id}`}>{item.name}</s-link>
                         <s-text color="subdued">{item.reason ? translateCode('explanation', item.reason) : t('actions.sellsPerDay', { rate: formatNumber(item.avg_daily_sales, 1) })}</s-text>
@@ -44,7 +44,7 @@ function Row({ item, today, checked, onToggle }: { item: ActionItem; today: stri
                             )}
                         </s-stack>
                     </s-stack>
-                </s-grid>
+                </s-grid></s-query-container>
             </s-grid>
         </s-box>
     );

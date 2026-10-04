@@ -25,7 +25,6 @@ export function ReorderPage() {
     const { t } = useTranslation();
     const [vendor, setVendor] = useState('');
     const purchaseOrders = useFeature('purchase_orders');
-    const budget = useFeature('order_budget');
     // Growth: stock that other locations can send, to move before ordering.
     const transfers = useTransfers(useEntitlements().transfers).data;
     const transferUnits = transfers?.routes.reduce((sum, r) => sum + r.total_units, 0) ?? 0;
@@ -41,23 +40,10 @@ export function ReorderPage() {
                 return (
                     <s-page heading={t('nav.reorder')}><SectionTabs group="reorder" />
                         <s-link slot="breadcrumb-actions" href="/">{t('nav.home')}</s-link>
-                        {budget && (
-                            <s-button slot="secondary-actions" href="/budget">
-                                {t('nav.budget')}
-                            </s-button>
-                        )}
-                        <s-button slot="secondary-actions" href="/orders">
-                            {t('orders.link', { count: orders?.open.length ?? 0 })}
-                        </s-button>
                         {overdue > 0 && (
                             <s-banner tone="warning" heading={t('orders.overdueHeading', { count: overdue })}>
                                 <s-paragraph>{t('orders.overdueBody')}</s-paragraph>
-                                {budget && (
-                            <s-button slot="secondary-actions" href="/budget">
-                                {t('nav.budget')}
-                            </s-button>
-                        )}
-                        <s-button slot="secondary-actions" href="/orders">{t('orders.review')}</s-button>
+                                <s-button slot="secondary-actions" href="/reorder/orders">{t('orders.review')}</s-button>
                             </s-banner>
                         )}
                         <Tip id="home_actions">{t(purchaseOrders ? 'tips.home_actions' : 'tips.home_actions_no_po')}</Tip>
@@ -70,7 +56,7 @@ export function ReorderPage() {
                             </s-banner>
                         )}
                         {vendors.length > 1 && (
-                            <s-box maxInlineSize="320px">
+                            <s-box maxInlineSize="320px" paddingBlockEnd="base">
                                 <s-select label={t('products.vendor')} value={optionValue(vendor)} onChange={(e) => setVendor(fromOption(e.currentTarget.value))}>
                                     <s-option value={NO_VALUE}>{t('products.allVendors')}</s-option>
                                     {vendors.map((v) => (

@@ -16,11 +16,14 @@ const TONE: Record<ManualOrderState, 'info' | 'warning' | 'critical' | 'success'
     cancelled: 'neutral',
 };
 
+const CLOSED_SHOWN = 8;
+
 /** Orders placed outside Shopify: counted as on the way until received, cancelled or overdue. */
 export function ManualOrdersPage() {
     const { t } = useTranslation();
     const { data, error, refetch } = useManualOrders();
     const update = useUpdateManualOrder();
+    const [showClosed, setShowClosed] = useState(false);
     // Partial delivery: the row being edited and the units received so far.
     const [part, setPart] = useState<{ id: number; value: string } | null>(null);
 
@@ -58,9 +61,9 @@ export function ManualOrdersPage() {
                             </s-stack>
                         </s-table-cell>
                         <s-table-cell>
-                            <s-stack gap="small-100">
+                            <s-stack gap="small-100" alignItems="end">
                                 <s-text>{formatNumber(o.quantity, 0)}</s-text>
-                                {o.state !== 'received' && o.received_quantity > 0 && (
+                                {(o.state === 'open' || o.state === 'late' || o.state === 'overdue') && o.received_quantity > 0 && (
                                     <s-text color="subdued">{t('orders.partReceived', { received: formatNumber(o.received_quantity, 0) })}</s-text>
                                 )}
                             </s-stack>
@@ -120,7 +123,16 @@ export function ManualOrdersPage() {
                 <s-section heading={t('orders.openHeading')} padding="none">{table(data.open, true)}</s-section>
             )}
             <ShopifyPurchaseOrders />
-            {data.closed.length > 0 && <s-section heading={t('orders.closedHeading')} padding="none">{table(data.closed, false)}</s-section>}
+            {data.closed.length > 0 && (
+                <s-section heading={t('orders.closedHeading')} padding="none">
+                    {table(showClosed ? data.closed : data.closed.slice(0, CLOSED_SHOWN), false)}
+                    {data.closed.length > CLOSED_SHOWN && !showClosed && (
+                        <s-box padding="base">
+                            <s-button variant="tertiary" onClick={() => setShowClosed(true)}>{t('actions.showMore', { count: data.closed.length - CLOSED_SHOWN })}</s-button>
+                        </s-box>
+                    )}
+                </s-section>
+            )}
         </s-page>
     );
 }

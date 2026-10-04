@@ -62,7 +62,7 @@ export function MarkOrderedModal({ id, modalRef, items, onDone }: Props) {
                 {single && (
                     <s-number-field label={t('orders.quantity')} min={1} value={qty} error={fieldError(create.error, 'items.0.quantity')} onInput={(e) => setQty(e.currentTarget.value)} />
                 )}
-                <s-grid gridTemplateColumns="@container (inline-size > 400px) 1fr 1fr, 1fr" gap="base">
+                <s-query-container><s-grid gridTemplateColumns="@container (inline-size > 400px) 1fr 1fr, 1fr" gap="base">
                     <s-date-field
                         label={t('orders.expected')}
                         details={t('orders.expectedHelp')}
@@ -72,7 +72,7 @@ export function MarkOrderedModal({ id, modalRef, items, onDone }: Props) {
                         onChange={(e) => setExpected(e.currentTarget.value)}
                     />
                     <s-text-field label={t('orders.reference')} placeholder="PO-1024" value={reference} onInput={(e) => setReference(e.currentTarget.value)} />
-                </s-grid>
+                </s-grid></s-query-container>
                 <s-text color="subdued">{t('orders.markHelp')}</s-text>
                 {fieldError(create.error, 'items') && <s-text tone="critical">{fieldError(create.error, 'items')}</s-text>}
             </s-stack>

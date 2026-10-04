@@ -21,7 +21,6 @@ export function HomeHeader({ dashboard }: { dashboard: Dashboard }) {
                 {t(greetingKey())} {now === 0 ? t('home.nothingToday') : t('home.toReorderToday', { count: now })}
             </s-heading>
             <s-stack direction="inline" gap="small-200" alignItems="center">
-                {sync?.status !== 'failed' && sync?.last_synced_at && <s-icon type="check-circle" tone="success" />}
                 <s-text color="subdued">
                     {[
                         sync?.last_synced_at ? t('home.dataSynced', { when: timeAgo(sync.last_synced_at) }) : t('home.notSyncedYet'),

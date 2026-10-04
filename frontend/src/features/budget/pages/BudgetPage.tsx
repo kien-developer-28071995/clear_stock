@@ -57,7 +57,7 @@ function BudgetView() {
             <s-section>
                 <s-stack gap="base">
                     <s-paragraph>{t('budget.intro')}</s-paragraph>
-                    <s-grid gridTemplateColumns="@container (inline-size > 600px) 1fr 1fr 1fr, 1fr" gap="base" alignItems="end">
+                    <s-query-container><s-grid gridTemplateColumns="@container (inline-size > 600px) 1fr 1fr 1fr, 1fr" gap="base" alignItems="start">
                         <s-number-field
                             label={t('budget.monthly')}
                             min={0}
@@ -77,7 +77,7 @@ function BudgetView() {
                             <s-text color="subdued">{t('budget.remaining')}</s-text>
                             <s-heading>{money(data.remaining)}</s-heading>
                         </s-stack>
-                    </s-grid>
+                    </s-grid></s-query-container>
                     <s-text color="subdued">{t('budget.how')}</s-text>
                 </s-stack>
             </s-section>
@@ -86,7 +86,7 @@ function BudgetView() {
                 <s-section><s-paragraph>{t('budget.nothingDue')}</s-paragraph></s-section>
             ) : (
                 <s-section heading={t('budget.dueHeading')} padding="none">
-                    <s-box padding="base">
+                    <s-box padding="none base base">
                         <s-stack gap="small-200">
                             <s-text>
                                 {data.budget === null

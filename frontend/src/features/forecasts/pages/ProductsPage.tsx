@@ -11,7 +11,7 @@ import { useFeature } from '@/hooks/useEntitlements';
 import { SavedViews } from '@/features/forecasts/components/SavedViews';
 import { useIsNarrow } from '@/hooks/useIsNarrow';
 import { AbcBadge } from '@/features/forecasts/components/AbcBadge';
-import { useFacets, useForecastList, useLocations } from '@/features/forecasts/hooks/useForecasts';
+import { useFacets, useForecastList, useLocations, useSavedViews } from '@/features/forecasts/hooks/useForecasts';
 import { TREND_THRESHOLD, type ForecastFilters } from '@/features/forecasts/types';
 import { formatDate, formatNumber } from '@/utils/format';
 import { NO_VALUE, fromOption, optionValue } from '@/utils/select';
@@ -48,6 +48,7 @@ export function ProductsPage() {
     const abc = useFeature('abc');
     const sortOptions = SORT_OPTIONS.filter((o) => abc || o !== 'revenue');
     const narrow = useIsNarrow();
+    const views = useSavedViews();
     // Search, status and sort are always there; the other filters open on demand (or when one is in use).
     const extraActive = [filters.location_id, filters.vendor, filters.product_type, filters.abc, filters.trend].some((v) => v !== '' && v !== undefined);
     const [moreOpen, setMoreOpen] = useState(false);
@@ -95,10 +96,6 @@ export function ProductsPage() {
                     {t('products.freeLimit', { count: limit })} <s-link href="/plans">{t('upgrade.upgrade')}</s-link>
                 </s-banner>
             )}
-            <SavedViews
-                current={Object.fromEntries(params.entries())}
-                onApply={(view) => setParams(view)}
-            />
             <s-section padding="none">
                 <s-table
                     loading={isPending || isFetching || undefined}
@@ -141,6 +138,11 @@ export function ProductsPage() {
                         <s-press-button pressed={showMore || undefined} disabled={extraActive || undefined} onClick={() => setMoreOpen(!moreOpen)}>
                             {t('products.moreFilters')}
                         </s-press-button>
+                        {(showMore || (views.data?.length ?? 0) > 0) && (
+                            <s-grid-item gridColumn="span 4">
+                                <SavedViews current={Object.fromEntries(params.entries())} onApply={(view) => setParams(view)} canSave={showMore} />
+                            </s-grid-item>
+                        )}
                         {showMore && (
                             <s-grid-item gridColumn="span 4">
                                 <s-stack direction="inline" gap="small-200">
@@ -239,7 +241,7 @@ export function ProductsPage() {
                                     </s-table-cell>
                                 )}
                                 <s-table-cell>
-                                    <s-stack gap="small-100">
+                                    <s-stack gap="small-100" alignItems="end">
                                         <s-text>{formatNumber(row.current_stock, 0)}</s-text>
                                         {row.incoming_stock > 0 && (
                                             <s-text color="subdued">{t('product.incomingShort', { qty: formatNumber(row.incoming_stock, 0) })}</s-text>
@@ -248,7 +250,7 @@ export function ProductsPage() {
                                 </s-table-cell>
                                 {!narrow && (
                                 <s-table-cell>
-                                    <s-stack gap="small-100">
+                                    <s-stack gap="small-100" alignItems="end">
                                         <s-text>{formatNumber(row.avg_daily_sales, 2)}</s-text>
                                         {row.trend_percent !== null && Math.abs(row.trend_percent) >= TREND_THRESHOLD && (
                                             <s-text color="subdued">

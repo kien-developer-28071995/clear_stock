@@ -18,7 +18,9 @@
     "dayCount_one": "{{count}} dia",
     "dayCount_other": "{{count}} dias",
     "dayCount_many": "{{count}} dias",
-    "discard": "Descartar"
+    "discard": "Descartar",
+    "more": "Mais",
+    "showAll": "Mostrar todos os {{count}}"
   },
   "nav": {
     "transfers": "Transferências",
@@ -390,7 +392,15 @@
     "referencePercent": "Parcela do ritmo de vendas dele",
     "referenceLocked": "Faça a previsão de produtos novos a partir de um produto semelhante até eles terem histórico de vendas próprio.",
     "supplierSku": "Código do produto no fornecedor",
-    "supplierSkuHelp": "Opcional. Aparece nos pedidos de compra e nos e-mails para o fornecedor reconhecer o produto."
+    "supplierSkuHelp": "Opcional. Aparece nos pedidos de compra e nos e-mails para o fornecedor reconhecer o produto.",
+    "groups": {
+      "supplier": "Fornecedor e prazo",
+      "orderRules": "Regras de pedido",
+      "limits": "Limites de estoque",
+      "cost": "Custo",
+      "forecast": "Previsão",
+      "status": "Status e alertas"
+    }
   },
   "products": {
     "freeLimit_one": "O plano Free faz a previsão do seu produto mais vendido.",
@@ -594,7 +604,8 @@
     "choose": "Escolher {{plan}}",
     "lockedHint": "Incluído no {{plan}}",
     "priceLockBadge": "Preço garantido",
-    "priceLock": "O preço da sua assinatura nunca sobe enquanto você continuar nesse plano. Se nossos preços subirem, você mantém o seu."
+    "priceLock": "O preço da sua assinatura nunca sobe enquanto você continuar nesse plano. Se nossos preços subirem, você mantém o seu.",
+    "everythingIn": "Tudo do {{plan}}, mais:"
   },
   "apiErrors": {
     "scope_required": "O Clear Stock precisa de permissão para criar transferências na Shopify. Clique no botão de novo e aprove.",

@@ -188,7 +188,7 @@ for (const plan of ['free', 'starter', 'growth'] as PlanKey[]) {
             expect(plan12.data.by_week.reduce((sum, w) => sum + w.units, 0)).toBe(plan12.data.totals.units);
             if (plan12.data.totals.orders > 0) {
                 await expect(app.locator('[aria-label="Spend per week"] [role="listitem"]')).toHaveCount(12);
-                await expect(app.locator('s-section[heading="By product"] s-table-body s-table-row')).toHaveCount(plan12.data.items.length);
+                await expect(app.locator('s-section[heading="By product"] s-table-body s-table-row')).toHaveCount(Math.min(plan12.data.items.length, 10)); // the rest sits behind "Show all"
             }
             const plan4 = await api<Plan>(app, '/purchase-plan?weeks=4');
             expect(plan4.data.totals.units).toBeLessThanOrEqual(plan12.data.totals.units);
@@ -211,7 +211,7 @@ for (const plan of ['free', 'starter', 'growth'] as PlanKey[]) {
             await open(app, '/purchase-plan');
             const plan = (await api<Plan>(app, '/purchase-plan')).data;
             expect(plan.calendar.reduce((sum, c) => sum + c.units, 0)).toBe(plan.totals.units);
-            if (plan.calendar.length > 0) await expect(app.locator('s-section[heading="Order calendar"] s-table-body s-table-row')).toHaveCount(plan.calendar.length);
+            if (plan.calendar.length > 0) await expect(app.locator('s-section[heading="Order calendar"] s-table-body s-table-row')).toHaveCount(Math.min(plan.calendar.length, 10));
 
             // Suppliers with order days: every later order falls on one of them.
             const suppliers = (await api<Suppliers>(app, '/suppliers')).data.filter((s) => s.order_weekdays);
@@ -597,6 +597,7 @@ for (const plan of ['free', 'starter', 'growth'] as PlanKey[]) {
         test('a saved view applies its filters with one click', async ({ app }) => {
             type View = { id: number; name: string; filters: Record<string, string> };
             await open(app, '/products?status=reorder_now&sort=name');
+            await app.locator('s-press-button', { hasText: 'More filters' }).click();
             await app.getByRole('textbox', { name: 'View name' }).fill('E2E due by name');
             await app.locator('s-button', { hasText: 'Save view' }).click();
             await expect.poll(async () => (await api<{ data: View[] }>(app, '/views')).data.find((v) => v.name === 'E2E due by name')?.filters).toEqual({ status: 'reorder_now', sort: 'name' });
