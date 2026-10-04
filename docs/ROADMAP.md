@@ -205,6 +205,8 @@ Nguồn lần 6: https://www.shopify.com/editions/spring2026 · https://www.fort
 
 ## Phase tiếp theo: tối ưu UI/UX và hiệu năng (kế hoạch, 2026-10-05)
 
+> **Trạng thái 2026-10-05:** đã làm nhóm trang + tab, sửa lệch chuẩn qua 2 vòng rà ảnh chụp (máy tính + điện thoại), web vitals, tăng tốc và cache kế hoạch nhập, tổng đến hạn theo NCC bằng SQL. Chưa làm: A4/A5 (chunk dùng chung 72 KB, nạp ngôn ngữ dự phòng), A6 prefetch, usage events (#57), lọc field webhook (#58), đọc bulk song song (#59).
+
 Dựa trên: yêu cầu Built for Shopify (bản hiện hành), hướng dẫn thiết kế app của Shopify (layout, onboarding), ảnh chụp 22 màn hình ở `docs/screens/`, và số đo trên store dev (19 sản phẩm, bản dev của Vite, mạng nội bộ).
 
 ### Số đo hiện tại

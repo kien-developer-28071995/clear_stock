@@ -35,7 +35,7 @@ function Row({ item, today, checked, onToggle }: { item: ActionItem; today: stri
                         <s-link href={`/products/${item.variant_id}`}>{item.name}</s-link>
                         <s-text color="subdued">{item.reason ? translateCode('explanation', item.reason) : t('actions.sellsPerDay', { rate: formatNumber(item.avg_daily_sales, 1) })}</s-text>
                     </s-stack>
-                    <s-stack direction="inline" gap="base" alignItems="center">
+                    <s-stack direction="inline" gap="base" alignItems="start">
                         <s-text tone={item.current_stock <= 0 ? 'critical' : undefined}>{stock}</s-text>
                         <s-stack gap="small-100">
                             <s-text type="strong">{t('actions.order', { qty: formatNumber(item.suggested_qty, 0) })}</s-text>
