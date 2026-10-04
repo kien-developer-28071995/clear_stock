@@ -25,6 +25,21 @@ export function useUpdateSettings() {
     });
 }
 
+export function useStockLocations() {
+    return useQuery({ queryKey: ['settings', 'locations'], queryFn: settingsApi.locations });
+}
+
+export function useExcludeLocations() {
+    const qc = useQueryClient();
+    return useMutation({
+        mutationFn: settingsApi.excludeLocations,
+        onSuccess: (data) => {
+            qc.setQueryData(['settings', 'locations'], data);
+            forecastQueries.forEach((queryKey) => qc.invalidateQueries({ queryKey }));
+        },
+    });
+}
+
 export function useSuppliers() {
     return useQuery({ queryKey: settingsKeys.suppliers, queryFn: supplierApi.list });
 }

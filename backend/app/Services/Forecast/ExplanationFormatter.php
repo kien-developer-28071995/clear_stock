@@ -57,6 +57,19 @@ class ExplanationFormatter
             }
         }
 
+        // Forecast profile other than the default, and the recent trend (absent in older explanations)
+        $profile = $e['profile']['name'] ?? 'balanced';
+        if ($e['avg_source'] !== 'override' && $profile !== 'balanced') {
+            $out[] = $this->line('profile_'.$profile.(($e['profile']['source'] ?? 'shop') === 'variant' ? '_product' : ''));
+        }
+        $trend = $e['trend'] ?? null;
+        if ($trend !== null && $trend['direction'] !== 'flat') {
+            $out[] = $this->line('trend_'.$trend['direction'], [
+                'percent' => abs($trend['percent']), 'count' => $trend['recent_days'],
+                'recent' => $this->round($trend['recent_avg']), 'baseline' => $this->round($trend['baseline_avg']), 'days' => $trend['baseline_days'],
+            ]);
+        }
+
         // One-off spikes capped (absent in explanations computed before it existed)
         $spikes = $e['spikes'] ?? null;
         if ($e['avg_source'] !== 'override' && ($spikes['applied'] ?? false)) {
@@ -147,6 +160,10 @@ class ExplanationFormatter
             $incoming = $e['stock']['incoming'] ?? 0; // absent in explanations computed before it existed
             $suggested = $e['reorder']['suggested_qty'];
             $ordered = $e['stock']['ordered'] ?? null; // placed outside Shopify (absent in older explanations)
+            // Oversold (negative stock): those units are already promised to customers.
+            if ($stock < 0 && $suggested > 0) {
+                $out[] = $this->line('backorder_included', ['count' => -$stock]);
+            }
             if ($incoming - ($ordered['units'] ?? 0) > 0) {
                 $out[] = $this->line('incoming_stock', ['count' => $incoming - ($ordered['units'] ?? 0)]);
             }

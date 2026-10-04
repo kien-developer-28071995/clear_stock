@@ -28,6 +28,11 @@ export function ForecastSummary({ f }: { f: ForecastDetail }) {
                     <StatusBadge status={f.status} />
                     <ConfidenceBadge confidence={f.confidence} />
                     {abc && <AbcBadge abc={abc.class} />}
+                    {f.trend && f.trend.direction !== 'flat' && (
+                        <s-badge tone={f.trend.direction === 'up' ? 'success' : 'warning'}>
+                            {t(f.trend.direction === 'up' ? 'trend.badgeUp' : 'trend.badgeDown', { percent: Math.abs(f.trend.percent) })}
+                        </s-badge>
+                    )}
                     {f.overrides.avg_daily_sales && <s-badge tone="info">{t('product.adjustedByYou')}</s-badge>}
                     {f.sku && <s-text color="subdued">{t('product.sku', { sku: f.sku })}</s-text>}
                 </s-stack>
@@ -58,6 +63,16 @@ export function ForecastSummary({ f }: { f: ForecastDetail }) {
                     <Metric label={t('table.supplier')} value={f.supplier?.name ?? t('common.notSet')} />
                 </s-grid>
                 {discontinued && <s-text color="subdued">{t('discontinued.summary')}</s-text>}
+                {/* How the rate moved since the forecast of an earlier week. */}
+                {f.previous && !f.overrides.avg_daily_sales && Math.abs(f.avg_daily_sales - f.previous.avg) >= 0.05 && (
+                    <s-text color="subdued">
+                        {t(f.avg_daily_sales > f.previous.avg ? 'product.rateUp' : 'product.rateDown', {
+                            date: formatDate(f.previous.week_start),
+                            previous: formatNumber(f.previous.avg, 2),
+                            current: formatNumber(f.avg_daily_sales, 2),
+                        })}
+                    </s-text>
+                )}
                 {/* How the forecast of a few weeks ago compared with what really sold. */}
                 {f.accuracy && (
                     <s-text color="subdued">

@@ -6,6 +6,7 @@ use App\Exceptions\ApiException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\BundleRequest;
 use App\Http\Resources\BundleResource;
+use App\Repositories\Contracts\CatalogRepositoryInterface;
 use App\Repositories\Contracts\VariantRepositoryInterface;
 use App\Services\App\BundleService;
 use App\Support\ShopContext;
@@ -18,10 +19,14 @@ class BundleController extends Controller
     public function __construct(
         private readonly BundleService $bundles,
         private readonly VariantRepositoryInterface $variants,
+        private readonly CatalogRepositoryInterface $catalog,
     ) {}
 
     public function index(ShopContext $context): AnonymousResourceCollection
     {
+        // Stock per product, to say how many of each bundle the components on hand make.
+        request()->attributes->set('stock', $this->catalog->stockByVariant($context->shop()));
+
         return BundleResource::collection($this->bundles->list($context->shop()));
     }
 

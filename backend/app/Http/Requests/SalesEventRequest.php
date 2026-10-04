@@ -25,6 +25,8 @@ class SalesEventRequest extends FormRequest
             }],
             // Sales x this on those days: 2 = double, 0.5 = half. 1 would change nothing.
             'multiplier' => ['required', 'numeric', 'min:0.1', 'max:10', 'not_in:1'],
+            // A season: the same dates every year.
+            'repeats_yearly' => ['sometimes', 'boolean'],
             'applies_to' => ['required', Rule::in([SalesEvent::ALL, SalesEvent::SUPPLIER, SalesEvent::PRODUCTS])],
             'supplier_id' => ['required_if:applies_to,supplier', 'nullable', 'integer', Rule::exists('suppliers', 'id')->where('shop_id', $shopId)],
             'variant_ids' => ['required_if:applies_to,products', 'nullable', 'array', 'max:500'],

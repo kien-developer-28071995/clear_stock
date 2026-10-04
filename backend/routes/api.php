@@ -6,19 +6,24 @@ use App\Http\Controllers\Api\BundleController;
 use App\Http\Controllers\Api\ClientErrorController;
 use App\Http\Controllers\Api\CostController;
 use App\Http\Controllers\Api\DashboardController;
+use App\Http\Controllers\Api\DataHealthController;
 use App\Http\Controllers\Api\ForecastAccuracyController;
 use App\Http\Controllers\Api\ForecastController;
 use App\Http\Controllers\Api\GrowthScenarioController;
 use App\Http\Controllers\Api\ImportController;
 use App\Http\Controllers\Api\ManualOrderController;
 use App\Http\Controllers\Api\OnboardingController;
+use App\Http\Controllers\Api\OrderingController;
 use App\Http\Controllers\Api\ProductExtensionController;
 use App\Http\Controllers\Api\PurchaseOrderController;
 use App\Http\Controllers\Api\PurchasePlanController;
 use App\Http\Controllers\Api\SalesEventController;
+use App\Http\Controllers\Api\SavedViewController;
 use App\Http\Controllers\Api\SettingsController;
 use App\Http\Controllers\Api\SetupGuideController;
 use App\Http\Controllers\Api\ShopController;
+use App\Http\Controllers\Api\StockHistoryController;
+use App\Http\Controllers\Api\StockInsightController;
 use App\Http\Controllers\Api\SupplierController;
 use App\Http\Controllers\Api\SupplierEmailController;
 use App\Http\Controllers\Api\SyncController;
@@ -51,10 +56,20 @@ Route::middleware('shopify.session')->group(function () {
     Route::post('/setup-guide/tips', [SetupGuideController::class, 'dismissTip']);
 
     Route::get('/forecasts', [ForecastController::class, 'index']);
+    Route::get('/forecasts/export', [ForecastController::class, 'export']);
     Route::get('/locations', [ForecastController::class, 'locations']);
     Route::get('/facets', [ForecastController::class, 'facets']);
     Route::get('/forecasts/{variant}', [ForecastController::class, 'show'])->whereNumber('variant');
     Route::put('/forecasts/{variant}/overrides', [ForecastController::class, 'updateOverrides'])->whereNumber('variant');
+    Route::put('/forecasts/{variant}/location-minimums', [ForecastController::class, 'updateLocationMinimums'])->whereNumber('variant');
+
+    // Saved product list views; clearance list and broken size runs (Insights).
+    Route::get('/views', [SavedViewController::class, 'index']);
+    Route::post('/views', [SavedViewController::class, 'store'])->middleware('throttle:30,1');
+    Route::delete('/views/{view}', [SavedViewController::class, 'destroy'])->whereNumber('view');
+    Route::get('/clearance', [StockInsightController::class, 'clearance']);
+    Route::get('/clearance/export', [StockInsightController::class, 'clearanceExport']);
+    Route::get('/size-runs', [StockInsightController::class, 'sizeRuns']);
 
     Route::get('/variants', [VariantController::class, 'index']);
     Route::put('/variants/settings', [VariantController::class, 'bulkUpdateSettings']);
@@ -62,6 +77,9 @@ Route::middleware('shopify.session')->group(function () {
 
     Route::get('/settings', [SettingsController::class, 'show']);
     Route::put('/settings', [SettingsController::class, 'update']);
+    // Locations whose stock is not for sale (returns, damaged goods): left out of the forecast's stock.
+    Route::get('/settings/locations', [SettingsController::class, 'locations']);
+    Route::put('/settings/locations', [SettingsController::class, 'updateLocations']);
 
     Route::get('/suppliers', [SupplierController::class, 'index']);
     Route::get('/suppliers/from-vendors', [VendorSupplierController::class, 'show']);
@@ -107,7 +125,16 @@ Route::middleware('shopify.session')->group(function () {
     // Forecast accuracy: past forecasts next to what really sold.
     Route::get('/accuracy', ForecastAccuracyController::class);
 
+    // Inventory units and value at cost, day by day; product data problems.
+    Route::get('/stock-history', StockHistoryController::class);
+    Route::get('/data-health', DataHealthController::class);
+
     Route::get('/purchase-orders/export', [PurchaseOrderController::class, 'export']);
+    // Shopify's own open purchase orders (optional scope), and a product's other suppliers.
+    Route::get('/shopify-purchase-orders', [OrderingController::class, 'shopifyPurchaseOrders'])->middleware('throttle:30,1');
+    Route::get('/variants/{variant}/suppliers', [OrderingController::class, 'suppliers'])->whereNumber('variant');
+    Route::put('/variants/{variant}/suppliers', [OrderingController::class, 'updateSuppliers'])->whereNumber('variant');
+    Route::post('/variants/{variant}/suppliers/{supplier}/main', [OrderingController::class, 'makeMainSupplier'])->whereNumber(['variant', 'supplier']);
 
     // Purchase order CSVs (Stocky and others) -> suppliers, product assignments, lead times.
     Route::post('/imports/purchase-orders/preview', [ImportController::class, 'preview'])->middleware('throttle:30,1');

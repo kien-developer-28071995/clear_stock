@@ -31,7 +31,10 @@ class CachedForecastQueryRepository implements ForecastQueryRepositoryInterface
             return $this->inner->paginate($shop, $filters, $today, $perPage, $page);
         }
 
-        $hash = md5(json_encode([$filters['status'] ?? null, $filters['sort'] ?? null, $filters['location_id'] ?? null, $filters['vendor'] ?? null, $filters['product_type'] ?? null, $filters['abc'] ?? null, $perPage, $page]));
+        // Every filter is part of the key (a new filter can't be forgotten here).
+        $used = array_filter($filters, fn ($v) => $v !== null && $v !== '');
+        ksort($used);
+        $hash = md5(json_encode([$used, $perPage, $page]));
         $key = CacheKeys::forecastPage($shop->id, $this->forecastVersion($shop), CacheVersion::catalog($shop->id), $today, $hash);
 
         return $this->cache->remember($key, CacheKeys::TTL_DASHBOARD, fn () => $this->inner->paginate($shop, $filters, $today, $perPage, $page));
@@ -54,6 +57,11 @@ class CachedForecastQueryRepository implements ForecastQueryRepositoryInterface
             CacheKeys::TTL_CATALOG,
             fn () => $this->inner->activeLocations($shop),
         );
+    }
+
+    public function lowCover(Shop $shop, string $today, int $days): Collection
+    {
+        return $this->inner->lowCover($shop, $today, $days);
     }
 
     public function reorderList(Shop $shop, string $today, ?int $supplierId, ?int $locationId = null, ?array $variantIds = null): Collection
@@ -104,6 +112,21 @@ class CachedForecastQueryRepository implements ForecastQueryRepositoryInterface
     public function discontinuedStock(Shop $shop): array
     {
         return $this->remember($shop, 'any', 'discontinued', fn () => $this->inner->discontinuedStock($shop));
+    }
+
+    public function clearance(Shop $shop, string $today, string $since, int $limit): array
+    {
+        return $this->inner->clearance($shop, $today, $since, $limit);
+    }
+
+    public function variantsByProduct(Shop $shop): array
+    {
+        return $this->inner->variantsByProduct($shop);
+    }
+
+    public function previousSnapshot(Shop $shop, int $variantId, string $weekStart): ?array
+    {
+        return $this->inner->previousSnapshot($shop, $variantId, $weekStart);
     }
 
     public function snapshotWeeks(Shop $shop, string $latestStart, int $limit): array

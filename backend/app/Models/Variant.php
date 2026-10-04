@@ -20,9 +20,11 @@ use Illuminate\Support\Carbon;
  * @property ?string $title
  * @property ?string $sku
  * @property ?string $barcode
+ * @property ?string $supplier_sku the supplier's own code for this product (purchase orders)
  * @property ?string $unit_cost cost used everywhere: cost_override, else Shopify's cost
  * @property ?string $shopify_unit_cost cost in Shopify (from the sync)
  * @property ?string $cost_override cost entered in the app (wins over Shopify's)
+ * @property bool $landed_cost_applied unit_cost includes the supplier's landed cost share
  * @property ?string $price current selling price (shop currency)
  * @property ?string $abc_class A, B or C by share of recent revenue; null without a price
  * @property string $revenue_90d net units sold in the ABC window x current price
@@ -40,6 +42,7 @@ use Illuminate\Support\Carbon;
  * @property ?int $max_stock manual order-up-to level (units)
  * @property bool $alerts_muted no alert email mentions this product
  * @property bool $discontinued no longer reordered: no order suggestions or alerts, outside the Free plan's limit
+ * @property ?string $forecast_profile window mix for this product (null = the shop's)
  * @property ?int $reference_variant_id similar product whose sales rate a new product borrows
  * @property ?int $reference_percent share of the reference's rate (null = 100%)
  * @property bool $is_bundle
@@ -51,8 +54,8 @@ class Variant extends Model
 
     protected $fillable = [
         'shop_id', 'shopify_variant_id', 'shopify_product_id', 'inventory_item_id',
-        'product_title', 'vendor', 'product_type', 'title', 'sku', 'barcode', 'unit_cost', 'shopify_unit_cost', 'cost_override', 'price', 'tracked', 'is_active',
-        'supplier_id', 'lead_time_override', 'safety_days', 'min_order_qty', 'pack_size', 'min_stock', 'max_stock', 'alerts_muted', 'discontinued', 'reference_variant_id', 'reference_percent', 'is_bundle', 'shopify_created_at',
+        'product_title', 'vendor', 'product_type', 'title', 'sku', 'barcode', 'supplier_sku', 'unit_cost', 'shopify_unit_cost', 'cost_override', 'price', 'tracked', 'is_active',
+        'supplier_id', 'lead_time_override', 'safety_days', 'min_order_qty', 'pack_size', 'min_stock', 'max_stock', 'alerts_muted', 'discontinued', 'forecast_profile', 'reference_variant_id', 'reference_percent', 'is_bundle', 'shopify_created_at',
     ];
 
     protected function casts(): array
@@ -64,6 +67,7 @@ class Variant extends Model
             'unit_cost' => 'decimal:4',
             'shopify_unit_cost' => 'decimal:4',
             'cost_override' => 'decimal:4',
+            'landed_cost_applied' => 'boolean',
             'price' => 'decimal:2',
             'revenue_90d' => 'decimal:2',
             'revenue_share' => 'decimal:6',
@@ -82,6 +86,14 @@ class Variant extends Model
             'is_bundle' => 'boolean',
             'shopify_created_at' => 'datetime',
         ];
+    }
+
+    /** What the supplier charges per unit: the cost without the landed cost share (purchase orders). */
+    public function purchaseCost(): ?float
+    {
+        $cost = $this->landed_cost_applied ? ($this->cost_override ?? $this->shopify_unit_cost) : $this->unit_cost;
+
+        return $cost !== null ? (float) $cost : null;
     }
 
     /** Minimum order: the product's own, else its supplier's default (supplier must be loaded). */

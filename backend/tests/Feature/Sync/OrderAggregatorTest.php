@@ -129,3 +129,22 @@ it('never touches other shops', function () {
 
     expect(DailySale::where('variant_id', $other->id)->value('units_sold'))->toBe(5);
 });
+
+it('leaves out orders the merchant excluded by tag or source', function () {
+    $this->shop->update(['excluded_order_tags' => ['Wholesale'], 'excluded_order_sources' => ['pos']]);
+    $file = jsonlFile([
+        order(1, '2026-09-10T15:00:00Z') + ['tags' => ['vip', 'wholesale']],          // tag, any letter case
+        lineItem(1, 101, 50),
+        order(2, '2026-09-10T15:00:00Z') + ['tags' => [], 'sourceName' => 'pos'],
+        lineItem(2, 101, 7),
+        order(3, '2026-09-10T15:00:00Z') + ['tags' => ['vip'], 'sourceName' => 'web'],
+        lineItem(3, 101, 2),
+        order(4, '2026-09-10T15:00:00Z') + ['sourceName' => 'shopify_draft_order'],  // drafts are not excluded here
+        lineItem(4, 101, 1),
+    ]);
+
+    $stats = app(OrderAggregator::class)->import($this->shop->fresh(), $file, '2026-09-01');
+
+    expect(sales($this->a))->toBe(['2026-09-10' => [3, 0]])
+        ->and($stats)->toMatchArray(['orders' => 4, 'excluded_orders' => 2]);
+});

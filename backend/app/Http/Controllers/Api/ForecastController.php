@@ -12,6 +12,7 @@ use App\Http\Resources\ForecastListResource;
 use App\Models\Shop;
 use App\Repositories\Contracts\CatalogRepositoryInterface;
 use App\Repositories\Contracts\VariantRepositoryInterface;
+use App\Services\App\AlternateSupplierService;
 use App\Services\App\ForecastAccuracyService;
 use App\Services\App\ForecastAdjustmentService;
 use App\Services\App\ForecastQueryService;
@@ -20,6 +21,7 @@ use App\Support\Features;
 use App\Support\ShopContext;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ForecastController extends Controller
 {
@@ -29,6 +31,7 @@ class ForecastController extends Controller
         private readonly VariantRepositoryInterface $variants,
         private readonly CatalogRepositoryInterface $catalog,
         private readonly ForecastAccuracyService $accuracy,
+        private readonly AlternateSupplierService $alternates,
     ) {}
 
     public function index(ForecastIndexRequest $request, ShopContext $context): JsonResponse
@@ -37,7 +40,7 @@ class ForecastController extends Controller
         // Resources read the container's base request, not this FormRequest copy.
         request()->attributes->set('today', $this->query->today($shop));
 
-        $filters = $request->safe()->only(['status', 'search', 'sort', 'vendor', 'product_type', 'abc']);
+        $filters = $request->safe()->only(['status', 'search', 'sort', 'vendor', 'product_type', 'abc', 'trend']);
         if (! Features::enabled(Feature::Abc)) {
             unset($filters['abc']); // ABC switched off app-wide: ignore a stale filter / sort in a saved URL
             if (($filters['sort'] ?? null) === 'revenue') {
@@ -61,6 +64,27 @@ class ForecastController extends Controller
                 'total' => $page->total(),
             ],
         ]);
+    }
+
+    /** The product list with the current filters as a CSV file (every plan: it is the merchant's own data). */
+    public function export(ForecastIndexRequest $request, ShopContext $context): StreamedResponse
+    {
+        $shop = $context->shop();
+        $filters = $request->safe()->only(['status', 'search', 'sort', 'vendor', 'product_type', 'abc', 'trend']);
+        if ($request->filled('location_id')) {
+            Entitlements::for($shop)->require(Feature::Locations);
+            $filters['location_id'] = (int) $request->validated('location_id');
+        }
+        $rows = $this->query->exportRows($shop, $filters);
+
+        return response()->streamDownload(function () use ($rows) {
+            $out = fopen('php://output', 'w');
+            fwrite($out, "\xEF\xBB\xBF"); // UTF-8 BOM so Excel opens accents correctly
+            foreach ($rows as $row) {
+                fputcsv($out, $row, escape: '');
+            }
+            fclose($out);
+        }, 'products-'.$this->query->today($shop).'.csv', ['Content-Type' => 'text/csv; charset=UTF-8']);
     }
 
     /** Vendors and product types of tracked products, for the list filters. */
@@ -92,6 +116,20 @@ class ForecastController extends Controller
         return $this->detail($request, $shop, $variant);
     }
 
+    public function updateLocationMinimums(Request $request, ShopContext $context, int $variant): JsonResponse
+    {
+        $shop = $context->shop();
+        $model = $this->variants->find($shop, $variant) ?? throw ApiException::notFound('product');
+        $data = $request->validate([
+            'minimums' => ['required', 'array', 'max:200'],
+            'minimums.*.location_id' => ['required', 'integer'],
+            'minimums.*.min_stock' => ['present', 'nullable', 'integer', 'min:0', 'max:1000000'],
+        ]);
+        $this->adjust->setLocationMinimums($shop, $model, $data['minimums']);
+
+        return $this->detail($request, $shop, $variant);
+    }
+
     private function detail(Request $request, Shop $shop, int $variantId): JsonResponse
     {
         $forecast = $this->query->detail($shop, $variantId) ?? throw ApiException::notFound('forecast');
@@ -101,10 +139,13 @@ class ForecastController extends Controller
         $request->attributes->set('shop_defaults', [
             'lead_time_days' => $shop->default_lead_time_days,
             'safety_days' => $shop->default_safety_days,
+            'forecast_profile' => $shop->forecast_profile,
         ]);
         $entitlements = Entitlements::for($shop);
         $request->attributes->set('explanations', $entitlements->has(Feature::Explanations));
         $request->attributes->set('accuracy', $this->accuracy->forVariant($shop, $variantId));
+        $request->attributes->set('alternate_suppliers', $this->alternates->list($shop, $variantId));
+        $request->attributes->set('previous', $this->accuracy->previousWeek($shop, $variantId));
         $request->attributes->set('by_location', $entitlements->has(Feature::Locations)
             ? $this->query->byLocation($shop, $variantId)
             : null);

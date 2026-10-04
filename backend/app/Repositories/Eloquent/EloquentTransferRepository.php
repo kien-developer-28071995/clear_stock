@@ -17,7 +17,7 @@ class EloquentTransferRepository implements TransferRepositoryInterface
             ->join('locations', 'locations.id', '=', 'forecasts.location_id')
             ->where('forecasts.shop_id', $shop->id)
             ->whereNotNull('forecasts.location_id')
-            ->where('locations.is_active', true)
+            ->where('locations.is_active', true)->where('locations.excluded', false)
             ->where('variants.tracked', true)
             ->where('variants.is_active', true)
             ->whereNotNull('variants.inventory_item_id')

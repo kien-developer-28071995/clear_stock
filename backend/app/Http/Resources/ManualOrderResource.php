@@ -18,6 +18,7 @@ class ManualOrderResource extends JsonResource
             'sku' => $this->variant?->sku,
             'supplier' => $this->supplier?->name,
             'quantity' => $this->quantity,
+            'received_quantity' => $this->received_quantity,
             'ordered_on' => $this->ordered_on->toDateString(),
             'expected_on' => $this->expected_on->toDateString(),
             'reference' => $this->reference,

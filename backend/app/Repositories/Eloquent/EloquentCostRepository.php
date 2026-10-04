@@ -42,11 +42,32 @@ class EloquentCostRepository implements CostRepositoryInterface
             DB::table('variants')->where('shop_id', $shop->id)->whereIn('id', array_keys($costs))
                 ->update(['unit_cost' => DB::raw('COALESCE(cost_override, shopify_unit_cost)')]);
         });
+        $this->applyLandedCosts($shop);
         // Money figures (stock value, plan spend) are cached per forecast and catalog version.
         CacheVersion::bump(CacheKeys::forecastVersion($shop->id));
         CacheVersion::bumpCatalog($shop->id);
 
         return $updated;
+    }
+
+    public function applyLandedCosts(Shop $shop): void
+    {
+        $base = 'COALESCE(cost_override, shopify_unit_cost)';
+        $withShare = fn () => DB::table('suppliers')->where('shop_id', $shop->id)->whereNotNull('landed_cost_percent')->select('id');
+        if (! $withShare()->exists() && ! DB::table('variants')->where('shop_id', $shop->id)->where('landed_cost_applied', true)->exists()) {
+            return; // nothing uses it: no write, no cache bump
+        }
+
+        // Correlated subquery rather than UPDATE ... JOIN: works on MySQL and SQLite (tests) alike.
+        DB::table('variants')->where('shop_id', $shop->id)->whereIn('supplier_id', $withShare())->whereRaw("{$base} IS NOT NULL")
+            ->update([
+                'unit_cost' => DB::raw("ROUND({$base} * (1 + (SELECT landed_cost_percent FROM suppliers WHERE suppliers.id = variants.supplier_id) / 100.0), 4)"),
+                'landed_cost_applied' => true,
+            ]);
+        DB::table('variants')->where('shop_id', $shop->id)->where('landed_cost_applied', true)
+            ->where(fn ($q) => $q->whereNull('supplier_id')->orWhereNotIn('supplier_id', $withShare()))
+            ->update(['unit_cost' => DB::raw($base), 'landed_cost_applied' => false]);
+        CacheVersion::bumpCatalog($shop->id);
     }
 
     public function idsBySkuAndBarcode(Shop $shop): array

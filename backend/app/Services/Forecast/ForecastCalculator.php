@@ -19,6 +19,7 @@ use Carbon\CarbonImmutable;
  *  5. Reorder point = average x (lead time + safety days).
  *     Suggested qty = average x (lead time + safety days + order cycle) - stock.
  *  6. Lost sales: the average x out-of-stock days of the last 30 days.
+ *     The windows and weights come from the product's forecast profile (balanced, recent, steady).
  *  7. Discontinued products (merchant no longer reorders them) keep the sell-through numbers
  *     (days of cover, stock-out date) but get no reorder point, order or overstock.
  */
@@ -40,7 +41,8 @@ class ForecastCalculator
 
         // --- 2. Windowed averages -------------------------------------------------
         $windows = [];
-        foreach ($this->config['windows'] as $days => $cfg) {
+        $profile = ($this->config['profiles'][$in->profile] ?? null) !== null ? $in->profile : 'balanced';
+        foreach ($this->config['profiles'][$profile] ?? $this->config['windows'] as $days => $cfg) {
             $windows[] = $this->window($series, $end, (int) $days, $cfg);
         }
         $usable = array_filter($windows, fn ($w) => $w['avg'] !== null);
@@ -51,6 +53,8 @@ class ForecastCalculator
             $baseAvg += $w['avg'] !== null ? $w['avg'] * ($w['weight'] / $weightSum) : 0;
         }
         unset($w);
+
+        $trend = $this->trend($series, $end);
 
         // --- 3. Seasonality ---------------------------------------------------------
         $seasonality = $this->seasonality($series, $in, $end);
@@ -108,6 +112,8 @@ class ForecastCalculator
                 'avg' => $w['avg'] !== null ? round($w['avg'], 2) : null,
                 'weight' => $w['weight_applied'],
             ], $windows),
+            'profile' => ['name' => $profile, 'source' => $in->profileSource],
+            'trend' => $trend,
             'spikes' => $spikes,
             // Sales events: past event days counted at their normal level; upcoming ones added to the orders.
             'events' => ['past' => $pastEvents, 'upcoming' => $plan['events']],
@@ -172,6 +178,7 @@ class ForecastCalculator
             targetStock: $targetStock,
             excessUnits: $excess,
             lostUnits30d: $lostUnits,
+            trendPercent: $trend['percent'] ?? null,
             confidence: Confidence::from($confidence['level']),
             explanation: $explanation,
         );
@@ -501,6 +508,43 @@ class ForecastCalculator
         $out['days'] = array_slice($out['days'], 0, 5);
 
         return $out;
+    }
+
+    /**
+     * Recent sales rate vs the weeks before (in-stock days only, spikes already capped).
+     * Null when there is too little to compare.
+     *
+     * @return ?array{direction: string, percent: int, recent_avg: float, baseline_avg: float, recent_days: int, baseline_days: int}
+     */
+    private function trend(array $series, CarbonImmutable $end): ?array
+    {
+        $cfg = $this->config['trend'] ?? null;
+        if ($cfg === null) {
+            return null;
+        }
+        $recentFrom = $end->subDays((int) $cfg['recent_days'] - 1);
+        $recent = $this->period($series, $recentFrom, $end);
+        $baseline = $this->period($series, $recentFrom->subDays((int) $cfg['baseline_days']), $recentFrom->subDay());
+        if ($recent['in_stock'] < $cfg['min_recent_in_stock_days'] || $baseline['in_stock'] < $cfg['min_baseline_in_stock_days']
+            || $baseline['units'] < $cfg['min_baseline_units'] || $baseline['avg'] <= 0) {
+            return null;
+        }
+
+        $change = $recent['avg'] / $baseline['avg'] - 1;
+        $percent = (int) max(-100, min((int) $cfg['max_percent'], round($change * 100)));
+
+        return [
+            'direction' => match (true) {
+                $change >= $cfg['threshold'] => 'up',
+                $change <= -$cfg['threshold'] => 'down',
+                default => 'flat',
+            },
+            'percent' => $percent,
+            'recent_avg' => round($recent['avg'], 2),
+            'baseline_avg' => round($baseline['avg'], 2),
+            'recent_days' => (int) $cfg['recent_days'],
+            'baseline_days' => (int) $cfg['baseline_days'],
+        ];
     }
 
     private function window(array $series, CarbonImmutable $end, int $days, array $cfg): array

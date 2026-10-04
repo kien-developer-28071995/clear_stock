@@ -180,6 +180,22 @@
         "ordered_manual": {
             "one": "Du hast {{count}} Stück als bestellt markiert (erwartet am {{expected_date}}): zählt als unterwegs.",
             "other": "Du hast {{count}} Stück als bestellt markiert (erwartet am {{expected_date}}): zählt als unterwegs."
+        },
+        "profile_recent": "Shop-Einstellung „Aktuellen Verkäufen folgen\": Die letzten 7 Tage zählen am meisten.",
+        "profile_recent_product": "Dieses Produkt folgt den aktuellen Verkäufen: Die letzten 7 Tage zählen am meisten.",
+        "profile_steady": "Shop-Einstellung „Stabil\": Die Rate wird über bis zu ein Jahr gemittelt.",
+        "profile_steady_product": "Dieses Produkt steht auf „Stabil\": Die Rate wird über bis zu ein Jahr gemittelt.",
+        "trend_up": {
+            "one": "Verkauft sich am letzten Tag {{percent}} % schneller ({{recent}}/Tag) als in den {{days}} Tagen davor ({{baseline}}/Tag).",
+            "other": "Verkauft sich in den letzten {{count}} Tagen {{percent}} % schneller ({{recent}}/Tag) als in den {{days}} Tagen davor ({{baseline}}/Tag)."
+        },
+        "trend_down": {
+            "one": "Verkauft sich am letzten Tag {{percent}} % langsamer ({{recent}}/Tag) als in den {{days}} Tagen davor ({{baseline}}/Tag).",
+            "other": "Verkauft sich in den letzten {{count}} Tagen {{percent}} % langsamer ({{recent}}/Tag) als in den {{days}} Tagen davor ({{baseline}}/Tag)."
+        },
+        "backorder_included": {
+            "one": "{{count}} Stück ist bereits im Rückstand verkauft (Bestand unter null) und in der Bestellung enthalten.",
+            "other": "{{count}} Stück sind bereits im Rückstand verkauft (Bestand unter null) und in der Bestellung enthalten."
         }
     },
     "ordered": "{{qty}} als bestellt markiert"

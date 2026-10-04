@@ -30,5 +30,12 @@ interface ManualOrderRepositoryInterface
     public function leadTimes(Shop $shop, array $variantIds): array;
 
     /** @return array{orders: int, cost: float, missing_cost: int} not cancelled, ordered on or after $fromDate, at current unit cost */
+    /**
+     * Days from order to delivery of received orders, per supplier, ordered since $fromDate.
+     *
+     * @return array<int, array<int, int>> supplier id => days of each order
+     */
+    public function deliveryDays(Shop $shop, string $fromDate): array;
+
     public function spentSince(Shop $shop, string $fromDate): array;
 }

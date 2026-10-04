@@ -16,7 +16,7 @@ class EloquentSalesEventRepository implements SalesEventRepositoryInterface
 
     public function endingFrom(Shop $shop, string $fromDate): Collection
     {
-        return SalesEvent::query()->forShop($shop)->where('ends_on', '>=', $fromDate)->orderBy('starts_on')->orderBy('id')->get();
+        return SalesEvent::query()->forShop($shop)->where(fn ($q) => $q->where('ends_on', '>=', $fromDate)->orWhere('repeats_yearly', true))->orderBy('starts_on')->orderBy('id')->get();
     }
 
     public function find(Shop $shop, int $id): ?SalesEvent

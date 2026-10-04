@@ -71,6 +71,7 @@ export function SalesEventsPage() {
                                         <s-stack direction="inline" gap="small-200" alignItems="center">
                                             <s-text type="strong">{e.name}</s-text>
                                             <s-badge tone={status(e) === 'now' ? 'info' : status(e) === 'past' ? 'neutral' : 'success'}>{t(`events.status.${status(e)}`)}</s-badge>
+                                            {e.repeats_yearly && <s-badge tone="info">{t('events.yearly')}</s-badge>}
                                         </s-stack>
                                     </s-table-cell>
                                     <s-table-cell>{`${formatDate(e.starts_on)} – ${formatDate(e.ends_on)}`}</s-table-cell>

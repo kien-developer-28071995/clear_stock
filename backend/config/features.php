@@ -27,8 +27,13 @@ return [
     'accuracy' => (bool) env('FEATURE_ACCURACY', true),               // past forecasts vs what really sold
     'sales_events' => (bool) env('FEATURE_SALES_EVENTS', true),       // promotions raising/lowering demand on set days
 
+    // Reports
+    'weekly_summary' => (bool) env('FEATURE_WEEKLY_SUMMARY', true),   // one summary email a week (every plan, opt-in)
+
     // Ordering
     'purchase_orders' => (bool) env('FEATURE_PURCHASE_ORDERS', true),   // PO export (CSV)
+    // Shopify's own purchase orders, read-only (needs the optional scope read_inventory_purchase_orders in shopify.app.toml).
+    'shopify_purchase_orders' => (bool) env('FEATURE_SHOPIFY_PURCHASE_ORDERS', true),
     'supplier_emails' => (bool) env('FEATURE_SUPPLIER_EMAILS', true),   // emailing orders to suppliers (by hand + automatic)
 
     // Multi-location (Growth). Transfers need locations.

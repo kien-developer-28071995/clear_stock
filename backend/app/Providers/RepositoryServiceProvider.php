@@ -17,6 +17,7 @@ use App\Repositories\Contracts\DailySalesRepositoryInterface;
 use App\Repositories\Contracts\FlowRepositoryInterface;
 use App\Repositories\Contracts\ForecastQueryRepositoryInterface;
 use App\Repositories\Contracts\ForecastRepositoryInterface;
+use App\Repositories\Contracts\InventorySnapshotRepositoryInterface;
 use App\Repositories\Contracts\LocationSalesRepositoryInterface;
 use App\Repositories\Contracts\ManualOrderRepositoryInterface;
 use App\Repositories\Contracts\RealtimeAlertRepositoryInterface;
@@ -35,6 +36,7 @@ use App\Repositories\Eloquent\EloquentDailySalesRepository;
 use App\Repositories\Eloquent\EloquentFlowRepository;
 use App\Repositories\Eloquent\EloquentForecastQueryRepository;
 use App\Repositories\Eloquent\EloquentForecastRepository;
+use App\Repositories\Eloquent\EloquentInventorySnapshotRepository;
 use App\Repositories\Eloquent\EloquentLocationSalesRepository;
 use App\Repositories\Eloquent\EloquentManualOrderRepository;
 use App\Repositories\Eloquent\EloquentRealtimeAlertRepository;
@@ -86,6 +88,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->singleton(ManualOrderRepositoryInterface::class, EloquentManualOrderRepository::class);
         $this->app->singleton(CostRepositoryInterface::class, EloquentCostRepository::class);
         $this->app->singleton(RealtimeAlertRepositoryInterface::class, EloquentRealtimeAlertRepository::class);
+        $this->app->singleton(InventorySnapshotRepositoryInterface::class, EloquentInventorySnapshotRepository::class);
 
         $this->app->singleton(ForecastQueryRepositoryInterface::class, fn ($app) => new CachedForecastQueryRepository(
             new EloquentForecastQueryRepository,

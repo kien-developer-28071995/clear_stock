@@ -32,6 +32,10 @@ export interface Entitlements {
     sales_events: boolean;
     /** Monthly purchasing budget and priorities (Starter and up). */
     order_budget: boolean;
+    /** One summary email a week (every plan, opt-in). */
+    weekly_summary: boolean;
+    /** Shopify's own open purchase orders shown in the app (Starter). */
+    shopify_purchase_orders: boolean;
     /** App-wide switches (backend config/features.php): off = hide, don't upsell. */
     features: FeatureSwitches;
 }
@@ -46,6 +50,8 @@ export type FeatureSwitch =
     | 'accuracy'
     | 'sales_events'
     | 'order_budget'
+    | 'weekly_summary'
+    | 'shopify_purchase_orders'
     | 'purchase_orders'
     | 'supplier_emails'
     | 'locations'

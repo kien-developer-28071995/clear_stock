@@ -73,3 +73,27 @@ it('is ignored when switched off app-wide', function () {
     expect(Forecast::where('variant_id', $this->mug->id)->value('reorder_point'))->toBe(84);
     $this->getJson('/api/sales-events', $this->auth)->assertNotFound()->assertJsonPath('code', 'feature_disabled');
 });
+
+it('applies a yearly season on the same dates every year, past and upcoming', function () {
+    // Entered last year for Sep 25 – 29: this year's occurrence is ahead, last year's is in the history.
+    $this->postJson('/api/sales-events', eventBody(['name' => 'Autumn peak', 'starts_on' => '2025-09-25', 'ends_on' => '2025-09-29', 'repeats_yearly' => true]), $this->auth)
+        ->assertCreated()->assertJsonPath('data.repeats_yearly', true);
+    app(ForecastService::class)->runForShop($this->shop);
+
+    $events = Forecast::where('variant_id', $this->mug->id)->first()->explanation['events'];
+    expect(array_column($events['upcoming'], 'from'))->toBe(['2026-09-25'])
+        ->and($events['upcoming'][0])->toMatchArray(['name' => 'Autumn peak', 'to' => '2026-09-29', 'multiplier' => 2.0, 'units_order' => 20.0]);
+
+    // Without the yearly repeat the old event is over: nothing ahead.
+    SalesEvent::query()->update(['repeats_yearly' => false]);
+    app(ForecastService::class)->runForShop($this->shop);
+    expect(Forecast::where('variant_id', $this->mug->id)->first()->explanation['events']['upcoming'])->toBe([]);
+});
+
+it('expands a season into the occurrences inside a window', function () {
+    $season = new SalesEvent(['name' => 'Holidays', 'starts_on' => '2024-12-20', 'ends_on' => '2025-01-05', 'multiplier' => 3, 'repeats_yearly' => true]);
+
+    expect(array_column($season->occurrences('2025-08-01', '2027-10-01'), 'from'))->toBe(['2025-12-20', '2026-12-20'])
+        ->and(array_column($season->occurrences('2026-01-01', '2026-01-03'), 'to'))->toBe(['2026-01-05'])      // spans New Year
+        ->and($season->fill(['repeats_yearly' => false])->occurrences('2026-01-01', '2026-12-31'))->toHaveCount(1);
+});

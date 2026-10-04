@@ -71,7 +71,7 @@ class SupplierEmailService
         foreach ($items as $item) {
             $v = $variants[$item['variant_id']] ?? null;
             if ($v !== null && $item['quantity'] > 0) {
-                $lines[] = ['variant_id' => $v->id, 'sku' => $v->sku, 'name' => $v->displayName(), 'quantity' => (int) $item['quantity']];
+                $lines[] = ['variant_id' => $v->id, 'sku' => $v->sku, 'supplier_sku' => $v->supplier_sku, 'name' => $v->displayName(), 'quantity' => (int) $item['quantity']];
             }
         }
         if ($lines === []) {
@@ -150,6 +150,7 @@ class SupplierEmailService
                 'variant_id' => $f->variant_id,
                 'name' => $f->variant->displayName(),
                 'sku' => $f->variant->sku,
+                'supplier_sku' => $f->variant->supplier_sku,
                 'quantity' => $f->suggested_qty,
             ])->values()->all();
     }

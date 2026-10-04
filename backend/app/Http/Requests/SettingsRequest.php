@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use App\Enums\AlertFrequency;
 use App\Enums\RealtimeAlertMode;
+use App\Services\Sync\OrderSource;
 use App\Support\Locales;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -17,6 +18,12 @@ class SettingsRequest extends FormRequest
             'default_safety_days' => ['sometimes', 'integer', 'min:0', 'max:365'],
             // null = switched off app-wide (the settings page sends back what it got)
             'filter_sales_spikes' => ['sometimes', 'nullable', 'boolean'],
+            'forecast_profile' => ['sometimes', Rule::in(array_keys(config('forecast.profiles')))],
+            // Orders left out of the sales the forecast learns from (changing them re-reads the order history).
+            'excluded_order_tags' => ['sometimes', 'array', 'max:20'],
+            'excluded_order_tags.*' => ['string', 'max:255'],
+            'excluded_order_sources' => ['sometimes', 'array'],
+            'excluded_order_sources.*' => [Rule::in(OrderSource::EXCLUDABLE)],
             // null = follow the Shopify admin language
             'locale' => ['sometimes', 'nullable', Rule::in(Locales::supported())],
             'alerts' => ['sometimes', 'array'],
@@ -25,6 +32,12 @@ class SettingsRequest extends FormRequest
             'alerts.frequency' => ['sometimes', Rule::enum(AlertFrequency::class)],
             'alerts.weekly_day' => ['sometimes', 'integer', 'between:1,7'],
             'alerts.realtime' => ['sometimes', Rule::enum(RealtimeAlertMode::class)],
+            // One summary email a week (every plan).
+            'alerts.weekly_summary' => ['sometimes', 'boolean'],
+            // Slack incoming webhook: only Slack's own host (never an arbitrary URL the server would call).
+            'alerts.slack_webhook_url' => ['sometimes', 'nullable', 'string', 'max:255', 'regex:#^https://hooks\.slack\.com/services/[A-Za-z0-9/_-]+$#'],
+            // Also alert at this many days of stock left or fewer.
+            'alerts.cover_days' => ['sometimes', 'nullable', 'integer', 'min:1', 'max:365'],
         ];
     }
 }

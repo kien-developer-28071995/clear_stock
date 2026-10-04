@@ -1,6 +1,6 @@
 # Clear Stock: danh sách tính năng và gói
 
-Cập nhật: 2026-09-27. Nguồn: `backend/config/billing.php` (gói nào có gì), `backend/config/features.php` (công tắc bật/tắt toàn app) và `backend/.env.production.example` (bản v1 nộp App Store).
+Cập nhật: 2026-10-04. Nguồn: `backend/config/billing.php` (gói nào có gì), `backend/config/features.php` (công tắc bật/tắt toàn app) và `backend/.env.production.example` (bản v1 nộp App Store).
 
 ## Gói và giá
 
@@ -57,6 +57,28 @@ Ký hiệu: ✅ có · — không có. Cột **Công tắc** là biến `FEATURE
 | **Lịch đặt hàng** | Trong Kế hoạch nhập: ngày × NCC | — | ✅ | ✅ | `FEATURE_PURCHASE_PLAN` | Bật |
 | **Xuất CSV kế hoạch nhập** | Mỗi dòng một lần đặt (cần cả quyền xuất PO) | — | ✅ | ✅ | `FEATURE_PURCHASE_PLAN` + `FEATURE_PURCHASE_ORDERS` | Bật |
 | **Ngân sách nhập hàng** | Ngân sách tháng, xếp hạng việc cần nhập, phần vượt thì chờ; kế hoạch nhập so theo tháng | — | ✅ | ✅ | `FEATURE_ORDER_BUDGET` | Bật |
+| Hồ sơ dự báo | Chọn cách lấy trung bình cho cả shop hoặc từng sản phẩm: Cân bằng (7/30/90), Theo doanh số gần đây, Ổn định (tới 365 ngày) | ✅ | ✅ | ✅ | — | Bật |
+| Xu hướng bán | 14 ngày gần đây so với 42 ngày trước; nhãn ↑/↓, bộ lọc ở danh sách, dòng giải thích | ✅ | ✅ | ✅ | — | Bật |
+| Email tóm tắt hằng tuần | 1 email/tuần (bật tay): cần đặt gì, hết hàng, tiền kẹt, doanh thu mất, giá trị tồn | ✅ | ✅ | ✅ | `FEATURE_WEEKLY_SUMMARY` | Bật |
+| Cảnh báo qua Slack + ngưỡng ngày tồn | Digest gửi thêm vào kênh Slack; cảnh báo khi còn dưới N ngày tồn | — | ✅ | ✅ | — (theo Cảnh báo email) | Bật |
+| Lịch sử giá trị tồn kho | Ghi mỗi ngày (số cái + giá trị theo giá vốn), biểu đồ ở Phân tích, giữ 2 năm | ✅ | ✅ | ✅ | — | Bật |
+| Kiểm tra dữ liệu | Tồn âm, không theo dõi tồn, thiếu giá vốn/SKU/giá/NCC, SKU trùng, lead time mặc định | ✅ | ✅ | ✅ | — | Bật |
+| Nhận hàng từng phần | Đơn đã đặt: nhập số đã nhận, phần còn lại vẫn tính là đang về | ✅ | ✅ | ✅ | — | Bật |
+| Lead time thực tế theo NCC | Trung vị số ngày từ đặt tới nhận (≥ 3 đơn), một bấm để áp dụng | ✅ | ✅ | ✅ | — | Bật |
+| Mã hàng của NCC | Lưu theo sản phẩm, in trên PO (cột Supplier SKU của Shopify) và email đặt hàng | ✅ | ✅ | ✅ | — | Bật |
+| Loại chi nhánh khỏi tồn | Kho hàng trả/hàng lỗi/showroom không tính vào tồn dự báo | ✅ | ✅ | ✅ | — | Bật |
+| Xuất danh sách sản phẩm (CSV) | Toàn bộ danh sách theo bộ lọc đang chọn | ✅ | ✅ | ✅ | — | Bật |
+| Landed cost theo NCC | % phí vận chuyển/thuế cộng vào giá vốn ở mọi con số tiền; PO vẫn dùng giá NCC | ✅ | ✅ | ✅ | — | Bật |
+| Giá trị đơn tối thiểu theo NCC | Trang Nhà cung cấp hiện lượng cần đặt và cảnh báo khi dưới mức tối thiểu | ✅ | ✅ | ✅ | — | Bật |
+| Nhà cung cấp khác (dự phòng) | Mỗi sản phẩm tới 5 NCC phụ với giá, lead time, mã riêng; một bấm để đổi NCC chính | ✅ | ✅ | ✅ | — | Bật |
+| Mùa vụ lặp lại hằng năm | Sự kiện bán hàng có thể lặp lại cùng ngày mỗi năm | ✅ | ✅ | ✅ | `FEATURE_SALES_EVENTS` | Bật |
+| Loại đơn khỏi dự báo | Theo tag đơn hàng (sỉ), đơn POS, đơn nháp; đổi cài đặt sẽ đồng bộ lại toàn bộ lịch sử | ✅ | ✅ | ✅ | — | Bật |
+| Chế độ xem đã lưu | Lưu bộ lọc danh sách sản phẩm dưới một tên (tối đa 20) | ✅ | ✅ | ✅ | — | Bật |
+| Hàng nên xả | Hàng chậm + tồn thừa kèm tỷ lệ bán hết 90 ngày và lần bán cuối; xuất CSV | ✅ | ✅ | ✅ | — | Bật |
+| Sản phẩm lệch size | Biến thể bán chạy thiếu hàng trong khi biến thể khác tồn nhiều | ✅ | ✅ | ✅ | — | Bật |
+| Số combo làm được | Từ tồn của thành phần, kèm thành phần hết trước | — | ✅ | ✅ | — | Bật |
+| Tồn tối thiểu theo chi nhánh | Điểm đặt lại riêng cho từng chi nhánh | — | — | ✅ | `FEATURE_LOCATIONS` | Tắt |
+| Đơn đặt hàng Shopify | Hiện PO gốc Shopify đang ở trạng thái đã đặt (chỉ đọc, scope tuỳ chọn) | — | ✅ | ✅ | `FEATURE_SHOPIFY_PURCHASE_ORDERS` | Tắt |
 | Mô phỏng tăng trưởng (what-if) | "+20% doanh số thì cần đặt gì" | — | ✅ | ✅ | `FEATURE_WHAT_IF` | Bật |
 | **Xuất CSV kịch bản what-if** | Đơn theo kịch bản (cần quyền xuất PO) | — | ✅ | ✅ | `FEATURE_WHAT_IF` + `FEATURE_PURCHASE_ORDERS` | Bật |
 

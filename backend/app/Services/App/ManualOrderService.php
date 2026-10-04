@@ -73,11 +73,21 @@ class ManualOrderService
         return $this->orders->find($shop, $id);
     }
 
-    /** @param array{status?: string, expected_on?: string, quantity?: int} $data */
+    /** @param array{status?: string, expected_on?: string, quantity?: int, received_quantity?: int} $data */
     public function update(Shop $shop, ManualOrder $order, array $data): ManualOrder
     {
+        // A partial delivery keeps the order open for the rest; the last units receive it.
+        if (isset($data['received_quantity']) && ! isset($data['status']) && $order->status === ManualOrder::OPEN) {
+            $data['received_quantity'] = min((int) $data['received_quantity'], (int) ($data['quantity'] ?? $order->quantity));
+            if ($data['received_quantity'] >= (int) ($data['quantity'] ?? $order->quantity)) {
+                $data['status'] = ManualOrder::RECEIVED;
+            }
+        }
         if (isset($data['status'])) {
             $data['closed_at'] = $data['status'] === ManualOrder::OPEN ? null : now();
+            if ($data['status'] === ManualOrder::RECEIVED) {
+                $data['received_quantity'] = (int) ($data['quantity'] ?? $order->quantity);
+            }
         }
         $order = $this->orders->update($order, $data);
         $this->recompute($shop, [$order->variant_id]);

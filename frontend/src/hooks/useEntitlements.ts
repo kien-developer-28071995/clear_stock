@@ -24,6 +24,8 @@ const NONE: Entitlements = {
     accuracy: true,
     sales_events: true,
     order_budget: false,
+    weekly_summary: true,
+    shopify_purchase_orders: false,
     features: {
         what_if: true,
         reference_products: true,
@@ -34,6 +36,8 @@ const NONE: Entitlements = {
         accuracy: true,
         sales_events: true,
         order_budget: true,
+        weekly_summary: true,
+        shopify_purchase_orders: true,
         purchase_orders: true,
         supplier_emails: true,
         locations: true,

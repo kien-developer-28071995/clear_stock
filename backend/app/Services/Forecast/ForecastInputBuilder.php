@@ -45,6 +45,8 @@ class ForecastInputBuilder
         $bundleIds = array_values(array_unique(array_merge([], ...array_map('array_keys', $bundles))));
         $rows = $this->locationSales->rowsBetween($shop, array_values(array_unique([...$variantIds, ...$bundleIds])), $historyStart, $asOf->subDay()->toDateString());
 
+        $minimums = $this->forecasts->locationMinimums($shop, $variantIds);
+
         $out = [];
         foreach ($variantIds as $id) {
             $base = $combined[$id] ?? null;
@@ -87,6 +89,10 @@ class ForecastInputBuilder
                     discontinued: $base->discontinued,
                     orderWeekdays: $base->orderWeekdays,
                     events: $base->events,
+                    // The product's minimum at this location (the store-wide min/max is not split across locations).
+                    minStock: $minimums[$id][$locationId] ?? null,
+                    profile: $base->profile,
+                    profileSource: $base->profileSource,
                 )];
             }
         }
@@ -176,6 +182,8 @@ class ForecastInputBuilder
                 orderWeekdays: $variant->supplier?->order_weekdays,
                 events: $events->for($id, $variant->supplier_id),
                 ordered: $ordered[$id] ?? null,
+                profile: $variant->forecast_profile ?? $shop->forecast_profile ?? 'balanced',
+                profileSource: $variant->forecast_profile !== null ? 'variant' : 'shop',
             );
         }
 

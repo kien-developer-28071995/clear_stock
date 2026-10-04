@@ -17,7 +17,8 @@ automatically_update_urls_on_dev = false
 scopes = "read_products,read_inventory,read_locations,read_orders,read_all_orders,read_merchant_managed_fulfillment_orders,read_third_party_fulfillment_orders,write_orders"
 # Optional: asked in the app only when a Growth merchant first creates a draft transfer
 # from the Transfers page (App Bridge shopify.scopes.request). Not needed to install.
-optional_scopes = [ "write_inventory_transfers" ]
+# read_inventory_purchase_orders: asked on the Orders page to show Shopify's own purchase orders (Starter).
+optional_scopes = [ "write_inventory_transfers", "read_inventory_purchase_orders" ]
 # Shopify-managed installation: Shopify shows the consent screen on install,
 # the app gets tokens via token exchange (no OAuth redirect dance).
 use_legacy_install_flow = false

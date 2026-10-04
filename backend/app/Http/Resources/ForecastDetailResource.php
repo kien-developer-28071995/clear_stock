@@ -45,6 +45,8 @@ class ForecastDetailResource extends ForecastResource
                 'max_stock' => $v->max_stock,
                 'alerts_muted' => $v->alerts_muted,
                 'discontinued' => $v->discontinued,
+                'forecast_profile' => $v->forecast_profile,
+                'supplier_sku' => $v->supplier_sku,
                 // Cost entered in the app (wins) and Shopify's own.
                 'cost_override' => $v->cost_override !== null ? (float) $v->cost_override : null,
                 'shopify_cost' => $v->shopify_unit_cost !== null ? (float) $v->shopify_unit_cost : null,
@@ -53,9 +55,14 @@ class ForecastDetailResource extends ForecastResource
                 'reference_name' => $v->reference_variant_id ? $v->reference?->displayName() : null,
                 'reference_percent' => $v->reference_percent,
             ],
+            // Other suppliers this product can be bought from.
+            'alternate_suppliers' => $request->attributes->get('alternate_suppliers', []),
             'defaults' => $shop,
+            'trend' => $this->explanation['trend'] ?? null,
             // Last judged forecast of this product next to what really sold (null until there is one).
             'accuracy' => $request->attributes->get('accuracy'),
+            // The rate forecast in an earlier week ({week_start, avg}), to show how it moved.
+            'previous' => $request->attributes->get('previous'),
         ];
     }
 
@@ -72,6 +79,8 @@ class ForecastDetailResource extends ForecastResource
             'location_id' => $l['location_id'],
             'location' => $l['location'],
             'available' => $l['available'],
+            // Manual reorder point at this location (null = from the forecast).
+            'min_stock' => $l['min_stock'] ?? null,
             'forecast' => $l['forecast'] === null ? null : [
                 'incoming_stock' => $l['forecast']->incoming_stock,
                 'avg_daily_sales' => (float) $l['forecast']->avg_daily_sales,

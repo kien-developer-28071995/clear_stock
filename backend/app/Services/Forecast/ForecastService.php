@@ -6,8 +6,10 @@ use App\Enums\Feature;
 use App\Events\ForecastsUpdated;
 use App\Models\Shop;
 use App\Repositories\Contracts\CatalogRepositoryInterface;
+use App\Repositories\Contracts\CostRepositoryInterface;
 use App\Repositories\Contracts\DailySalesRepositoryInterface;
 use App\Repositories\Contracts\ForecastRepositoryInterface;
+use App\Repositories\Contracts\InventorySnapshotRepositoryInterface;
 use App\Repositories\Contracts\ShopRepositoryInterface;
 use App\Services\Sync\LocationSupport;
 use App\Support\Entitlements;
@@ -27,6 +29,8 @@ class ForecastService
         private readonly ForecastCalculator $calculator,
         private readonly DailySalesRepositoryInterface $sales,
         private readonly LocationSupport $locationSupport,
+        private readonly InventorySnapshotRepositoryInterface $inventorySnapshots,
+        private readonly CostRepositoryInterface $costs,
     ) {}
 
     /**
@@ -37,6 +41,9 @@ class ForecastService
     {
         $asOf = ($now ?? CarbonImmutable::now())->setTimezone($shop->timezone)->startOfDay();
         $computedAt = now();
+
+        // Supplier and cost changes all end in a forecast run: unit costs follow the suppliers' landed cost share here.
+        $this->costs->applyLandedCosts($shop);
 
         $ids = $this->forecasts->forecastableVariantIds($shop);
         $notForecasted = 0;
@@ -106,6 +113,9 @@ class ForecastService
             // Variants no longer active/tracked keep no stale forecast.
             $stats['removed'] = $this->forecasts->deleteForecastsExcept($shop, $ids);
             $this->saveSnapshots($shop, $asOf, $snapshots);
+            // Today's stock units and value, for the inventory value history.
+            $this->inventorySnapshots->record($shop, $asOf->toDateString(), $stock);
+            $this->inventorySnapshots->prune($shop, $asOf->subDays((int) config('forecast.stock_history_days'))->toDateString());
             $shop = $this->shops->update($shop, ['forecasted_at' => $computedAt]);
         }
 
@@ -156,6 +166,7 @@ class ForecastService
             'target_stock' => $r->targetStock,
             'excess_units' => $r->excessUnits,
             'lost_units_30d' => $r->lostUnits30d,
+            'trend_percent' => $r->trendPercent,
             'confidence' => $r->confidence->value,
             'explanation' => json_encode($r->explanation, JSON_THROW_ON_ERROR),
             'computed_at' => $computedAt,

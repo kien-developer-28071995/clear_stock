@@ -51,7 +51,18 @@ export function BundlesPage() {
                             {data?.map((b) => (
                                 <s-table-row key={b.variant_id}>
                                     <s-table-cell>{b.name}</s-table-cell>
-                                    <s-table-cell>{b.components.map((c) => `${c.quantity} × ${c.name}`).join(', ')}</s-table-cell>
+                                    <s-table-cell>
+                                        <s-stack gap="small-100">
+                                            <s-text>{b.components.map((c) => `${c.quantity} × ${c.name}`).join(', ')}</s-text>
+                                            {b.buildable !== null && (
+                                                <s-text color="subdued">
+                                                    {b.buildable > 0 && b.limiting_component
+                                                        ? t('bundles.buildable', { count: b.buildable, component: b.limiting_component })
+                                                        : t('bundles.buildableNone', { component: b.limiting_component ?? '' })}
+                                                </s-text>
+                                            )}
+                                        </s-stack>
+                                    </s-table-cell>
                                     <s-table-cell>
                                         {b.editable ? <s-badge>{t('bundles.manual')}</s-badge> : <s-badge tone="info">{t('bundles.shopify')}</s-badge>}
                                     </s-table-cell>

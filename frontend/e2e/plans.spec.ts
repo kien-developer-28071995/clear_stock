@@ -42,6 +42,7 @@ const PAGES: [string, string][] = [
     ['/orders', 'Orders placed'],
     ['/costs', 'Unit costs'],
     ['/budget', 'Order budget'],
+    ['/data-health', 'Data check'],
     ['/plans', 'Plans'],
 ];
 
@@ -105,7 +106,7 @@ for (const plan of ['free', 'starter', 'growth'] as PlanKey[]) {
             const list = await api<{ data: Record<string, unknown>[]; meta: Record<string, number> }>(app, '/forecasts');
             expect(Object.keys(list.meta).sort()).toEqual(['current_page', 'last_page', 'per_page', 'total']);
             expect(Object.keys(list.data[0]).sort()).toEqual(
-                ['abc_class', 'avg_daily_sales', 'current_stock', 'days_of_cover', 'excess_units', 'incoming_stock', 'name', 'reorder_date', 'sku', 'status', 'suggested_qty', 'variant_id', 'vendor'].sort(),
+                ['abc_class', 'avg_daily_sales', 'current_stock', 'days_of_cover', 'excess_units', 'incoming_stock', 'name', 'reorder_date', 'sku', 'status', 'suggested_qty', 'trend_percent', 'variant_id', 'vendor'].sort(),
             );
             await expect(app.locator('s-table-body s-table-row')).toHaveCount(Math.min(list.meta.total, list.meta.per_page));
         });
@@ -306,7 +307,7 @@ for (const plan of ['free', 'starter', 'growth'] as PlanKey[]) {
 
             // Put it back: cleared in the product settings.
             await open(app, `/products/${row.variant_id}`);
-            await app.getByRole('spinbutton', { name: 'Unit cost' }).fill('');
+            await app.locator('s-section[heading="Product settings"]').getByRole('spinbutton', { name: 'Unit cost' }).fill('');
             await saveBar(app, 'product-settings-save-bar');
             await expect.poll(async () => (await api<Detail>(app, `/forecasts/${row.variant_id}`)).data.settings.cost_override).toBeNull();
         });
@@ -433,6 +434,228 @@ for (const plan of ['free', 'starter', 'growth'] as PlanKey[]) {
 
             await app.locator('s-button', { hasText: 'Use automatic forecast' }).click();
             await expect.poll(async () => (await api<{ data: { overrides: { avg_daily_sales: unknown } } }>(app, `/forecasts/${variantId}`)).data.overrides.avg_daily_sales).toBeNull();
+        });
+
+        test('forecast profile: the store setting and a product\'s own change the windows used', async ({ app }) => {
+            type Detail = { data: { explanation: { profile: { name: string; source: string }; windows: { days: number }[] }; settings: { forecast_profile: string | null } } };
+            await open(app, '/products?sort=suggested');
+            await app.locator('s-table-body s-table-row s-link').first().click();
+            await settled(app);
+            const variantId = Number(app.url().split('/').pop());
+
+            await app.locator('s-select[label="Sales rate for this product"]').locator('select').selectOption('steady').catch(async () => {
+                await app.getByRole('combobox', { name: 'Sales rate for this product' }).selectOption('steady');
+            });
+            await saveBar(app, 'product-settings-save-bar');
+            let detail = (await api<Detail>(app, `/forecasts/${variantId}`)).data;
+            expect(detail.settings.forecast_profile).toBe('steady');
+            expect(detail.explanation.profile).toEqual({ name: 'steady', source: 'variant' });
+            expect(detail.explanation.windows.map((w) => w.days)).toEqual([30, 90, 365]);
+
+            await api(app, `/variants/${variantId}/settings`, { method: 'PUT', body: { forecast_profile: null } });
+            detail = (await api<Detail>(app, `/forecasts/${variantId}`)).data;
+            expect(detail.explanation.profile).toEqual({ name: 'balanced', source: 'shop' });
+            expect(detail.explanation.windows.map((w) => w.days)).toEqual([7, 30, 90]);
+        });
+
+        test('trend filter lists only products selling clearly faster or slower', async ({ app }) => {
+            type Row = { trend_percent: number | null };
+            await open(app, '/products');
+            const all = (await api<{ data: Row[] }>(app, '/forecasts')).data;
+            for (const [option, keep] of [['up', (r: Row) => (r.trend_percent ?? 0) >= 25], ['down', (r: Row) => (r.trend_percent ?? 0) <= -25]] as const) {
+                await app.getByRole('combobox', { name: 'Trend' }).selectOption(option);
+                await expect(app).toHaveURL(new RegExp(`trend=${option}`));
+                await settled(app);
+                const listed = (await api<{ data: Row[]; meta: { total: number } }>(app, `/forecasts?trend=${option}`));
+                expect(listed.data.every(keep)).toBe(true);
+                expect(listed.meta.total).toBe(all.filter(keep).length);
+                await expect(app.locator('s-table-body s-table-row')).toHaveCount(listed.meta.total);
+            }
+        });
+
+        test('insights show the inventory value history', async ({ app }) => {
+            type History = { data: { latest: { units: number } | null; points: unknown[] } };
+            await open(app, '/insights');
+            const history = (await api<History>(app, '/stock-history?days=90')).data;
+            expect(history.latest).not.toBeNull();   // a forecast run records today's stock
+            const section = app.locator('s-section[heading="Inventory value over time"]');
+            await expect(section).toBeVisible();
+            await expect(section).toContainText('in stock');
+            await app.screenshot({ path: `e2e-results/stock-history-${plan}.png`, fullPage: true });
+        });
+
+        test('data check lists what to fix in the product data', async ({ app }) => {
+            type Health = { data: { checked: number; findings: { code: string; count: number }[] } };
+            await open(app, '/settings');
+            await app.locator('s-link', { hasText: 'Check my product data' }).click();
+            await expect(app.locator('s-page[heading="Data check"]')).toBeVisible();
+            await settled(app);
+            const health = (await api<Health>(app, '/data-health')).data;
+            await expect(app.locator('s-section')).toHaveCount(health.findings.length + 1);
+            if (health.findings.length === 0) await expect(app.locator('s-page')).toContainText('nothing to fix');
+            await app.screenshot({ path: `e2e-results/data-health-${plan}.png`, fullPage: true });
+        });
+
+        test('weekly summary can be switched on from Settings on every plan', async ({ app }) => {
+            type S = { data: { alerts: { weekly_summary: boolean; email: string | null; weekly_day: number } } };
+            await open(app, '/settings');
+            const before = (await api<S>(app, '/settings')).data.alerts;
+            const toggle = app.locator('s-switch[label="Email me a summary once a week"]');
+            await expect(toggle).not.toHaveAttribute('disabled');
+            await api(app, '/settings', { method: 'PUT', body: { alerts: { weekly_summary: true, email: 'owner@example.com' } } });
+            expect((await api<S>(app, '/settings')).data.alerts.weekly_summary).toBe(true);
+            await api(app, '/settings', { method: 'PUT', body: { alerts: { weekly_summary: before.weekly_summary, email: before.email } } });
+        });
+
+        test('Slack webhook and days-left threshold are saved with the alert settings', async ({ app }) => {
+            type S = { data: { alerts: { slack_webhook_url: string | null; cover_days: number | null } } };
+            await open(app, '/settings');
+            const slack = app.locator('s-url-field[label="Slack webhook URL"]');
+            if (has.alerts) await expect(slack).not.toHaveAttribute('disabled');
+            else await expect(slack).toHaveAttribute('disabled');
+
+            const bad = await app.evaluate(async () => {
+                const res = await fetch('/api/settings', { method: 'PUT', headers: { Authorization: `Bearer ${await window.shopify.idToken()}`, 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify({ alerts: { slack_webhook_url: 'https://example.com/hook' } }) });
+                return res.status;
+            });
+            expect(bad).toBe(422);
+            await api(app, '/settings', { method: 'PUT', body: { alerts: { slack_webhook_url: 'https://hooks.slack.com/services/T0/B0/e2e', cover_days: 30 } } });
+            expect((await api<S>(app, '/settings')).data.alerts).toMatchObject({ slack_webhook_url: 'https://hooks.slack.com/services/T0/B0/e2e', cover_days: 30 });
+            await api(app, '/settings', { method: 'PUT', body: { alerts: { slack_webhook_url: null, cover_days: null } } });
+        });
+
+        test('a partly delivered order keeps the rest on the way', async ({ app }) => {
+            type Orders = { data: { open: { id: number; variant_id: number; quantity: number; received_quantity: number; state: string }[] } };
+            await open(app, '/orders');
+            // A product with a forecast (untracked ones, like gift cards, have none).
+            const variant = { id: (await api<{ data: { variant_id: number }[] }>(app, '/forecasts')).data[0].variant_id };
+            const incoming = async () => (await api<{ data: { incoming_stock: number } }>(app, `/forecasts/${variant.id}`)).data?.incoming_stock ?? 0;
+            const before = await incoming();
+            await api(app, '/manual-orders', { method: 'POST', body: { items: [{ variant_id: variant.id, quantity: 40 }], reference: 'E2E-PART' } });
+            const order = (await api<Orders>(app, '/manual-orders')).data.open.find((o) => o.variant_id === variant.id && o.quantity === 40)!;
+
+            await open(app, '/orders');
+            const row = app.locator('s-table-row', { hasText: 'E2E-PART' }).first();
+            await row.locator('s-button', { hasText: 'Part received' }).click();
+            await row.getByRole('spinbutton', { name: 'Received so far' }).fill('15');
+            await row.locator('s-button', { hasText: 'Save' }).click();
+            await expect.poll(async () => (await api<Orders>(app, '/manual-orders')).data.open.find((o) => o.id === order.id)?.received_quantity).toBe(15);
+            await expect(row).toContainText('15 received');
+            expect(await incoming()).toBe(before + 25);
+
+            await api(app, `/manual-orders/${order.id}`, { method: 'PATCH', body: { status: 'cancelled' } });
+            expect(await incoming()).toBe(before);
+        });
+
+        test('supplier product code is saved on the product and exported', async ({ app }) => {
+            await open(app, '/products');
+            await app.locator('s-table-body s-table-row s-link').first().click();
+            await settled(app);
+            const variantId = Number(app.url().split('/').pop());
+            await app.locator('s-section[heading="Product settings"]').getByRole('textbox', { name: "Supplier's product code" }).fill('E2E-SUP-1');
+            await saveBar(app, 'product-settings-save-bar');
+            expect((await api<{ data: { settings: { supplier_sku: string | null } } }>(app, `/forecasts/${variantId}`)).data.settings.supplier_sku).toBe('E2E-SUP-1');
+            await api(app, `/variants/${variantId}/settings`, { method: 'PUT', body: { supplier_sku: null } });
+        });
+
+        test('the product list exports as CSV with the current filters', async ({ app }) => {
+            await open(app, '/products?status=reorder_now');
+            const total = (await api<{ meta: { total: number } }>(app, '/forecasts?status=reorder_now')).meta.total;
+            // The button sits in the page's title bar, which only the Shopify admin renders: ask the API as the button does.
+            const csv = (await app.evaluate(async () => {
+                const res = await fetch('/api/forecasts/export?status=reorder_now', { headers: { Authorization: `Bearer ${await window.shopify.idToken()}` } });
+                return res.ok ? await res.text() : `HTTP ${res.status}`;
+            })).trim().split('\n');
+            expect(csv[0]).toContain('Product,SKU,Vendor,Supplier,Status');
+            expect(csv).toHaveLength(total + 1);
+        });
+
+        test('locations can be left out of the stock the forecast counts', async ({ app }) => {
+            type Loc = { id: number; name: string; excluded: boolean };
+            await open(app, '/settings');
+            const locations = (await api<{ data: Loc[] }>(app, '/settings/locations')).data;
+            const section = app.locator('s-section[heading="Locations counted as stock"]');
+            test.skip(locations.length < 2, 'dev store has a single location');
+            await expect(section.locator('s-checkbox')).toHaveCount(locations.length);
+
+            const target = locations.find((l) => !l.excluded)!;
+            await api(app, '/settings/locations', { method: 'PUT', body: { excluded_ids: [target.id] } });
+            expect((await api<{ data: Loc[] }>(app, '/settings/locations')).data.find((l) => l.id === target.id)?.excluded).toBe(true);
+            await api(app, '/settings/locations', { method: 'PUT', body: { excluded_ids: locations.filter((l) => l.excluded).map((l) => l.id) } });
+        });
+
+        test('a saved view applies its filters with one click', async ({ app }) => {
+            type View = { id: number; name: string; filters: Record<string, string> };
+            await open(app, '/products?status=reorder_now&sort=name');
+            await app.getByRole('textbox', { name: 'View name' }).fill('E2E due by name');
+            await app.locator('s-button', { hasText: 'Save view' }).click();
+            await expect.poll(async () => (await api<{ data: View[] }>(app, '/views')).data.find((v) => v.name === 'E2E due by name')?.filters).toEqual({ status: 'reorder_now', sort: 'name' });
+
+            await open(app, '/products');
+            await app.locator('s-button', { hasText: 'E2E due by name' }).click();
+            await expect(app).toHaveURL(/status=reorder_now/);
+            await expect(app).toHaveURL(/sort=name/);
+
+            const view = (await api<{ data: View[] }>(app, '/views')).data.find((v) => v.name === 'E2E due by name')!;
+            await api(app, `/views/${view.id}`, { method: 'DELETE' });
+        });
+
+        test('insights list what to clear and broken size runs', async ({ app }) => {
+            type Clearance = { data: { count: number } };
+            await open(app, '/insights');
+            const clearance = (await api<Clearance>(app, '/clearance')).data;
+            const runs = (await api<{ data: unknown[] }>(app, '/size-runs')).data;
+            await expect(app.locator('s-section[heading="What to clear"]')).toHaveCount(clearance.count > 0 ? 1 : 0);
+            await expect(app.locator('s-section[heading="Broken size runs"]')).toHaveCount(runs.length > 0 ? 1 : 0);
+            await app.screenshot({ path: `e2e-results/clearance-${plan}.png`, fullPage: true });
+        });
+
+        test('another supplier can be kept for a product and made its supplier', async ({ app }) => {
+            type Supplier = { id: number; name: string };
+            type Detail = { data: { settings: { supplier_id: number | null; lead_time_override: number | null; cost_override: number | null; supplier_sku: string | null }; alternate_suppliers: { supplier_id: number }[] } };
+            await open(app, '/products');
+            const suppliers = (await api<{ data: Supplier[] }>(app, '/suppliers')).data;
+            test.skip(suppliers.length < 2, 'dev store needs two suppliers');
+            const variantId = (await api<{ data: { variant_id: number }[] }>(app, '/forecasts')).data[0].variant_id;
+            const before = (await api<Detail>(app, `/forecasts/${variantId}`)).data;
+            const other = suppliers.find((s) => s.id !== before.settings.supplier_id)!;
+
+            await open(app, `/products/${variantId}`);
+            const section = app.locator('s-section[heading="Other suppliers"]');
+            await section.getByRole('combobox', { name: 'Add a supplier' }).selectOption(String(other.id));
+            await section.getByRole('spinbutton', { name: 'Lead time' }).fill('33');
+            await section.locator('s-button', { hasText: /^Add$/ }).click();
+            await expect.poll(async () => (await api<Detail>(app, `/forecasts/${variantId}`)).data.alternate_suppliers.map((a) => a.supplier_id)).toContain(other.id);
+
+            await section.locator('s-button', { hasText: 'Use as supplier' }).first().click();
+            await expect.poll(async () => (await api<Detail>(app, `/forecasts/${variantId}`)).data.settings.supplier_id).toBe(other.id);
+            expect((await api<Detail>(app, `/forecasts/${variantId}`)).data.settings.lead_time_override).toBe(33);
+
+            // Put the product back as it was.
+            await api(app, `/variants/${variantId}/suppliers`, { method: 'PUT', body: { suppliers: [] } });
+            await api(app, `/variants/${variantId}/settings`, { method: 'PUT', body: { supplier_id: before.settings.supplier_id, lead_time_override: before.settings.lead_time_override, supplier_sku: before.settings.supplier_sku, cost_override: before.settings.cost_override } });
+        });
+
+        test('a sales event can repeat every year', async ({ app }) => {
+            type Event = { id: number; name: string; repeats_yearly: boolean };
+            await open(app, '/events');
+            await api(app, '/sales-events', { method: 'POST', body: { name: 'E2E season', starts_on: '2025-12-01', ends_on: '2025-12-20', multiplier: 2, repeats_yearly: true, applies_to: 'all' } });
+            await open(app, '/events');
+            await expect(app.locator('s-table-row', { hasText: 'E2E season' }).locator('s-badge', { hasText: 'Every year' })).toBeVisible();
+            const event = (await api<{ data: Event[] }>(app, '/sales-events')).data.find((e) => e.name === 'E2E season')!;
+            expect(event.repeats_yearly).toBe(true);
+            await api(app, `/sales-events/${event.id}`, { method: 'DELETE' });
+        });
+
+        test('Shopify purchase orders ask for the permission first and follow the plan', async ({ app }) => {
+            await open(app, '/orders');
+            const section = app.locator('s-section[heading="Purchase orders in Shopify"]');
+            if (has.purchase_orders) {
+                await expect(section).toBeVisible();
+                await expect(section.locator('s-button', { hasText: 'Show Shopify purchase orders' })).toBeVisible();
+            } else {
+                await expect(section).toHaveCount(0);
+            }
         });
 
         test('default lead time is saved and used by forecasts', async ({ app }) => {

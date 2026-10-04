@@ -289,7 +289,9 @@
     "units_one": "{{qty}} unit",
     "units_other": "{{qty}} units",
     "onTheWay": "On the way",
-    "incomingShort": "+{{qty}} on the way"
+    "incomingShort": "+{{qty}} on the way",
+    "rateUp": "Up from {{previous}}/day in the forecast of the week of {{date}} (now {{current}}/day).",
+    "rateDown": "Down from {{previous}}/day in the forecast of the week of {{date}} (now {{current}}/day)."
   },
   "why": {
     "heading": "Why these numbers?",
@@ -317,7 +319,10 @@
     "location": "Location",
     "pending": "Per-location forecasts appear after the next sync (open the app once to approve the new fulfillment permissions if Shopify asks).",
     "why": "Why: {{location}}",
-    "hint": "Select a location to see why. Sales-rate adjustments apply to the store total only."
+    "hint": "Select a location to see why. Sales-rate adjustments apply to the store total only.",
+    "minimum": "Minimum here",
+    "minimumAt": "Minimum stock at {{location}}",
+    "saveMinimums": "Save minimums"
   },
   "adjust": {
     "heading": "Adjust the sales rate",
@@ -362,7 +367,9 @@
     "referenceClear": "Remove",
     "referenceNone": "None",
     "referencePercent": "Share of its sales rate",
-    "referenceLocked": "Forecast new products from a similar product until they have their own sales history."
+    "referenceLocked": "Forecast new products from a similar product until they have their own sales history.",
+    "supplierSku": "Supplier's product code",
+    "supplierSkuHelp": "Optional. Printed on purchase orders and order emails so the supplier recognises the product."
   },
   "products": {
     "freeLimit_one": "The Free plan forecasts your best seller.",
@@ -387,7 +394,8 @@
     "vendor": "Vendor",
     "allVendors": "All vendors",
     "productType": "Product type",
-    "allTypes": "All product types"
+    "allTypes": "All product types",
+    "exportCsv": "Export list (CSV)"
   },
   "settings": {
     "defaultsHeading": "Forecast defaults",
@@ -418,7 +426,26 @@
     "languageHeading": "Language",
     "language": "App language",
     "languageHelp": "Alert emails are sent in English.",
-    "languageAuto": "Same as Shopify admin ({{language}})"
+    "languageAuto": "Same as Shopify admin ({{language}})",
+    "coverDays": "Also alert when stock covers fewer than",
+    "coverDaysHelp": "Optional. Products with this many days of stock left are added to the summary even before their reorder date. Empty = reorder date only.",
+    "slackUrl": "Slack webhook URL",
+    "slackUrlHelp": "Optional. The same summary is posted to this Slack channel. Create an incoming webhook in Slack and paste its URL.",
+    "summaryHeading": "Weekly summary",
+    "summaryEnabled": "Email me a summary once a week",
+    "summaryHelp": "What to order first, products out of stock, cash tied up in slow stock, sales missed and your inventory value. One email a week, on every plan.",
+    "summaryEmail": "Send it to",
+    "locationsHeading": "Locations counted as stock",
+    "locationsIntro": "Untick a location whose stock is not for sale (returns, damaged goods, a showroom). Its units are left out of days of stock and order suggestions; sales shipped from it still count as demand.",
+    "locationsSaved": "Saved. Forecasts are being updated.",
+    "excludedHeading": "Orders left out of the forecast",
+    "excludedIntro": "Wholesale or in-store orders can inflate the sales rate of your online store. Saving a change here re-reads your order history, which takes a few minutes.",
+    "excludedTags": "Leave out orders tagged",
+    "excludedTagsHelp": "Order tags in Shopify, separated by commas.",
+    "excludedSource": {
+      "pos": "Leave out Point of Sale orders",
+      "draft": "Leave out draft orders (created by staff)"
+    }
   },
   "suppliers": {
     "add": "Add supplier",
@@ -445,7 +472,18 @@
     "orderCycleHelp": "How often you order from this supplier. Each suggested order covers this many days of sales on top of lead time and safety stock.",
     "orderDays": "Order days",
     "orderDaysHelp": "Days you place orders with this supplier. A product due in between is ordered on the order day before it, so nothing runs out. None ticked = any day.",
-    "ordersOn": "Orders on {{days}}"
+    "ordersOn": "Orders on {{days}}",
+    "actualLeadTime_one": "Your last {{count}} delivery took {{days}} days (median)",
+    "actualLeadTime_other": "Your last {{count}} deliveries took {{days}} days (median)",
+    "useActual_one": "Use {{count}} day",
+    "useActual_other": "Use {{count}} days",
+    "minOrderValue": "Minimum order value",
+    "minOrderValueHelp": "In your store currency. An order below it is flagged.",
+    "landedCost": "Freight and duty",
+    "landedCostHelp": "Added to the unit cost in stock value and spend figures. Purchase orders keep the supplier's price.",
+    "due_one": "{{count}} product to order now · {{cost}}",
+    "due_other": "{{count}} products to order now · {{cost}}",
+    "belowMinimum": "Below the {{minimum}} minimum"
   },
   "bundles": {
     "add": "Add bundle",
@@ -468,7 +506,10 @@
     "quantity": "Quantity",
     "changeProducts": "Change products",
     "selectProducts": "Select products",
-    "save": "Save bundle"
+    "save": "Save bundle",
+    "buildable_one": "Stock for {{count}} bundle; {{component}} runs out first",
+    "buildable_other": "Stock for {{count}} bundles; {{component}} runs out first",
+    "buildableNone": "No stock to make one: {{component}} is out"
   },
   "plans": {
     "names": {
@@ -585,7 +626,12 @@
     "event_too_long": "An event can last at most 3 months. For a lasting change, adjust the sales rate instead.",
     "required_if": "This field is required.",
     "not_in": "Choose a different value.",
-    "cost_columns_missing": "The file needs a SKU or barcode column and a cost column."
+    "cost_columns_missing": "The file needs a SKU or barcode column and a cost column.",
+    "keep_one_location": "At least one location must count as stock.",
+    "too_many_views": "You can keep up to 20 views. Delete one first.",
+    "alternate_is_main": "This is already the product's supplier.",
+    "too_many_suppliers": "Up to 5 other suppliers per product.",
+    "not_an_alternate": "Add this supplier to the product first."
   },
   "explanation": {
     "unknown": "—",
@@ -672,7 +718,17 @@
     "event_upcoming_lower_one": "{{name}} ({{from_date}} – {{to_date}}, ×{{multiplier}}) takes {{count}} unit off what to order.",
     "event_upcoming_lower_other": "{{name}} ({{from_date}} – {{to_date}}, ×{{multiplier}}) takes {{count}} units off what to order.",
     "ordered_manual_one": "You marked {{count}} unit as ordered (expected {{expected_date}}): counted as on the way.",
-    "ordered_manual_other": "You marked {{count}} units as ordered (expected {{expected_date}}): counted as on the way."
+    "ordered_manual_other": "You marked {{count}} units as ordered (expected {{expected_date}}): counted as on the way.",
+    "profile_recent": "Store setting \"Follow recent sales\": the last 7 days count most.",
+    "profile_recent_product": "This product follows recent sales: the last 7 days count most.",
+    "profile_steady": "Store setting \"Steady\": the rate is averaged over up to a year.",
+    "profile_steady_product": "This product is set to \"Steady\": the rate is averaged over up to a year.",
+    "trend_up_one": "Selling {{percent}}% faster in the last {{count}} day ({{recent}}/day) than in the {{days}} days before ({{baseline}}/day).",
+    "trend_up_other": "Selling {{percent}}% faster in the last {{count}} days ({{recent}}/day) than in the {{days}} days before ({{baseline}}/day).",
+    "trend_down_one": "Selling {{percent}}% slower in the last {{count}} day ({{recent}}/day) than in the {{days}} days before ({{baseline}}/day).",
+    "trend_down_other": "Selling {{percent}}% slower in the last {{count}} days ({{recent}}/day) than in the {{days}} days before ({{baseline}}/day).",
+    "backorder_included_one": "{{count}} unit is already sold on backorder (stock below zero) and is included in the order.",
+    "backorder_included_other": "{{count}} units are already sold on backorder (stock below zero) and are included in the order."
   },
   "import": {
     "fromStocky": "Import from Stocky",
@@ -1047,7 +1103,10 @@
     "emptyHeading": "No sales events yet",
     "emptyBody": "Planning a Black Friday or a sale? Add it so orders cover the extra demand in time.",
     "deleteHeading": "Delete event?",
-    "confirmDelete": "Delete \"{{name}}\"? Forecasts will be recomputed without it."
+    "confirmDelete": "Delete \"{{name}}\"? Forecasts will be recomputed without it.",
+    "repeatsYearly": "Repeats every year",
+    "repeatsYearlyHelp": "For a season: the same change on the same dates each year.",
+    "yearly": "Every year"
   },
   "orders": {
     "mark": "Mark as ordered",
@@ -1074,7 +1133,8 @@
     "done": {
       "received": "Marked as received",
       "cancelled": "Order cancelled",
-      "open": "Order reopened"
+      "open": "Order reopened",
+      "part": "Saved: the rest still counts as on the way"
     },
     "state": {
       "open": "On the way",
@@ -1090,7 +1150,10 @@
     "overdueBody": "They no longer count as on the way. Mark them received, or cancel them if they will not come.",
     "review": "Review orders",
     "link_one": "Orders placed ({{count}})",
-    "link_other": "Orders placed ({{count}})"
+    "link_other": "Orders placed ({{count}})",
+    "receivePart": "Part received",
+    "receivedSoFar": "Received so far",
+    "partReceived": "{{received}} received, the rest is on the way"
   },
   "costs": {
     "intro": "Stock value, cash tied up, purchase order and plan totals need each product's unit cost. Enter costs here for products without one in Shopify, or to use your real landed cost. They win over Shopify's cost in the app; Shopify itself is not changed.",
@@ -1153,5 +1216,143 @@
       "reorder_point": "Reached reorder point"
     },
     "noCost": "No cost"
+  },
+  "forecastProfile": {
+    "label": "How the sales rate is averaged",
+    "help": "Balanced suits most products. Each forecast shows the days and weights used; a product can have its own setting.",
+    "productLabel": "Sales rate for this product",
+    "productHelp": "Use \"Follow recent sales\" for a new or fast-growing product, \"Steady\" for one that sells slowly or unevenly.",
+    "storeDefault": "Store setting ({{name}})",
+    "balanced": "Balanced (7, 30 and 90 days)",
+    "recent": "Follow recent sales (last 7 days count most)",
+    "steady": "Steady (up to a year of sales)"
+  },
+  "trend": {
+    "filter": "Trend",
+    "all": "Any trend",
+    "up": "Selling faster",
+    "down": "Selling slower",
+    "badgeUp": "Selling {{percent}}% faster lately",
+    "badgeDown": "Selling {{percent}}% slower lately"
+  },
+  "stockHistory": {
+    "heading": "Inventory value over time",
+    "units_one": "{{units}} unit",
+    "units_other": "{{units}} units",
+    "inStock_one": "{{units}} units across {{count}} product in stock",
+    "inStock_other": "{{units}} units across {{count}} products in stock",
+    "up": "+{{amount}} since {{date}}",
+    "down": "−{{amount}} since {{date}}",
+    "chartLabel": "Inventory from {{from}} ({{first}}) to {{to}} ({{last}})",
+    "collecting": "Recording started on {{date}}. The chart appears once there are two days to compare.",
+    "period_one": "{{count}} day",
+    "period_other": "{{count}} days",
+    "how": "Stock on hand × unit cost, recorded once a day since the app was installed (Shopify keeps no history to start from). Kept for two years."
+  },
+  "health": {
+    "heading": "Data check",
+    "settingsBody": "Missing costs, SKUs or suppliers and negative stock make forecasts and money figures less accurate.",
+    "settingsLink": "Check my product data",
+    "intro_one": "We checked {{products}} tracked product. Fixing what is listed below makes the forecasts and money figures more accurate.",
+    "intro_other": "We checked {{products}} tracked products. Fixing what is listed below makes the forecasts and money figures more accurate.",
+    "allGood_one": "We checked {{products}} tracked product and found nothing to fix.",
+    "allGood_other": "We checked {{products}} tracked products and found nothing to fix.",
+    "more_one": "…and {{count}} more",
+    "more_other": "…and {{count}} more",
+    "findings": {
+      "negative_stock": {
+        "title_one": "Product with negative stock",
+        "title_other": "Products with negative stock",
+        "body": "Shopify shows less than zero in stock (oversold, or stock never counted). Days left and order sizes start from that number: correct the quantity in Shopify."
+      },
+      "not_tracked": {
+        "title_one": "Product without inventory tracking",
+        "title_other": "Products without inventory tracking",
+        "body": "Shopify does not track their quantity, so there is nothing to forecast. Turn on \"Track quantity\" on the product in Shopify if you stock them."
+      },
+      "missing_cost": {
+        "title_one": "Product without a unit cost",
+        "title_other": "Products without a unit cost",
+        "body": "They are missing from every money figure: cash tied up, inventory value, purchase plan and budget.",
+        "fix": "Add unit costs"
+      },
+      "duplicate_sku": {
+        "title_one": "Product sharing a SKU with another",
+        "title_other": "Products sharing a SKU with another",
+        "body": "Purchase orders and CSV imports match products by SKU, so a shared SKU can put a quantity or cost on the wrong product. Give each product its own SKU in Shopify."
+      },
+      "missing_sku": {
+        "title_one": "Product without a SKU",
+        "title_other": "Products without a SKU",
+        "body": "Without a SKU (or barcode) a product is left out of the Shopify purchase order export and cannot be matched in CSV imports."
+      },
+      "missing_price": {
+        "title_one": "Product without a price",
+        "title_other": "Products without a price",
+        "body": "No ABC class and no estimate of revenue missed while out of stock. The price comes from Shopify at the next sync."
+      },
+      "no_supplier": {
+        "title_one": "Product without a supplier",
+        "title_other": "Products without a supplier",
+        "body": "Orders can't be grouped by supplier, and the supplier's lead time, minimum order and order days don't apply.",
+        "fix": "Set up suppliers"
+      },
+      "default_lead_time": {
+        "title_one": "Product using the store's default lead time",
+        "title_other": "Products using the store's default lead time",
+        "body": "Neither the product nor its supplier has a lead time, so the store default of {{days}} days decides when to reorder. Fine if that matches your suppliers; otherwise set the real lead time.",
+        "fix": "Set supplier lead times"
+      }
+    }
+  },
+  "clearance": {
+    "heading": "What to clear",
+    "intro_one": "Slow and overstocked products, most stock value first. Sell-through is what sold in the last {{count}} day out of what was available.",
+    "intro_other": "Slow and overstocked products, most stock value first. Sell-through is what sold in the last {{count}} days out of what was available.",
+    "sold_one": "Sold in {{count}} day",
+    "sold_other": "Sold in {{count}} days",
+    "sellThrough": "Sell-through",
+    "lastSale": "Last sale",
+    "never": "No sale on record",
+    "daysAgo_one": "{{count}} day ago ({{date}})",
+    "daysAgo_other": "{{count}} days ago ({{date}})",
+    "export": "Export the list (CSV)",
+    "more_one": "{{count}} more in the file",
+    "more_other": "{{count}} more in the file"
+  },
+  "sizeRuns": {
+    "heading": "Broken size runs",
+    "intro": "Products where a best-selling variant is out or due for reorder while other variants sit in stock. The product looks stocked, but shoppers can't buy the size they want.",
+    "short": "{{title}}: {{share}}% of sales, {{stock}} left",
+    "sitting": "{{title}}: {{stock}} sitting",
+    "ok": "{{title}}: {{stock}}"
+  },
+  "views": {
+    "saved": "View saved",
+    "delete": "Delete the view {{name}}",
+    "name": "View name",
+    "namePlaceholder": "Save these filters as…",
+    "save": "Save view"
+  },
+  "alternates": {
+    "heading": "Other suppliers",
+    "intro": "Keep a backup supplier with its own cost, lead time and product code. Switching makes it this product's supplier and keeps the current one here.",
+    "cost": "Unit cost",
+    "makeMain": "Use as supplier",
+    "switched": "{{name}} is now this product's supplier",
+    "add": "Add a supplier",
+    "choose": "Choose…",
+    "addButton": "Add"
+  },
+  "shopifyPo": {
+    "heading": "Purchase orders in Shopify",
+    "connectBody": "See the purchase orders you created in Shopify next to the ones marked here. Their units already count as on the way; this needs your permission to read them.",
+    "connect": "Show Shopify purchase orders",
+    "declined": "Permission not granted",
+    "error": "Shopify did not return the purchase orders. Try again later.",
+    "none": "No purchase order is marked as ordered in Shopify.",
+    "order": "Purchase order",
+    "orderedOn": "Ordered",
+    "cost": "Cost"
   }
 }

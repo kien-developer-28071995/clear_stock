@@ -52,3 +52,34 @@ export function useUpdateVariantSettings(variantId: number) {
         },
     });
 }
+
+/** Changes to one product that move its forecast: refresh everything derived from forecasts. */
+function useProductMutation<T, R>(fn: (arg: T) => Promise<R>) {
+    const qc = useQueryClient();
+    return useMutation({
+        mutationFn: fn,
+        onSuccess: () => {
+            qc.invalidateQueries({ queryKey: forecastKeys.all });
+            qc.invalidateQueries({ queryKey: ['dashboard'] });
+            qc.invalidateQueries({ queryKey: ['suppliers'] });
+        },
+    });
+}
+
+export const useSetLocationMinimums = (variantId: number) =>
+    useProductMutation((minimums: { location_id: number; min_stock: number | null }[]) => forecastApi.setLocationMinimums(variantId, minimums));
+export const useSetAlternates = (variantId: number) =>
+    useProductMutation((suppliers: Parameters<typeof forecastApi.setAlternates>[1]) => forecastApi.setAlternates(variantId, suppliers));
+export const useMakeMainSupplier = (variantId: number) => useProductMutation((supplierId: number) => forecastApi.makeMainSupplier(variantId, supplierId));
+
+export function useSavedViews() {
+    return useQuery({ queryKey: ['views'], queryFn: forecastApi.views, staleTime: 5 * 60_000 });
+}
+
+function useViewMutation<T>(fn: (arg: T) => Promise<unknown>) {
+    const qc = useQueryClient();
+    return useMutation({ mutationFn: fn, onSuccess: (data) => qc.setQueryData(['views'], data) });
+}
+
+export const useSaveView = () => useViewMutation(forecastApi.saveView);
+export const useDeleteView = () => useViewMutation(forecastApi.deleteView);

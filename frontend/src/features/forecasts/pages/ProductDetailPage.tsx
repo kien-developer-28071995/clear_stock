@@ -10,6 +10,7 @@ import { ForecastSummary } from '@/features/forecasts/components/ForecastSummary
 import { WhyThisNumber } from '@/features/forecasts/components/WhyThisNumber';
 import { AdjustForecastForm } from '@/features/forecasts/components/AdjustForecastForm';
 import { ProductSettingsForm } from '@/features/forecasts/components/ProductSettingsForm';
+import { AlternateSuppliers } from '@/features/forecasts/components/AlternateSuppliers';
 import { LocationForecasts } from '@/features/forecasts/components/LocationForecasts';
 import { MarkOrderedModal } from '@/features/orders/components/MarkOrderedModal';
 import { useModal } from '@/hooks/useModal';
@@ -59,6 +60,7 @@ export function ProductDetailPage() {
             <WhyThisNumber f={f} />
             <AdjustForecastForm f={f} />
             <ProductSettingsForm f={f} />
+            <AlternateSuppliers f={f} />
         </s-page>
     );
 }

@@ -54,7 +54,7 @@ class EloquentRealtimeAlertRepository implements RealtimeAlertRepositoryInterfac
         $row = DB::table('inventory_levels')
             ->join('locations', 'locations.id', '=', 'inventory_levels.location_id')
             ->where('inventory_levels.variant_id', $variant->id)
-            ->where('locations.is_active', true)
+            ->where('locations.is_active', true)->where('locations.excluded', false)
             ->selectRaw('COALESCE(SUM(inventory_levels.available), 0) as available, COALESCE(SUM(inventory_levels.incoming), 0) as incoming')
             ->first();
 
@@ -68,7 +68,7 @@ class EloquentRealtimeAlertRepository implements RealtimeAlertRepositoryInterfac
             ->join('locations', 'locations.id', '=', 'inventory_levels.location_id')
             ->where('inventory_levels.shop_id', $shop->id)
             ->whereIn('inventory_levels.variant_id', $variantIds)
-            ->where('locations.is_active', true)
+            ->where('locations.is_active', true)->where('locations.excluded', false)
             ->orderBy('locations.name')
             ->get(['inventory_levels.variant_id', 'locations.name', 'inventory_levels.available'])
             ->each(function ($r) use (&$out) {

@@ -15,6 +15,8 @@ class ManualOrderUpdateRequest extends FormRequest
             'status' => ['sometimes', Rule::in([ManualOrder::OPEN, ManualOrder::RECEIVED, ManualOrder::CANCELLED])],
             'expected_on' => ['sometimes', 'date_format:Y-m-d'],
             'quantity' => ['sometimes', 'integer', 'min:1', 'max:1000000'],
+            // Units delivered so far (a partial delivery); reaching the ordered quantity receives the order.
+            'received_quantity' => ['sometimes', 'integer', 'min:0', 'max:1000000'],
         ];
     }
 }

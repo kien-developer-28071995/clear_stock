@@ -289,7 +289,9 @@
     "units_one": "{{qty}} Stück",
     "units_other": "{{qty}} Stück",
     "onTheWay": "Unterwegs",
-    "incomingShort": "+{{qty}} unterwegs"
+    "incomingShort": "+{{qty}} unterwegs",
+    "rateUp": "Gestiegen von {{previous}}/Tag in der Prognose der Woche vom {{date}} (jetzt {{current}}/Tag).",
+    "rateDown": "Gesunken von {{previous}}/Tag in der Prognose der Woche vom {{date}} (jetzt {{current}}/Tag)."
   },
   "why": {
     "heading": "Warum diese Zahlen?",
@@ -317,7 +319,10 @@
     "location": "Standort",
     "pending": "Prognosen pro Standort erscheinen nach der nächsten Synchronisierung (öffne die App einmal, um die neuen Fulfillment-Berechtigungen zu bestätigen, falls Shopify danach fragt).",
     "why": "Warum: {{location}}",
-    "hint": "Wähle einen Standort, um das Warum zu sehen. Anpassungen der Verkaufsrate gelten nur für die Shop-Summe."
+    "hint": "Wähle einen Standort, um das Warum zu sehen. Anpassungen der Verkaufsrate gelten nur für die Shop-Summe.",
+    "minimum": "Minimum hier",
+    "minimumAt": "Mindestbestand in {{location}}",
+    "saveMinimums": "Mindestbestände speichern"
   },
   "adjust": {
     "heading": "Verkaufsrate anpassen",
@@ -362,7 +367,9 @@
     "referenceClear": "Entfernen",
     "referenceNone": "Keines",
     "referencePercent": "Anteil seiner Verkaufsrate",
-    "referenceLocked": "Erstelle Prognosen für neue Produkte anhand eines ähnlichen Produkts, bis sie eine eigene Verkaufshistorie haben."
+    "referenceLocked": "Erstelle Prognosen für neue Produkte anhand eines ähnlichen Produkts, bis sie eine eigene Verkaufshistorie haben.",
+    "supplierSku": "Artikelnummer des Lieferanten",
+    "supplierSkuHelp": "Optional. Steht auf Bestellungen und Bestell-E-Mails, damit der Lieferant das Produkt erkennt."
   },
   "products": {
     "freeLimit_one": "Der Free-Tarif erstellt eine Prognose für deinen Bestseller.",
@@ -387,7 +394,8 @@
     "vendor": "Hersteller",
     "allVendors": "Alle Hersteller",
     "productType": "Produkttyp",
-    "allTypes": "Alle Produkttypen"
+    "allTypes": "Alle Produkttypen",
+    "exportCsv": "Liste exportieren (CSV)"
   },
   "settings": {
     "defaultsHeading": "Prognose-Standards",
@@ -418,7 +426,26 @@
     "languageHeading": "Sprache",
     "language": "App-Sprache",
     "languageHelp": "Warn-E-Mails werden auf Englisch gesendet.",
-    "languageAuto": "Wie Shopify-Adminbereich ({{language}})"
+    "languageAuto": "Wie Shopify-Adminbereich ({{language}})",
+    "coverDays": "Auch warnen, wenn der Bestand weniger reicht als",
+    "coverDaysHelp": "Optional. Produkte mit so vielen Tagen Bestand kommen schon vor ihrem Bestelldatum in die Zusammenfassung. Leer = nur das Bestelldatum.",
+    "slackUrl": "Slack-Webhook-URL",
+    "slackUrlHelp": "Optional. Dieselbe Zusammenfassung wird in diesen Slack-Kanal gepostet. Erstelle in Slack einen eingehenden Webhook und füge die URL ein.",
+    "summaryHeading": "Wöchentliche Zusammenfassung",
+    "summaryEnabled": "Mir einmal pro Woche eine Zusammenfassung senden",
+    "summaryHelp": "Was zuerst zu bestellen ist, ausverkaufte Produkte, gebundenes Kapital in Langsamdrehern, entgangene Verkäufe und dein Lagerwert. Eine E-Mail pro Woche, in jedem Tarif.",
+    "summaryEmail": "Senden an",
+    "locationsHeading": "Standorte, die als Bestand zählen",
+    "locationsIntro": "Entferne das Häkchen bei einem Standort, dessen Bestand nicht zum Verkauf steht (Retouren, beschädigte Ware, Showroom). Seine Stückzahlen zählen nicht für Reichweite und Bestellvorschläge; von dort versandte Verkäufe zählen weiter als Nachfrage.",
+    "locationsSaved": "Gespeichert. Die Prognosen werden aktualisiert.",
+    "excludedHeading": "Von der Prognose ausgeschlossene Bestellungen",
+    "excludedIntro": "Großhandels- oder Ladenbestellungen können die Verkaufsrate deines Onlineshops aufblähen. Beim Speichern einer Änderung wird der Bestellverlauf neu gelesen, das dauert einige Minuten.",
+    "excludedTags": "Bestellungen mit diesem Tag ausschließen",
+    "excludedTagsHelp": "Bestell-Tags in Shopify, durch Kommas getrennt.",
+    "excludedSource": {
+      "pos": "Point-of-Sale-Bestellungen ausschließen",
+      "draft": "Bestellentwürfe ausschließen (vom Team erstellt)"
+    }
   },
   "suppliers": {
     "add": "Lieferant hinzufügen",
@@ -445,7 +472,18 @@
     "orderCycleHelp": "Wie oft du bei diesem Lieferanten bestellst. Jeder Bestellvorschlag deckt so viele Tage Verkäufe ab, zusätzlich zu Lieferzeit und Sicherheitsbestand.",
     "orderDays": "Bestelltage",
     "orderDaysHelp": "Die Tage, an denen du bei diesem Lieferanten bestellst. Ein dazwischen fälliges Produkt wird am Bestelltag davor bestellt, damit nichts ausgeht. Keiner angehakt = jeder Tag.",
-    "ordersOn": "Bestellt am: {{days}}"
+    "ordersOn": "Bestellt am: {{days}}",
+    "actualLeadTime_one": "Deine letzte {{count}} Lieferung dauerte {{days}} Tage (Median)",
+    "actualLeadTime_other": "Deine letzten {{count}} Lieferungen dauerten {{days}} Tage (Median)",
+    "useActual_one": "{{count}} Tag verwenden",
+    "useActual_other": "{{count}} Tage verwenden",
+    "minOrderValue": "Mindestbestellwert",
+    "minOrderValueHelp": "In deiner Shop-Währung. Eine Bestellung darunter wird markiert.",
+    "landedCost": "Fracht und Zoll",
+    "landedCostHelp": "Wird in Lagerwert und Ausgaben zu den Stückkosten addiert. Bestellungen behalten den Lieferantenpreis.",
+    "due_one": "{{count}} Produkt jetzt zu bestellen · {{cost}}",
+    "due_other": "{{count}} Produkte jetzt zu bestellen · {{cost}}",
+    "belowMinimum": "Unter dem Minimum von {{minimum}}"
   },
   "bundles": {
     "add": "Bundle hinzufügen",
@@ -468,7 +506,10 @@
     "quantity": "Menge",
     "changeProducts": "Produkte ändern",
     "selectProducts": "Produkte auswählen",
-    "save": "Bundle speichern"
+    "save": "Bundle speichern",
+    "buildable_one": "Bestand für {{count}} Bundle; {{component}} geht zuerst aus",
+    "buildable_other": "Bestand für {{count}} Bundles; {{component}} geht zuerst aus",
+    "buildableNone": "Kein Bestand für ein Bundle: {{component}} fehlt"
   },
   "plans": {
     "names": {
@@ -585,7 +626,12 @@
     "event_too_long": "Eine Aktion darf höchstens 3 Monate dauern. Bei einer dauerhaften Änderung passe stattdessen die Verkaufsrate an.",
     "required_if": "Dieses Feld ist erforderlich.",
     "not_in": "Wähle einen anderen Wert.",
-    "cost_columns_missing": "Die Datei braucht eine SKU- oder Barcode-Spalte und eine Kostenspalte."
+    "cost_columns_missing": "Die Datei braucht eine SKU- oder Barcode-Spalte und eine Kostenspalte.",
+    "keep_one_location": "Mindestens ein Standort muss als Bestand zählen.",
+    "too_many_views": "Bis zu 20 Ansichten möglich. Lösche zuerst eine.",
+    "alternate_is_main": "Das ist bereits der Lieferant des Produkts.",
+    "too_many_suppliers": "Bis zu 5 weitere Lieferanten pro Produkt.",
+    "not_an_alternate": "Füge diesen Lieferanten zuerst dem Produkt hinzu."
   },
   "explanation": {
     "unknown": "—",
@@ -672,7 +718,17 @@
     "event_upcoming_lower_one": "{{name}} ({{from_date}} – {{to_date}}, ×{{multiplier}}) zieht {{count}} Stück von der Bestellmenge ab.",
     "event_upcoming_lower_other": "{{name}} ({{from_date}} – {{to_date}}, ×{{multiplier}}) zieht {{count}} Stück von der Bestellmenge ab.",
     "ordered_manual_one": "Du hast {{count}} Stück als bestellt markiert (erwartet am {{expected_date}}): zählt als unterwegs.",
-    "ordered_manual_other": "Du hast {{count}} Stück als bestellt markiert (erwartet am {{expected_date}}): zählt als unterwegs."
+    "ordered_manual_other": "Du hast {{count}} Stück als bestellt markiert (erwartet am {{expected_date}}): zählt als unterwegs.",
+    "profile_recent": "Shop-Einstellung „Aktuellen Verkäufen folgen\": Die letzten 7 Tage zählen am meisten.",
+    "profile_recent_product": "Dieses Produkt folgt den aktuellen Verkäufen: Die letzten 7 Tage zählen am meisten.",
+    "profile_steady": "Shop-Einstellung „Stabil\": Die Rate wird über bis zu ein Jahr gemittelt.",
+    "profile_steady_product": "Dieses Produkt steht auf „Stabil\": Die Rate wird über bis zu ein Jahr gemittelt.",
+    "trend_up_one": "Verkauft sich am letzten Tag {{percent}} % schneller ({{recent}}/Tag) als in den {{days}} Tagen davor ({{baseline}}/Tag).",
+    "trend_up_other": "Verkauft sich in den letzten {{count}} Tagen {{percent}} % schneller ({{recent}}/Tag) als in den {{days}} Tagen davor ({{baseline}}/Tag).",
+    "trend_down_one": "Verkauft sich am letzten Tag {{percent}} % langsamer ({{recent}}/Tag) als in den {{days}} Tagen davor ({{baseline}}/Tag).",
+    "trend_down_other": "Verkauft sich in den letzten {{count}} Tagen {{percent}} % langsamer ({{recent}}/Tag) als in den {{days}} Tagen davor ({{baseline}}/Tag).",
+    "backorder_included_one": "{{count}} Stück ist bereits im Rückstand verkauft (Bestand unter null) und in der Bestellung enthalten.",
+    "backorder_included_other": "{{count}} Stück sind bereits im Rückstand verkauft (Bestand unter null) und in der Bestellung enthalten."
   },
   "import": {
     "fromStocky": "Aus Stocky importieren",
@@ -1047,7 +1103,10 @@
     "emptyHeading": "Noch keine Verkaufsaktionen",
     "emptyBody": "Du planst einen Black Friday oder einen Sale? Füge ihn hinzu, damit die Bestellungen den Mehrbedarf rechtzeitig abdecken.",
     "deleteHeading": "Aktion löschen?",
-    "confirmDelete": "„{{name}}“ löschen? Die Prognosen werden ohne sie neu berechnet."
+    "confirmDelete": "„{{name}}“ löschen? Die Prognosen werden ohne sie neu berechnet.",
+    "repeatsYearly": "Wiederholt sich jedes Jahr",
+    "repeatsYearlyHelp": "Für eine Saison: dieselbe Änderung an denselben Tagen jedes Jahr.",
+    "yearly": "Jedes Jahr"
   },
   "orders": {
     "mark": "Als bestellt markieren",
@@ -1074,7 +1133,8 @@
     "done": {
       "received": "Als erhalten markiert",
       "cancelled": "Bestellung storniert",
-      "open": "Bestellung wieder geöffnet"
+      "open": "Bestellung wieder geöffnet",
+      "part": "Gespeichert: Der Rest zählt weiter als unterwegs"
     },
     "state": {
       "open": "Unterwegs",
@@ -1090,7 +1150,10 @@
     "overdueBody": "Sie zählen nicht mehr als unterwegs. Markiere sie als erhalten oder storniere sie, wenn sie nicht kommen.",
     "review": "Bestellungen prüfen",
     "link_one": "Aufgegebene Bestellungen ({{count}})",
-    "link_other": "Aufgegebene Bestellungen ({{count}})"
+    "link_other": "Aufgegebene Bestellungen ({{count}})",
+    "receivePart": "Teilweise erhalten",
+    "receivedSoFar": "Bisher erhalten",
+    "partReceived": "{{received}} erhalten, der Rest ist unterwegs"
   },
   "costs": {
     "intro": "Lagerwert, gebundenes Kapital sowie Bestell- und Plansummen brauchen die Stückkosten jedes Produkts. Gib hier Kosten für Produkte ein, die in Shopify keine haben, oder um deine echten Einstandskosten zu verwenden. Sie haben in der App Vorrang vor den Shopify-Kosten; Shopify selbst wird nicht geändert.",
@@ -1153,5 +1216,143 @@
       "reorder_point": "Meldebestand erreicht"
     },
     "noCost": "Keine Kosten"
+  },
+  "forecastProfile": {
+    "label": "Wie die Verkaufsrate gemittelt wird",
+    "help": "Ausgewogen passt für die meisten Produkte. Jede Prognose zeigt die verwendeten Tage und Gewichte; ein Produkt kann eine eigene Einstellung haben.",
+    "productLabel": "Verkaufsrate für dieses Produkt",
+    "productHelp": "Nutze „Aktuellen Verkäufen folgen\" für ein neues oder schnell wachsendes Produkt, „Stabil\" für eines, das langsam oder unregelmäßig verkauft wird.",
+    "storeDefault": "Shop-Einstellung ({{name}})",
+    "balanced": "Ausgewogen (7, 30 und 90 Tage)",
+    "recent": "Aktuellen Verkäufen folgen (die letzten 7 Tage zählen am meisten)",
+    "steady": "Stabil (bis zu ein Jahr Verkäufe)"
+  },
+  "trend": {
+    "filter": "Trend",
+    "all": "Jeder Trend",
+    "up": "Verkauft sich schneller",
+    "down": "Verkauft sich langsamer",
+    "badgeUp": "Verkauft sich zuletzt {{percent}} % schneller",
+    "badgeDown": "Verkauft sich zuletzt {{percent}} % langsamer"
+  },
+  "stockHistory": {
+    "heading": "Lagerwert im Zeitverlauf",
+    "units_one": "{{units}} Stück",
+    "units_other": "{{units}} Stück",
+    "inStock_one": "{{units}} Stück in {{count}} Produkt auf Lager",
+    "inStock_other": "{{units}} Stück in {{count}} Produkten auf Lager",
+    "up": "+{{amount}} seit {{date}}",
+    "down": "−{{amount}} seit {{date}}",
+    "chartLabel": "Bestand vom {{from}} ({{first}}) bis {{to}} ({{last}})",
+    "collecting": "Die Aufzeichnung begann am {{date}}. Das Diagramm erscheint, sobald zwei Tage zum Vergleichen vorliegen.",
+    "period_one": "{{count}} Tag",
+    "period_other": "{{count}} Tage",
+    "how": "Bestand × Stückkosten, einmal täglich aufgezeichnet, seit die App installiert wurde (Shopify speichert keinen Verlauf). Zwei Jahre aufbewahrt."
+  },
+  "health": {
+    "heading": "Datenprüfung",
+    "settingsBody": "Fehlende Kosten, SKUs oder Lieferanten und negativer Bestand machen Prognosen und Geldbeträge ungenauer.",
+    "settingsLink": "Meine Produktdaten prüfen",
+    "intro_one": "Wir haben {{products}} verfolgtes Produkt geprüft. Das Beheben der folgenden Punkte macht Prognosen und Beträge genauer.",
+    "intro_other": "Wir haben {{products}} verfolgte Produkte geprüft. Das Beheben der folgenden Punkte macht Prognosen und Beträge genauer.",
+    "allGood_one": "Wir haben {{products}} verfolgtes Produkt geprüft und nichts zu beheben gefunden.",
+    "allGood_other": "Wir haben {{products}} verfolgte Produkte geprüft und nichts zu beheben gefunden.",
+    "more_one": "…und {{count}} weiteres",
+    "more_other": "…und {{count}} weitere",
+    "findings": {
+      "negative_stock": {
+        "title_one": "Produkt mit negativem Bestand",
+        "title_other": "Produkte mit negativem Bestand",
+        "body": "Shopify zeigt weniger als null auf Lager (überverkauft oder nie gezählt). Resttage und Bestellmengen gehen von dieser Zahl aus: Korrigiere die Menge in Shopify."
+      },
+      "not_tracked": {
+        "title_one": "Produkt ohne Bestandsverfolgung",
+        "title_other": "Produkte ohne Bestandsverfolgung",
+        "body": "Shopify verfolgt ihre Menge nicht, daher gibt es nichts zu prognostizieren. Aktiviere „Menge verfolgen\" am Produkt in Shopify, wenn du sie lagerst."
+      },
+      "missing_cost": {
+        "title_one": "Produkt ohne Stückkosten",
+        "title_other": "Produkte ohne Stückkosten",
+        "body": "Sie fehlen in allen Geldbeträgen: gebundenes Kapital, Lagerwert, Einkaufsplan und Budget.",
+        "fix": "Stückkosten hinzufügen"
+      },
+      "duplicate_sku": {
+        "title_one": "Produkt mit doppelter SKU",
+        "title_other": "Produkte mit doppelter SKU",
+        "body": "Bestellungen und CSV-Importe ordnen Produkte per SKU zu; eine doppelte SKU kann Menge oder Kosten dem falschen Produkt zuweisen. Gib jedem Produkt in Shopify eine eigene SKU."
+      },
+      "missing_sku": {
+        "title_one": "Produkt ohne SKU",
+        "title_other": "Produkte ohne SKU",
+        "body": "Ohne SKU (oder Barcode) fehlt ein Produkt im Shopify-Bestellexport und kann in CSV-Importen nicht zugeordnet werden."
+      },
+      "missing_price": {
+        "title_one": "Produkt ohne Preis",
+        "title_other": "Produkte ohne Preis",
+        "body": "Keine ABC-Klasse und keine Schätzung des entgangenen Umsatzes. Der Preis kommt bei der nächsten Synchronisierung aus Shopify."
+      },
+      "no_supplier": {
+        "title_one": "Produkt ohne Lieferant",
+        "title_other": "Produkte ohne Lieferant",
+        "body": "Bestellungen lassen sich nicht nach Lieferant gruppieren, und dessen Lieferzeit, Mindestbestellung und Bestelltage gelten nicht.",
+        "fix": "Lieferanten einrichten"
+      },
+      "default_lead_time": {
+        "title_one": "Produkt mit Standard-Lieferzeit",
+        "title_other": "Produkte mit Standard-Lieferzeit",
+        "body": "Weder das Produkt noch sein Lieferant hat eine Lieferzeit, daher entscheidet der Standard von {{days}} Tagen über den Bestellzeitpunkt. Passt das zu deinen Lieferanten, ist es in Ordnung; sonst trage die echte Lieferzeit ein.",
+        "fix": "Lieferzeiten der Lieferanten eintragen"
+      }
+    }
+  },
+  "clearance": {
+    "heading": "Was abverkauft werden sollte",
+    "intro_one": "Langsamdreher und Überbestände, höchster Lagerwert zuerst. Die Abverkaufsquote ist der Verkauf des letzten {{count}} Tages gemessen am Verfügbaren.",
+    "intro_other": "Langsamdreher und Überbestände, höchster Lagerwert zuerst. Die Abverkaufsquote ist der Verkauf der letzten {{count}} Tage gemessen am Verfügbaren.",
+    "sold_one": "Verkauft in {{count}} Tag",
+    "sold_other": "Verkauft in {{count}} Tagen",
+    "sellThrough": "Abverkaufsquote",
+    "lastSale": "Letzter Verkauf",
+    "never": "Kein Verkauf erfasst",
+    "daysAgo_one": "Vor {{count}} Tag ({{date}})",
+    "daysAgo_other": "Vor {{count}} Tagen ({{date}})",
+    "export": "Liste exportieren (CSV)",
+    "more_one": "{{count}} weiteres in der Datei",
+    "more_other": "{{count}} weitere in der Datei"
+  },
+  "sizeRuns": {
+    "heading": "Lückenhafte Größenläufe",
+    "intro": "Produkte, bei denen eine meistverkaufte Variante fehlt oder nachbestellt werden muss, während andere liegen bleiben. Das Produkt wirkt vorrätig, aber die gesuchte Größe fehlt.",
+    "short": "{{title}}: {{share}} % der Verkäufe, {{stock}} übrig",
+    "sitting": "{{title}}: {{stock}} liegen",
+    "ok": "{{title}}: {{stock}}"
+  },
+  "views": {
+    "saved": "Ansicht gespeichert",
+    "delete": "Ansicht {{name}} löschen",
+    "name": "Name der Ansicht",
+    "namePlaceholder": "Diese Filter speichern als…",
+    "save": "Ansicht speichern"
+  },
+  "alternates": {
+    "heading": "Weitere Lieferanten",
+    "intro": "Halte einen Ersatzlieferanten mit eigenen Kosten, eigener Lieferzeit und Artikelnummer bereit. Beim Wechsel wird er zum Lieferanten des Produkts, der bisherige bleibt hier.",
+    "cost": "Stückkosten",
+    "makeMain": "Als Lieferant verwenden",
+    "switched": "{{name}} ist jetzt der Lieferant dieses Produkts",
+    "add": "Lieferanten hinzufügen",
+    "choose": "Auswählen…",
+    "addButton": "Hinzufügen"
+  },
+  "shopifyPo": {
+    "heading": "Bestellungen in Shopify",
+    "connectBody": "Sieh die in Shopify erstellten Bestellungen neben den hier markierten. Ihre Stückzahlen zählen bereits als unterwegs; zum Lesen ist deine Erlaubnis nötig.",
+    "connect": "Shopify-Bestellungen anzeigen",
+    "declined": "Berechtigung nicht erteilt",
+    "error": "Shopify hat die Bestellungen nicht zurückgegeben. Versuche es später erneut.",
+    "none": "Keine Bestellung ist in Shopify als bestellt markiert.",
+    "order": "Bestellung",
+    "orderedOn": "Bestellt am",
+    "cost": "Kosten"
   }
 }

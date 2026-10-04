@@ -5,6 +5,11 @@ export interface Settings {
     default_safety_days: number;
     /** Cap one-off sales spikes before averaging; null when switched off app-wide. */
     filter_sales_spikes: boolean | null;
+    /** Default averaging windows (a product's own setting wins). */
+    forecast_profile: 'balanced' | 'recent' | 'steady';
+    /** Orders left out of the sales history: by order tag, and by source. Changing them re-reads the history. */
+    excluded_order_tags: string[];
+    excluded_order_sources: ('pos' | 'draft')[];
     /** null = follow the Shopify admin language */
     locale: string | null;
     alerts: {
@@ -16,9 +21,22 @@ export interface Settings {
         /** Growth: live stock emails, batched and capped (see backend config/alerts.php). */
         realtime_available: boolean;
         realtime: RealtimeAlertMode;
+        /** One summary email a week (every plan); null when switched off app-wide. */
+        weekly_summary: boolean | null;
+        /** Slack incoming webhook the reorder digest is also posted to. */
+        slack_webhook_url: string | null;
+        /** Also alert at this many days of stock left or fewer (null = reorder date only). */
+        cover_days: number | null;
     };
     /** Shopify Flow triggers (Growth); `active` = a workflow in Flow uses one of them. */
     flow: { available: boolean; active: boolean };
+}
+
+/** A location and whether its stock is left out of the forecasts (returns, damaged goods, showroom). */
+export interface StockLocation {
+    id: number;
+    name: string;
+    excluded: boolean;
 }
 
 export interface Supplier {
@@ -26,6 +44,14 @@ export interface Supplier {
     name: string;
     email: string | null;
     lead_time_days: number | null;
+    /** Freight, duty and handling on top of the supplier's price (%): money figures use the landed cost. */
+    landed_cost_percent?: number | null;
+    /** The supplier's minimum order value (shop currency). */
+    min_order_value?: number | null;
+    /** What is due to order from this supplier now, at the supplier's price (null = nothing). */
+    due?: { products: number; units: number; cost: number } | null;
+    /** Median days real deliveries took (orders marked as ordered, then received); null with too few. */
+    actual_lead_time?: { median_days: number; orders: number } | null;
     /** Defaults for this supplier's products (a product's own setting wins). */
     min_order_qty: number | null;
     pack_size: number | null;
@@ -39,7 +65,7 @@ export interface Supplier {
     last_emailed_at: string | null;
 }
 
-export type SupplierInput = Pick<Supplier, 'name' | 'email' | 'lead_time_days' | 'min_order_qty' | 'pack_size' | 'order_cycle_days' | 'order_weekdays'> & { auto_email?: boolean };
+export type SupplierInput = Pick<Supplier, 'name' | 'email' | 'lead_time_days' | 'min_order_qty' | 'pack_size' | 'order_cycle_days' | 'order_weekdays'> & Partial<Pick<Supplier, 'landed_cost_percent' | 'min_order_value'>> & { auto_email?: boolean };
 
 /** A Shopify vendor that can become a supplier. */
 export interface VendorCandidate {
@@ -98,6 +124,9 @@ export interface Bundle {
     sku: string | null;
     components: BundleComponent[];
     editable: boolean;
+    /** Bundles the components on hand make, and the component that runs out first. */
+    buildable: number | null;
+    limiting_component: string | null;
 }
 
 /** Variants are local ids or Shopify variant gids (App Bridge resource picker). */

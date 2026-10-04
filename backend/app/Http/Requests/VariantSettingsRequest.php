@@ -28,10 +28,14 @@ class VariantSettingsRequest extends FormRequest
             'min_stock' => ['sometimes', 'nullable', 'integer', 'min:0', 'max:1000000'],
             'max_stock' => ['sometimes', 'nullable', 'integer', 'min:1', 'max:1000000'],
             'alerts_muted' => ['sometimes', 'boolean'],
+            // The supplier's own product code, for purchase orders.
+            'supplier_sku' => ['sometimes', 'nullable', 'string', 'max:255'],
             // Unit cost entered in the app (null = Shopify's cost).
             'cost_override' => ['sometimes', 'nullable', 'numeric', 'min:0', 'max:10000000'],
             // No longer reordered: sells through what is left (no suggestions, alerts, plan).
             'discontinued' => ['sometimes', 'boolean'],
+            // Window mix for this product (null = the store's).
+            'forecast_profile' => ['sometimes', 'nullable', Rule::in(array_keys(config('forecast.profiles')))],
             // New products: a similar product (local id or Shopify variant gid) and the share of its rate.
             'reference_variant' => ['sometimes', 'nullable', function (string $attr, mixed $value, \Closure $fail) {
                 if (! is_int($value) && ! (is_string($value) && preg_match('#^gid://shopify/ProductVariant/\d+$#', $value))) {
@@ -56,6 +60,6 @@ class VariantSettingsRequest extends FormRequest
 
     public function settings(): array
     {
-        return $this->safe()->only(['supplier_id', 'lead_time_override', 'safety_days', 'min_order_qty', 'pack_size', 'min_stock', 'max_stock', 'alerts_muted', 'discontinued']);
+        return $this->safe()->only(['supplier_id', 'lead_time_override', 'safety_days', 'min_order_qty', 'pack_size', 'min_stock', 'max_stock', 'alerts_muted', 'discontinued', 'forecast_profile', 'supplier_sku']);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\AlertSetting;
 use App\Models\Shop;
 use App\Support\CacheKeys;
 use Illuminate\Console\Command;
@@ -57,6 +58,27 @@ class ReencryptSecrets extends Command
                 Shop::query()->whereKey($shop->id)->update($updates);
                 Cache::forget(CacheKeys::shopById($shop->id));
                 Cache::forget(CacheKeys::shopByDomain($shop->domain));
+            }
+        });
+
+        // Slack webhook URLs of the alert settings (same cast, another table).
+        AlertSetting::query()->withoutGlobalScope('shop')->whereNotNull('slack_webhook_url')->orderBy('id')->each(function (AlertSetting $setting) use ($current, &$counts) {
+            $raw = (string) $setting->getRawOriginal('slack_webhook_url');
+            if ($this->opens($current, $raw)) {
+                $counts['current']++;
+
+                return;
+            }
+            try {
+                $value = $current->encryptString(Crypt::decryptString($raw));
+                $counts['reencrypted']++;
+                if (! $this->option('dry-run')) {
+                    AlertSetting::query()->withoutGlobalScope('shop')->whereKey($setting->id)->update(['slack_webhook_url' => $value]);
+                    Cache::forget(CacheKeys::alertSetting($setting->shop_id));
+                }
+            } catch (DecryptException) {
+                $counts['unreadable']++;
+                $this->error("alert setting {$setting->id}: slack_webhook_url cannot be decrypted with APP_KEY or APP_PREVIOUS_KEYS");
             }
         });
 

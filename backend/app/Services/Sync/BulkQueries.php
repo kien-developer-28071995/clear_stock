@@ -48,7 +48,8 @@ final class BulkQueries
 
     /**
      * Order line quantities since a date. Only what the forecast needs:
-     * no customer, address or price fields are requested.
+     * no customer, address or price fields are requested. Tags and the source name are
+     * read to leave out orders the merchant excluded (wholesale, POS); they are not stored.
      */
     public static function orders(string $processedSinceIso, bool $withLocations = false): string
     {
@@ -66,7 +67,7 @@ final class BulkQueries
             {
               orders(query: "processed_at:>='{$processedSinceIso}'") {
                 edges { node {
-                  id processedAt cancelledAt
+                  id processedAt cancelledAt tags sourceName
                   lineItems { edges { node {
                     quantity currentQuantity
                     variant { id }

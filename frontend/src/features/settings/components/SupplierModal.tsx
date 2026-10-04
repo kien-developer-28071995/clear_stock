@@ -26,6 +26,8 @@ export function SupplierModal({ modalRef, supplier, onDone }: Props) {
     const [minOrder, setMinOrder] = useState('');
     const [pack, setPack] = useState('');
     const [cycle, setCycle] = useState('');
+    const [landed, setLanded] = useState('');
+    const [minValue, setMinValue] = useState('');
     const [weekdays, setWeekdays] = useState<number[]>([]);
     const [autoEmail, setAutoEmail] = useState(false);
     // Emailing an order by hand is Starter; automatic weekly orders are Growth.
@@ -39,6 +41,8 @@ export function SupplierModal({ modalRef, supplier, onDone }: Props) {
         setMinOrder(supplier?.min_order_qty?.toString() ?? '');
         setPack(supplier?.pack_size?.toString() ?? '');
         setCycle(supplier?.order_cycle_days?.toString() ?? '');
+        setLanded(supplier?.landed_cost_percent?.toString() ?? '');
+        setMinValue(supplier?.min_order_value?.toString() ?? '');
         setWeekdays(supplier?.order_weekdays ?? []);
         setAutoEmail(supplier?.auto_email ?? false);
         create.reset();
@@ -54,6 +58,8 @@ export function SupplierModal({ modalRef, supplier, onDone }: Props) {
             min_order_qty: minOrder === '' ? null : Number(minOrder),
             pack_size: pack === '' ? null : Number(pack),
             order_cycle_days: cycle === '' ? null : Number(cycle),
+            landed_cost_percent: landed === '' ? null : Number(landed),
+            min_order_value: minValue === '' ? null : Number(minValue),
             order_weekdays: weekdays.length === 0 ? null : weekdays,
             ...(canAutoEmail ? { auto_email: autoEmail && email.trim() !== '' } : {}),
         };
@@ -105,6 +111,30 @@ export function SupplierModal({ modalRef, supplier, onDone }: Props) {
                     error={fieldError(mutation.error, 'order_cycle_days')}
                     onInput={(e) => setCycle(e.currentTarget.value)}
                 />
+                <s-grid gridTemplateColumns="1fr 1fr" gap="base">
+                    <s-number-field
+                        label={t('suppliers.minOrderValue')}
+                        min={0}
+                        step={0.01}
+                        placeholder={t('productSettings.none')}
+                        details={t('suppliers.minOrderValueHelp')}
+                        value={minValue}
+                        error={fieldError(mutation.error, 'min_order_value')}
+                        onInput={(e) => setMinValue(e.currentTarget.value)}
+                    />
+                    <s-number-field
+                        label={t('suppliers.landedCost')}
+                        suffix="%"
+                        min={0}
+                        max={500}
+                        step={0.1}
+                        placeholder="0"
+                        details={t('suppliers.landedCostHelp')}
+                        value={landed}
+                        error={fieldError(mutation.error, 'landed_cost_percent')}
+                        onInput={(e) => setLanded(e.currentTarget.value)}
+                    />
+                </s-grid>
                 <s-stack gap="small-200">
                     <s-text type="strong">{t('suppliers.orderDays')}</s-text>
                     <s-stack direction="inline" gap="base">

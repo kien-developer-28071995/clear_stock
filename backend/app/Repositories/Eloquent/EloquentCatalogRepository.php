@@ -139,7 +139,7 @@ class EloquentCatalogRepository implements CatalogRepositoryInterface
         return DB::table('inventory_levels')
             ->join('locations', 'locations.id', '=', 'inventory_levels.location_id')
             ->where('inventory_levels.shop_id', $shop->id)
-            ->where('locations.is_active', true)
+            ->where('locations.is_active', true)->where('locations.excluded', false)
             ->groupBy('inventory_levels.variant_id')
             ->selectRaw("inventory_levels.variant_id as variant_id, SUM(inventory_levels.{$column}) as qty")
             ->pluck('qty', 'variant_id')->mapWithKeys(fn ($s, $id) => [(int) $id => (int) $s])->all();
@@ -151,7 +151,7 @@ class EloquentCatalogRepository implements CatalogRepositoryInterface
         $out = [];
         DB::table('inventory_levels')
             ->join('locations', 'locations.id', '=', 'inventory_levels.location_id')
-            ->where('inventory_levels.shop_id', $shop->id)->where('locations.is_active', true)
+            ->where('inventory_levels.shop_id', $shop->id)->where('locations.is_active', true)->where('locations.excluded', false)
             ->orderBy('inventory_levels.id')
             ->each(function ($r) use (&$out, $column) {
                 $out[(int) $r->variant_id][(int) $r->location_id] = (int) $r->{$column};

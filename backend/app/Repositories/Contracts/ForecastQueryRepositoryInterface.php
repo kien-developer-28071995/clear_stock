@@ -36,6 +36,9 @@ interface ForecastQueryRepositoryInterface
     /** @return array{total: int, tracked: int, reorder_now: int, out_of_stock: int, slow: int, healthy: int} total = forecasted, tracked = forecastable products */
     public function counts(Shop $shop, string $today): array;
 
+    /** Selling products with at most $days of stock left whose reorder date is still ahead (not discontinued). */
+    public function lowCover(Shop $shop, string $today, int $days): Collection;
+
     /**
      * Products needing action by $until (out of stock, or reorder date reached), most urgent first.
      *
@@ -90,6 +93,23 @@ interface ForecastQueryRepositoryInterface
     public function discontinuedStock(Shop $shop): array;
 
     /** @return array<int, string> weeks (Y-m-d, newest first) with forecast snapshots, up to $latestStart */
+    /**
+     * Slow and overstocked products, most stock value first, with what sold since $since and the last sale.
+     *
+     * @return array<int, array{variant_id: int, name: string, sku: ?string, status: string, stock: int, excess: int, days_of_cover: ?float, value: ?float, sold: int, sell_through: ?float, last_sold_on: ?string}>
+     */
+    public function clearance(Shop $shop, string $today, string $since, int $limit): array;
+
+    /**
+     * Forecast products grouped by Shopify product (not discontinued), for products with several variants.
+     *
+     * @return array<int, array<int, array{variant_id: int, product: string, title: ?string, avg: float, stock: int, days_of_cover: ?float, reorder_date: ?string}>>
+     */
+    public function variantsByProduct(Shop $shop): array;
+
+    /** The latest weekly snapshot of a product from before $weekStart: {week_start, avg} or null. */
+    public function previousSnapshot(Shop $shop, int $variantId, string $weekStart): ?array;
+
     public function snapshotWeeks(Shop $shop, string $latestStart, int $limit): array;
 
     /**

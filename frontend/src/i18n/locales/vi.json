@@ -273,7 +273,9 @@
     "reorderPoint": "Điểm đặt hàng lại",
     "units_other": "{{qty}} cái",
     "onTheWay": "Đang về",
-    "incomingShort": "+{{qty}} đang về"
+    "incomingShort": "+{{qty}} đang về",
+    "rateUp": "Tăng từ {{previous}}/ngày ở dự báo tuần {{date}} (nay {{current}}/ngày).",
+    "rateDown": "Giảm từ {{previous}}/ngày ở dự báo tuần {{date}} (nay {{current}}/ngày)."
   },
   "why": {
     "heading": "Vì sao ra các con số này?",
@@ -300,7 +302,10 @@
     "location": "Chi nhánh",
     "pending": "Dự báo theo chi nhánh sẽ có sau lần đồng bộ tới (mở app một lần để chấp thuận quyền fulfillment mới nếu Shopify yêu cầu).",
     "why": "Vì sao: {{location}}",
-    "hint": "Chọn một chi nhánh để xem giải thích. Việc chỉnh tốc độ bán chỉ áp dụng cho tổng cửa hàng."
+    "hint": "Chọn một chi nhánh để xem giải thích. Việc chỉnh tốc độ bán chỉ áp dụng cho tổng cửa hàng.",
+    "minimum": "Tồn tối thiểu tại đây",
+    "minimumAt": "Tồn tối thiểu tại {{location}}",
+    "saveMinimums": "Lưu mức tối thiểu"
   },
   "adjust": {
     "heading": "Chỉnh tốc độ bán",
@@ -345,7 +350,9 @@
     "referenceClear": "Bỏ",
     "referenceNone": "Chưa chọn",
     "referencePercent": "Tỷ lệ tốc độ bán",
-    "referenceLocked": "Dự báo sản phẩm mới theo một sản phẩm tương tự cho tới khi có lịch sử bán riêng."
+    "referenceLocked": "Dự báo sản phẩm mới theo một sản phẩm tương tự cho tới khi có lịch sử bán riêng.",
+    "supplierSku": "Mã hàng của nhà cung cấp",
+    "supplierSkuHelp": "Không bắt buộc. In trên đơn đặt hàng và email đặt hàng để nhà cung cấp nhận ra sản phẩm."
   },
   "products": {
     "freeLimit_other": "Gói Miễn phí dự báo {{count}} sản phẩm bán chạy nhất.",
@@ -368,7 +375,8 @@
     "vendor": "Vendor",
     "allVendors": "Tất cả vendor",
     "productType": "Loại sản phẩm",
-    "allTypes": "Tất cả loại sản phẩm"
+    "allTypes": "Tất cả loại sản phẩm",
+    "exportCsv": "Xuất danh sách (CSV)"
   },
   "settings": {
     "defaultsHeading": "Mặc định cho dự báo",
@@ -399,7 +407,26 @@
     "languageHeading": "Ngôn ngữ",
     "language": "Ngôn ngữ của app",
     "languageHelp": "Email cảnh báo được gửi bằng tiếng Anh.",
-    "languageAuto": "Giống Shopify admin ({{language}})"
+    "languageAuto": "Giống Shopify admin ({{language}})",
+    "coverDays": "Cảnh báo thêm khi tồn kho chỉ còn đủ bán dưới",
+    "coverDaysHelp": "Không bắt buộc. Sản phẩm còn đủ bán chừng này ngày sẽ có trong email tóm tắt dù chưa tới ngày cần đặt. Để trống = chỉ theo ngày cần đặt.",
+    "slackUrl": "URL webhook của Slack",
+    "slackUrlHelp": "Không bắt buộc. Bản tóm tắt cũng được gửi vào kênh Slack này. Tạo incoming webhook trong Slack rồi dán URL vào đây.",
+    "summaryHeading": "Tóm tắt hằng tuần",
+    "summaryEnabled": "Gửi cho tôi email tóm tắt mỗi tuần một lần",
+    "summaryHelp": "Cần đặt gì trước, sản phẩm hết hàng, tiền kẹt ở hàng bán chậm, doanh thu mất và giá trị tồn kho. Một email mỗi tuần, có ở mọi gói.",
+    "summaryEmail": "Gửi tới",
+    "locationsHeading": "Chi nhánh được tính tồn kho",
+    "locationsIntro": "Bỏ chọn chi nhánh có hàng không để bán (hàng trả về, hàng lỗi, showroom). Tồn ở đó không tính vào số ngày còn hàng và gợi ý đặt hàng; đơn giao từ đó vẫn tính là nhu cầu.",
+    "locationsSaved": "Đã lưu. Dự báo đang được cập nhật.",
+    "excludedHeading": "Đơn hàng không tính vào dự báo",
+    "excludedIntro": "Đơn sỉ hoặc đơn tại quầy có thể làm tốc độ bán online bị đội lên. Khi lưu thay đổi ở đây, app đọc lại lịch sử đơn hàng, mất vài phút.",
+    "excludedTags": "Bỏ qua đơn có tag",
+    "excludedTagsHelp": "Tag của đơn hàng trong Shopify, cách nhau bằng dấu phẩy.",
+    "excludedSource": {
+      "pos": "Bỏ qua đơn bán tại quầy (POS)",
+      "draft": "Bỏ qua đơn nháp (do nhân viên tạo)"
+    }
   },
   "suppliers": {
     "add": "Thêm nhà cung cấp",
@@ -424,7 +451,15 @@
     "orderCycleHelp": "Bao lâu bạn đặt hàng NCC này một lần. Mỗi đơn gợi ý đủ bán ngần ấy ngày, cộng thêm lead time và tồn an toàn.",
     "orderDays": "Ngày đặt hàng",
     "orderDaysHelp": "Những ngày bạn đặt hàng với nhà cung cấp này. Sản phẩm đến hạn vào giữa hai ngày sẽ được đặt vào ngày đặt hàng liền trước, để không bị hết hàng. Không chọn ngày nào = ngày nào cũng được.",
-    "ordersOn": "Đặt hàng: {{days}}"
+    "ordersOn": "Đặt hàng: {{days}}",
+    "actualLeadTime_other": "{{count}} lần giao gần đây mất {{days}} ngày (trung vị)",
+    "useActual_other": "Dùng {{count}} ngày",
+    "minOrderValue": "Giá trị đơn tối thiểu",
+    "minOrderValueHelp": "Theo tiền tệ của cửa hàng. Đơn thấp hơn mức này sẽ được đánh dấu.",
+    "landedCost": "Phí vận chuyển và thuế nhập",
+    "landedCostHelp": "Cộng vào giá vốn khi tính giá trị tồn và chi phí. Đơn đặt hàng vẫn dùng giá của nhà cung cấp.",
+    "due_other": "{{count}} sản phẩm cần đặt ngay · {{cost}}",
+    "belowMinimum": "Dưới mức tối thiểu {{minimum}}"
   },
   "bundles": {
     "add": "Thêm combo",
@@ -447,7 +482,9 @@
     "quantity": "Số lượng",
     "changeProducts": "Đổi sản phẩm",
     "selectProducts": "Chọn sản phẩm",
-    "save": "Lưu combo"
+    "save": "Lưu combo",
+    "buildable_other": "Tồn đủ làm {{count}} combo; {{component}} hết trước",
+    "buildableNone": "Không đủ tồn để làm: {{component}} đã hết"
   },
   "plans": {
     "names": {
@@ -562,7 +599,12 @@
     "event_too_long": "Sự kiện dài tối đa 3 tháng. Nếu thay đổi kéo dài, hãy chỉnh tốc độ bán.",
     "required_if": "Vui lòng nhập ô này.",
     "not_in": "Hãy chọn giá trị khác.",
-    "cost_columns_missing": "File cần có cột SKU hoặc barcode và cột giá vốn."
+    "cost_columns_missing": "File cần có cột SKU hoặc barcode và cột giá vốn.",
+    "keep_one_location": "Phải có ít nhất một chi nhánh được tính tồn kho.",
+    "too_many_views": "Tối đa 20 chế độ xem. Hãy xoá bớt một cái.",
+    "alternate_is_main": "Đây đã là nhà cung cấp của sản phẩm.",
+    "too_many_suppliers": "Tối đa 5 nhà cung cấp khác cho mỗi sản phẩm.",
+    "not_an_alternate": "Hãy thêm nhà cung cấp này cho sản phẩm trước."
   },
   "explanation": {
     "unknown": "—",
@@ -621,7 +663,14 @@
     "event_past_other": "{{name}} (×{{multiplier}}): {{count}} ngày được tính theo mức bình thường.",
     "event_upcoming_other": "{{name}} ({{from_date}} – {{to_date}}, ×{{multiplier}}) cộng thêm {{count}} cái vào lượng cần đặt.",
     "event_upcoming_lower_other": "{{name}} ({{from_date}} – {{to_date}}, ×{{multiplier}}) giảm {{count}} cái khỏi lượng cần đặt.",
-    "ordered_manual_other": "Bạn đã đánh dấu đặt {{count}} cái (dự kiến về {{expected_date}}): tính là hàng đang về."
+    "ordered_manual_other": "Bạn đã đánh dấu đặt {{count}} cái (dự kiến về {{expected_date}}): tính là hàng đang về.",
+    "profile_recent": "Cài đặt cửa hàng \"Theo doanh số gần đây\": 7 ngày gần nhất tính nhiều nhất.",
+    "profile_recent_product": "Sản phẩm này tính theo doanh số gần đây: 7 ngày gần nhất tính nhiều nhất.",
+    "profile_steady": "Cài đặt cửa hàng \"Ổn định\": tốc độ bán lấy trung bình tới một năm.",
+    "profile_steady_product": "Sản phẩm này đặt \"Ổn định\": tốc độ bán lấy trung bình tới một năm.",
+    "trend_up_other": "{{count}} ngày gần đây bán nhanh hơn {{percent}}% ({{recent}}/ngày) so với {{days}} ngày trước đó ({{baseline}}/ngày).",
+    "trend_down_other": "{{count}} ngày gần đây bán chậm hơn {{percent}}% ({{recent}}/ngày) so với {{days}} ngày trước đó ({{baseline}}/ngày).",
+    "backorder_included_other": "{{count}} cái đã bán vượt tồn (tồn kho âm) và được cộng vào lượng cần đặt."
   },
   "import": {
     "fromStocky": "Nhập từ Stocky",
@@ -948,7 +997,10 @@
     "emptyHeading": "Chưa có sự kiện bán hàng",
     "emptyBody": "Sắp có Black Friday hay đợt sale? Thêm vào để đơn đặt hàng kịp đáp ứng nhu cầu tăng thêm.",
     "deleteHeading": "Xoá sự kiện?",
-    "confirmDelete": "Xoá \"{{name}}\"? Dự báo sẽ được tính lại khi không có sự kiện này."
+    "confirmDelete": "Xoá \"{{name}}\"? Dự báo sẽ được tính lại khi không có sự kiện này.",
+    "repeatsYearly": "Lặp lại hằng năm",
+    "repeatsYearlyHelp": "Dùng cho mùa vụ: cùng mức thay đổi vào cùng ngày mỗi năm.",
+    "yearly": "Hằng năm"
   },
   "orders": {
     "mark": "Đánh dấu đã đặt",
@@ -973,7 +1025,8 @@
     "done": {
       "received": "Đã đánh dấu đã nhận",
       "cancelled": "Đã huỷ đơn",
-      "open": "Đã mở lại đơn"
+      "open": "Đã mở lại đơn",
+      "part": "Đã lưu: phần còn lại vẫn tính là đang về"
     },
     "state": {
       "open": "Đang về",
@@ -987,7 +1040,10 @@
     "overdueHeading_other": "{{count}} đơn đã quá ngày dự kiến",
     "overdueBody": "Các đơn này không còn được tính là đang về. Hãy đánh dấu đã nhận, hoặc huỷ nếu hàng sẽ không về.",
     "review": "Xem các đơn",
-    "link_other": "Đơn đã đặt ({{count}})"
+    "link_other": "Đơn đã đặt ({{count}})",
+    "receivePart": "Nhận một phần",
+    "receivedSoFar": "Đã nhận",
+    "partReceived": "Đã nhận {{received}}, phần còn lại đang về"
   },
   "costs": {
     "intro": "Giá trị tồn kho, tiền kẹt, tổng tiền đơn đặt hàng và kế hoạch nhập đều cần giá vốn của từng sản phẩm. Nhập ở đây cho các sản phẩm chưa có giá vốn trên Shopify, hoặc để dùng giá vốn thực tế (gồm vận chuyển). Giá vốn nhập trong app được ưu tiên hơn giá trên Shopify; Shopify không bị thay đổi.",
@@ -1041,5 +1097,125 @@
       "reorder_point": "Đã tới điểm đặt lại"
     },
     "noCost": "Chưa có giá vốn"
+  },
+  "forecastProfile": {
+    "label": "Cách tính tốc độ bán",
+    "help": "Cân bằng phù hợp với hầu hết sản phẩm. Mỗi dự báo ghi rõ số ngày và trọng số đã dùng; từng sản phẩm có thể đặt riêng.",
+    "productLabel": "Tốc độ bán của sản phẩm này",
+    "productHelp": "Chọn \"Theo doanh số gần đây\" cho sản phẩm mới hoặc đang tăng nhanh, \"Ổn định\" cho sản phẩm bán chậm hoặc không đều.",
+    "storeDefault": "Theo cài đặt cửa hàng ({{name}})",
+    "balanced": "Cân bằng (7, 30 và 90 ngày)",
+    "recent": "Theo doanh số gần đây (7 ngày gần nhất tính nhiều nhất)",
+    "steady": "Ổn định (tới một năm doanh số)"
+  },
+  "trend": {
+    "filter": "Xu hướng",
+    "all": "Mọi xu hướng",
+    "up": "Đang bán nhanh hơn",
+    "down": "Đang bán chậm lại",
+    "badgeUp": "Gần đây bán nhanh hơn {{percent}}%",
+    "badgeDown": "Gần đây bán chậm hơn {{percent}}%"
+  },
+  "stockHistory": {
+    "heading": "Giá trị tồn kho theo thời gian",
+    "units_other": "{{units}} cái",
+    "inStock_other": "{{units}} cái ở {{count}} sản phẩm còn hàng",
+    "up": "+{{amount}} từ {{date}}",
+    "down": "−{{amount}} từ {{date}}",
+    "chartLabel": "Tồn kho từ {{from}} ({{first}}) đến {{to}} ({{last}})",
+    "collecting": "Bắt đầu ghi từ {{date}}. Biểu đồ sẽ hiện khi có hai ngày để so sánh.",
+    "period_other": "{{count}} ngày",
+    "how": "Tồn kho × giá vốn, ghi mỗi ngày một lần từ khi cài app (Shopify không lưu lịch sử để lấy lại). Giữ trong hai năm."
+  },
+  "health": {
+    "heading": "Kiểm tra dữ liệu",
+    "settingsBody": "Thiếu giá vốn, SKU, nhà cung cấp hoặc tồn kho âm làm dự báo và các con số tiền kém chính xác.",
+    "settingsLink": "Kiểm tra dữ liệu sản phẩm",
+    "intro_other": "Đã kiểm tra {{products}} sản phẩm đang theo dõi. Sửa các mục dưới đây giúp dự báo và các con số tiền chính xác hơn.",
+    "allGood_other": "Đã kiểm tra {{products}} sản phẩm đang theo dõi, không có gì cần sửa.",
+    "more_other": "…và {{count}} sản phẩm khác",
+    "findings": {
+      "negative_stock": {
+        "title_other": "Sản phẩm có tồn kho âm",
+        "body": "Shopify đang ghi tồn kho dưới 0 (bán vượt, hoặc chưa từng nhập số tồn). Số ngày còn hàng và lượng cần đặt tính từ con số này: hãy sửa số lượng trong Shopify."
+      },
+      "not_tracked": {
+        "title_other": "Sản phẩm không theo dõi tồn kho",
+        "body": "Shopify không theo dõi số lượng nên không có gì để dự báo. Bật \"Theo dõi số lượng\" cho sản phẩm trong Shopify nếu bạn có trữ hàng."
+      },
+      "missing_cost": {
+        "title_other": "Sản phẩm thiếu giá vốn",
+        "body": "Các sản phẩm này không có trong mọi con số tiền: tiền kẹt, giá trị tồn kho, kế hoạch nhập và ngân sách.",
+        "fix": "Thêm giá vốn"
+      },
+      "duplicate_sku": {
+        "title_other": "Sản phẩm trùng SKU với sản phẩm khác",
+        "body": "Đơn đặt hàng và nhập CSV khớp sản phẩm theo SKU, nên SKU trùng có thể gán số lượng hoặc giá vốn nhầm sản phẩm. Đặt SKU riêng cho từng sản phẩm trong Shopify."
+      },
+      "missing_sku": {
+        "title_other": "Sản phẩm thiếu SKU",
+        "body": "Không có SKU (hoặc barcode) thì sản phẩm bị bỏ qua khi xuất đơn đặt hàng Shopify và không khớp được khi nhập CSV."
+      },
+      "missing_price": {
+        "title_other": "Sản phẩm thiếu giá bán",
+        "body": "Không có nhóm ABC và không ước tính được doanh thu mất khi hết hàng. Giá bán lấy từ Shopify ở lần đồng bộ tới."
+      },
+      "no_supplier": {
+        "title_other": "Sản phẩm chưa có nhà cung cấp",
+        "body": "Không gom được đơn theo nhà cung cấp, và lead time, số lượng tối thiểu, ngày đặt hàng của nhà cung cấp không được áp dụng.",
+        "fix": "Thiết lập nhà cung cấp"
+      },
+      "default_lead_time": {
+        "title_other": "Sản phẩm đang dùng lead time mặc định của cửa hàng",
+        "body": "Sản phẩm và nhà cung cấp đều chưa có lead time, nên mặc định {{days}} ngày của cửa hàng quyết định khi nào đặt hàng. Nếu đúng với nhà cung cấp thì không sao; nếu không, hãy nhập lead time thực tế.",
+        "fix": "Nhập lead time của nhà cung cấp"
+      }
+    }
+  },
+  "clearance": {
+    "heading": "Hàng nên xả",
+    "intro_other": "Sản phẩm bán chậm và tồn thừa, giá trị tồn lớn nhất trước. Tỷ lệ bán hết = lượng bán trong {{count}} ngày qua trên lượng có sẵn.",
+    "sold_other": "Bán trong {{count}} ngày",
+    "sellThrough": "Tỷ lệ bán hết",
+    "lastSale": "Lần bán cuối",
+    "never": "Chưa ghi nhận lần bán nào",
+    "daysAgo_other": "{{count}} ngày trước ({{date}})",
+    "export": "Xuất danh sách (CSV)",
+    "more_other": "còn {{count}} sản phẩm nữa trong file"
+  },
+  "sizeRuns": {
+    "heading": "Sản phẩm lệch size",
+    "intro": "Sản phẩm có biến thể bán chạy đang hết hoặc cần đặt, trong khi biến thể khác tồn nhiều. Nhìn tổng thì còn hàng, nhưng khách không mua được size họ cần.",
+    "short": "{{title}}: {{share}}% lượng bán, còn {{stock}}",
+    "sitting": "{{title}}: tồn {{stock}}",
+    "ok": "{{title}}: {{stock}}"
+  },
+  "views": {
+    "saved": "Đã lưu chế độ xem",
+    "delete": "Xoá chế độ xem {{name}}",
+    "name": "Tên chế độ xem",
+    "namePlaceholder": "Lưu bộ lọc này thành…",
+    "save": "Lưu"
+  },
+  "alternates": {
+    "heading": "Nhà cung cấp khác",
+    "intro": "Lưu nhà cung cấp dự phòng với giá, lead time và mã hàng riêng. Khi chuyển, nó thành nhà cung cấp của sản phẩm và nhà cung cấp hiện tại được giữ ở đây.",
+    "cost": "Giá vốn",
+    "makeMain": "Dùng làm nhà cung cấp",
+    "switched": "{{name}} giờ là nhà cung cấp của sản phẩm này",
+    "add": "Thêm nhà cung cấp",
+    "choose": "Chọn…",
+    "addButton": "Thêm"
+  },
+  "shopifyPo": {
+    "heading": "Đơn đặt hàng trong Shopify",
+    "connectBody": "Xem đơn đặt hàng bạn tạo trong Shopify cạnh các đơn đánh dấu ở đây. Số lượng của chúng vốn đã tính là đang về; app cần bạn cho phép để đọc.",
+    "connect": "Hiện đơn đặt hàng Shopify",
+    "declined": "Chưa được cấp quyền",
+    "error": "Shopify chưa trả về danh sách đơn đặt hàng. Hãy thử lại sau.",
+    "none": "Không có đơn đặt hàng nào ở trạng thái đã đặt trong Shopify.",
+    "order": "Đơn đặt hàng",
+    "orderedOn": "Ngày đặt",
+    "cost": "Chi phí"
   }
 }

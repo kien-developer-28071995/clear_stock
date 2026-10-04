@@ -18,6 +18,9 @@ class SupplierController extends Controller
 
     public function index(ShopContext $context): AnonymousResourceCollection
     {
+        request()->attributes->set('supplier_due', $this->suppliers->dueTotals($context->shop()));
+        request()->attributes->set('actual_lead_times', $this->suppliers->actualLeadTimes($context->shop()));
+
         return SupplierResource::collection($this->suppliers->list($context->shop()));
     }
 

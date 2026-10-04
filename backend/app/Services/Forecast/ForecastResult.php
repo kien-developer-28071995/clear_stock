@@ -19,6 +19,7 @@ final readonly class ForecastResult
         public int $targetStock,     // order-up-to level (units)
         public int $excessUnits,     // stock + on the way above it
         public float $lostUnits30d,  // estimated units not sold on the out-of-stock days of the last 30 days
+        public ?int $trendPercent,   // recent sales vs the weeks before, in percent (null = too little to tell)
         public Confidence $confidence,
         public array $explanation,
     ) {}

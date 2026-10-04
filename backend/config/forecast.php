@@ -20,6 +20,38 @@ return [
         90 => ['weight' => 0.3, 'min_in_stock_days' => 20],
     ],
 
+    // Forecast profiles: other window mixes a merchant can pick for the shop or for one product.
+    // `balanced` is the windows above. Every profile keeps the 30- and 90-day windows (lost sales,
+    // confidence and the explanation read them).
+    'profiles' => [
+        'balanced' => null,
+        // New or fast-changing products: follows the last weeks closely.
+        'recent' => [
+            7 => ['weight' => 0.5, 'min_in_stock_days' => 4],
+            30 => ['weight' => 0.4, 'min_in_stock_days' => 10],
+            90 => ['weight' => 0.1, 'min_in_stock_days' => 20],
+        ],
+        // Steady or slow sellers: a full year smooths out quiet and busy weeks.
+        'steady' => [
+            30 => ['weight' => 0.2, 'min_in_stock_days' => 10],
+            90 => ['weight' => 0.4, 'min_in_stock_days' => 20],
+            365 => ['weight' => 0.4, 'min_in_stock_days' => 120],
+        ],
+    ],
+
+    // Trend: sales per in-stock day over the last `recent_days` vs the `baseline_days` before them.
+    // Reported when both periods have enough in-stock days and the baseline enough units; a change of
+    // at least `threshold` (25%) counts as rising / falling. Information only: the rate is not changed.
+    'trend' => [
+        'recent_days' => 14,
+        'baseline_days' => 42,
+        'min_recent_in_stock_days' => 10,
+        'min_baseline_in_stock_days' => 21,
+        'min_baseline_units' => 10,
+        'threshold' => 0.25,
+        'max_percent' => 999,
+    ],
+
     'seasonality' => [
         // Compare the next N days vs the previous N days, one year ago. A multiple of 7 so both
         // periods contain the same weekdays (weekly order patterns would otherwise look seasonal).
@@ -84,6 +116,9 @@ return [
         'weeks' => 8,       // weeks shown in the trend
         'keep_weeks' => 16,
     ],
+
+    // Daily inventory snapshots (units and value at cost) kept this long.
+    'stock_history_days' => 730,
 
     'confidence' => [
         'low_in_stock_days' => 14,  // fewer in-stock days in the last 90 => low

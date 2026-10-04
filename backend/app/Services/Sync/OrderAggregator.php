@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\DB;
  *
  * - units_sold     = LineItem.quantity (incl. later refunded/removed units)
  * - units_returned = quantity - currentQuantity (refunded or removed units)
- * - cancelled orders are ignored
+ * - cancelled orders are ignored, and so are orders the merchant excluded by tag or source
  * - native bundles: component lines are counted as component sales (Shopify
  *   already splits them); the bundle's own sales come from lineItemGroup.
  * - with locations (Growth): fulfillment orders give the location each unit is
@@ -31,7 +31,7 @@ class OrderAggregator
         private readonly LocationSalesRepositoryInterface $locationSales,
     ) {}
 
-    /** @return array{orders: int, line_items: int, rows: int, location_rows: int} */
+    /** @return array{orders: int, excluded_orders: int, line_items: int, rows: int, location_rows: int} */
     public function import(Shop $shop, ?string $path, string $windowStart, bool $withLocations = false): array
     {
         $variantIds = $this->catalog->variantIdMap($shop);
@@ -41,8 +41,20 @@ class OrderAggregator
         // Children may precede parents in the JSONL, so lines are aggregated in a second pass.
         $orderDay = [];
         $fulfillmentOrders = [];
+        // Orders the merchant keeps out of the forecast (Settings): by tag or by source.
+        $tags = array_map('mb_strtolower', $shop->excluded_order_tags ?? []);
+        $sources = $shop->excluded_order_sources ?? [];
+        $excludedOrders = 0;
+        $excluded = fn (array $order): bool => ($tags !== [] && array_intersect($tags, array_map('mb_strtolower', $order['tags'] ?? [])) !== [])
+            || ($sources !== [] && in_array(OrderSource::of($order['sourceName'] ?? null), $sources, true));
         foreach ($path ? JsonlReader::read($path) : [] as $line) {
             if (! isset($line['__parentId'])) {
+                if ($excluded($line)) {
+                    $orderDay[Gid::id($line['id'])] = null;
+                    $excludedOrders++;
+
+                    continue;
+                }
                 $orderDay[Gid::id($line['id'])] = $line['cancelledAt'] === null
                     ? Carbon::parse($line['processedAt'])->setTimezone($shop->timezone)->toDateString()
                     : null;
@@ -125,6 +137,6 @@ class OrderAggregator
             $this->locationSales->replaceFrom($shop, $windowStart, $locationRows);
         }
 
-        return ['orders' => count($orderDay), 'line_items' => $lineItems, 'rows' => count($rows), 'location_rows' => count($byLocation)];
+        return ['orders' => count($orderDay), 'excluded_orders' => $excludedOrders, 'line_items' => $lineItems, 'rows' => count($rows), 'location_rows' => count($byLocation)];
     }
 }

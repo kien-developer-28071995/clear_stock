@@ -5,6 +5,7 @@ namespace App\Services\App;
 use App\Enums\Feature;
 use App\Enums\OverrideField;
 use App\Jobs\Forecast\RecomputeForecasts;
+use App\Models\Location;
 use App\Models\Shop;
 use App\Models\Variant;
 use App\Repositories\Contracts\ForecastRepositoryInterface;
@@ -59,6 +60,25 @@ class ForecastAdjustmentService
         }
 
         return $variant;
+    }
+
+    /**
+     * Manual reorder points per location (Growth). Only the shop's own active locations count.
+     *
+     * @param  array<int, array{location_id: int, min_stock: ?int}>  $minimums
+     */
+    public function setLocationMinimums(Shop $shop, Variant $variant, array $minimums): void
+    {
+        Entitlements::for($shop)->require(Feature::Locations);
+        $own = Location::query()->forShop($shop)->where('is_active', true)->pluck('id')->all();
+        $rows = [];
+        foreach ($minimums as $m) {
+            if (in_array((int) $m['location_id'], $own, true)) {
+                $rows[(int) $m['location_id']] = $m['min_stock'] === null ? null : (int) $m['min_stock'];
+            }
+        }
+        $this->forecasts->setLocationMinimums($shop, $variant->id, $rows);
+        $this->engine->runForShop($shop, [$variant->id]);
     }
 
     /** @param array<int, int|string> $variantRefs local ids or Shopify variant gids */

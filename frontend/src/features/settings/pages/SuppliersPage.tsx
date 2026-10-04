@@ -8,8 +8,9 @@ import { ExportPurchaseOrderButton } from '@/features/forecasts/components/Expor
 import { SupplierModal } from '@/features/settings/components/SupplierModal';
 import { SupplierEmailModal } from '@/features/settings/components/SupplierEmailModal';
 import { useEntitlements, useFeature } from '@/hooks/useEntitlements';
-import { timeAgo, weekdayName } from '@/utils/format';
-import { useAssignSupplier, useDeleteSupplier, useSuppliers } from '@/features/settings/hooks/useSettings';
+import { formatMoney, timeAgo, weekdayName } from '@/utils/format';
+import { useShop } from '@/features/shop/hooks/useShop';
+import { useAssignSupplier, useDeleteSupplier, useSuppliers, useUpdateSupplier } from '@/features/settings/hooks/useSettings';
 import type { Supplier } from '@/features/settings/types';
 
 export function SuppliersPage() {
@@ -17,6 +18,10 @@ export function SuppliersPage() {
     const { data, isPending, error, refetch } = useSuppliers();
     const remove = useDeleteSupplier();
     const assign = useAssignSupplier();
+    const currency = useShop().data?.currency ?? null;
+    const updateSupplier = useUpdateSupplier();
+    const applyActualLeadTime = (s: Supplier, days: number) =>
+        updateSupplier.mutate({ id: s.id, name: s.name, lead_time_days: days } as Parameters<typeof updateSupplier.mutate>[0], { onSuccess: () => shopify.toast.show(t('common.saved')) });
     const modal = useModal();
     const { confirm, modal: confirmModal } = useConfirm();
     const emailModal = useModal();
@@ -95,10 +100,26 @@ export function SuppliersPage() {
                                     <s-table-cell>
                                         <s-stack gap="small-100">
                                             <s-text>{s.lead_time_days == null ? t('suppliers.storeDefault') : t('common.dayCount', { count: s.lead_time_days })}</s-text>
+                                            {s.actual_lead_time && s.actual_lead_time.median_days !== s.lead_time_days && (
+                                                <s-stack gap="small-100">
+                                                    <s-text color="subdued">{t('suppliers.actualLeadTime', { count: s.actual_lead_time.orders, days: s.actual_lead_time.median_days })}</s-text>
+                                                    <s-link onClick={() => applyActualLeadTime(s, s.actual_lead_time!.median_days)}>{t('suppliers.useActual', { count: s.actual_lead_time.median_days })}</s-link>
+                                                </s-stack>
+                                            )}
                                             {s.order_weekdays && <s-text color="subdued">{t('suppliers.ordersOn', { days: s.order_weekdays.map((d) => weekdayName(d)).join(', ') })}</s-text>}
                                         </s-stack>
                                     </s-table-cell>
-                                    <s-table-cell>{s.variants_count ?? 0}</s-table-cell>
+                                    <s-table-cell>
+                                        <s-stack gap="small-100">
+                                            <s-text>{s.variants_count ?? 0}</s-text>
+                                            {s.due && (
+                                                <s-text color="subdued">{t('suppliers.due', { count: s.due.products, cost: formatMoney(s.due.cost, currency) })}</s-text>
+                                            )}
+                                            {s.due && s.min_order_value != null && s.due.cost < s.min_order_value && (
+                                                <s-badge tone="warning">{t('suppliers.belowMinimum', { minimum: formatMoney(s.min_order_value, currency) })}</s-badge>
+                                            )}
+                                        </s-stack>
+                                    </s-table-cell>
                                     <s-table-cell>
                                         <s-button-group>
                                             <s-button slot="secondary-actions" onClick={() => assignProducts(s)}>{t('suppliers.assign')}</s-button>

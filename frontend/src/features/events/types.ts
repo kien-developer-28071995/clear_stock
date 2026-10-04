@@ -8,6 +8,8 @@ export interface SalesEvent {
     ends_on: string;
     /** Sales x this on those days (2 = double, 0.5 = half). */
     multiplier: number;
+    /** A season: the same dates every year. */
+    repeats_yearly: boolean;
     applies_to: EventScope;
     supplier_id: number | null;
     supplier: string | null;
@@ -19,6 +21,7 @@ export interface SalesEventInput {
     starts_on: string;
     ends_on: string;
     multiplier: number;
+    repeats_yearly?: boolean;
     applies_to: EventScope;
     supplier_id?: number | null;
     /** Local ids or Shopify variant gids (resource picker). */

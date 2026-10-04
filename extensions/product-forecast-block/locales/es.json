@@ -208,6 +208,25 @@
             "one": "Marcaste {{count}} unidad como pedida (llega el {{expected_date}}): cuenta como en camino.",
             "other": "Marcaste {{count}} unidades como pedidas (llegan el {{expected_date}}): cuentan como en camino.",
             "many": "Marcaste {{count}} unidades como pedidas (llegan el {{expected_date}}): cuentan como en camino."
+        },
+        "profile_recent": "Ajuste de la tienda \"Seguir las ventas recientes\": los últimos 7 días pesan más.",
+        "profile_recent_product": "Este producto sigue las ventas recientes: los últimos 7 días pesan más.",
+        "profile_steady": "Ajuste de la tienda \"Estable\": el ritmo se promedia hasta un año.",
+        "profile_steady_product": "Este producto está en \"Estable\": el ritmo se promedia hasta un año.",
+        "trend_up": {
+            "one": "Se vende un {{percent}}% más rápido en el último día ({{recent}}/día) que en los {{days}} días anteriores ({{baseline}}/día).",
+            "other": "Se vende un {{percent}}% más rápido en los últimos {{count}} días ({{recent}}/día) que en los {{days}} días anteriores ({{baseline}}/día).",
+            "many": "Se vende un {{percent}}% más rápido en los últimos {{count}} días ({{recent}}/día) que en los {{days}} días anteriores ({{baseline}}/día)."
+        },
+        "trend_down": {
+            "one": "Se vende un {{percent}}% más lento en el último día ({{recent}}/día) que en los {{days}} días anteriores ({{baseline}}/día).",
+            "other": "Se vende un {{percent}}% más lento en los últimos {{count}} días ({{recent}}/día) que en los {{days}} días anteriores ({{baseline}}/día).",
+            "many": "Se vende un {{percent}}% más lento en los últimos {{count}} días ({{recent}}/día) que en los {{days}} días anteriores ({{baseline}}/día)."
+        },
+        "backorder_included": {
+            "one": "{{count}} unidad ya está vendida sin stock (stock bajo cero) y se incluye en el pedido.",
+            "other": "{{count}} unidades ya están vendidas sin stock (stock bajo cero) y se incluyen en el pedido.",
+            "many": "{{count}} unidades ya están vendidas sin stock (stock bajo cero) y se incluyen en el pedido."
         }
     },
     "ordered": "{{qty}} marcadas como pedidas"

@@ -5,6 +5,7 @@ namespace App\Repositories\Eloquent;
 use App\Models\ManualOrder;
 use App\Models\Shop;
 use App\Repositories\Contracts\ManualOrderRepositoryInterface;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
@@ -16,7 +17,9 @@ class EloquentManualOrderRepository implements ManualOrderRepositoryInterface
             ->where('expected_on', '>=', $countedFrom)
             ->when($variantIds !== null, fn ($q) => $q->whereIn('variant_id', $variantIds))
             ->groupBy('variant_id')
-            ->selectRaw('variant_id, SUM(quantity) as units, MIN(expected_on) as expected_on, COUNT(*) as n')
+            ->whereColumn('received_quantity', '<', 'quantity')
+            // Partial deliveries: only what has not arrived yet is still on the way.
+            ->selectRaw('variant_id, SUM(quantity - received_quantity) as units, MIN(expected_on) as expected_on, COUNT(*) as n')
             ->get()->mapWithKeys(fn ($r) => [(int) $r->variant_id => [
                 'units' => (int) $r->units, 'expected_on' => substr((string) $r->expected_on, 0, 10), 'orders' => (int) $r->n,
             ]])->all();
@@ -54,6 +57,23 @@ class EloquentManualOrderRepository implements ManualOrderRepositoryInterface
             ->pluck('explanation', 'variant_id')
             ->map(fn ($e) => (int) (json_decode((string) $e, true)['lead_time']['days'] ?? 0))
             ->mapWithKeys(fn ($days, $id) => [(int) $id => $days])->all();
+    }
+
+    public function deliveryDays(Shop $shop, string $fromDate): array
+    {
+        $out = [];
+        DB::table('manual_orders')->where('shop_id', $shop->id)->where('status', ManualOrder::RECEIVED)
+            ->whereNotNull('supplier_id')->whereNotNull('closed_at')->where('ordered_on', '>=', $fromDate)
+            ->orderBy('id')->get(['supplier_id', 'ordered_on', 'closed_at'])
+            ->each(function ($r) use (&$out, $shop) {
+                $received = Carbon::parse($r->closed_at, 'UTC')->setTimezone($shop->timezone)->startOfDay();
+                $days = (int) Carbon::parse(substr((string) $r->ordered_on, 0, 10), $shop->timezone)->diffInDays($received, false);
+                if ($days >= 0) {
+                    $out[(int) $r->supplier_id][] = $days;
+                }
+            });
+
+        return $out;
     }
 
     public function spentSince(Shop $shop, string $fromDate): array

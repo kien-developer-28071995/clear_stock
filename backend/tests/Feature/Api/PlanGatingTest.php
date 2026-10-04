@@ -102,7 +102,7 @@ describe('Growth plan', function () {
         expect($response->headers->get('content-disposition'))->toContain('purchase-order-acme-ceramics-2026-09-20.csv');
         $lines = array_map('str_getcsv', explode("\n", trim(ltrim($response->streamedContent(), "\xEF\xBB\xBF"))));
         expect($lines)->toHaveCount(2)
-            ->and($lines[1])->toBe(['All locations', 'Acme Ceramics', 'Mug', 'MUG-1', '10', '4', '2026-09-22', '194', '3.5', '679', 'USD']);
+            ->and($lines[1])->toBe(['All locations', 'Acme Ceramics', 'Mug', 'MUG-1', '', '10', '4', '2026-09-22', '194', '3.5', '679', 'USD']);
     });
 
     it('exports in Shopify\'s purchase order import format, leaving out products Shopify cannot match', function () {

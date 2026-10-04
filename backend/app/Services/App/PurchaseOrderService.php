@@ -44,15 +44,16 @@ class PurchaseOrderService
             return $this->shopifyFormat($items, "shopify-purchase-order{$slug}-{$today}.csv");
         }
 
-        $rows = [['Location', 'Supplier', 'Product', 'SKU', 'In stock', 'Sells per day', 'Runs out', 'Order quantity', 'Unit cost', 'Line total', 'Currency']];
+        $rows = [['Location', 'Supplier', 'Product', 'SKU', 'Supplier SKU', 'In stock', 'Sells per day', 'Runs out', 'Order quantity', 'Unit cost', 'Line total', 'Currency']];
         foreach ($items as $f) {
             /** @var Forecast $f */
-            $cost = $f->variant->unit_cost !== null ? (float) $f->variant->unit_cost : null;
+            $cost = $f->variant->purchaseCost(); // the supplier's price, without freight and duty
             $rows[] = [
                 $f->location?->name ?? 'All locations',
                 $f->variant->supplier?->name ?? '',
                 $f->variant->displayName(),
                 $f->variant->sku ?? '',
+                $f->variant->supplier_sku ?? '',
                 $f->current_stock,
                 (float) $f->avg_daily_sales,
                 $f->stockout_date?->toDateString() ?? '',
@@ -69,7 +70,7 @@ class PurchaseOrderService
     /**
      * Shopify matches each row by SKU and/or barcode: products with neither can't be
      * imported and are left out (counted in `skipped`). Cost is the unit cost in the
-     * shop's currency; supplier SKU and tax are left for the merchant.
+     * shop's currency; tax is left for the merchant.
      *
      * @param  iterable<Forecast>  $items
      */
@@ -89,9 +90,9 @@ class PurchaseOrderService
             $rows[] = [
                 $f->variant->sku ?? '',
                 $f->variant->barcode ?? '',
-                '',
+                $f->variant->supplier_sku ?? '',
                 $f->suggested_qty,
-                $f->variant->unit_cost !== null ? number_format((float) $f->variant->unit_cost, 2, '.', '') : '',
+                $f->variant->purchaseCost() !== null ? number_format($f->variant->purchaseCost(), 2, '.', '') : '',
                 '',
             ];
         }

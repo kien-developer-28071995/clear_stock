@@ -11,10 +11,12 @@ import { useFeature } from '@/hooks/useEntitlements';
 import { useDismissSetupGuide, useSetupGuide } from '@/features/setup/hooks/useSetupGuide';
 import { SaveBar } from '@/components/ui/SaveBar';
 import { SyncStatusCard } from '@/features/sync/components/SyncStatusCard';
+import { StockLocationsSection } from '@/features/settings/components/StockLocationsSection';
 import { FlowSection } from '@/features/settings/components/FlowSection';
 import { useSettings, useUpdateSettings } from '@/features/settings/hooks/useSettings';
 import type { RealtimeAlertMode, Settings } from '@/features/settings/types';
 import { NO_VALUE, fromOption, optionValue } from '@/utils/select';
+import { FORECAST_PROFILES } from '@/features/forecasts/types';
 
 /** ISO weekday (1 = Monday) → name in the current language. 2024-01-01 was a Monday. */
 const weekdayName = (iso: number) =>
@@ -29,11 +31,14 @@ export function SettingsPage() {
     const guide = useSetupGuide();
     const reopenGuide = useDismissSetupGuide();
     const [form, setForm] = useState<Settings | null>(null);
+    // The tags as typed (the form keeps the cleaned list); null = show the saved list.
+    const [tagsText, setTagsText] = useState<string | null>(null);
     const realtimeExists = useFeature('realtime_alerts');
     const flowExists = useFeature('flow_triggers');
 
     useEffect(() => {
         if (data) setForm(data);
+        setTagsText(null);
     }, [data]);
 
     if (isPending || !form) {
@@ -87,6 +92,17 @@ export function SettingsPage() {
                         error={fieldError(update.error, 'default_safety_days')}
                         onInput={(e) => setForm({ ...form, default_safety_days: Number(e.currentTarget.value) })}
                     />
+                    <s-select
+                        label={t('forecastProfile.label')}
+                        details={t('forecastProfile.help')}
+                        value={form.forecast_profile}
+                        error={fieldError(update.error, 'forecast_profile')}
+                        onChange={(e) => setForm({ ...form, forecast_profile: e.currentTarget.value as Settings['forecast_profile'] })}
+                    >
+                        {FORECAST_PROFILES.map((p) => (
+                            <s-option key={p} value={p}>{t(`forecastProfile.${p}`)}</s-option>
+                        ))}
+                    </s-select>
                     {form.filter_sales_spikes !== null && (
                         <s-switch
                             label={t('settings.filterSpikes')}
@@ -97,6 +113,40 @@ export function SettingsPage() {
                     )}
                 </s-stack>
             </s-section>
+
+            <s-section heading={t('settings.excludedHeading')}>
+                <s-stack gap="base">
+                    <s-paragraph>{t('settings.excludedIntro')}</s-paragraph>
+                    <s-text-field
+                        label={t('settings.excludedTags')}
+                        details={t('settings.excludedTagsHelp')}
+                        placeholder="wholesale, b2b"
+                        value={tagsText ?? form.excluded_order_tags.join(', ')}
+                        error={fieldError(update.error, 'excluded_order_tags')}
+                        onInput={(e) => {
+                            setTagsText(e.currentTarget.value);
+                            setForm({ ...form, excluded_order_tags: [...new Set(e.currentTarget.value.split(',').map((x) => x.trim()).filter(Boolean))].sort() });
+                        }}
+                    />
+                    {(['pos', 'draft'] as const).map((source) => (
+                        <s-checkbox
+                            key={source}
+                            label={t(`settings.excludedSource.${source}`)}
+                            checked={form.excluded_order_sources.includes(source) || undefined}
+                            onChange={(e) =>
+                                setForm({
+                                    ...form,
+                                    excluded_order_sources: e.currentTarget.checked
+                                        ? [...form.excluded_order_sources, source].sort()
+                                        : form.excluded_order_sources.filter((x) => x !== source),
+                                })
+                            }
+                        />
+                    ))}
+                </s-stack>
+            </s-section>
+
+            <StockLocationsSection />
 
             <s-section heading={t('costs.settingsHeading')}>
                 <s-stack gap="small-200">
@@ -160,6 +210,26 @@ export function SettingsPage() {
                             ))}
                         </s-select>
                     )}
+                    <s-number-field
+                        label={t('settings.coverDays')}
+                        details={t('settings.coverDaysHelp')}
+                        suffix={t('common.daysSuffix')}
+                        min={1}
+                        max={365}
+                        disabled={!form.alerts.available || undefined}
+                        value={form.alerts.cover_days?.toString() ?? ''}
+                        error={fieldError(update.error, 'alerts.cover_days')}
+                        onInput={(e) => setAlerts({ cover_days: e.currentTarget.value.trim() === '' ? null : Number(e.currentTarget.value) })}
+                    />
+                    <s-url-field
+                        label={t('settings.slackUrl')}
+                        details={t('settings.slackUrlHelp')}
+                        placeholder="https://hooks.slack.com/services/…"
+                        disabled={!form.alerts.available || undefined}
+                        value={form.alerts.slack_webhook_url ?? ''}
+                        error={fieldError(update.error, 'alerts.slack_webhook_url')}
+                        onInput={(e) => setAlerts({ slack_webhook_url: e.currentTarget.value.trim() || null })}
+                    />
                     {realtimeExists && form.alerts.available && !form.alerts.realtime_available && (
                         <UpgradePrompt id="realtime-alerts" plan="growth">{t('settings.realtimeLocked')}</UpgradePrompt>
                     )}
@@ -174,6 +244,45 @@ export function SettingsPage() {
                         <s-option value="out_of_stock">{t('settings.realtimeOutOfStock')}</s-option>
                         <s-option value="all">{t('settings.realtimeAll')}</s-option>
                     </s-select>)}
+                </s-stack>
+            </s-section>
+
+            {form.alerts.weekly_summary !== null && (
+                <s-section heading={t('settings.summaryHeading')}>
+                    <s-stack gap="base">
+                        <s-switch
+                            label={t('settings.summaryEnabled')}
+                            details={t('settings.summaryHelp')}
+                            checked={form.alerts.weekly_summary || undefined}
+                            onChange={(e) => setAlerts({ weekly_summary: e.currentTarget.checked })}
+                        />
+                        {form.alerts.weekly_summary && (
+                            <>
+                                <s-email-field
+                                    label={t('settings.summaryEmail')}
+                                    value={form.alerts.email ?? ''}
+                                    error={fieldError(update.error, 'alerts.email')}
+                                    onInput={(e) => setAlerts({ email: e.currentTarget.value })}
+                                />
+                                <s-select
+                                    label={t('settings.sendOn')}
+                                    value={String(form.alerts.weekly_day)}
+                                    onChange={(e) => setAlerts({ weekly_day: Number(e.currentTarget.value) })}
+                                >
+                                    {[1, 2, 3, 4, 5, 6, 7].map((day) => (
+                                        <s-option key={day} value={String(day)}>{weekdayName(day)}</s-option>
+                                    ))}
+                                </s-select>
+                            </>
+                        )}
+                    </s-stack>
+                </s-section>
+            )}
+
+            <s-section heading={t('health.heading')}>
+                <s-stack gap="small-200">
+                    <s-paragraph>{t('health.settingsBody')}</s-paragraph>
+                    <s-link href="/data-health">{t('health.settingsLink')}</s-link>
                 </s-stack>
             </s-section>
 
