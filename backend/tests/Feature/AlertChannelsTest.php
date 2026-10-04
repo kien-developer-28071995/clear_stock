@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Queue;
 
-const SLACK_URL = 'https://hooks.slack.com/services/T000/B000/abcDEF123';
+const ALERT_SLACK_URL = 'https://hooks.slack.com/services/T000/B000/abcDEF123';
 
 beforeEach(function () {
     Mail::fake();
@@ -36,7 +36,7 @@ beforeEach(function () {
 });
 
 it('posts the digest to Slack as well, without the webhook in the queue payload', function () {
-    $this->setting->update(['slack_webhook_url' => SLACK_URL]);
+    $this->setting->update(['slack_webhook_url' => ALERT_SLACK_URL]);
     expect(DB::table('alert_settings')->value('slack_webhook_url'))->not->toContain('hooks.slack.com'); // encrypted at rest
 
     expect($this->alerts->sendIfDue($this->shop->fresh(), $this->now))->toBe('sent');
@@ -53,7 +53,7 @@ it('posts the digest to Slack as well, without the webhook in the queue payload'
 });
 
 it('sends to Slack alone when there is no email', function () {
-    $this->setting->update(['email' => null, 'slack_webhook_url' => SLACK_URL]);
+    $this->setting->update(['email' => null, 'slack_webhook_url' => ALERT_SLACK_URL]);
 
     expect($this->alerts->sendIfDue($this->shop->fresh(), $this->now))->toBe('sent');
     Mail::assertNothingQueued();
@@ -64,18 +64,18 @@ it('sends to Slack alone when there is no email', function () {
 });
 
 it('delivers to the stored webhook and retries when Slack fails', function () {
-    $this->setting->update(['slack_webhook_url' => SLACK_URL]);
-    Http::fake([SLACK_URL => Http::sequence()->push('ok')->push('no', 500)]);
+    $this->setting->update(['slack_webhook_url' => ALERT_SLACK_URL]);
+    Http::fake([ALERT_SLACK_URL => Http::sequence()->push('ok')->push('no', 500)]);
     $job = new PostAlertDigestToSlack($this->shop->id, ['text' => 'hi']);
 
     $job->handle(app(SlackNotifier::class), app(ShopRepositoryInterface::class), app(AlertSettingRepositoryInterface::class));
-    Http::assertSent(fn ($request) => $request->url() === SLACK_URL && $request['text'] === 'hi');
+    Http::assertSent(fn ($request) => $request->url() === ALERT_SLACK_URL && $request['text'] === 'hi');
 });
 
 it('only accepts Slack webhook URLs', function () {
     $this->putJson('/api/settings', ['alerts' => ['slack_webhook_url' => 'https://evil.example/hook']], $this->auth)->assertStatus(422);
     $this->putJson('/api/settings', ['alerts' => ['slack_webhook_url' => 'http://hooks.slack.com/services/T/B/x']], $this->auth)->assertStatus(422);
-    $this->putJson('/api/settings', ['alerts' => ['slack_webhook_url' => SLACK_URL]], $this->auth)->assertOk()->assertJsonPath('data.alerts.slack_webhook_url', SLACK_URL);
+    $this->putJson('/api/settings', ['alerts' => ['slack_webhook_url' => ALERT_SLACK_URL]], $this->auth)->assertOk()->assertJsonPath('data.alerts.slack_webhook_url', ALERT_SLACK_URL);
     $this->putJson('/api/settings', ['alerts' => ['slack_webhook_url' => null]], $this->auth)->assertOk()->assertJsonPath('data.alerts.slack_webhook_url', null);
 });
 

@@ -111,6 +111,21 @@ class EloquentForecastQueryRepository implements ForecastQueryRepositoryInterfac
         return $query->orderBy('variants.product_title')->orderBy('variants.title')->get(['forecasts.*']);
     }
 
+    public function dueBySupplier(Shop $shop, string $today): array
+    {
+        // Same price as Variant::purchaseCost().
+        $cost = 'CASE WHEN variants.landed_cost_applied = 1 THEN COALESCE(variants.cost_override, variants.shopify_unit_cost) ELSE variants.unit_cost END';
+
+        return $this->statusQuery($shop, ForecastStatus::ReorderNow, $today)
+            ->where('forecasts.suggested_qty', '>', 0)
+            ->whereNotNull('variants.supplier_id')->where('variants.discontinued', false)
+            ->groupBy('variants.supplier_id')
+            ->selectRaw("variants.supplier_id as supplier_id, COUNT(*) as products, SUM(forecasts.suggested_qty) as units, COALESCE(SUM(forecasts.suggested_qty * ({$cost})), 0) as cost")
+            ->toBase()->get()
+            ->mapWithKeys(fn ($r) => [(int) $r->supplier_id => ['products' => (int) $r->products, 'units' => (int) $r->units, 'cost' => round((float) $r->cost, 2)]])
+            ->all();
+    }
+
     public function lowCover(Shop $shop, string $today, int $days): Collection
     {
         return $this->base($shop)->with('variant')

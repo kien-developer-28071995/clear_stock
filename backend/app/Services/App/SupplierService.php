@@ -26,12 +26,6 @@ class SupplierService
     ) {}
 
     /**
-     * How long deliveries really took: the median days from "marked as ordered" to "received"
-     * over the last year, per supplier with enough received orders.
-     *
-     * @return array<int, array{median_days: int, orders: int}>
-     */
-    /**
      * What is due to reorder now per supplier, at the supplier's price: lets the list say when an
      * order would fall short of the supplier's minimum order value.
      *
@@ -39,21 +33,15 @@ class SupplierService
      */
     public function dueTotals(Shop $shop): array
     {
-        $out = [];
-        foreach ($this->forecasts->reorderList($shop, CarbonImmutable::now($shop->timezone)->toDateString(), null) as $f) {
-            $id = $f->variant->supplier_id;
-            if ($id === null || $f->variant->discontinued) {
-                continue;
-            }
-            $out[$id] ??= ['products' => 0, 'units' => 0, 'cost' => 0.0];
-            $out[$id]['products']++;
-            $out[$id]['units'] += $f->suggested_qty;
-            $out[$id]['cost'] = round($out[$id]['cost'] + $f->suggested_qty * (float) $f->variant->purchaseCost(), 2);
-        }
-
-        return $out;
+        return $this->forecasts->dueBySupplier($shop, CarbonImmutable::now($shop->timezone)->toDateString());
     }
 
+    /**
+     * How long deliveries really took: the median days from "marked as ordered" to "received"
+     * over the last year, per supplier with enough received orders.
+     *
+     * @return array<int, array{median_days: int, orders: int}>
+     */
     public function actualLeadTimes(Shop $shop): array
     {
         $out = [];

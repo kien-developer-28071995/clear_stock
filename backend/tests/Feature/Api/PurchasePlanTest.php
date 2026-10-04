@@ -5,6 +5,7 @@ use App\Models\SalesEvent;
 use App\Models\Shop;
 use App\Models\Supplier;
 use App\Services\Forecast\ForecastService;
+use App\Services\Planning\PurchasePlanner;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Queue;
@@ -127,4 +128,24 @@ it('plans more for an upcoming sales event', function () {
     SalesEvent::factory()->for($this->shop)->create(['starts_on' => '2026-10-01', 'ends_on' => '2026-10-10', 'multiplier' => 3]);
 
     expect(collect(purchasePlan(['weeks' => 4])['items'])->firstWhere('name', 'Mug')['units'])->toBeGreaterThan($before);
+});
+
+it('keeps the plan until a forecast or the catalog changes, and reads the budget fresh', function () {
+    $first = purchasePlan();
+
+    // Same forecast and catalog: the stored plan is served without walking the products again.
+    $this->mock(PurchasePlanner::class)->shouldNotReceive('orders');
+    $again = $this->getJson('/api/purchase-plan', $this->auth)->assertOk()->json('data');
+    expect($again)->toEqual($first);
+
+    $this->shop->update(['order_budget' => 500]);
+    expect($this->getJson('/api/purchase-plan', $this->auth)->json('data.budget'))->toEqual(500);
+});
+
+it('rebuilds the plan after the forecast runs again', function () {
+    expect(collect(purchasePlan()['items'])->pluck('name')->all())->toBe(['Mug', 'Cup']);
+
+    $this->cup->update(['discontinued' => true]);
+
+    expect(collect(purchasePlan()['items'])->pluck('name')->all())->toBe(['Mug']);
 });
