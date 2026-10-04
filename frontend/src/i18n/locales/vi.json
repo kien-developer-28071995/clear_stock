@@ -33,7 +33,8 @@
     "events": "Sự kiện bán hàng",
     "orders": "Đơn đã đặt",
     "costs": "Giá vốn",
-    "budget": "Ngân sách nhập hàng"
+    "budget": "Ngân sách nhập hàng",
+    "planning": "Kế hoạch"
   },
   "notFound": {
     "heading": "Không tìm thấy trang",
@@ -275,7 +276,9 @@
     "onTheWay": "Đang về",
     "incomingShort": "+{{qty}} đang về",
     "rateUp": "Tăng từ {{previous}}/ngày ở dự báo tuần {{date}} (nay {{current}}/ngày).",
-    "rateDown": "Giảm từ {{previous}}/ngày ở dự báo tuần {{date}} (nay {{current}}/ngày)."
+    "rateDown": "Giảm từ {{previous}}/ngày ở dự báo tuần {{date}} (nay {{current}}/ngày).",
+    "headlineOrder_other": "Đặt {{qty}} cái trước {{date}}",
+    "headlineOk": "Chưa cần đặt hàng"
   },
   "why": {
     "heading": "Vì sao ra các con số này?",
@@ -375,7 +378,8 @@
     "allVendors": "Tất cả vendor",
     "productType": "Loại sản phẩm",
     "allTypes": "Tất cả loại sản phẩm",
-    "exportCsv": "Xuất danh sách (CSV)"
+    "exportCsv": "Xuất danh sách (CSV)",
+    "moreFilters": "Thêm bộ lọc"
   },
   "settings": {
     "defaultsHeading": "Mặc định cho dự báo",
@@ -457,7 +461,8 @@
     "landedCost": "Phí vận chuyển và thuế nhập",
     "landedCostHelp": "Cộng vào giá vốn khi tính giá trị tồn và chi phí. Đơn đặt hàng vẫn dùng giá của nhà cung cấp.",
     "due_other": "{{count}} sản phẩm cần đặt ngay · {{cost}}",
-    "belowMinimum": "Dưới mức tối thiểu {{minimum}}"
+    "belowMinimum": "Dưới mức tối thiểu {{minimum}}",
+    "moreActions": "Thao tác khác với {{name}}"
   },
   "bundles": {
     "add": "Thêm combo",
@@ -1236,5 +1241,9 @@
       "alerts": "Cảnh báo và email",
       "general": "Chung"
     }
+  },
+  "sections": {
+    "toOrder": "Cần đặt",
+    "allProducts": "Tất cả sản phẩm"
   }
 }

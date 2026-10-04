@@ -1,3 +1,4 @@
+import { SectionTabs } from '@/components/layout/SectionTabs';
 import { useTranslation } from 'react-i18next';
 import { ErrorBanner } from '@/components/ui/ErrorBanner';
 import { LoadingPage } from '@/components/ui/LoadingPage';
@@ -18,7 +19,7 @@ export function TransfersPage() {
 
     if (!allowed) {
         return (
-            <s-page heading={t('nav.transfers')}>
+            <s-page heading={t('nav.reorder')}><SectionTabs group="reorder" />
                 <UpgradePrompt id="transfers" plan="growth">{t('transfers.locked')}</UpgradePrompt>
                 <s-section>
                     <s-paragraph>{t('transfers.intro')}</s-paragraph>
@@ -26,10 +27,10 @@ export function TransfersPage() {
             </s-page>
         );
     }
-    if (isPending) return <LoadingPage heading={t('nav.transfers')} />;
+    if (isPending) return <LoadingPage heading={t('nav.reorder')} group="reorder" />;
 
     return (
-        <s-page heading={t('nav.transfers')}>
+        <s-page heading={t('nav.reorder')}><SectionTabs group="reorder" />
             {error && <ErrorBanner error={error} onRetry={() => refetch()} />}
             {data && (
                 <s-stack gap="base">

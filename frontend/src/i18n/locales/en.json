@@ -34,7 +34,8 @@
     "events": "Sales events",
     "orders": "Orders placed",
     "costs": "Unit costs",
-    "budget": "Order budget"
+    "budget": "Order budget",
+    "planning": "Planning"
   },
   "notFound": {
     "heading": "Page not found",
@@ -291,7 +292,10 @@
     "onTheWay": "On the way",
     "incomingShort": "+{{qty}} on the way",
     "rateUp": "Up from {{previous}}/day in the forecast of the week of {{date}} (now {{current}}/day).",
-    "rateDown": "Down from {{previous}}/day in the forecast of the week of {{date}} (now {{current}}/day)."
+    "rateDown": "Down from {{previous}}/day in the forecast of the week of {{date}} (now {{current}}/day).",
+    "headlineOrder_one": "Order {{qty}} unit by {{date}}",
+    "headlineOrder_other": "Order {{qty}} units by {{date}}",
+    "headlineOk": "Nothing to order right now"
   },
   "why": {
     "heading": "Why these numbers?",
@@ -394,7 +398,8 @@
     "allVendors": "All vendors",
     "productType": "Product type",
     "allTypes": "All product types",
-    "exportCsv": "Export list (CSV)"
+    "exportCsv": "Export list (CSV)",
+    "moreFilters": "More filters"
   },
   "settings": {
     "defaultsHeading": "Forecast defaults",
@@ -481,7 +486,8 @@
     "landedCostHelp": "Added to the unit cost in stock value and spend figures. Purchase orders keep the supplier's price.",
     "due_one": "{{count}} product to order now · {{cost}}",
     "due_other": "{{count}} products to order now · {{cost}}",
-    "belowMinimum": "Below the {{minimum}} minimum"
+    "belowMinimum": "Below the {{minimum}} minimum",
+    "moreActions": "More actions for {{name}}"
   },
   "bundles": {
     "add": "Add bundle",
@@ -1373,5 +1379,9 @@
       "alerts": "Alerts and emails",
       "general": "General"
     }
+  },
+  "sections": {
+    "toOrder": "To order",
+    "allProducts": "All products"
   }
 }

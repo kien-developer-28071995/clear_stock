@@ -1,3 +1,4 @@
+import { SectionTabs } from '@/components/layout/SectionTabs';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ErrorBanner } from '@/components/ui/ErrorBanner';
@@ -43,8 +44,7 @@ export function CostsPage() {
     const importError = importCsv.error instanceof ApiError ? fieldError(importCsv.error, 'file') ?? errorMessage(importCsv.error) : undefined;
 
     return (
-        <s-page heading={t('nav.costs')}>
-            <s-link slot="breadcrumb-actions" href="/settings">{t('nav.settings')}</s-link>
+        <s-page heading={t('nav.products')}><SectionTabs group="products" />
             <SaveBar id="costs-save-bar" dirty={dirty} saving={update.isPending} onSave={save} onDiscard={() => setEdits({})} />
             {error && <ErrorBanner error={error} onRetry={() => refetch()} />}
 

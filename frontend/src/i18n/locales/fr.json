@@ -35,7 +35,8 @@
     "events": "Événements commerciaux",
     "orders": "Commandes passées",
     "costs": "Coûts unitaires",
-    "budget": "Budget d'achat"
+    "budget": "Budget d'achat",
+    "planning": "Planification"
   },
   "notFound": {
     "heading": "Page introuvable",
@@ -307,7 +308,11 @@
     "onTheWay": "En cours d'acheminement",
     "incomingShort": "+{{qty}} en route",
     "rateUp": "En hausse depuis {{previous}}/jour dans la prévision de la semaine du {{date}} (maintenant {{current}}/jour).",
-    "rateDown": "En baisse depuis {{previous}}/jour dans la prévision de la semaine du {{date}} (maintenant {{current}}/jour)."
+    "rateDown": "En baisse depuis {{previous}}/jour dans la prévision de la semaine du {{date}} (maintenant {{current}}/jour).",
+    "headlineOrder_one": "Commander {{qty}} unité avant le {{date}}",
+    "headlineOrder_other": "Commander {{qty}} unités avant le {{date}}",
+    "headlineOrder_many": "Commander {{qty}} unités avant le {{date}}",
+    "headlineOk": "Rien à commander pour le moment"
   },
   "why": {
     "heading": "Pourquoi ces chiffres ?",
@@ -413,7 +418,8 @@
     "allVendors": "Toutes les marques",
     "productType": "Type de produit",
     "allTypes": "Tous les types de produits",
-    "exportCsv": "Exporter la liste (CSV)"
+    "exportCsv": "Exporter la liste (CSV)",
+    "moreFilters": "Plus de filtres"
   },
   "settings": {
     "defaultsHeading": "Valeurs par défaut des prévisions",
@@ -505,7 +511,8 @@
     "due_one": "{{count}} produit à commander maintenant · {{cost}}",
     "due_other": "{{count}} produits à commander maintenant · {{cost}}",
     "due_many": "{{count}} produits à commander maintenant · {{cost}}",
-    "belowMinimum": "Sous le minimum de {{minimum}}"
+    "belowMinimum": "Sous le minimum de {{minimum}}",
+    "moreActions": "Autres actions pour {{name}}"
   },
   "bundles": {
     "add": "Ajouter un lot",
@@ -1510,5 +1517,9 @@
       "alerts": "Alertes et e-mails",
       "general": "Général"
     }
+  },
+  "sections": {
+    "toOrder": "À commander",
+    "allProducts": "Tous les produits"
   }
 }

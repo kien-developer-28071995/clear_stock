@@ -35,7 +35,8 @@
     "events": "Eventos de vendas",
     "orders": "Pedidos feitos",
     "costs": "Custos unitários",
-    "budget": "Orçamento de compras"
+    "budget": "Orçamento de compras",
+    "planning": "Planejamento"
   },
   "notFound": {
     "heading": "Página não encontrada",
@@ -307,7 +308,11 @@
     "onTheWay": "A caminho",
     "incomingShort": "+{{qty}} a caminho",
     "rateUp": "Subiu de {{previous}}/dia na previsão da semana de {{date}} (agora {{current}}/dia).",
-    "rateDown": "Caiu de {{previous}}/dia na previsão da semana de {{date}} (agora {{current}}/dia)."
+    "rateDown": "Caiu de {{previous}}/dia na previsão da semana de {{date}} (agora {{current}}/dia).",
+    "headlineOrder_one": "Peça {{qty}} unidade até {{date}}",
+    "headlineOrder_other": "Peça {{qty}} unidades até {{date}}",
+    "headlineOrder_many": "Peça {{qty}} unidades até {{date}}",
+    "headlineOk": "Nada a pedir por enquanto"
   },
   "why": {
     "heading": "Por que estes números?",
@@ -413,7 +418,8 @@
     "allVendors": "Todas as marcas",
     "productType": "Tipo de produto",
     "allTypes": "Todos os tipos de produto",
-    "exportCsv": "Exportar lista (CSV)"
+    "exportCsv": "Exportar lista (CSV)",
+    "moreFilters": "Mais filtros"
   },
   "settings": {
     "defaultsHeading": "Padrões da previsão",
@@ -505,7 +511,8 @@
     "due_one": "{{count}} produto para pedir agora · {{cost}}",
     "due_other": "{{count}} produtos para pedir agora · {{cost}}",
     "due_many": "{{count}} produtos para pedir agora · {{cost}}",
-    "belowMinimum": "Abaixo do mínimo de {{minimum}}"
+    "belowMinimum": "Abaixo do mínimo de {{minimum}}",
+    "moreActions": "Mais ações para {{name}}"
   },
   "bundles": {
     "add": "Adicionar kit",
@@ -1510,5 +1517,9 @@
       "alerts": "Alertas e e-mails",
       "general": "Geral"
     }
+  },
+  "sections": {
+    "toOrder": "A pedir",
+    "allProducts": "Todos os produtos"
   }
 }

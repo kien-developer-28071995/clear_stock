@@ -34,7 +34,8 @@
     "events": "Verkaufsaktionen",
     "orders": "Aufgegebene Bestellungen",
     "costs": "Stückkosten",
-    "budget": "Einkaufsbudget"
+    "budget": "Einkaufsbudget",
+    "planning": "Planung"
   },
   "notFound": {
     "heading": "Seite nicht gefunden",
@@ -291,7 +292,10 @@
     "onTheWay": "Unterwegs",
     "incomingShort": "+{{qty}} unterwegs",
     "rateUp": "Gestiegen von {{previous}}/Tag in der Prognose der Woche vom {{date}} (jetzt {{current}}/Tag).",
-    "rateDown": "Gesunken von {{previous}}/Tag in der Prognose der Woche vom {{date}} (jetzt {{current}}/Tag)."
+    "rateDown": "Gesunken von {{previous}}/Tag in der Prognose der Woche vom {{date}} (jetzt {{current}}/Tag).",
+    "headlineOrder_one": "{{qty}} Stück bis {{date}} bestellen",
+    "headlineOrder_other": "{{qty}} Stück bis {{date}} bestellen",
+    "headlineOk": "Aktuell nichts zu bestellen"
   },
   "why": {
     "heading": "Warum diese Zahlen?",
@@ -394,7 +398,8 @@
     "allVendors": "Alle Hersteller",
     "productType": "Produkttyp",
     "allTypes": "Alle Produkttypen",
-    "exportCsv": "Liste exportieren (CSV)"
+    "exportCsv": "Liste exportieren (CSV)",
+    "moreFilters": "Weitere Filter"
   },
   "settings": {
     "defaultsHeading": "Prognose-Standards",
@@ -481,7 +486,8 @@
     "landedCostHelp": "Wird in Lagerwert und Ausgaben zu den Stückkosten addiert. Bestellungen behalten den Lieferantenpreis.",
     "due_one": "{{count}} Produkt jetzt zu bestellen · {{cost}}",
     "due_other": "{{count}} Produkte jetzt zu bestellen · {{cost}}",
-    "belowMinimum": "Unter dem Minimum von {{minimum}}"
+    "belowMinimum": "Unter dem Minimum von {{minimum}}",
+    "moreActions": "Weitere Aktionen für {{name}}"
   },
   "bundles": {
     "add": "Bundle hinzufügen",
@@ -1373,5 +1379,9 @@
       "alerts": "Benachrichtigungen und E-Mails",
       "general": "Allgemein"
     }
+  },
+  "sections": {
+    "toOrder": "Zu bestellen",
+    "allProducts": "Alle Produkte"
   }
 }

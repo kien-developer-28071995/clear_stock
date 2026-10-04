@@ -1,3 +1,4 @@
+import { SectionTabs } from '@/components/layout/SectionTabs';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MissingCostNote } from '@/components/ui/MissingCostNote';
@@ -46,7 +47,7 @@ export function WhatIfPage() {
     const { t } = useTranslation();
     if (!useEntitlements().what_if) {
         return (
-            <s-page heading={t('nav.whatIf')}>
+            <s-page heading={t('nav.planning')}><SectionTabs group="planning" />
                 <UpgradePrompt id="what-if" plan="starter">{t('whatIf.locked')}</UpgradePrompt>
                 <s-section>
                     <s-paragraph>{t('whatIf.intro')}</s-paragraph>
@@ -114,7 +115,7 @@ function WhatIfView() {
     const totalsCost = (x: WhatIfTotals) => (x.cost === 0 && x.missing_cost > 0 ? '—' : money(x.cost));
 
     return (
-        <s-page heading={t('nav.whatIf')}>
+        <s-page heading={t('nav.planning')}><SectionTabs group="planning" />
             {poAllowed && poExists && (data?.totals.scenario.products ?? 0) > 0 && (
                 <s-button slot="secondary-actions" icon="export" loading={exporting || undefined} onClick={exportCsv}>
                     {t('whatIf.export')}

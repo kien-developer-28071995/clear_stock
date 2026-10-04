@@ -199,5 +199,30 @@ class ReportsTest extends TestCase
         $this->assertEquals(['failed' => 1, 'completed' => 1], $response->viewData('sync_runs'));
         $this->assertSame([['type' => 'ReorderDigestMail', 'sent' => 1, 'failed' => 1]], $response->viewData('emails'));
         $this->assertSame(['total' => 0, 'week' => 0], $response->viewData('failed_jobs'));
+        $this->assertNull($response->viewData('web_vitals')); // this version of the app has no web_vitals table
+    }
+
+    public function test_health_shows_the_75th_percentile_of_web_vitals_against_the_built_for_shopify_limits(): void
+    {
+        Schema::connection('app')->create('web_vitals', function (Blueprint $t) {
+            $t->id();
+            $t->unsignedBigInteger('shop_id');
+            $t->string('metric');
+            $t->decimal('value', 12, 4);
+            $t->string('page');
+            $t->timestamp('created_at')->nullable();
+        });
+        $rows = [];
+        foreach ([1000, 2000, 3000, 4000] as $lcp) {
+            $rows[] = ['shop_id' => 1, 'metric' => 'LCP', 'value' => $lcp, 'page' => '/', 'created_at' => '2026-09-25 10:00:00'];
+        }
+        $rows[] = ['shop_id' => 1, 'metric' => 'LCP', 'value' => 9000, 'page' => '/', 'created_at' => '2026-08-01 10:00:00']; // older than 28 days
+        $rows[] = ['shop_id' => 1, 'metric' => 'CLS', 'value' => 0.05, 'page' => '/', 'created_at' => '2026-09-25 10:00:00'];
+        DB::connection('app')->table('web_vitals')->insert($rows);
+
+        $vitals = collect($this->actingAs($this->owner)->get('/health')->assertOk()->assertSee('App speed in the Shopify admin')->viewData('web_vitals'))->keyBy('metric');
+        $this->assertSame([3000.0, 4, false, false], [$vitals['LCP']['p75'], $vitals['LCP']['samples'], $vitals['LCP']['ok'], $vitals['LCP']['enough']]);
+        $this->assertTrue($vitals['CLS']['ok']);
+        $this->assertNull($vitals['INP']['p75']);
     }
 }

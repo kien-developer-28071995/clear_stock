@@ -1,3 +1,4 @@
+import { SectionTabs } from '@/components/layout/SectionTabs';
 import { useModal } from '@/hooks/useModal';
 import { useConfirm } from '@/components/ui/ConfirmModal';
 import { useTranslation } from 'react-i18next';
@@ -22,7 +23,7 @@ export function BundlesPage() {
     };
 
     return (
-        <s-page heading={t('nav.bundles')}>
+        <s-page heading={t('nav.products')}><SectionTabs group="products" />
             <s-button slot="primary-action" variant="primary" onClick={modal.open} disabled={!allowed || undefined}>
                 {t('bundles.add')}
             </s-button>

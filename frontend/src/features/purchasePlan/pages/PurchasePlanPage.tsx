@@ -1,3 +1,4 @@
+import { SectionTabs } from '@/components/layout/SectionTabs';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MissingCostNote } from '@/components/ui/MissingCostNote';
@@ -23,7 +24,7 @@ export function PurchasePlanPage() {
     const { t } = useTranslation();
     if (!useEntitlements().purchase_plan) {
         return (
-            <s-page heading={t('nav.purchasePlan')}>
+            <s-page heading={t('nav.planning')}><SectionTabs group="planning" />
                 <UpgradePrompt id="purchase-plan" plan="starter">{t('purchasePlan.locked')}</UpgradePrompt>
                 <s-section>
                     <s-paragraph>{t('purchasePlan.intro')}</s-paragraph>
@@ -70,19 +71,18 @@ function PurchasePlanView() {
 
     if (!data) {
         return error ? (
-            <s-page heading={t('nav.purchasePlan')}>
+            <s-page heading={t('nav.planning')}><SectionTabs group="planning" />
                 <ErrorBanner error={error} onRetry={() => refetch()} />
             </s-page>
         ) : (
-            <LoadingPage heading={t('nav.purchasePlan')} />
+            <LoadingPage heading={t('nav.planning')} group="planning" />
         );
     }
 
     const money = (v: number | null, missing = 0) => (v === null || (v === 0 && missing > 0) ? '—' : formatMoney(v, data?.currency ?? null));
 
     return (
-        <s-page heading={t('nav.purchasePlan')}>
-            <s-link slot="breadcrumb-actions" href="/reorder">{t('nav.reorder')}</s-link>
+        <s-page heading={t('nav.planning')}><SectionTabs group="planning" />
             {canExport && data.totals.orders > 0 && (
                 <s-button slot="secondary-actions" icon="export" loading={exporting || undefined} onClick={exportCsv}>
                     {t('purchasePlan.export')}
@@ -195,6 +195,11 @@ function PurchasePlanView() {
                                 ))}
                             </s-table-body>
                         </s-table>
+                        {data.calendar_total > data.calendar.length && (
+                            <s-box padding="base">
+                                <s-text color="subdued">{t('whatIf.truncated', { shown: data.calendar.length, count: data.calendar_total })}</s-text>
+                            </s-box>
+                        )}
                     </s-section>
 
                     {data.by_supplier.length > 1 && (

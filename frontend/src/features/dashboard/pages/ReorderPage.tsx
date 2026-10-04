@@ -1,3 +1,4 @@
+import { SectionTabs } from '@/components/layout/SectionTabs';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DashboardGate } from '@/features/dashboard/components/DashboardGate';
@@ -33,12 +34,12 @@ export function ReorderPage() {
     const overdue = orders?.open.filter((o) => o.state === 'overdue').length ?? 0;
 
     return (
-        <DashboardGate heading={t('nav.reorder')}>
+        <DashboardGate heading={t('nav.reorder')} group="reorder">
             {(data) => {
                 const vendors = [...new Set(Object.values(data.actions).flat().map((i) => i.vendor).filter((v): v is string => !!v))].sort();
 
                 return (
-                    <s-page heading={t('nav.reorder')}>
+                    <s-page heading={t('nav.reorder')}><SectionTabs group="reorder" />
                         <s-link slot="breadcrumb-actions" href="/">{t('nav.home')}</s-link>
                         {budget && (
                             <s-button slot="secondary-actions" href="/budget">

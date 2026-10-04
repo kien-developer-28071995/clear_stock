@@ -35,7 +35,8 @@
     "events": "Eventos de venta",
     "orders": "Pedidos realizados",
     "costs": "Costos unitarios",
-    "budget": "Presupuesto de compras"
+    "budget": "Presupuesto de compras",
+    "planning": "Planificación"
   },
   "notFound": {
     "heading": "Página no encontrada",
@@ -307,7 +308,11 @@
     "onTheWay": "En camino",
     "incomingShort": "+{{qty}} en camino",
     "rateUp": "Sube desde {{previous}}/día en la previsión de la semana del {{date}} (ahora {{current}}/día).",
-    "rateDown": "Baja desde {{previous}}/día en la previsión de la semana del {{date}} (ahora {{current}}/día)."
+    "rateDown": "Baja desde {{previous}}/día en la previsión de la semana del {{date}} (ahora {{current}}/día).",
+    "headlineOrder_one": "Pide {{qty}} unidad antes del {{date}}",
+    "headlineOrder_other": "Pide {{qty}} unidades antes del {{date}}",
+    "headlineOrder_many": "Pide {{qty}} unidades antes del {{date}}",
+    "headlineOk": "Nada que pedir por ahora"
   },
   "why": {
     "heading": "¿Por qué estos números?",
@@ -413,7 +418,8 @@
     "allVendors": "Todas las marcas",
     "productType": "Tipo de producto",
     "allTypes": "Todos los tipos de producto",
-    "exportCsv": "Exportar lista (CSV)"
+    "exportCsv": "Exportar lista (CSV)",
+    "moreFilters": "Más filtros"
   },
   "settings": {
     "defaultsHeading": "Valores predeterminados de la previsión",
@@ -505,7 +511,8 @@
     "due_one": "{{count}} producto por pedir ahora · {{cost}}",
     "due_other": "{{count}} productos por pedir ahora · {{cost}}",
     "due_many": "{{count}} productos por pedir ahora · {{cost}}",
-    "belowMinimum": "Por debajo del mínimo de {{minimum}}"
+    "belowMinimum": "Por debajo del mínimo de {{minimum}}",
+    "moreActions": "Más acciones para {{name}}"
   },
   "bundles": {
     "add": "Añadir paquete",
@@ -1510,5 +1517,9 @@
       "alerts": "Alertas y correos",
       "general": "General"
     }
+  },
+  "sections": {
+    "toOrder": "Por pedir",
+    "allProducts": "Todos los productos"
   }
 }

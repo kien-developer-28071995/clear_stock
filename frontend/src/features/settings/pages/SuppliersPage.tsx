@@ -122,21 +122,19 @@ export function SuppliersPage() {
                                     </s-table-cell>
                                     <s-table-cell>
                                         <s-button-group>
-                                            <s-button slot="secondary-actions" onClick={() => assignProducts(s)}>{t('suppliers.assign')}</s-button>
+                                            <s-button slot="secondary-actions" onClick={() => openEdit(s)}>{t('common.edit')}</s-button>
                                             <ExportPurchaseOrderButton supplierId={s.id} label={t('po.short')} />
+                                            <s-button slot="secondary-actions" icon="menu-horizontal" accessibilityLabel={t('suppliers.moreActions', { name: s.name })} commandFor={`supplier-menu-${s.id}`} command="--toggle" />
+                                        </s-button-group>
+                                        <s-menu id={`supplier-menu-${s.id}`} accessibilityLabel={t('suppliers.moreActions', { name: s.name })}>
+                                            <s-button onClick={() => assignProducts(s)}>{t('suppliers.assign')}</s-button>
                                             {emailsExist && (
-                                                <s-button
-                                                    slot="secondary-actions"
-                                                    icon={canEmail ? 'email' : 'lock'}
-                                                    disabled={!canEmail || !s.email || undefined}
-                                                    onClick={() => openEmail(s)}
-                                                >
+                                                <s-button icon={canEmail ? 'email' : 'lock'} disabled={!canEmail || !s.email || undefined} onClick={() => openEmail(s)}>
                                                     {t('supplierEmail.button')}
                                                 </s-button>
                                             )}
-                                            <s-button slot="secondary-actions" onClick={() => openEdit(s)}>{t('common.edit')}</s-button>
-                                            <s-button slot="secondary-actions" tone="critical" onClick={() => confirmDelete(s)}>{t('common.delete')}</s-button>
-                                        </s-button-group>
+                                            <s-button tone="critical" onClick={() => confirmDelete(s)}>{t('common.delete')}</s-button>
+                                        </s-menu>
                                     </s-table-cell>
                                 </s-table-row>
                             ))}

@@ -18,6 +18,8 @@ class PurchasePlanService
     /** Products listed; totals always cover every product. */
     private const ITEM_LIMIT = 200;
 
+    private const CALENDAR_LIMIT = 100;
+
     public function __construct(
         private readonly ForecastQueryRepositoryInterface $forecasts,
         private readonly PurchasePlanner $planner,
@@ -166,7 +168,9 @@ class PurchasePlanService
             'by_month' => array_map($money, array_values($months)),
             'budget' => Entitlements::for($shop)->has(Feature::OrderBudget) && $shop->order_budget !== null ? (float) $shop->order_budget : null,
             // When to order from whom (products without a supplier: supplier null, listed last on a day).
-            'calendar' => array_map($money, $calendar),
+            // The next order days only: a large shop has thousands of day x supplier entries.
+            'calendar' => array_map($money, array_slice($calendar, 0, self::CALENDAR_LIMIT)),
+            'calendar_total' => count($calendar),
             'items' => array_slice($items, 0, self::ITEM_LIMIT),
             'items_total' => count($items),
         ];

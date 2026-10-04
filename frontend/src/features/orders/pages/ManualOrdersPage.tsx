@@ -1,3 +1,4 @@
+import { SectionTabs } from '@/components/layout/SectionTabs';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ErrorBanner } from '@/components/ui/ErrorBanner';
@@ -23,7 +24,7 @@ export function ManualOrdersPage() {
     // Partial delivery: the row being edited and the units received so far.
     const [part, setPart] = useState<{ id: number; value: string } | null>(null);
 
-    if (!data) return error ? <s-page heading={t('nav.orders')}><ErrorBanner error={error} onRetry={() => refetch()} /></s-page> : <LoadingPage heading={t('nav.orders')} />;
+    if (!data) return error ? <s-page heading={t('nav.reorder')}><SectionTabs group="reorder" /><ErrorBanner error={error} onRetry={() => refetch()} /></s-page> : <LoadingPage heading={t('nav.reorder')} group="reorder" />;
 
     const act = (o: ManualOrder, status: 'received' | 'cancelled' | 'open') =>
         update.mutate({ id: o.id, status }, { onSuccess: () => shopify.toast.show(t(`orders.done.${status}`)) });
@@ -99,8 +100,7 @@ export function ManualOrdersPage() {
     );
 
     return (
-        <s-page heading={t('nav.orders')}>
-            <s-link slot="breadcrumb-actions" href="/reorder">{t('nav.reorder')}</s-link>
+        <s-page heading={t('nav.reorder')}><SectionTabs group="reorder" />
             {overdue.length > 0 && (
                 <s-banner tone="warning" heading={t('orders.overdueHeading', { count: overdue.length })}>
                     <s-paragraph>{t('orders.overdueBody')}</s-paragraph>

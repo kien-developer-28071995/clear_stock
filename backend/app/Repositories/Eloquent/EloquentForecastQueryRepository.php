@@ -246,47 +246,61 @@ class EloquentForecastQueryRepository implements ForecastQueryRepositoryInterfac
 
     public function planningRows(Shop $shop, array $filters): iterable
     {
+        // Plain rows, only the columns the planners use: a shop can have tens of thousands of products,
+        // and hydrating a model with its whole explanation for each made plans take seconds.
         // Discontinued products are never ordered again: no plan, scenario or Flow trigger.
-        $query = $this->base($shop)->with('variant.supplier')->where('variants.discontinued', false)
+        $query = $this->base($shop)->toBase()
+            ->leftJoin('suppliers', 'suppliers.id', '=', 'variants.supplier_id')
+            ->where('variants.discontinued', false)
             ->when(($filters['supplier_id'] ?? null) !== null, fn ($q) => $q->where('variants.supplier_id', $filters['supplier_id']))
             ->when(($filters['vendor'] ?? '') !== '', fn ($q) => $q->where('variants.vendor', $filters['vendor']))
             ->when(in_array($filters['abc'] ?? '', ['A', 'B', 'C'], true), fn ($q) => $q->where('variants.abc_class', $filters['abc']))
-            ->select('forecasts.*')->orderBy('forecasts.id');
+            ->orderBy('forecasts.id')
+            ->select([
+                'forecasts.id', 'forecasts.variant_id', 'forecasts.avg_daily_sales', 'forecasts.current_stock', 'forecasts.incoming_stock',
+                'forecasts.reorder_date', 'forecasts.stockout_date', 'forecasts.suggested_qty', 'forecasts.confidence', 'forecasts.computed_at',
+                'variants.shopify_product_id', 'variants.shopify_variant_id', 'variants.product_title', 'variants.title', 'variants.sku', 'variants.abc_class',
+                'variants.supplier_id', 'variants.unit_cost', 'variants.min_stock', 'variants.max_stock', 'variants.min_order_qty', 'variants.pack_size',
+                'suppliers.name as supplier', 'suppliers.email as supplier_email', 'suppliers.lead_time_days as supplier_lead_time_days',
+                'suppliers.min_order_qty as supplier_min_order_qty', 'suppliers.pack_size as supplier_pack_size',
+                'suppliers.order_cycle_days', 'suppliers.order_weekdays',
+            ])
+            // json_extract reads the same on MySQL and SQLite (a string comes back quoted on MySQL).
+            ->selectRaw("json_extract(forecasts.explanation, '$.as_of') as as_of, json_extract(forecasts.explanation, '$.lead_time.days') as lead_days, json_extract(forecasts.explanation, '$.safety.days') as safety_days");
 
-        foreach ($query->lazy(500) as $f) {
-            /** @var Forecast $f */
-            $v = $f->variant;
-            $e = $f->explanation;
+        foreach ($query->lazyById(2000, 'forecasts.id', 'id') as $r) {
+            $int = fn ($v) => $v !== null ? (int) $v : null;
 
             yield [
-                'variant_id' => $f->variant_id,
-                'shopify_product_id' => $v->shopify_product_id,
-                'shopify_variant_id' => $v->shopify_variant_id,
-                'name' => $v->displayName(),
-                'sku' => $v->sku,
-                'abc_class' => $v->abc_class,
-                'supplier_id' => $v->supplier_id,
-                'supplier' => $v->supplier?->name,
-                'supplier_email' => $v->supplier?->email,
-                'supplier_lead_time_days' => $v->supplier?->lead_time_days,
-                'unit_cost' => $v->unit_cost !== null ? (float) $v->unit_cost : null,
-                'as_of' => (string) ($e['as_of'] ?? $f->computed_at->toDateString()),
-                'avg' => (float) $f->avg_daily_sales,
-                'stock' => $f->current_stock,
-                'incoming' => $f->incoming_stock,
-                'lead_time_days' => (int) ($e['lead_time']['days'] ?? 0),
-                'safety_days' => (int) ($e['safety']['days'] ?? 0),
-                'min_stock' => $v->min_stock,
-                'max_stock' => $v->max_stock,
-                'min_order_qty' => $v->effectiveMinOrderQty(),
-                'pack_size' => $v->effectivePackSize(),
-                'order_cycle_days' => $v->supplier?->order_cycle_days,
-                'order_weekdays' => $v->supplier?->order_weekdays,
+                'variant_id' => (int) $r->variant_id,
+                'shopify_product_id' => (int) $r->shopify_product_id,
+                'shopify_variant_id' => (int) $r->shopify_variant_id,
+                'name' => $r->title && $r->title !== 'Default Title' ? "{$r->product_title} - {$r->title}" : $r->product_title,
+                'sku' => $r->sku,
+                'abc_class' => $r->abc_class,
+                'supplier_id' => $int($r->supplier_id),
+                'supplier' => $r->supplier,
+                'supplier_email' => $r->supplier_email,
+                'supplier_lead_time_days' => $int($r->supplier_lead_time_days),
+                'unit_cost' => $r->unit_cost !== null ? (float) $r->unit_cost : null,
+                'as_of' => $r->as_of !== null ? trim((string) $r->as_of, '"') : substr((string) $r->computed_at, 0, 10),
+                'avg' => (float) $r->avg_daily_sales,
+                'stock' => (int) $r->current_stock,
+                'incoming' => (int) $r->incoming_stock,
+                'lead_time_days' => (int) $r->lead_days,
+                'safety_days' => (int) $r->safety_days,
+                'min_stock' => $int($r->min_stock),
+                'max_stock' => $int($r->max_stock),
+                // The product's own rule, else its supplier's default.
+                'min_order_qty' => $int($r->min_order_qty ?? $r->supplier_min_order_qty),
+                'pack_size' => $int($r->pack_size ?? $r->supplier_pack_size),
+                'order_cycle_days' => $int($r->order_cycle_days),
+                'order_weekdays' => $r->order_weekdays !== null ? json_decode((string) $r->order_weekdays, true) : null,
                 // The stored forecast itself (Flow triggers).
-                'reorder_date' => $f->reorder_date?->toDateString(),
-                'stockout_date' => $f->stockout_date?->toDateString(),
-                'suggested_qty' => $f->suggested_qty,
-                'confidence' => $f->confidence->value,
+                'reorder_date' => $r->reorder_date !== null ? substr((string) $r->reorder_date, 0, 10) : null,
+                'stockout_date' => $r->stockout_date !== null ? substr((string) $r->stockout_date, 0, 10) : null,
+                'suggested_qty' => (int) $r->suggested_qty,
+                'confidence' => (string) $r->confidence,
             ];
         }
     }

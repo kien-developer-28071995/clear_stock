@@ -1,3 +1,4 @@
+import { SectionTabs } from '@/components/layout/SectionTabs';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useModal } from '@/hooks/useModal';
@@ -37,7 +38,7 @@ export function SalesEventsPage() {
     const status = (e: SalesEvent) => (e.ends_on < today ? 'past' : e.starts_on <= today ? 'now' : 'upcoming');
 
     return (
-        <s-page heading={t('nav.events')}>
+        <s-page heading={t('nav.planning')}><SectionTabs group="planning" />
             <s-link slot="breadcrumb-actions" href="/">{t('nav.home')}</s-link>
             <s-button slot="primary-action" variant="primary" onClick={openNew}>
                 {t('events.add')}

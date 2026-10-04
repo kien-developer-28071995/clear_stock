@@ -7,6 +7,29 @@ class Health
 {
     public function __construct(private readonly AppData $app) {}
 
+    /** Built for Shopify thresholds (75th percentile over 28 days, at least 100 measurements). */
+    private const VITALS = ['LCP' => 2500, 'CLS' => 0.1, 'INP' => 200];
+
+    /**
+     * 75th percentile of each web vital the Shopify admin measured over the last 28 days.
+     *
+     * @return array<int, array{metric: string, p75: ?float, limit: float, samples: int, ok: ?bool, enough: bool}>
+     */
+    private function webVitals(): array
+    {
+        $since = now()->subDays(28);
+        $out = [];
+        foreach (self::VITALS as $metric => $limit) {
+            $query = fn () => $this->app->table('web_vitals')->where('metric', $metric)->where('created_at', '>=', $since);
+            $n = $query()->count();
+            // The value three quarters of the way up the sorted measurements.
+            $p75 = $n === 0 ? null : (float) $query()->orderBy('value')->offset((int) floor(0.75 * ($n - 1)))->limit(1)->value('value');
+            $out[] = ['metric' => $metric, 'p75' => $p75, 'limit' => $limit, 'samples' => $n, 'ok' => $p75 === null ? null : $p75 <= $limit, 'enough' => $n >= 100];
+        }
+
+        return $out;
+    }
+
     public function build(): array
     {
         $app = $this->app;
@@ -37,6 +60,7 @@ class Health
                         'failed' => (int) ($rows->firstWhere('status', 'failed')->n ?? 0),
                     ])->values()->all()
                 : null,
+            'web_vitals' => $app->has('web_vitals', ['metric', 'value', 'created_at']) ? $this->webVitals() : null,
             'failed_jobs' => $app->has('failed_jobs', ['failed_at'])
                 ? ['total' => $app->table('failed_jobs')->count(), 'week' => $app->table('failed_jobs')->where('failed_at', '>=', $weekAgo)->count()]
                 : null,

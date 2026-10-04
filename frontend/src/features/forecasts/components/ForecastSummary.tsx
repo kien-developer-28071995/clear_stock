@@ -24,6 +24,14 @@ export function ForecastSummary({ f }: { f: ForecastDetail }) {
     return (
         <s-section>
             <s-stack gap="base">
+                {/* What to do, before the numbers behind it. */}
+                {!discontinued && selling && (
+                    <s-heading>
+                        {f.suggested_qty > 0 && f.reorder_date
+                            ? t('product.headlineOrder', { count: f.suggested_qty, qty: formatNumber(f.suggested_qty, 0), date: formatDate(f.reorder_date) })
+                            : t('product.headlineOk')}
+                    </s-heading>
+                )}
                 <s-stack direction="inline" gap="small-200">
                     <StatusBadge status={f.status} />
                     <ConfidenceBadge confidence={f.confidence} />
@@ -46,6 +54,7 @@ export function ForecastSummary({ f }: { f: ForecastDetail }) {
                           })
                         : t('abc.noPrice')}
                 </s-text>)}
+                <s-query-container>
                 <s-grid gridTemplateColumns="@container (inline-size > 500px) 1fr 1fr 1fr 1fr, 1fr 1fr" gap="base">
                     <Metric label={t('table.inStock')} value={formatNumber(f.current_stock, 0)} />
                     {f.incoming_stock > 0 && <Metric label={t('product.onTheWay')} value={formatNumber(f.incoming_stock, 0)} />}
@@ -62,6 +71,7 @@ export function ForecastSummary({ f }: { f: ForecastDetail }) {
                     {!discontinued && <Metric label={t('table.suggestedOrder')} value={t('product.units', { count: f.suggested_qty, qty: formatNumber(f.suggested_qty, 0) })} />}
                     <Metric label={t('table.supplier')} value={f.supplier?.name ?? t('common.notSet')} />
                 </s-grid>
+                </s-query-container>
                 {discontinued && <s-text color="subdued">{t('discontinued.summary')}</s-text>}
                 {/* How the rate moved since the forecast of an earlier week. */}
                 {f.previous && !f.overrides.avg_daily_sales && Math.abs(f.avg_daily_sales - f.previous.avg) >= 0.05 && (
