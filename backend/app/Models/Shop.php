@@ -37,6 +37,8 @@ use Illuminate\Support\Carbon;
  * @property int $default_safety_days
  * @property bool $filter_sales_spikes cap one-off sales spikes before averaging
  * @property string $forecast_profile default window mix (config forecast.profiles)
+ * @property ?array<int, string> $excluded_order_tags orders with one of these tags are left out of the sales history
+ * @property ?array<int, string> $excluded_order_sources order sources left out (pos, draft)
  * @property ?Carbon $onboarded_at
  * @property ?array{events?: array<string, string>, skipped?: array<int, string>, dismissed_at?: ?string, tips_dismissed?: array<int, string>} $setup_guide
  * @property SyncStatus $sync_status
@@ -57,7 +59,7 @@ class Shop extends Model
     protected $fillable = [
         'domain', 'name',
         'access_token', 'access_token_expires_at', 'refresh_token', 'refresh_token_expires_at', 'scopes',
-        'plan', 'plan_interval', 'subscription_id', 'subscription_status', 'plan_renews_at', 'trial_started_at', 'currency', 'timezone', 'locale', 'default_lead_time_days', 'default_safety_days', 'filter_sales_spikes', 'forecast_profile', 'order_budget', 'onboarded_at', 'setup_guide',
+        'plan', 'plan_interval', 'subscription_id', 'subscription_status', 'plan_renews_at', 'trial_started_at', 'currency', 'timezone', 'locale', 'default_lead_time_days', 'default_safety_days', 'filter_sales_spikes', 'forecast_profile', 'excluded_order_tags', 'excluded_order_sources', 'order_budget', 'onboarded_at', 'setup_guide',
         'sync_status', 'sync_error', 'sync_failure_notified_at', 'last_synced_at', 'forecasted_at', 'realtime_webhook_id',
         'installed_at', 'uninstalled_at',
     ];
@@ -98,6 +100,8 @@ class Shop extends Model
             'default_safety_days' => 'integer',
             'filter_sales_spikes' => 'boolean',
             'order_budget' => 'decimal:2',
+            'excluded_order_tags' => 'array',
+            'excluded_order_sources' => 'array',
         ];
     }
 

@@ -73,6 +73,8 @@ class EloquentForecastQueryRepository implements ForecastQueryRepositoryInterfac
         $forecasts = Forecast::query()->withoutGlobalScope('shop')->where('shop_id', $shop->id)
             ->where('variant_id', $variantId)->whereNotNull('location_id')->get()->keyBy('location_id');
 
+        $minimums = DB::table('location_minimums')->where('shop_id', $shop->id)->where('variant_id', $variantId)->pluck('min_stock', 'location_id');
+
         return DB::table('locations')
             ->leftJoin('inventory_levels', fn ($j) => $j->on('inventory_levels.location_id', '=', 'locations.id')->where('inventory_levels.variant_id', $variantId))
             ->where('locations.shop_id', $shop->id)->where('locations.is_active', true)->where('locations.excluded', false)
@@ -83,6 +85,7 @@ class EloquentForecastQueryRepository implements ForecastQueryRepositoryInterfac
                 'location_id' => (int) $r->id,
                 'location' => $r->name,
                 'available' => (int) ($r->available ?? 0),
+                'min_stock' => isset($minimums[$r->id]) ? (int) $minimums[$r->id] : null,
                 'forecast' => $forecasts->get($r->id),
             ])->values()->all();
     }
@@ -324,6 +327,67 @@ class EloquentForecastQueryRepository implements ForecastQueryRepositoryInterfac
             ->toBase()->first();
 
         return ['count' => (int) $row->n, 'units' => (int) $row->units, 'value' => round((float) $row->value, 2), 'missing_cost' => (int) $row->missing];
+    }
+
+    public function clearance(Shop $shop, string $today, string $since, int $limit): array
+    {
+        $value = 'forecasts.current_stock * COALESCE(variants.unit_cost, 0)';
+        $rows = collect();
+        foreach ([ForecastStatus::Slow, ForecastStatus::Overstock] as $status) {
+            $rows = $rows->concat($this->statusQuery($shop, $status, $today)->with('variant')
+                ->orderByRaw("{$value} DESC")->orderByDesc('forecasts.current_stock')->orderBy('forecasts.id')->limit($limit)->get(['forecasts.*'])
+                ->map(fn (Forecast $f) => [$status->value, $f]));
+        }
+        $ids = $rows->map(fn ($r) => $r[1]->variant_id)->all();
+        $sales = [];
+        foreach (array_chunk($ids, 1000) as $chunk) {
+            DB::table('daily_sales')->where('shop_id', $shop->id)->whereIn('variant_id', $chunk)
+                ->groupBy('variant_id')
+                ->selectRaw('variant_id, SUM(CASE WHEN date >= ? AND units_sold > units_returned THEN units_sold - units_returned ELSE 0 END) as sold, '
+                    .'MAX(CASE WHEN units_sold > 0 THEN date END) as last_sold_on', [$since])
+                ->get()->each(function ($r) use (&$sales) {
+                    $sales[(int) $r->variant_id] = ['sold' => (int) $r->sold, 'last_sold_on' => $r->last_sold_on !== null ? substr((string) $r->last_sold_on, 0, 10) : null];
+                });
+        }
+
+        return $rows->map(function (array $row) use ($sales) {
+            [$status, $f] = $row;
+            $sold = $sales[$f->variant_id]['sold'] ?? 0;
+            $cost = $f->variant->unit_cost !== null ? (float) $f->variant->unit_cost : null;
+
+            return [
+                'variant_id' => $f->variant_id,
+                'name' => $f->variant->displayName(),
+                'sku' => $f->variant->sku,
+                'status' => $status,
+                'stock' => $f->current_stock,
+                'excess' => $status === ForecastStatus::Overstock->value ? $f->excess_units : $f->current_stock,
+                'days_of_cover' => $f->days_of_cover !== null ? (float) $f->days_of_cover : null,
+                'value' => $cost !== null ? round($f->current_stock * $cost, 2) : null,
+                'sold' => $sold,
+                // Share of what was available that sold: units sold / (units sold + still in stock).
+                'sell_through' => $sold + $f->current_stock > 0 ? round($sold / ($sold + $f->current_stock), 3) : null,
+                'last_sold_on' => $sales[$f->variant_id]['last_sold_on'] ?? null,
+            ];
+        })->sortByDesc(fn ($r) => $r['value'] ?? 0)->values()->take($limit)->all();
+    }
+
+    public function variantsByProduct(Shop $shop): array
+    {
+        $out = [];
+        $this->base($shop)->where('variants.discontinued', false)->toBase()
+            ->orderBy('variants.shopify_product_id')->orderBy('forecasts.id')
+            ->select(['forecasts.variant_id', 'variants.shopify_product_id', 'variants.product_title', 'variants.title', 'forecasts.avg_daily_sales', 'forecasts.current_stock', 'forecasts.days_of_cover', 'forecasts.reorder_date'])
+            ->each(function ($r) use (&$out) {
+                $out[(int) $r->shopify_product_id][] = [
+                    'variant_id' => (int) $r->variant_id, 'product' => $r->product_title, 'title' => $r->title,
+                    'avg' => (float) $r->avg_daily_sales, 'stock' => (int) $r->current_stock,
+                    'days_of_cover' => $r->days_of_cover !== null ? (float) $r->days_of_cover : null,
+                    'reorder_date' => $r->reorder_date !== null ? substr((string) $r->reorder_date, 0, 10) : null,
+                ];
+            }, 2000);
+
+        return array_filter($out, fn ($variants) => count($variants) > 1);
     }
 
     public function previousSnapshot(Shop $shop, int $variantId, string $weekStart): ?array

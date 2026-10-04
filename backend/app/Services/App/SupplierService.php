@@ -6,6 +6,7 @@ use App\Enums\Feature;
 use App\Jobs\Forecast\RecomputeForecasts;
 use App\Models\Shop;
 use App\Models\Supplier;
+use App\Repositories\Contracts\ForecastQueryRepositoryInterface;
 use App\Repositories\Contracts\ManualOrderRepositoryInterface;
 use App\Repositories\Contracts\SupplierRepositoryInterface;
 use App\Support\Entitlements;
@@ -21,6 +22,7 @@ class SupplierService
     public function __construct(
         private readonly SupplierRepositoryInterface $suppliers,
         private readonly ManualOrderRepositoryInterface $orders,
+        private readonly ForecastQueryRepositoryInterface $forecasts,
     ) {}
 
     /**
@@ -29,6 +31,29 @@ class SupplierService
      *
      * @return array<int, array{median_days: int, orders: int}>
      */
+    /**
+     * What is due to reorder now per supplier, at the supplier's price: lets the list say when an
+     * order would fall short of the supplier's minimum order value.
+     *
+     * @return array<int, array{products: int, units: int, cost: float}>
+     */
+    public function dueTotals(Shop $shop): array
+    {
+        $out = [];
+        foreach ($this->forecasts->reorderList($shop, CarbonImmutable::now($shop->timezone)->toDateString(), null) as $f) {
+            $id = $f->variant->supplier_id;
+            if ($id === null || $f->variant->discontinued) {
+                continue;
+            }
+            $out[$id] ??= ['products' => 0, 'units' => 0, 'cost' => 0.0];
+            $out[$id]['products']++;
+            $out[$id]['units'] += $f->suggested_qty;
+            $out[$id]['cost'] = round($out[$id]['cost'] + $f->suggested_qty * (float) $f->variant->purchaseCost(), 2);
+        }
+
+        return $out;
+    }
+
     public function actualLeadTimes(Shop $shop): array
     {
         $out = [];
@@ -64,8 +89,9 @@ class SupplierService
     {
         $data = $this->withAutoEmail($shop, $data, $supplier);
         // Lead time and order rules feed the forecasts of the supplier's products.
-        $changed = collect(['lead_time_days', 'min_order_qty', 'pack_size', 'order_cycle_days', 'order_weekdays'])
-            ->contains(fn ($field) => array_key_exists($field, $data) && $data[$field] !== $supplier->{$field});
+        // (The landed cost share changes unit costs, applied at the start of the forecast run.)
+        $changed = collect(['lead_time_days', 'min_order_qty', 'pack_size', 'order_cycle_days', 'order_weekdays', 'landed_cost_percent'])
+            ->contains(fn ($field) => array_key_exists($field, $data) && $data[$field] != $supplier->{$field});
         $supplier = $this->suppliers->update($supplier, $data);
 
         if ($changed) {

@@ -41,6 +41,7 @@ return [
                 'sales_events' => true,         // promotions / Black Friday in the forecast
                 'order_budget' => false,        // monthly purchasing budget and priorities
                 'weekly_summary' => true,       // one summary email a week (opt-in)
+                'shopify_purchase_orders' => false, // Shopify's own open purchase orders in the app
             ],
         ],
         'starter' => [
@@ -68,6 +69,7 @@ return [
                 'sales_events' => true,
                 'order_budget' => true,
                 'weekly_summary' => true,
+                'shopify_purchase_orders' => true,
             ],
         ],
         'growth' => [
@@ -98,6 +100,7 @@ return [
                 'sales_events' => true,
                 'order_budget' => true,
                 'weekly_summary' => true,
+                'shopify_purchase_orders' => true,
             ],
         ],
     ],

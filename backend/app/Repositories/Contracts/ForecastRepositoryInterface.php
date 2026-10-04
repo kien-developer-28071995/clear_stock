@@ -96,6 +96,12 @@ interface ForecastRepositoryInterface
      *
      * @param  array<int, array{variant_id: int, avg_daily_sales: float, avg_source: string, has_bundles: bool}>  $rows
      */
+    /** @return array<int, array<int, int>> variant id => location id => manual minimum there */
+    public function locationMinimums(Shop $shop, array $variantIds): array;
+
+    /** @param array<int, ?int> $minimums location id => minimum (null removes it) */
+    public function setLocationMinimums(Shop $shop, int $variantId, array $minimums): void;
+
     public function saveWeeklySnapshots(Shop $shop, string $weekStart, array $rows): void;
 
     /** Snapshots older than this date are deleted. */

@@ -211,6 +211,32 @@ class EloquentForecastRepository implements ForecastRepositoryInterface
         Cache::increment($key);
     }
 
+    public function locationMinimums(Shop $shop, array $variantIds): array
+    {
+        $out = [];
+        DB::table('location_minimums')->where('shop_id', $shop->id)->whereIn('variant_id', $variantIds)->get(['variant_id', 'location_id', 'min_stock'])
+            ->each(function ($r) use (&$out) {
+                $out[(int) $r->variant_id][(int) $r->location_id] = (int) $r->min_stock;
+            });
+
+        return $out;
+    }
+
+    public function setLocationMinimums(Shop $shop, int $variantId, array $minimums): void
+    {
+        $now = now();
+        foreach ($minimums as $locationId => $min) {
+            if ($min === null) {
+                DB::table('location_minimums')->where('shop_id', $shop->id)->where('variant_id', $variantId)->where('location_id', $locationId)->delete();
+            } else {
+                DB::table('location_minimums')->upsert(
+                    [['shop_id' => $shop->id, 'variant_id' => $variantId, 'location_id' => $locationId, 'min_stock' => $min, 'created_at' => $now, 'updated_at' => $now]],
+                    ['variant_id', 'location_id'], ['min_stock', 'updated_at'],
+                );
+            }
+        }
+    }
+
     public function saveWeeklySnapshots(Shop $shop, string $weekStart, array $rows): void
     {
         $now = now();

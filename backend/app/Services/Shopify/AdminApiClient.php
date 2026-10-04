@@ -20,11 +20,12 @@ class AdminApiClient
     ) {}
 
     /**
-     * Run a query/mutation and return its `data` payload.
+     * Run a query/mutation and return its `data` payload. $apiVersion: for an API that only exists
+     * in a newer version than the app's default.
      *
      * @throws ShopifyApiException
      */
-    public function query(Shop $shop, string $query, array $variables = []): array
+    public function query(Shop $shop, string $query, array $variables = [], ?string $apiVersion = null): array
     {
         $token = $this->tokens->accessToken($shop);
 
@@ -35,7 +36,7 @@ class AdminApiClient
                 ->asJson()
                 ->timeout($this->timeout)
                 ->post(
-                    "https://{$shop->domain}/admin/api/{$this->apiVersion}/graphql.json",
+                    "https://{$shop->domain}/admin/api/".($apiVersion ?? $this->apiVersion).'/graphql.json',
                     array_filter(['query' => $query, 'variables' => $variables ?: null]),
                 );
         } catch (ConnectionException $e) {

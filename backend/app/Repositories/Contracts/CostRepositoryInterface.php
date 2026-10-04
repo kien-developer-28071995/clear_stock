@@ -23,4 +23,10 @@ interface CostRepositoryInterface
 
     /** @return array<string, int> SKU and barcode => variant id (active products; first match wins) */
     public function idsBySkuAndBarcode(Shop $shop): array;
+
+    /**
+     * Brings variants.unit_cost in line with the suppliers' landed cost share: base cost x (1 + %)
+     * for products of a supplier that has one, the plain base cost again for products that left it.
+     */
+    public function applyLandedCosts(Shop $shop): void;
 }

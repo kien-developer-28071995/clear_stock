@@ -6,6 +6,7 @@ use App\Enums\Feature;
 use App\Events\ForecastsUpdated;
 use App\Models\Shop;
 use App\Repositories\Contracts\CatalogRepositoryInterface;
+use App\Repositories\Contracts\CostRepositoryInterface;
 use App\Repositories\Contracts\DailySalesRepositoryInterface;
 use App\Repositories\Contracts\ForecastRepositoryInterface;
 use App\Repositories\Contracts\InventorySnapshotRepositoryInterface;
@@ -29,6 +30,7 @@ class ForecastService
         private readonly DailySalesRepositoryInterface $sales,
         private readonly LocationSupport $locationSupport,
         private readonly InventorySnapshotRepositoryInterface $inventorySnapshots,
+        private readonly CostRepositoryInterface $costs,
     ) {}
 
     /**
@@ -39,6 +41,9 @@ class ForecastService
     {
         $asOf = ($now ?? CarbonImmutable::now())->setTimezone($shop->timezone)->startOfDay();
         $computedAt = now();
+
+        // Supplier and cost changes all end in a forecast run: unit costs follow the suppliers' landed cost share here.
+        $this->costs->applyLandedCosts($shop);
 
         $ids = $this->forecasts->forecastableVariantIds($shop);
         $notForecasted = 0;

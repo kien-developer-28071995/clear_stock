@@ -24,6 +24,7 @@ use Illuminate\Support\Carbon;
  * @property ?string $unit_cost cost used everywhere: cost_override, else Shopify's cost
  * @property ?string $shopify_unit_cost cost in Shopify (from the sync)
  * @property ?string $cost_override cost entered in the app (wins over Shopify's)
+ * @property bool $landed_cost_applied unit_cost includes the supplier's landed cost share
  * @property ?string $price current selling price (shop currency)
  * @property ?string $abc_class A, B or C by share of recent revenue; null without a price
  * @property string $revenue_90d net units sold in the ABC window x current price
@@ -66,6 +67,7 @@ class Variant extends Model
             'unit_cost' => 'decimal:4',
             'shopify_unit_cost' => 'decimal:4',
             'cost_override' => 'decimal:4',
+            'landed_cost_applied' => 'boolean',
             'price' => 'decimal:2',
             'revenue_90d' => 'decimal:2',
             'revenue_share' => 'decimal:6',
@@ -84,6 +86,14 @@ class Variant extends Model
             'is_bundle' => 'boolean',
             'shopify_created_at' => 'datetime',
         ];
+    }
+
+    /** What the supplier charges per unit: the cost without the landed cost share (purchase orders). */
+    public function purchaseCost(): ?float
+    {
+        $cost = $this->landed_cost_applied ? ($this->cost_override ?? $this->shopify_unit_cost) : $this->unit_cost;
+
+        return $cost !== null ? (float) $cost : null;
     }
 
     /** Minimum order: the product's own, else its supplier's default (supplier must be loaded). */

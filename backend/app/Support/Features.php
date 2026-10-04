@@ -23,6 +23,7 @@ final class Features
         Feature::SalesEvents->value => 'sales_events',
         Feature::OrderBudget->value => 'order_budget',
         Feature::WeeklySummary->value => 'weekly_summary',
+        Feature::ShopifyPurchaseOrders->value => 'shopify_purchase_orders',
         Feature::PurchaseOrders->value => 'purchase_orders',
         Feature::SupplierEmails->value => 'supplier_emails',
         Feature::SupplierAutoEmail->value => 'supplier_emails',

@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use App\Enums\AlertFrequency;
 use App\Enums\RealtimeAlertMode;
+use App\Services\Sync\OrderSource;
 use App\Support\Locales;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -18,6 +19,11 @@ class SettingsRequest extends FormRequest
             // null = switched off app-wide (the settings page sends back what it got)
             'filter_sales_spikes' => ['sometimes', 'nullable', 'boolean'],
             'forecast_profile' => ['sometimes', Rule::in(array_keys(config('forecast.profiles')))],
+            // Orders left out of the sales the forecast learns from (changing them re-reads the order history).
+            'excluded_order_tags' => ['sometimes', 'array', 'max:20'],
+            'excluded_order_tags.*' => ['string', 'max:255'],
+            'excluded_order_sources' => ['sometimes', 'array'],
+            'excluded_order_sources.*' => [Rule::in(OrderSource::EXCLUDABLE)],
             // null = follow the Shopify admin language
             'locale' => ['sometimes', 'nullable', Rule::in(Locales::supported())],
             'alerts' => ['sometimes', 'array'],

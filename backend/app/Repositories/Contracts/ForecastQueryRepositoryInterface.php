@@ -93,6 +93,20 @@ interface ForecastQueryRepositoryInterface
     public function discontinuedStock(Shop $shop): array;
 
     /** @return array<int, string> weeks (Y-m-d, newest first) with forecast snapshots, up to $latestStart */
+    /**
+     * Slow and overstocked products, most stock value first, with what sold since $since and the last sale.
+     *
+     * @return array<int, array{variant_id: int, name: string, sku: ?string, status: string, stock: int, excess: int, days_of_cover: ?float, value: ?float, sold: int, sell_through: ?float, last_sold_on: ?string}>
+     */
+    public function clearance(Shop $shop, string $today, string $since, int $limit): array;
+
+    /**
+     * Forecast products grouped by Shopify product (not discontinued), for products with several variants.
+     *
+     * @return array<int, array<int, array{variant_id: int, product: string, title: ?string, avg: float, stock: int, days_of_cover: ?float, reorder_date: ?string}>>
+     */
+    public function variantsByProduct(Shop $shop): array;
+
     /** The latest weekly snapshot of a product from before $weekStart: {week_start, avg} or null. */
     public function previousSnapshot(Shop $shop, int $variantId, string $weekStart): ?array;
 

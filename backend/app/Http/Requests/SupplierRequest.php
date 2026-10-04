@@ -25,6 +25,9 @@ class SupplierRequest extends FormRequest
             // Weekdays orders are placed with this supplier (ISO: 1 = Monday ... 7 = Sunday); empty/null = any day.
             'order_weekdays' => ['sometimes', 'nullable', 'array', 'max:7'],
             'order_weekdays.*' => ['integer', 'between:1,7'], // duplicates are dropped
+            // Freight, duty and handling on top of the supplier's price (%); the supplier's minimum order value.
+            'landed_cost_percent' => ['sometimes', 'nullable', 'numeric', 'min:0', 'max:500'],
+            'min_order_value' => ['sometimes', 'nullable', 'numeric', 'min:0', 'max:100000000'],
             // Automatic purchase order emails (Growth); needs a supplier email.
             'auto_email' => ['sometimes', 'boolean'],
         ];

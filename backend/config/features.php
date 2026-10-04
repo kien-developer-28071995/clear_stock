@@ -32,6 +32,8 @@ return [
 
     // Ordering
     'purchase_orders' => (bool) env('FEATURE_PURCHASE_ORDERS', true),   // PO export (CSV)
+    // Shopify's own purchase orders, read-only (needs the optional scope read_inventory_purchase_orders in shopify.app.toml).
+    'shopify_purchase_orders' => (bool) env('FEATURE_SHOPIFY_PURCHASE_ORDERS', true),
     'supplier_emails' => (bool) env('FEATURE_SUPPLIER_EMAILS', true),   // emailing orders to suppliers (by hand + automatic)
 
     // Multi-location (Growth). Transfers need locations.

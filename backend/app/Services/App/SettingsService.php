@@ -5,6 +5,7 @@ namespace App\Services\App;
 use App\Enums\AlertFrequency;
 use App\Enums\Feature;
 use App\Enums\RealtimeAlertMode;
+use App\Enums\SyncType;
 use App\Jobs\Forecast\RecomputeForecasts;
 use App\Jobs\SyncRealtimeWebhook;
 use App\Models\Location;
@@ -12,6 +13,7 @@ use App\Models\Shop;
 use App\Repositories\Contracts\AlertSettingRepositoryInterface;
 use App\Repositories\Contracts\FlowRepositoryInterface;
 use App\Repositories\Contracts\ShopRepositoryInterface;
+use App\Services\Sync\SyncService;
 use App\Support\CacheVersion;
 use App\Support\Entitlements;
 use Illuminate\Validation\ValidationException;
@@ -23,6 +25,7 @@ class SettingsService
         private readonly ShopRepositoryInterface $shops,
         private readonly AlertSettingRepositoryInterface $alerts,
         private readonly FlowRepositoryInterface $flow,
+        private readonly SyncService $sync,
     ) {}
 
     public function get(Shop $shop): array
@@ -35,6 +38,8 @@ class SettingsService
             // One-off sales spikes capped before averaging (hidden when switched off app-wide).
             'filter_sales_spikes' => Entitlements::for($shop)->has(Feature::SpikeFilter) ? $shop->filter_sales_spikes : null,
             'forecast_profile' => $shop->forecast_profile,
+            'excluded_order_tags' => $shop->excluded_order_tags ?? [],
+            'excluded_order_sources' => $shop->excluded_order_sources ?? [],
             'locale' => $shop->locale,
             'alerts' => [
                 'available' => Entitlements::for($shop)->has(Feature::Alerts),
@@ -70,6 +75,22 @@ class SettingsService
             if ($changed) {
                 RecomputeForecasts::dispatch($shop->id);
             }
+        }
+
+        // Excluded orders change the sales history itself: the whole window is read again from Shopify.
+        $exclusions = [];
+        foreach (['excluded_order_tags', 'excluded_order_sources'] as $key) {
+            if (array_key_exists($key, $data)) {
+                $values = array_values(array_unique(array_filter(array_map(fn ($v) => trim((string) $v), $data[$key] ?? []), fn ($v) => $v !== '')));
+                sort($values);
+                if ($values !== ($shop->{$key} ?? [])) {
+                    $exclusions[$key] = $values === [] ? null : $values;
+                }
+            }
+        }
+        if ($exclusions !== []) {
+            $shop = $this->shops->update($shop, $exclusions);
+            $this->sync->start($shop, SyncType::Manual, full: true);
         }
 
         if (array_key_exists('locale', $data)) {

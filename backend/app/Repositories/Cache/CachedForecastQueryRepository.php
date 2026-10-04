@@ -114,6 +114,16 @@ class CachedForecastQueryRepository implements ForecastQueryRepositoryInterface
         return $this->remember($shop, 'any', 'discontinued', fn () => $this->inner->discontinuedStock($shop));
     }
 
+    public function clearance(Shop $shop, string $today, string $since, int $limit): array
+    {
+        return $this->inner->clearance($shop, $today, $since, $limit);
+    }
+
+    public function variantsByProduct(Shop $shop): array
+    {
+        return $this->inner->variantsByProduct($shop);
+    }
+
     public function previousSnapshot(Shop $shop, int $variantId, string $weekStart): ?array
     {
         return $this->inner->previousSnapshot($shop, $variantId, $weekStart);

@@ -47,7 +47,7 @@ class PurchaseOrderService
         $rows = [['Location', 'Supplier', 'Product', 'SKU', 'Supplier SKU', 'In stock', 'Sells per day', 'Runs out', 'Order quantity', 'Unit cost', 'Line total', 'Currency']];
         foreach ($items as $f) {
             /** @var Forecast $f */
-            $cost = $f->variant->unit_cost !== null ? (float) $f->variant->unit_cost : null;
+            $cost = $f->variant->purchaseCost(); // the supplier's price, without freight and duty
             $rows[] = [
                 $f->location?->name ?? 'All locations',
                 $f->variant->supplier?->name ?? '',
@@ -92,7 +92,7 @@ class PurchaseOrderService
                 $f->variant->barcode ?? '',
                 $f->variant->supplier_sku ?? '',
                 $f->suggested_qty,
-                $f->variant->unit_cost !== null ? number_format((float) $f->variant->unit_cost, 2, '.', '') : '',
+                $f->variant->purchaseCost() !== null ? number_format($f->variant->purchaseCost(), 2, '.', '') : '',
                 '',
             ];
         }

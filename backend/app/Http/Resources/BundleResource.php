@@ -12,8 +12,21 @@ class BundleResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
+        // How many bundles the components on hand make, and the component that runs out first.
+        $stock = $request->attributes->get('stock');
+        $buildable = null;
+        $limiting = null;
+        foreach ($stock === null ? [] : $this->bundleComponents as $c) {
+            $makes = intdiv(max(0, (int) ($stock[$c->component_variant_id] ?? 0)), max(1, $c->quantity));
+            if ($buildable === null || $makes < $buildable) {
+                [$buildable, $limiting] = [$makes, $c->component?->displayName()];
+            }
+        }
+
         return [
             'variant_id' => $this->id,
+            'buildable' => $buildable,
+            'limiting_component' => $limiting,
             'shopify_variant_id' => $this->shopify_variant_id,
             'name' => $this->displayName(),
             'sku' => $this->sku,
@@ -23,6 +36,7 @@ class BundleResource extends JsonResource
                 'name' => $c->component?->displayName(),
                 'sku' => $c->component?->sku,
                 'quantity' => $c->quantity,
+                'stock' => $stock === null ? null : (int) ($stock[$c->component_variant_id] ?? 0),
                 'source' => $c->source,
             ])->values(),
             'editable' => $this->bundleComponents->every(fn ($c) => $c->source === BundleComponent::SOURCE_MANUAL),

@@ -74,7 +74,10 @@ class SalesEventService
         }
         $asOf ??= CarbonImmutable::now($shop->timezone);
 
-        return new SalesEventMatcher($this->events->endingFrom($shop, $asOf->subDays((int) config('forecast.history_days'))->toDateString()));
+        $from = $asOf->subDays((int) config('forecast.history_days'))->toDateString();
+
+        // Seasons repeat: next year's occurrence matters to an order placed today.
+        return new SalesEventMatcher($this->events->endingFrom($shop, $from), $from, $asOf->addDays((int) config('forecast.history_days'))->toDateString());
     }
 
     /** Product picks may be Shopify gids (resource picker): stored as local ids. */
@@ -98,6 +101,7 @@ class SalesEventService
             'starts_on' => $data['starts_on'],
             'ends_on' => $data['ends_on'],
             'multiplier' => $data['multiplier'],
+            'repeats_yearly' => (bool) ($data['repeats_yearly'] ?? false),
             'applies_to' => $appliesTo,
             'supplier_id' => $appliesTo === SalesEvent::SUPPLIER ? $data['supplier_id'] : null,
             'variant_ids' => $ids,

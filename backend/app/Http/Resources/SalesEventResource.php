@@ -17,6 +17,7 @@ class SalesEventResource extends JsonResource
             'starts_on' => $this->starts_on->toDateString(),
             'ends_on' => $this->ends_on->toDateString(),
             'multiplier' => (float) $this->multiplier,
+            'repeats_yearly' => $this->repeats_yearly,
             'applies_to' => $this->applies_to,
             'supplier_id' => $this->supplier_id,
             'supplier' => $this->supplier?->name,

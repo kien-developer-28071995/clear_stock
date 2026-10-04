@@ -39,6 +39,8 @@ enum Feature: string
     case OrderBudget = 'order_budget';
     /** One summary email a week: what to order, cash tied up, lost sales (every plan, opt-in). */
     case WeeklySummary = 'weekly_summary';
+    /** Shopify's own open purchase orders shown in the app (Starter; optional scope). */
+    case ShopifyPurchaseOrders = 'shopify_purchase_orders';
 
     /** The cheapest plan that includes it (for upgrade prompts). */
     public function minimumPlan(): Plan

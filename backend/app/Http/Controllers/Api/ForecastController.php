@@ -12,6 +12,7 @@ use App\Http\Resources\ForecastListResource;
 use App\Models\Shop;
 use App\Repositories\Contracts\CatalogRepositoryInterface;
 use App\Repositories\Contracts\VariantRepositoryInterface;
+use App\Services\App\AlternateSupplierService;
 use App\Services\App\ForecastAccuracyService;
 use App\Services\App\ForecastAdjustmentService;
 use App\Services\App\ForecastQueryService;
@@ -30,6 +31,7 @@ class ForecastController extends Controller
         private readonly VariantRepositoryInterface $variants,
         private readonly CatalogRepositoryInterface $catalog,
         private readonly ForecastAccuracyService $accuracy,
+        private readonly AlternateSupplierService $alternates,
     ) {}
 
     public function index(ForecastIndexRequest $request, ShopContext $context): JsonResponse
@@ -114,6 +116,20 @@ class ForecastController extends Controller
         return $this->detail($request, $shop, $variant);
     }
 
+    public function updateLocationMinimums(Request $request, ShopContext $context, int $variant): JsonResponse
+    {
+        $shop = $context->shop();
+        $model = $this->variants->find($shop, $variant) ?? throw ApiException::notFound('product');
+        $data = $request->validate([
+            'minimums' => ['required', 'array', 'max:200'],
+            'minimums.*.location_id' => ['required', 'integer'],
+            'minimums.*.min_stock' => ['present', 'nullable', 'integer', 'min:0', 'max:1000000'],
+        ]);
+        $this->adjust->setLocationMinimums($shop, $model, $data['minimums']);
+
+        return $this->detail($request, $shop, $variant);
+    }
+
     private function detail(Request $request, Shop $shop, int $variantId): JsonResponse
     {
         $forecast = $this->query->detail($shop, $variantId) ?? throw ApiException::notFound('forecast');
@@ -128,6 +144,7 @@ class ForecastController extends Controller
         $entitlements = Entitlements::for($shop);
         $request->attributes->set('explanations', $entitlements->has(Feature::Explanations));
         $request->attributes->set('accuracy', $this->accuracy->forVariant($shop, $variantId));
+        $request->attributes->set('alternate_suppliers', $this->alternates->list($shop, $variantId));
         $request->attributes->set('previous', $this->accuracy->previousWeek($shop, $variantId));
         $request->attributes->set('by_location', $entitlements->has(Feature::Locations)
             ? $this->query->byLocation($shop, $variantId)
