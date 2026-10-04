@@ -7,7 +7,7 @@ export GID := $(shell id -g)
 
 .DEFAULT_GOAL := help
 .PHONY: help setup up down restart build shell migrate fresh test e2e extensions logs tunnel tunnel-url tunnel-down e2e-features-off listing-screenshots listing-video \
-        app-url webhook artisan composer npm typecheck website website-build prod-build prod-up prod-down prod-migrate prod-logs
+        app-url webhook artisan composer npm typecheck website website-build admin-setup admin-user admin-test prod-build prod-up prod-down prod-migrate prod-logs
 
 help: ## List available commands
 	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-14s\033[0m %s\n", $$1, $$2}'
@@ -99,6 +99,21 @@ website: ## Open the marketing website (dev server of website/, started by make 
 
 website-build: ## Check translations + types and build the static website into website/dist
 	$(DC) run --rm --no-deps website sh -c "npm install --no-audit --no-fund && npm run check && npm run build"
+
+admin-setup: ## First run of the owner reports (admin/): env file with the app's DB credentials, deps, key, migrate
+	@test -f admin/.env || { cp admin/.env.example admin/.env; \
+		for k in DATABASE USERNAME PASSWORD; do v=$$(grep -E "^DB_$$k=" backend/.env | cut -d= -f2-); \
+		sed -i.bak "s|^APPDB_$$k=.*|APPDB_$$k=$$v|" admin/.env; done; rm -f admin/.env.bak; }
+	$(DC) run --rm --no-deps admin composer install
+	@grep -qE '^APP_KEY=.+' admin/.env || $(DC) run --rm --no-deps admin php artisan key:generate --ansi
+	$(DC) up -d admin
+	@echo "Next: make admin-user EMAIL=you@example.com, then open http://localhost:$${FORWARD_ADMIN_PORT:-8090}"
+
+admin-user: ## Create the owner account of the reports or reset its password: make admin-user EMAIL=you@example.com
+	$(DC) exec admin php artisan admin:user $(EMAIL)
+
+admin-test: ## Run the tests of the owner reports
+	$(DC) run --rm --no-deps admin php artisan test
 
 tunnel: ## Start the HTTPS tunnel, print its URL and write it into backend/.env, frontend/.env, shopify.app.toml
 	@if grep -qE '^TUNNEL_TOKEN=.+' backend/.env; then \

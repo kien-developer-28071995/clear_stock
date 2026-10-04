@@ -212,6 +212,10 @@ API (session-token authenticated): `GET /api/dashboard`, `GET|POST /api/onboardi
 - **Screenshots** in `website/public/screenshots` are copies of `docs/listing/screenshots` (re-copy after `make listing-screenshots`).
 - **Run:** `make up` starts it with hot reload on http://localhost:4321 (or `cd website && npm install && npm run dev`); `make website-build` checks and builds `website/dist`. Production: Caddy serves the built files (deploy/Caddyfile, docs/DEPLOY.md).
 
+## Owner reports (`admin/`)
+
+A separate plain Laravel + Blade app for the app owner only: how many shops have the app installed, how many uninstalled, which shop uses which feature, and whether syncs and emails are healthy. It only reads this app's database and keeps its own SQLite ledger of installs, uninstalls and plan changes (the app deletes a shop 48 hours after an uninstall, so that history would otherwise be lost). Dev: `make admin-setup`, `make admin-user EMAIL=you@example.com`, then http://localhost:8090. Details, security and what to build next: [admin/README.md](admin/README.md).
+
 ## Languages
 
 The app is translated into English, Vietnamese, Spanish, German, French and Portuguese (Brazil) (react-i18next). It follows the Shopify admin language; merchants can override it in **Settings → Language** (saved on the shop).
