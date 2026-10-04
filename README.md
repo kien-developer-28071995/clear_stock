@@ -262,6 +262,7 @@ Three [admin UI extensions](https://shopify.dev/docs/api/admin-extensions) in `e
 | `FEATURE_LOST_SALES` | Sales lost to stock-outs (Insights, explanation line) | still computed, just hidden |
 | `FEATURE_ORDER_BUDGET` | Monthly order budget and priorities (Starter) | the saved budget is kept |
 | `FEATURE_WEEKLY_SUMMARY` | Weekly summary email (every plan, opt-in) | the merchant's choice is kept, nothing is sent |
+| `FEATURE_SHOPIFY_PURCHASE_ORDERS` | Shopify's own open purchase orders on the Orders page (Starter; optional scope `read_inventory_purchase_orders`) | nothing is stored |
 | `FEATURE_SALES_EVENTS` | Sales events (promotions raising/lowering demand on set days) | saved events are ignored by forecasts while off |
 | `FEATURE_ACCURACY` | Forecast accuracy (Insights, product page): each week's forecast vs what really sold | weekly snapshots are still saved |
 | `FEATURE_PURCHASE_ORDERS` | Purchase order CSV export | |

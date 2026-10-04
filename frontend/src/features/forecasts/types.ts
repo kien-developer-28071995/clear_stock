@@ -146,6 +146,8 @@ export interface ForecastDetail extends ForecastRow {
         reference_name: string | null;
         reference_percent: number | null;
     };
+    /** Other suppliers this product can be bought from. */
+    alternate_suppliers: AlternateSupplier[];
     defaults: { lead_time_days: number; safety_days: number; forecast_profile: ForecastProfile };
     /** Recent sales rate vs the weeks before (null = too little to compare). */
     trend: { direction: 'up' | 'down' | 'flat'; percent: number; recent_avg: number; baseline_avg: number } | null;
@@ -162,10 +164,26 @@ export interface ForecastDetail extends ForecastRow {
     } | null;
 }
 
+export interface AlternateSupplier {
+    supplier_id: number;
+    name: string;
+    unit_cost: number | null;
+    lead_time_days: number | null;
+    supplier_sku: string | null;
+}
+
+export interface SavedView {
+    id: number;
+    name: string;
+    filters: Record<string, string>;
+}
+
 export interface LocationForecast {
     location_id: number;
     location: string;
     available: number;
+    /** Manual reorder point at this location (null = from the forecast). */
+    min_stock: number | null;
     forecast: {
         incoming_stock: number;
         avg_daily_sales: number;

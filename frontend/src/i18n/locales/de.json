@@ -319,7 +319,10 @@
     "location": "Standort",
     "pending": "Prognosen pro Standort erscheinen nach der nächsten Synchronisierung (öffne die App einmal, um die neuen Fulfillment-Berechtigungen zu bestätigen, falls Shopify danach fragt).",
     "why": "Warum: {{location}}",
-    "hint": "Wähle einen Standort, um das Warum zu sehen. Anpassungen der Verkaufsrate gelten nur für die Shop-Summe."
+    "hint": "Wähle einen Standort, um das Warum zu sehen. Anpassungen der Verkaufsrate gelten nur für die Shop-Summe.",
+    "minimum": "Minimum hier",
+    "minimumAt": "Mindestbestand in {{location}}",
+    "saveMinimums": "Mindestbestände speichern"
   },
   "adjust": {
     "heading": "Verkaufsrate anpassen",
@@ -434,7 +437,15 @@
     "summaryEmail": "Senden an",
     "locationsHeading": "Standorte, die als Bestand zählen",
     "locationsIntro": "Entferne das Häkchen bei einem Standort, dessen Bestand nicht zum Verkauf steht (Retouren, beschädigte Ware, Showroom). Seine Stückzahlen zählen nicht für Reichweite und Bestellvorschläge; von dort versandte Verkäufe zählen weiter als Nachfrage.",
-    "locationsSaved": "Gespeichert. Die Prognosen werden aktualisiert."
+    "locationsSaved": "Gespeichert. Die Prognosen werden aktualisiert.",
+    "excludedHeading": "Von der Prognose ausgeschlossene Bestellungen",
+    "excludedIntro": "Großhandels- oder Ladenbestellungen können die Verkaufsrate deines Onlineshops aufblähen. Beim Speichern einer Änderung wird der Bestellverlauf neu gelesen, das dauert einige Minuten.",
+    "excludedTags": "Bestellungen mit diesem Tag ausschließen",
+    "excludedTagsHelp": "Bestell-Tags in Shopify, durch Kommas getrennt.",
+    "excludedSource": {
+      "pos": "Point-of-Sale-Bestellungen ausschließen",
+      "draft": "Bestellentwürfe ausschließen (vom Team erstellt)"
+    }
   },
   "suppliers": {
     "add": "Lieferant hinzufügen",
@@ -465,7 +476,14 @@
     "actualLeadTime_one": "Deine letzte {{count}} Lieferung dauerte {{days}} Tage (Median)",
     "actualLeadTime_other": "Deine letzten {{count}} Lieferungen dauerten {{days}} Tage (Median)",
     "useActual_one": "{{count}} Tag verwenden",
-    "useActual_other": "{{count}} Tage verwenden"
+    "useActual_other": "{{count}} Tage verwenden",
+    "minOrderValue": "Mindestbestellwert",
+    "minOrderValueHelp": "In deiner Shop-Währung. Eine Bestellung darunter wird markiert.",
+    "landedCost": "Fracht und Zoll",
+    "landedCostHelp": "Wird in Lagerwert und Ausgaben zu den Stückkosten addiert. Bestellungen behalten den Lieferantenpreis.",
+    "due_one": "{{count}} Produkt jetzt zu bestellen · {{cost}}",
+    "due_other": "{{count}} Produkte jetzt zu bestellen · {{cost}}",
+    "belowMinimum": "Unter dem Minimum von {{minimum}}"
   },
   "bundles": {
     "add": "Bundle hinzufügen",
@@ -488,7 +506,10 @@
     "quantity": "Menge",
     "changeProducts": "Produkte ändern",
     "selectProducts": "Produkte auswählen",
-    "save": "Bundle speichern"
+    "save": "Bundle speichern",
+    "buildable_one": "Bestand für {{count}} Bundle; {{component}} geht zuerst aus",
+    "buildable_other": "Bestand für {{count}} Bundles; {{component}} geht zuerst aus",
+    "buildableNone": "Kein Bestand für ein Bundle: {{component}} fehlt"
   },
   "plans": {
     "names": {
@@ -606,7 +627,11 @@
     "required_if": "Dieses Feld ist erforderlich.",
     "not_in": "Wähle einen anderen Wert.",
     "cost_columns_missing": "Die Datei braucht eine SKU- oder Barcode-Spalte und eine Kostenspalte.",
-    "keep_one_location": "Mindestens ein Standort muss als Bestand zählen."
+    "keep_one_location": "Mindestens ein Standort muss als Bestand zählen.",
+    "too_many_views": "Bis zu 20 Ansichten möglich. Lösche zuerst eine.",
+    "alternate_is_main": "Das ist bereits der Lieferant des Produkts.",
+    "too_many_suppliers": "Bis zu 5 weitere Lieferanten pro Produkt.",
+    "not_an_alternate": "Füge diesen Lieferanten zuerst dem Produkt hinzu."
   },
   "explanation": {
     "unknown": "—",
@@ -1078,7 +1103,10 @@
     "emptyHeading": "Noch keine Verkaufsaktionen",
     "emptyBody": "Du planst einen Black Friday oder einen Sale? Füge ihn hinzu, damit die Bestellungen den Mehrbedarf rechtzeitig abdecken.",
     "deleteHeading": "Aktion löschen?",
-    "confirmDelete": "„{{name}}“ löschen? Die Prognosen werden ohne sie neu berechnet."
+    "confirmDelete": "„{{name}}“ löschen? Die Prognosen werden ohne sie neu berechnet.",
+    "repeatsYearly": "Wiederholt sich jedes Jahr",
+    "repeatsYearlyHelp": "Für eine Saison: dieselbe Änderung an denselben Tagen jedes Jahr.",
+    "yearly": "Jedes Jahr"
   },
   "orders": {
     "mark": "Als bestellt markieren",
@@ -1276,5 +1304,55 @@
         "fix": "Lieferzeiten der Lieferanten eintragen"
       }
     }
+  },
+  "clearance": {
+    "heading": "Was abverkauft werden sollte",
+    "intro_one": "Langsamdreher und Überbestände, höchster Lagerwert zuerst. Die Abverkaufsquote ist der Verkauf des letzten {{count}} Tages gemessen am Verfügbaren.",
+    "intro_other": "Langsamdreher und Überbestände, höchster Lagerwert zuerst. Die Abverkaufsquote ist der Verkauf der letzten {{count}} Tage gemessen am Verfügbaren.",
+    "sold_one": "Verkauft in {{count}} Tag",
+    "sold_other": "Verkauft in {{count}} Tagen",
+    "sellThrough": "Abverkaufsquote",
+    "lastSale": "Letzter Verkauf",
+    "never": "Kein Verkauf erfasst",
+    "daysAgo_one": "Vor {{count}} Tag ({{date}})",
+    "daysAgo_other": "Vor {{count}} Tagen ({{date}})",
+    "export": "Liste exportieren (CSV)",
+    "more_one": "{{count}} weiteres in der Datei",
+    "more_other": "{{count}} weitere in der Datei"
+  },
+  "sizeRuns": {
+    "heading": "Lückenhafte Größenläufe",
+    "intro": "Produkte, bei denen eine meistverkaufte Variante fehlt oder nachbestellt werden muss, während andere liegen bleiben. Das Produkt wirkt vorrätig, aber die gesuchte Größe fehlt.",
+    "short": "{{title}}: {{share}} % der Verkäufe, {{stock}} übrig",
+    "sitting": "{{title}}: {{stock}} liegen",
+    "ok": "{{title}}: {{stock}}"
+  },
+  "views": {
+    "saved": "Ansicht gespeichert",
+    "delete": "Ansicht {{name}} löschen",
+    "name": "Name der Ansicht",
+    "namePlaceholder": "Diese Filter speichern als…",
+    "save": "Ansicht speichern"
+  },
+  "alternates": {
+    "heading": "Weitere Lieferanten",
+    "intro": "Halte einen Ersatzlieferanten mit eigenen Kosten, eigener Lieferzeit und Artikelnummer bereit. Beim Wechsel wird er zum Lieferanten des Produkts, der bisherige bleibt hier.",
+    "cost": "Stückkosten",
+    "makeMain": "Als Lieferant verwenden",
+    "switched": "{{name}} ist jetzt der Lieferant dieses Produkts",
+    "add": "Lieferanten hinzufügen",
+    "choose": "Auswählen…",
+    "addButton": "Hinzufügen"
+  },
+  "shopifyPo": {
+    "heading": "Bestellungen in Shopify",
+    "connectBody": "Sieh die in Shopify erstellten Bestellungen neben den hier markierten. Ihre Stückzahlen zählen bereits als unterwegs; zum Lesen ist deine Erlaubnis nötig.",
+    "connect": "Shopify-Bestellungen anzeigen",
+    "declined": "Berechtigung nicht erteilt",
+    "error": "Shopify hat die Bestellungen nicht zurückgegeben. Versuche es später erneut.",
+    "none": "Keine Bestellung ist in Shopify als bestellt markiert.",
+    "order": "Bestellung",
+    "orderedOn": "Bestellt am",
+    "cost": "Kosten"
   }
 }

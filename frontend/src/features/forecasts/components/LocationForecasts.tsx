@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { ForecastDetail } from '@/features/forecasts/types';
+import { useSetLocationMinimums } from '@/features/forecasts/hooks/useForecasts';
 import { ConfidenceBadge } from '@/components/ui/StatusBadge';
 import { Explanation } from '@/components/ui/Explanation';
 import { formatDate, formatNumber } from '@/utils/format';
@@ -9,6 +10,9 @@ import { formatDate, formatNumber } from '@/utils/format';
 export function LocationForecasts({ f }: { f: ForecastDetail }) {
     const { t } = useTranslation();
     const [open, setOpen] = useState<number | null>(null);
+    // Manual minimum per location: the values being edited (location id => text), saved together.
+    const [mins, setMins] = useState<Record<number, string>>({});
+    const saveMins = useSetLocationMinimums(f.variant_id);
     if (!f.locations || f.locations.length < 2) return null;
 
     const forecasted = f.locations.some((l) => l.forecast);
@@ -29,6 +33,7 @@ export function LocationForecasts({ f }: { f: ForecastDetail }) {
                         <s-table-header>{t('table.orderBy')}</s-table-header>
                         <s-table-header format="numeric">{t('table.suggestedOrder')}</s-table-header>
                         <s-table-header>{t('table.confidence')}</s-table-header>
+                        <s-table-header>{t('locations.minimum')}</s-table-header>
                     </s-table-header-row>
                     <s-table-body>
                         {f.locations.map((l) => (
@@ -48,6 +53,18 @@ export function LocationForecasts({ f }: { f: ForecastDetail }) {
                                 <s-table-cell>{l.forecast && l.forecast.avg_daily_sales > 0 ? formatDate(l.forecast.reorder_date) : '—'}</s-table-cell>
                                 <s-table-cell>{l.forecast ? formatNumber(l.forecast.suggested_qty, 0) : '—'}</s-table-cell>
                                 <s-table-cell>{l.forecast ? <ConfidenceBadge confidence={l.forecast.confidence} /> : '—'}</s-table-cell>
+                                <s-table-cell>
+                                    <s-box maxInlineSize="110px">
+                                        <s-number-field
+                                            label={t('locations.minimumAt', { location: l.location })}
+                                            labelAccessibilityVisibility="exclusive"
+                                            min={0}
+                                            placeholder={t('productSettings.fromForecastShort')}
+                                            value={mins[l.location_id] ?? l.min_stock?.toString() ?? ''}
+                                            onInput={(e) => setMins({ ...mins, [l.location_id]: e.currentTarget.value })}
+                                        />
+                                    </s-box>
+                                </s-table-cell>
                             </s-table-row>
                         ))}
                     </s-table-body>
@@ -59,6 +76,23 @@ export function LocationForecasts({ f }: { f: ForecastDetail }) {
                             <Explanation lines={opened.forecast.explanation_lines} />
                         </s-stack>
                     </s-box>
+                )}
+                {Object.keys(mins).length > 0 && (
+                    <s-stack direction="inline" gap="small-200">
+                        <s-button
+                            variant="primary"
+                            loading={saveMins.isPending || undefined}
+                            onClick={() =>
+                                saveMins.mutate(
+                                    Object.entries(mins).map(([id, value]) => ({ location_id: Number(id), min_stock: value.trim() === '' ? null : Number(value) })),
+                                    { onSuccess: () => { setMins({}); shopify.toast.show(t('common.saved')); } },
+                                )
+                            }
+                        >
+                            {t('locations.saveMinimums')}
+                        </s-button>
+                        <s-button variant="tertiary" onClick={() => setMins({})}>{t('common.cancel')}</s-button>
+                    </s-stack>
                 )}
                 {forecasted && <s-text color="subdued">{t('locations.hint')}</s-text>}
             </s-stack>

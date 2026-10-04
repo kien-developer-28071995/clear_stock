@@ -302,7 +302,10 @@
     "location": "Chi nhánh",
     "pending": "Dự báo theo chi nhánh sẽ có sau lần đồng bộ tới (mở app một lần để chấp thuận quyền fulfillment mới nếu Shopify yêu cầu).",
     "why": "Vì sao: {{location}}",
-    "hint": "Chọn một chi nhánh để xem giải thích. Việc chỉnh tốc độ bán chỉ áp dụng cho tổng cửa hàng."
+    "hint": "Chọn một chi nhánh để xem giải thích. Việc chỉnh tốc độ bán chỉ áp dụng cho tổng cửa hàng.",
+    "minimum": "Tồn tối thiểu tại đây",
+    "minimumAt": "Tồn tối thiểu tại {{location}}",
+    "saveMinimums": "Lưu mức tối thiểu"
   },
   "adjust": {
     "heading": "Chỉnh tốc độ bán",
@@ -415,7 +418,15 @@
     "summaryEmail": "Gửi tới",
     "locationsHeading": "Chi nhánh được tính tồn kho",
     "locationsIntro": "Bỏ chọn chi nhánh có hàng không để bán (hàng trả về, hàng lỗi, showroom). Tồn ở đó không tính vào số ngày còn hàng và gợi ý đặt hàng; đơn giao từ đó vẫn tính là nhu cầu.",
-    "locationsSaved": "Đã lưu. Dự báo đang được cập nhật."
+    "locationsSaved": "Đã lưu. Dự báo đang được cập nhật.",
+    "excludedHeading": "Đơn hàng không tính vào dự báo",
+    "excludedIntro": "Đơn sỉ hoặc đơn tại quầy có thể làm tốc độ bán online bị đội lên. Khi lưu thay đổi ở đây, app đọc lại lịch sử đơn hàng, mất vài phút.",
+    "excludedTags": "Bỏ qua đơn có tag",
+    "excludedTagsHelp": "Tag của đơn hàng trong Shopify, cách nhau bằng dấu phẩy.",
+    "excludedSource": {
+      "pos": "Bỏ qua đơn bán tại quầy (POS)",
+      "draft": "Bỏ qua đơn nháp (do nhân viên tạo)"
+    }
   },
   "suppliers": {
     "add": "Thêm nhà cung cấp",
@@ -442,7 +453,13 @@
     "orderDaysHelp": "Những ngày bạn đặt hàng với nhà cung cấp này. Sản phẩm đến hạn vào giữa hai ngày sẽ được đặt vào ngày đặt hàng liền trước, để không bị hết hàng. Không chọn ngày nào = ngày nào cũng được.",
     "ordersOn": "Đặt hàng: {{days}}",
     "actualLeadTime_other": "{{count}} lần giao gần đây mất {{days}} ngày (trung vị)",
-    "useActual_other": "Dùng {{count}} ngày"
+    "useActual_other": "Dùng {{count}} ngày",
+    "minOrderValue": "Giá trị đơn tối thiểu",
+    "minOrderValueHelp": "Theo tiền tệ của cửa hàng. Đơn thấp hơn mức này sẽ được đánh dấu.",
+    "landedCost": "Phí vận chuyển và thuế nhập",
+    "landedCostHelp": "Cộng vào giá vốn khi tính giá trị tồn và chi phí. Đơn đặt hàng vẫn dùng giá của nhà cung cấp.",
+    "due_other": "{{count}} sản phẩm cần đặt ngay · {{cost}}",
+    "belowMinimum": "Dưới mức tối thiểu {{minimum}}"
   },
   "bundles": {
     "add": "Thêm combo",
@@ -465,7 +482,9 @@
     "quantity": "Số lượng",
     "changeProducts": "Đổi sản phẩm",
     "selectProducts": "Chọn sản phẩm",
-    "save": "Lưu combo"
+    "save": "Lưu combo",
+    "buildable_other": "Tồn đủ làm {{count}} combo; {{component}} hết trước",
+    "buildableNone": "Không đủ tồn để làm: {{component}} đã hết"
   },
   "plans": {
     "names": {
@@ -581,7 +600,11 @@
     "required_if": "Vui lòng nhập ô này.",
     "not_in": "Hãy chọn giá trị khác.",
     "cost_columns_missing": "File cần có cột SKU hoặc barcode và cột giá vốn.",
-    "keep_one_location": "Phải có ít nhất một chi nhánh được tính tồn kho."
+    "keep_one_location": "Phải có ít nhất một chi nhánh được tính tồn kho.",
+    "too_many_views": "Tối đa 20 chế độ xem. Hãy xoá bớt một cái.",
+    "alternate_is_main": "Đây đã là nhà cung cấp của sản phẩm.",
+    "too_many_suppliers": "Tối đa 5 nhà cung cấp khác cho mỗi sản phẩm.",
+    "not_an_alternate": "Hãy thêm nhà cung cấp này cho sản phẩm trước."
   },
   "explanation": {
     "unknown": "—",
@@ -974,7 +997,10 @@
     "emptyHeading": "Chưa có sự kiện bán hàng",
     "emptyBody": "Sắp có Black Friday hay đợt sale? Thêm vào để đơn đặt hàng kịp đáp ứng nhu cầu tăng thêm.",
     "deleteHeading": "Xoá sự kiện?",
-    "confirmDelete": "Xoá \"{{name}}\"? Dự báo sẽ được tính lại khi không có sự kiện này."
+    "confirmDelete": "Xoá \"{{name}}\"? Dự báo sẽ được tính lại khi không có sự kiện này.",
+    "repeatsYearly": "Lặp lại hằng năm",
+    "repeatsYearlyHelp": "Dùng cho mùa vụ: cùng mức thay đổi vào cùng ngày mỗi năm.",
+    "yearly": "Hằng năm"
   },
   "orders": {
     "mark": "Đánh dấu đã đặt",
@@ -1145,5 +1171,51 @@
         "fix": "Nhập lead time của nhà cung cấp"
       }
     }
+  },
+  "clearance": {
+    "heading": "Hàng nên xả",
+    "intro_other": "Sản phẩm bán chậm và tồn thừa, giá trị tồn lớn nhất trước. Tỷ lệ bán hết = lượng bán trong {{count}} ngày qua trên lượng có sẵn.",
+    "sold_other": "Bán trong {{count}} ngày",
+    "sellThrough": "Tỷ lệ bán hết",
+    "lastSale": "Lần bán cuối",
+    "never": "Chưa ghi nhận lần bán nào",
+    "daysAgo_other": "{{count}} ngày trước ({{date}})",
+    "export": "Xuất danh sách (CSV)",
+    "more_other": "còn {{count}} sản phẩm nữa trong file"
+  },
+  "sizeRuns": {
+    "heading": "Sản phẩm lệch size",
+    "intro": "Sản phẩm có biến thể bán chạy đang hết hoặc cần đặt, trong khi biến thể khác tồn nhiều. Nhìn tổng thì còn hàng, nhưng khách không mua được size họ cần.",
+    "short": "{{title}}: {{share}}% lượng bán, còn {{stock}}",
+    "sitting": "{{title}}: tồn {{stock}}",
+    "ok": "{{title}}: {{stock}}"
+  },
+  "views": {
+    "saved": "Đã lưu chế độ xem",
+    "delete": "Xoá chế độ xem {{name}}",
+    "name": "Tên chế độ xem",
+    "namePlaceholder": "Lưu bộ lọc này thành…",
+    "save": "Lưu"
+  },
+  "alternates": {
+    "heading": "Nhà cung cấp khác",
+    "intro": "Lưu nhà cung cấp dự phòng với giá, lead time và mã hàng riêng. Khi chuyển, nó thành nhà cung cấp của sản phẩm và nhà cung cấp hiện tại được giữ ở đây.",
+    "cost": "Giá vốn",
+    "makeMain": "Dùng làm nhà cung cấp",
+    "switched": "{{name}} giờ là nhà cung cấp của sản phẩm này",
+    "add": "Thêm nhà cung cấp",
+    "choose": "Chọn…",
+    "addButton": "Thêm"
+  },
+  "shopifyPo": {
+    "heading": "Đơn đặt hàng trong Shopify",
+    "connectBody": "Xem đơn đặt hàng bạn tạo trong Shopify cạnh các đơn đánh dấu ở đây. Số lượng của chúng vốn đã tính là đang về; app cần bạn cho phép để đọc.",
+    "connect": "Hiện đơn đặt hàng Shopify",
+    "declined": "Chưa được cấp quyền",
+    "error": "Shopify chưa trả về danh sách đơn đặt hàng. Hãy thử lại sau.",
+    "none": "Không có đơn đặt hàng nào ở trạng thái đã đặt trong Shopify.",
+    "order": "Đơn đặt hàng",
+    "orderedOn": "Ngày đặt",
+    "cost": "Chi phí"
   }
 }

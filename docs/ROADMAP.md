@@ -137,22 +137,22 @@ Nguồn: review 1–4 sao của Prediko, Assisty, Inventory Planner, Sumtracker,
 ### Đề xuất (✅ = đã làm trên nhánh `feature/research-round-5`, chưa merge)
 
 **A. Khép vòng đặt hàng**
-32. **Đọc PO gốc Shopify qua API** (Starter, M): PO đang mở theo NCC, ngày dự kiến về, "hàng về kịp trước khi hết không"; thay cho việc merchant phải đánh dấu tay. Thêm scope `read_inventory_purchase_orders`.
+32. ✅ (chỉ hiện PO đã đặt; API không có ngày dự kiến về và số đã nhận; tắt ở v1, chưa thử với API thật) **Đọc PO gốc Shopify qua API** (Starter, M): PO đang mở theo NCC, ngày dự kiến về, "hàng về kịp trước khi hết không"; thay cho việc merchant phải đánh dấu tay. Thêm scope `read_inventory_purchase_orders`.
 33. ✅ **Lead time thực tế + độ tin cậy NCC** (mọi gói, M): đo từ PO Shopify và `manual_orders` (ngày đặt → ngày nhận), gợi ý "lead time đang cài 14, thực tế trung vị 19", số ngày an toàn theo độ dao động. (Checklist chuyển từ Stocky: lead time phải dựng lại bằng tay.)
 34. ✅ (mã hàng NCC; chưa có PDF) **PO dạng PDF + mã hàng của NCC + mô tả sản phẩm** (Starter, M): `variants.supplier_sku`, đính PDF vào email NCC. (Stocky 2026-02: không thấy mô tả khi tạo đơn; Logistified gửi PDF/XLSX/CSV; mẫu CSV PO của Shopify có cột Supplier SKU.)
 35. ✅ (phần nhận từng phần; chưa có nhiều ngày giao) **Nhận hàng từng phần + giao nhiều đợt** cho đơn đã đặt (mọi gói, M): mỗi dòng có số đã nhận, nhiều ngày dự kiến. (Salorworks: đối chiếu đặt/nhận là chỗ khó nhất khi rời Stocky; Prediko 4 sao 2025-03: thiếu "blanket PO / shipment plan".)
-36. **Nhiều NCC cho một sản phẩm** (Starter, L): NCC chính + dự phòng, giá và lead time riêng. (Sensible, Logistified, Monocle có.)
-37. **Điều kiện mua theo NCC** (Starter, M): tiền tệ của NCC, giá trị đơn tối thiểu, bậc giá theo số lượng; gợi ý thêm hàng cho đủ ngưỡng. (Stockful "price lists"; phần "lấp đơn cho đủ ngưỡng" là suy luận của ta từ MOQ.)
-38. **Landed cost đơn giản** (Starter, S): % hoặc phí mỗi đơn vị theo NCC cộng vào giá vốn khi tính tiền. (Stockful; LandedCostSync bán riêng $12/tháng.)
+36. ✅ **Nhiều NCC cho một sản phẩm** (Starter, L): NCC chính + dự phòng, giá và lead time riêng. (Sensible, Logistified, Monocle có.)
+37. ✅ (giá trị đơn tối thiểu; chưa có tiền tệ NCC và bậc giá) **Điều kiện mua theo NCC** (Starter, M): tiền tệ của NCC, giá trị đơn tối thiểu, bậc giá theo số lượng; gợi ý thêm hàng cho đủ ngưỡng. (Stockful "price lists"; phần "lấp đơn cho đủ ngưỡng" là suy luận của ta từ MOQ.)
+38. ✅ **Landed cost đơn giản** (Starter, S): % hoặc phí mỗi đơn vị theo NCC cộng vào giá vốn khi tính tiền. (Stockful; LandedCostSync bán riêng $12/tháng.)
 
 **B. Dự báo đúng hơn, chỉnh được hơn**
-39. **Loại kênh bán / đơn theo tag khỏi dự báo** (mọi gói, L): bỏ đơn sỉ, POS, draft order. Cần lưu tổng hợp theo kênh (thêm cột hoặc bảng, vẫn không lưu đơn thô). (Shopify Community; Inventory Planner 2024-12.)
+39. ✅ (lọc lúc tổng hợp đơn, không thêm bảng; đổi cài đặt = đồng bộ lại toàn bộ) **Loại kênh bán / đơn theo tag khỏi dự báo** (mọi gói, L): bỏ đơn sỉ, POS, draft order. Cần lưu tổng hợp theo kênh (thêm cột hoặc bảng, vẫn không lưu đơn thô). (Shopify Community; Inventory Planner 2024-12.)
 40. ✅ (đã kiểm tra: tồn âm vốn đã cộng vào lượng đặt và ngày có bán được tính là còn hàng; thêm dòng giải thích) **Backorder / pre-order** (mọi gói, M): tồn âm cộng vào lượng cần nhập; ngày bán pre-order không bị coi là hết hàng. **Kiểm tra code hiện tại xử lý `available` âm thế nào trước.** (Fabrikatör sống nhờ tính năng này; Prediko không có.)
 41. ✅ (3 hồ sơ: balanced / recent / steady) **Hồ sơ dự báo theo sản phẩm** (mọi gói, M): Ổn định / Theo mùa / Mới bán nhanh / Bán thưa, mỗi hồ sơ là một bộ trọng số 7/30/90/365 ghi rõ trong giải thích; shop chọn mặc định. (Prediko 2026-09, Inventory Planner 2024-08, Flow thread "30 ngày không đủ".)
 42. ✅ **Chỉ báo xu hướng** (mọi gói, S): "7 ngày gần đây cao hơn 40% so với 30 ngày", lọc "đang tăng / đang giảm". (StockAngel, Monocle; Community "trend analysis".)
-43. **Đường mùa vụ 12 tháng chỉnh được** (Starter, M): hệ số theo tháng cho sản phẩm / loại sản phẩm, gợi ý từ lịch sử, thay hệ số 28 ngày khi merchant đã đặt. (Inventory Planner: hàng mùa vụ dự báo sai là than phiền lặp lại.)
-44. **Xem theo sản phẩm cha + đường cong size** (Starter, L): gom biến thể, cảnh báo size chủ lực sắp hết trong khi size khác thừa, chia lượng đặt theo tỷ lệ size. (Restocked, Stovura, Shopify Community.)
-45. **Mức tồn tối thiểu theo từng chi nhánh** (Growth, M): hiện Min/Max chỉ áp dụng dự báo tổng. (Assisty 2026-08.)
+43. ✅ (làm bằng sự kiện bán hàng lặp lại hằng năm thay cho 12 hệ số) **Đường mùa vụ 12 tháng chỉnh được** (Starter, M): hệ số theo tháng cho sản phẩm / loại sản phẩm, gợi ý từ lịch sử, thay hệ số 28 ngày khi merchant đã đặt. (Inventory Planner: hàng mùa vụ dự báo sai là than phiền lặp lại.)
+44. ✅ (mục "Sản phẩm lệch size" ở Phân tích; chưa chia lượng đặt theo tỷ lệ size) **Xem theo sản phẩm cha + đường cong size** (Starter, L): gom biến thể, cảnh báo size chủ lực sắp hết trong khi size khác thừa, chia lượng đặt theo tỷ lệ size. (Restocked, Stovura, Shopify Community.)
+45. ✅ **Mức tồn tối thiểu theo từng chi nhánh** (Growth, M): hiện Min/Max chỉ áp dụng dự báo tổng. (Assisty 2026-08.)
 46. ✅ **Loại chi nhánh khỏi tồn khả dụng** (mọi gói, S): kho 3PL trả hàng, kho hàng lỗi, showroom. **Kiểm tra xem đã có chưa.** (Inventory Planner 2024-10.)
 
 **C. Báo cáo và thông báo**
@@ -160,14 +160,14 @@ Nguồn: review 1–4 sao của Prediko, Assisty, Inventory Planner, Sumtracker,
 48. ✅ (Slack incoming webhook) **Cảnh báo qua Slack / webhook** (Starter, S): cùng nội dung digest, cùng luật chống spam. (iAlert, Restoket, Stockup, Stockful.)
 49. ✅ (digest; Flow chưa đổi) **Ngưỡng "còn N ngày tồn" tự chọn** cho cảnh báo và Flow (Starter, S): theo shop hoặc sản phẩm, thay ngưỡng cứng 30/14/7/0. (Flow feature request, vd. 35 ngày.)
 50. ✅ (bảng `inventory_snapshots`, ghi từ ngày triển khai: `end_of_day_stock` cũ thiếu sản phẩm không bán nên không dùng để dựng lại) **Lịch sử tồn kho và giá trị tồn theo ngày** (mọi gói, S–M): biểu đồ 400 ngày từ `daily_sales.end_of_day_stock` × giá vốn, đã có sẵn dữ liệu. (Community "track daily inventory value"; Stockful bán "daily snapshots 2 năm"; Shopify chỉ giữ 180 ngày.)
-51. **Sell-through, vòng quay, tuổi tồn + danh sách xả hàng** (Starter, M): xuất CSV sản phẩm cần giảm giá. (Stovura "aged stock"; mọi đối thủ quảng cáo dead stock.)
+51. ✅ **Sell-through, vòng quay, tuổi tồn + danh sách xả hàng** (Starter, M): xuất CSV sản phẩm cần giảm giá. (Stovura "aged stock"; mọi đối thủ quảng cáo dead stock.)
 52. ✅ (xuất CSV danh sách sản phẩm; chưa có báo cáo định kỳ) **Báo cáo định kỳ + xuất mọi bảng** (Starter, M): CSV gửi email theo lịch, hoặc link CSV cho Google Sheets `IMPORTDATA`. (Assisty 2024-02: bỏ export là mất quy trình; Inventory Planner xin export.)
-53. **Chế độ xem đã lưu, cột tuỳ chọn, bộ lọc loại trừ, lọc theo tag / collection** (mọi gói, M). (Assisty 2026-08, Prediko 2026-09, IFH 2024-12, Logistified.)
+53. ✅ (chế độ xem đã lưu; chưa có cột tuỳ chọn và lọc theo tag/collection) **Chế độ xem đã lưu, cột tuỳ chọn, bộ lọc loại trừ, lọc theo tag / collection** (mọi gói, M). (Assisty 2026-08, Prediko 2026-09, IFH 2024-12, Logistified.)
 
 **D. Tin cậy và ngách**
 54. ✅ **Kiểm tra sức khoẻ dữ liệu** (mọi gói, S–M): thiếu SKU / giá vốn / NCC, không theo dõi tồn, tồn âm, lead time còn mặc định, SKU trùng; mỗi dòng có link sửa. (Stockful "Health Checks"; Assisty 2024-10 và Prediko 2026-09: phải tự đối chiếu số với Shopify.)
 55. ✅ **"Vì sao con số đổi so với tuần trước"** (mọi gói, S): so `forecast_snapshots` với hiện tại. (Bằng chứng yếu hơn: suy ra từ than phiền "hộp đen".)
-56. **Nguyên liệu / BOM nhẹ** (Starter, L): dùng lại `bundle_components` cho hàng tự sản xuất, "làm được bao nhiêu từ nguyên liệu đang có". (Sumtracker 2025-06, Prediko 2025-02; Katana $179, Craftybase $20.)
+56. ✅ (số combo làm được từ tồn thành phần) **Nguyên liệu / BOM nhẹ** (Starter, L): dùng lại `bundle_components` cho hàng tự sản xuất, "làm được bao nhiêu từ nguyên liệu đang có". (Sumtracker 2025-06, Prediko 2025-02; Katana $179, Craftybase $20.)
 
 ### Quyết định không làm (giữ nguyên)
 Đồng bộ đa kênh Amazon/eBay/Etsy, kiểm kho bằng barcode, in nhãn: nhiều review Sumtracker 1 sao là do app ghi đè tồn kho; ta chỉ đọc, không ghi tồn.

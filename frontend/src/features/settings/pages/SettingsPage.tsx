@@ -31,11 +31,14 @@ export function SettingsPage() {
     const guide = useSetupGuide();
     const reopenGuide = useDismissSetupGuide();
     const [form, setForm] = useState<Settings | null>(null);
+    // The tags as typed (the form keeps the cleaned list); null = show the saved list.
+    const [tagsText, setTagsText] = useState<string | null>(null);
     const realtimeExists = useFeature('realtime_alerts');
     const flowExists = useFeature('flow_triggers');
 
     useEffect(() => {
         if (data) setForm(data);
+        setTagsText(null);
     }, [data]);
 
     if (isPending || !form) {
@@ -108,6 +111,38 @@ export function SettingsPage() {
                             onChange={(e) => setForm({ ...form, filter_sales_spikes: e.currentTarget.checked })}
                         />
                     )}
+                </s-stack>
+            </s-section>
+
+            <s-section heading={t('settings.excludedHeading')}>
+                <s-stack gap="base">
+                    <s-paragraph>{t('settings.excludedIntro')}</s-paragraph>
+                    <s-text-field
+                        label={t('settings.excludedTags')}
+                        details={t('settings.excludedTagsHelp')}
+                        placeholder="wholesale, b2b"
+                        value={tagsText ?? form.excluded_order_tags.join(', ')}
+                        error={fieldError(update.error, 'excluded_order_tags')}
+                        onInput={(e) => {
+                            setTagsText(e.currentTarget.value);
+                            setForm({ ...form, excluded_order_tags: [...new Set(e.currentTarget.value.split(',').map((x) => x.trim()).filter(Boolean))].sort() });
+                        }}
+                    />
+                    {(['pos', 'draft'] as const).map((source) => (
+                        <s-checkbox
+                            key={source}
+                            label={t(`settings.excludedSource.${source}`)}
+                            checked={form.excluded_order_sources.includes(source) || undefined}
+                            onChange={(e) =>
+                                setForm({
+                                    ...form,
+                                    excluded_order_sources: e.currentTarget.checked
+                                        ? [...form.excluded_order_sources, source].sort()
+                                        : form.excluded_order_sources.filter((x) => x !== source),
+                                })
+                            }
+                        />
+                    ))}
                 </s-stack>
             </s-section>
 

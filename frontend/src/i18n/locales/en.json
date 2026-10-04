@@ -319,7 +319,10 @@
     "location": "Location",
     "pending": "Per-location forecasts appear after the next sync (open the app once to approve the new fulfillment permissions if Shopify asks).",
     "why": "Why: {{location}}",
-    "hint": "Select a location to see why. Sales-rate adjustments apply to the store total only."
+    "hint": "Select a location to see why. Sales-rate adjustments apply to the store total only.",
+    "minimum": "Minimum here",
+    "minimumAt": "Minimum stock at {{location}}",
+    "saveMinimums": "Save minimums"
   },
   "adjust": {
     "heading": "Adjust the sales rate",
@@ -434,7 +437,15 @@
     "summaryEmail": "Send it to",
     "locationsHeading": "Locations counted as stock",
     "locationsIntro": "Untick a location whose stock is not for sale (returns, damaged goods, a showroom). Its units are left out of days of stock and order suggestions; sales shipped from it still count as demand.",
-    "locationsSaved": "Saved. Forecasts are being updated."
+    "locationsSaved": "Saved. Forecasts are being updated.",
+    "excludedHeading": "Orders left out of the forecast",
+    "excludedIntro": "Wholesale or in-store orders can inflate the sales rate of your online store. Saving a change here re-reads your order history, which takes a few minutes.",
+    "excludedTags": "Leave out orders tagged",
+    "excludedTagsHelp": "Order tags in Shopify, separated by commas.",
+    "excludedSource": {
+      "pos": "Leave out Point of Sale orders",
+      "draft": "Leave out draft orders (created by staff)"
+    }
   },
   "suppliers": {
     "add": "Add supplier",
@@ -465,7 +476,14 @@
     "actualLeadTime_one": "Your last {{count}} delivery took {{days}} days (median)",
     "actualLeadTime_other": "Your last {{count}} deliveries took {{days}} days (median)",
     "useActual_one": "Use {{count}} day",
-    "useActual_other": "Use {{count}} days"
+    "useActual_other": "Use {{count}} days",
+    "minOrderValue": "Minimum order value",
+    "minOrderValueHelp": "In your store currency. An order below it is flagged.",
+    "landedCost": "Freight and duty",
+    "landedCostHelp": "Added to the unit cost in stock value and spend figures. Purchase orders keep the supplier's price.",
+    "due_one": "{{count}} product to order now · {{cost}}",
+    "due_other": "{{count}} products to order now · {{cost}}",
+    "belowMinimum": "Below the {{minimum}} minimum"
   },
   "bundles": {
     "add": "Add bundle",
@@ -488,7 +506,10 @@
     "quantity": "Quantity",
     "changeProducts": "Change products",
     "selectProducts": "Select products",
-    "save": "Save bundle"
+    "save": "Save bundle",
+    "buildable_one": "Stock for {{count}} bundle; {{component}} runs out first",
+    "buildable_other": "Stock for {{count}} bundles; {{component}} runs out first",
+    "buildableNone": "No stock to make one: {{component}} is out"
   },
   "plans": {
     "names": {
@@ -606,7 +627,11 @@
     "required_if": "This field is required.",
     "not_in": "Choose a different value.",
     "cost_columns_missing": "The file needs a SKU or barcode column and a cost column.",
-    "keep_one_location": "At least one location must count as stock."
+    "keep_one_location": "At least one location must count as stock.",
+    "too_many_views": "You can keep up to 20 views. Delete one first.",
+    "alternate_is_main": "This is already the product's supplier.",
+    "too_many_suppliers": "Up to 5 other suppliers per product.",
+    "not_an_alternate": "Add this supplier to the product first."
   },
   "explanation": {
     "unknown": "—",
@@ -1078,7 +1103,10 @@
     "emptyHeading": "No sales events yet",
     "emptyBody": "Planning a Black Friday or a sale? Add it so orders cover the extra demand in time.",
     "deleteHeading": "Delete event?",
-    "confirmDelete": "Delete \"{{name}}\"? Forecasts will be recomputed without it."
+    "confirmDelete": "Delete \"{{name}}\"? Forecasts will be recomputed without it.",
+    "repeatsYearly": "Repeats every year",
+    "repeatsYearlyHelp": "For a season: the same change on the same dates each year.",
+    "yearly": "Every year"
   },
   "orders": {
     "mark": "Mark as ordered",
@@ -1276,5 +1304,55 @@
         "fix": "Set supplier lead times"
       }
     }
+  },
+  "clearance": {
+    "heading": "What to clear",
+    "intro_one": "Slow and overstocked products, most stock value first. Sell-through is what sold in the last {{count}} day out of what was available.",
+    "intro_other": "Slow and overstocked products, most stock value first. Sell-through is what sold in the last {{count}} days out of what was available.",
+    "sold_one": "Sold in {{count}} day",
+    "sold_other": "Sold in {{count}} days",
+    "sellThrough": "Sell-through",
+    "lastSale": "Last sale",
+    "never": "No sale on record",
+    "daysAgo_one": "{{count}} day ago ({{date}})",
+    "daysAgo_other": "{{count}} days ago ({{date}})",
+    "export": "Export the list (CSV)",
+    "more_one": "{{count}} more in the file",
+    "more_other": "{{count}} more in the file"
+  },
+  "sizeRuns": {
+    "heading": "Broken size runs",
+    "intro": "Products where a best-selling variant is out or due for reorder while other variants sit in stock. The product looks stocked, but shoppers can't buy the size they want.",
+    "short": "{{title}}: {{share}}% of sales, {{stock}} left",
+    "sitting": "{{title}}: {{stock}} sitting",
+    "ok": "{{title}}: {{stock}}"
+  },
+  "views": {
+    "saved": "View saved",
+    "delete": "Delete the view {{name}}",
+    "name": "View name",
+    "namePlaceholder": "Save these filters as…",
+    "save": "Save view"
+  },
+  "alternates": {
+    "heading": "Other suppliers",
+    "intro": "Keep a backup supplier with its own cost, lead time and product code. Switching makes it this product's supplier and keeps the current one here.",
+    "cost": "Unit cost",
+    "makeMain": "Use as supplier",
+    "switched": "{{name}} is now this product's supplier",
+    "add": "Add a supplier",
+    "choose": "Choose…",
+    "addButton": "Add"
+  },
+  "shopifyPo": {
+    "heading": "Purchase orders in Shopify",
+    "connectBody": "See the purchase orders you created in Shopify next to the ones marked here. Their units already count as on the way; this needs your permission to read them.",
+    "connect": "Show Shopify purchase orders",
+    "declined": "Permission not granted",
+    "error": "Shopify did not return the purchase orders. Try again later.",
+    "none": "No purchase order is marked as ordered in Shopify.",
+    "order": "Purchase order",
+    "orderedOn": "Ordered",
+    "cost": "Cost"
   }
 }

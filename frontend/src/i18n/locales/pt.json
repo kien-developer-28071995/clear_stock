@@ -336,7 +336,10 @@
     "location": "Local",
     "pending": "As previsões por local aparecem após a próxima sincronização (abra o app uma vez para aprovar as novas permissões de processamento de pedidos, se a Shopify pedir).",
     "why": "Por quê: {{location}}",
-    "hint": "Selecione um local para ver o porquê. Os ajustes do ritmo de vendas valem só para o total da loja."
+    "hint": "Selecione um local para ver o porquê. Os ajustes do ritmo de vendas valem só para o total da loja.",
+    "minimum": "Mínimo aqui",
+    "minimumAt": "Estoque mínimo em {{location}}",
+    "saveMinimums": "Salvar mínimos"
   },
   "adjust": {
     "heading": "Ajustar o ritmo de vendas",
@@ -453,7 +456,15 @@
     "summaryEmail": "Enviar para",
     "locationsHeading": "Locais contados como estoque",
     "locationsIntro": "Desmarque um local cujo estoque não está à venda (devoluções, itens danificados, showroom). As unidades dele ficam fora dos dias de estoque e das sugestões; as vendas enviadas de lá continuam contando como demanda.",
-    "locationsSaved": "Salvo. As previsões estão sendo atualizadas."
+    "locationsSaved": "Salvo. As previsões estão sendo atualizadas.",
+    "excludedHeading": "Pedidos fora da previsão",
+    "excludedIntro": "Pedidos de atacado ou na loja física podem inflar o ritmo de vendas online. Ao salvar uma alteração aqui, o histórico de pedidos é relido, o que leva alguns minutos.",
+    "excludedTags": "Excluir pedidos com a tag",
+    "excludedTagsHelp": "Tags de pedido no Shopify, separadas por vírgulas.",
+    "excludedSource": {
+      "pos": "Excluir pedidos do Ponto de venda",
+      "draft": "Excluir rascunhos de pedido (criados pela equipe)"
+    }
   },
   "suppliers": {
     "add": "Adicionar fornecedor",
@@ -488,7 +499,15 @@
     "actualLeadTime_many": "Suas últimas {{count}} entregas levaram {{days}} dias (mediana)",
     "useActual_one": "Usar {{count}} dia",
     "useActual_other": "Usar {{count}} dias",
-    "useActual_many": "Usar {{count}} dias"
+    "useActual_many": "Usar {{count}} dias",
+    "minOrderValue": "Valor mínimo do pedido",
+    "minOrderValueHelp": "Na moeda da sua loja. Um pedido abaixo disso é sinalizado.",
+    "landedCost": "Frete e impostos",
+    "landedCostHelp": "Somado ao custo unitário no valor do estoque e nos gastos. Os pedidos mantêm o preço do fornecedor.",
+    "due_one": "{{count}} produto para pedir agora · {{cost}}",
+    "due_other": "{{count}} produtos para pedir agora · {{cost}}",
+    "due_many": "{{count}} produtos para pedir agora · {{cost}}",
+    "belowMinimum": "Abaixo do mínimo de {{minimum}}"
   },
   "bundles": {
     "add": "Adicionar kit",
@@ -511,7 +530,11 @@
     "quantity": "Quantidade",
     "changeProducts": "Alterar produtos",
     "selectProducts": "Selecionar produtos",
-    "save": "Salvar kit"
+    "save": "Salvar kit",
+    "buildable_one": "Estoque para {{count}} kit; {{component}} acaba primeiro",
+    "buildable_other": "Estoque para {{count}} kits; {{component}} acaba primeiro",
+    "buildable_many": "Estoque para {{count}} kits; {{component}} acaba primeiro",
+    "buildableNone": "Sem estoque para montar: falta {{component}}"
   },
   "plans": {
     "names": {
@@ -631,7 +654,11 @@
     "required_if": "Este campo é obrigatório.",
     "not_in": "Escolha outro valor.",
     "cost_columns_missing": "O arquivo precisa de uma coluna de SKU ou código de barras e de uma coluna de custo.",
-    "keep_one_location": "Pelo menos um local deve contar como estoque."
+    "keep_one_location": "Pelo menos um local deve contar como estoque.",
+    "too_many_views": "Até 20 visualizações. Exclua uma primeiro.",
+    "alternate_is_main": "Este já é o fornecedor do produto.",
+    "too_many_suppliers": "Até 5 outros fornecedores por produto.",
+    "not_an_alternate": "Adicione primeiro este fornecedor ao produto."
   },
   "explanation": {
     "unknown": "—",
@@ -1182,7 +1209,10 @@
     "emptyHeading": "Ainda não há eventos de vendas",
     "emptyBody": "Planejando uma Black Friday ou uma liquidação? Adicione para que os pedidos cubram a demanda extra a tempo.",
     "deleteHeading": "Excluir evento?",
-    "confirmDelete": "Excluir \"{{name}}\"? As previsões serão recalculadas sem ele."
+    "confirmDelete": "Excluir \"{{name}}\"? As previsões serão recalculadas sem ele.",
+    "repeatsYearly": "Repete todo ano",
+    "repeatsYearlyHelp": "Para uma temporada: a mesma mudança nas mesmas datas todo ano.",
+    "yearly": "Todo ano"
   },
   "orders": {
     "mark": "Marcar como pedido",
@@ -1407,5 +1437,59 @@
         "fix": "Informar prazos dos fornecedores"
       }
     }
+  },
+  "clearance": {
+    "heading": "O que liquidar",
+    "intro_one": "Produtos lentos e com excesso de estoque, maior valor primeiro. O giro é o que vendeu no último {{count}} dia sobre o disponível.",
+    "intro_other": "Produtos lentos e com excesso de estoque, maior valor primeiro. O giro é o que vendeu nos últimos {{count}} dias sobre o disponível.",
+    "intro_many": "Produtos lentos e com excesso de estoque, maior valor primeiro. O giro é o que vendeu nos últimos {{count}} dias sobre o disponível.",
+    "sold_one": "Vendido em {{count}} dia",
+    "sold_other": "Vendido em {{count}} dias",
+    "sold_many": "Vendido em {{count}} dias",
+    "sellThrough": "Giro",
+    "lastSale": "Última venda",
+    "never": "Nenhuma venda registrada",
+    "daysAgo_one": "Há {{count}} dia ({{date}})",
+    "daysAgo_other": "Há {{count}} dias ({{date}})",
+    "daysAgo_many": "Há {{count}} dias ({{date}})",
+    "export": "Exportar a lista (CSV)",
+    "more_one": "mais {{count}} no arquivo",
+    "more_other": "mais {{count}} no arquivo",
+    "more_many": "mais {{count}} no arquivo"
+  },
+  "sizeRuns": {
+    "heading": "Grades quebradas",
+    "intro": "Produtos com uma variante mais vendida esgotada ou a pedir enquanto outras ficam paradas. O produto parece abastecido, mas falta o tamanho procurado.",
+    "short": "{{title}}: {{share}}% das vendas, restam {{stock}}",
+    "sitting": "{{title}}: {{stock}} parados",
+    "ok": "{{title}}: {{stock}}"
+  },
+  "views": {
+    "saved": "Visualização salva",
+    "delete": "Excluir a visualização {{name}}",
+    "name": "Nome da visualização",
+    "namePlaceholder": "Salvar estes filtros como…",
+    "save": "Salvar visualização"
+  },
+  "alternates": {
+    "heading": "Outros fornecedores",
+    "intro": "Mantenha um fornecedor reserva com custo, prazo e código próprios. Ao trocar, ele vira o fornecedor do produto e o atual fica aqui.",
+    "cost": "Custo unitário",
+    "makeMain": "Usar como fornecedor",
+    "switched": "{{name}} agora é o fornecedor deste produto",
+    "add": "Adicionar fornecedor",
+    "choose": "Escolher…",
+    "addButton": "Adicionar"
+  },
+  "shopifyPo": {
+    "heading": "Pedidos de compra no Shopify",
+    "connectBody": "Veja os pedidos de compra criados no Shopify ao lado dos marcados aqui. As unidades já contam como a caminho; é preciso sua permissão para lê-los.",
+    "connect": "Mostrar pedidos de compra do Shopify",
+    "declined": "Permissão não concedida",
+    "error": "O Shopify não retornou os pedidos de compra. Tente mais tarde.",
+    "none": "Nenhum pedido de compra está marcado como pedido no Shopify.",
+    "order": "Pedido de compra",
+    "orderedOn": "Pedido em",
+    "cost": "Custo"
   }
 }

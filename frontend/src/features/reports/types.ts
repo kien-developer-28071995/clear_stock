@@ -31,3 +31,52 @@ export interface DataHealth {
     default_lead_time_days: number;
     findings: HealthFinding[];
 }
+
+/** Slow and overstocked products with what sold lately: what to discount. */
+export interface Clearance {
+    days: number;
+    currency: string | null;
+    count: number;
+    value: number;
+    items: {
+        variant_id: number;
+        name: string;
+        sku: string | null;
+        status: 'slow' | 'overstock';
+        stock: number;
+        excess: number;
+        days_of_cover: number | null;
+        value: number | null;
+        sold: number;
+        /** Units sold / (units sold + still in stock). */
+        sell_through: number | null;
+        last_sold_on: string | null;
+        days_since_sale: number | null;
+    }[];
+}
+
+/** A product whose best-selling variant is short while other variants sit. */
+export interface SizeRun {
+    product_id: number;
+    product: string;
+    short: number;
+    sitting: number;
+    variants: { variant_id: number; title: string | null; share: number; stock: number; days_of_cover: number | null; state: 'short' | 'sitting' | 'ok' }[];
+}
+
+/** Shopify's own purchase orders that are ordered and still open. */
+export interface ShopifyPurchaseOrders {
+    scope_granted: boolean;
+    scope: string;
+    error: string | null;
+    orders: {
+        id: number;
+        name: string;
+        supplier: string | null;
+        ordered_on: string | null;
+        units: number;
+        cost: number;
+        currency: string | null;
+        lines: { variant_id: number | null; name: string | null; supplier_sku: string | null; quantity: number }[];
+    }[];
+}

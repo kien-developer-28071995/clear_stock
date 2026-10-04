@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { ErrorBanner } from '@/components/ui/ErrorBanner';
 import { LoadingPage } from '@/components/ui/LoadingPage';
 import { useManualOrders, useUpdateManualOrder } from '@/features/orders/hooks/useManualOrders';
+import { ShopifyPurchaseOrders } from '@/features/orders/components/ShopifyPurchaseOrders';
 import type { ManualOrder, ManualOrderState } from '@/features/orders/types';
 import { formatDate, formatNumber } from '@/utils/format';
 
@@ -118,6 +119,7 @@ export function ManualOrdersPage() {
             ) : (
                 <s-section heading={t('orders.openHeading')} padding="none">{table(data.open, true)}</s-section>
             )}
+            <ShopifyPurchaseOrders />
             {data.closed.length > 0 && <s-section heading={t('orders.closedHeading')} padding="none">{table(data.closed, false)}</s-section>}
         </s-page>
     );

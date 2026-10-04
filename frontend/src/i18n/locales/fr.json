@@ -336,7 +336,10 @@
     "location": "Emplacement",
     "pending": "Les prévisions par emplacement apparaissent après la prochaine synchronisation (ouvrez l'application une fois pour approuver les nouvelles autorisations d'expédition si Shopify le demande).",
     "why": "Pourquoi : {{location}}",
-    "hint": "Sélectionnez un emplacement pour voir pourquoi. Les ajustements du rythme de ventes s'appliquent uniquement au total de la boutique."
+    "hint": "Sélectionnez un emplacement pour voir pourquoi. Les ajustements du rythme de ventes s'appliquent uniquement au total de la boutique.",
+    "minimum": "Minimum ici",
+    "minimumAt": "Stock minimum à {{location}}",
+    "saveMinimums": "Enregistrer les minimums"
   },
   "adjust": {
     "heading": "Ajuster le rythme de ventes",
@@ -453,7 +456,15 @@
     "summaryEmail": "Envoyer à",
     "locationsHeading": "Emplacements comptés dans le stock",
     "locationsIntro": "Décochez un emplacement dont le stock n'est pas à vendre (retours, articles abîmés, showroom). Ses unités ne comptent pas dans les jours de stock ni dans les suggestions ; les ventes expédiées depuis cet emplacement comptent toujours comme demande.",
-    "locationsSaved": "Enregistré. Les prévisions sont en cours de mise à jour."
+    "locationsSaved": "Enregistré. Les prévisions sont en cours de mise à jour.",
+    "excludedHeading": "Commandes exclues de la prévision",
+    "excludedIntro": "Les commandes de gros ou en magasin peuvent gonfler le rythme de vente en ligne. Enregistrer un changement ici relit l'historique des commandes, ce qui prend quelques minutes.",
+    "excludedTags": "Exclure les commandes avec la balise",
+    "excludedTagsHelp": "Balises de commande dans Shopify, séparées par des virgules.",
+    "excludedSource": {
+      "pos": "Exclure les commandes Point de vente",
+      "draft": "Exclure les commandes provisoires (créées par l'équipe)"
+    }
   },
   "suppliers": {
     "add": "Ajouter un fournisseur",
@@ -488,7 +499,15 @@
     "actualLeadTime_many": "Vos {{count}} dernières livraisons ont pris {{days}} jours (médiane)",
     "useActual_one": "Utiliser {{count}} jour",
     "useActual_other": "Utiliser {{count}} jours",
-    "useActual_many": "Utiliser {{count}} jours"
+    "useActual_many": "Utiliser {{count}} jours",
+    "minOrderValue": "Montant minimum de commande",
+    "minOrderValueHelp": "Dans la devise de votre boutique. Une commande inférieure est signalée.",
+    "landedCost": "Fret et droits",
+    "landedCostHelp": "Ajouté au coût unitaire dans la valeur du stock et les dépenses. Les bons de commande gardent le prix du fournisseur.",
+    "due_one": "{{count}} produit à commander maintenant · {{cost}}",
+    "due_other": "{{count}} produits à commander maintenant · {{cost}}",
+    "due_many": "{{count}} produits à commander maintenant · {{cost}}",
+    "belowMinimum": "Sous le minimum de {{minimum}}"
   },
   "bundles": {
     "add": "Ajouter un lot",
@@ -511,7 +530,11 @@
     "quantity": "Quantité",
     "changeProducts": "Modifier les produits",
     "selectProducts": "Sélectionner des produits",
-    "save": "Enregistrer le lot"
+    "save": "Enregistrer le lot",
+    "buildable_one": "Stock pour {{count}} lot ; {{component}} s'épuise en premier",
+    "buildable_other": "Stock pour {{count}} lots ; {{component}} s'épuise en premier",
+    "buildable_many": "Stock pour {{count}} lots ; {{component}} s'épuise en premier",
+    "buildableNone": "Pas de stock pour en faire un : {{component}} est épuisé"
   },
   "plans": {
     "names": {
@@ -631,7 +654,11 @@
     "required_if": "Ce champ est obligatoire.",
     "not_in": "Choisissez une autre valeur.",
     "cost_columns_missing": "Le fichier doit contenir une colonne SKU ou code-barres et une colonne de coût.",
-    "keep_one_location": "Au moins un emplacement doit compter dans le stock."
+    "keep_one_location": "Au moins un emplacement doit compter dans le stock.",
+    "too_many_views": "Jusqu'à 20 vues. Supprimez-en une d'abord.",
+    "alternate_is_main": "C'est déjà le fournisseur du produit.",
+    "too_many_suppliers": "Jusqu'à 5 autres fournisseurs par produit.",
+    "not_an_alternate": "Ajoutez d'abord ce fournisseur au produit."
   },
   "explanation": {
     "unknown": "—",
@@ -1182,7 +1209,10 @@
     "emptyHeading": "Pas encore d'événements commerciaux",
     "emptyBody": "Vous préparez un Black Friday ou des soldes ? Ajoutez-le pour que les commandes couvrent la demande supplémentaire à temps.",
     "deleteHeading": "Supprimer l'événement ?",
-    "confirmDelete": "Supprimer « {{name}} » ? Les prévisions seront recalculées sans lui."
+    "confirmDelete": "Supprimer « {{name}} » ? Les prévisions seront recalculées sans lui.",
+    "repeatsYearly": "Se répète chaque année",
+    "repeatsYearlyHelp": "Pour une saison : le même changement aux mêmes dates chaque année.",
+    "yearly": "Chaque année"
   },
   "orders": {
     "mark": "Marquer comme commandé",
@@ -1407,5 +1437,59 @@
         "fix": "Indiquer les délais des fournisseurs"
       }
     }
+  },
+  "clearance": {
+    "heading": "À écouler",
+    "intro_one": "Produits lents et en surstock, la plus grande valeur d'abord. Le taux d'écoulement est ce qui s'est vendu sur le dernier {{count}} jour par rapport au disponible.",
+    "intro_other": "Produits lents et en surstock, la plus grande valeur d'abord. Le taux d'écoulement est ce qui s'est vendu sur les {{count}} derniers jours par rapport au disponible.",
+    "intro_many": "Produits lents et en surstock, la plus grande valeur d'abord. Le taux d'écoulement est ce qui s'est vendu sur les {{count}} derniers jours par rapport au disponible.",
+    "sold_one": "Vendu en {{count}} jour",
+    "sold_other": "Vendu en {{count}} jours",
+    "sold_many": "Vendu en {{count}} jours",
+    "sellThrough": "Taux d'écoulement",
+    "lastSale": "Dernière vente",
+    "never": "Aucune vente enregistrée",
+    "daysAgo_one": "Il y a {{count}} jour ({{date}})",
+    "daysAgo_other": "Il y a {{count}} jours ({{date}})",
+    "daysAgo_many": "Il y a {{count}} jours ({{date}})",
+    "export": "Exporter la liste (CSV)",
+    "more_one": "{{count}} de plus dans le fichier",
+    "more_other": "{{count}} de plus dans le fichier",
+    "more_many": "{{count}} de plus dans le fichier"
+  },
+  "sizeRuns": {
+    "heading": "Tailles déséquilibrées",
+    "intro": "Produits dont une variante très vendue est en rupture ou à commander alors que d'autres dorment en stock. Le produit semble disponible, mais pas dans la taille recherchée.",
+    "short": "{{title}} : {{share}} % des ventes, {{stock}} restants",
+    "sitting": "{{title}} : {{stock}} en attente",
+    "ok": "{{title}} : {{stock}}"
+  },
+  "views": {
+    "saved": "Vue enregistrée",
+    "delete": "Supprimer la vue {{name}}",
+    "name": "Nom de la vue",
+    "namePlaceholder": "Enregistrer ces filtres sous…",
+    "save": "Enregistrer la vue"
+  },
+  "alternates": {
+    "heading": "Autres fournisseurs",
+    "intro": "Gardez un fournisseur de secours avec son coût, son délai et sa référence. En basculant, il devient le fournisseur du produit et l'actuel reste ici.",
+    "cost": "Coût unitaire",
+    "makeMain": "Utiliser comme fournisseur",
+    "switched": "{{name}} est maintenant le fournisseur de ce produit",
+    "add": "Ajouter un fournisseur",
+    "choose": "Choisir…",
+    "addButton": "Ajouter"
+  },
+  "shopifyPo": {
+    "heading": "Bons de commande dans Shopify",
+    "connectBody": "Affichez les bons de commande créés dans Shopify à côté de ceux marqués ici. Leurs unités comptent déjà comme en route ; il faut votre autorisation pour les lire.",
+    "connect": "Afficher les bons de commande Shopify",
+    "declined": "Autorisation non accordée",
+    "error": "Shopify n'a pas renvoyé les bons de commande. Réessayez plus tard.",
+    "none": "Aucun bon de commande n'est marqué comme commandé dans Shopify.",
+    "order": "Bon de commande",
+    "orderedOn": "Commandé le",
+    "cost": "Coût"
   }
 }

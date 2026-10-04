@@ -29,6 +29,7 @@ export function SalesEventModal({ modalRef, event, onDone }: Props) {
     const [to, setTo] = useState('');
     const [percent, setPercent] = useState('100');
     const [scope, setScope] = useState<EventScope>('all');
+    const [yearly, setYearly] = useState(false);
     const [supplierId, setSupplierId] = useState('');
     // Picked in this dialog (gids + names), or the saved products (local ids, count only).
     const [picked, setPicked] = useState<PickedVariant[] | null>(null);
@@ -39,6 +40,7 @@ export function SalesEventModal({ modalRef, event, onDone }: Props) {
         setTo(event?.ends_on ?? '');
         setPercent(event ? toPercent(event.multiplier) : '100');
         setScope(event?.applies_to ?? 'all');
+        setYearly(event?.repeats_yearly ?? false);
         setSupplierId(event?.supplier_id ? String(event.supplier_id) : '');
         setPicked(null);
         create.reset();
@@ -53,6 +55,7 @@ export function SalesEventModal({ modalRef, event, onDone }: Props) {
             starts_on: from,
             ends_on: to,
             multiplier: toMultiplier(percent),
+            repeats_yearly: yearly,
             applies_to: scope,
             supplier_id: scope === 'supplier' && supplierId ? Number(supplierId) : null,
             variant_ids: scope === 'products' ? (picked ? picked.map((p) => p.gid) : event?.variant_ids ?? []) : null,
@@ -84,6 +87,12 @@ export function SalesEventModal({ modalRef, event, onDone }: Props) {
                     value={percent}
                     error={fieldError(mutation.error, 'multiplier')}
                     onInput={(e) => setPercent(e.currentTarget.value)}
+                />
+                <s-checkbox
+                    label={t('events.repeatsYearly')}
+                    details={t('events.repeatsYearlyHelp')}
+                    checked={yearly || undefined}
+                    onChange={(e) => setYearly(e.currentTarget.checked)}
                 />
                 <s-select label={t('events.appliesTo')} value={scope} onChange={(e) => setScope(e.currentTarget.value as EventScope)}>
                     <s-option value="all">{t('events.scope.all')}</s-option>

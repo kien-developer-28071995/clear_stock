@@ -1,6 +1,8 @@
 import { http } from '@/lib/http';
 import type {
+    AlternateSupplier,
     ForecastDetail,
+    SavedView,
     ForecastFilters,
     ForecastListRow,
     OverridesInput,
@@ -20,4 +22,12 @@ export const forecastApi = {
     setOverrides: async (variantId: number, body: OverridesInput) =>
         (await http.put<{ data: ForecastDetail }>(`/forecasts/${variantId}/overrides`, body)).data,
     updateSettings: (variantId: number, body: VariantSettingsInput) => http.put(`/variants/${variantId}/settings`, body),
+    setLocationMinimums: async (variantId: number, minimums: { location_id: number; min_stock: number | null }[]) =>
+        (await http.put<{ data: ForecastDetail }>(`/forecasts/${variantId}/location-minimums`, { minimums })).data,
+    setAlternates: async (variantId: number, suppliers: Omit<AlternateSupplier, 'name'>[]) =>
+        (await http.put<{ data: AlternateSupplier[] }>(`/variants/${variantId}/suppliers`, { suppliers })).data,
+    makeMainSupplier: (variantId: number, supplierId: number) => http.post(`/variants/${variantId}/suppliers/${supplierId}/main`),
+    views: async () => (await http.get<{ data: SavedView[] }>('/views')).data,
+    saveView: async (body: { name: string; filters: Record<string, string> }) => (await http.post<{ data: SavedView[] }>('/views', body)).data,
+    deleteView: async (id: number) => (await http.delete<{ data: SavedView[] }>(`/views/${id}`)).data,
 };

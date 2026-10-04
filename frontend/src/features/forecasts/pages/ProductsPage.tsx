@@ -7,6 +7,7 @@ import { ExportPurchaseOrderButton } from '@/features/forecasts/components/Expor
 import { useShop } from '@/features/shop/hooks/useShop';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useFeature } from '@/hooks/useEntitlements';
+import { SavedViews } from '@/features/forecasts/components/SavedViews';
 import { AbcBadge } from '@/features/forecasts/components/AbcBadge';
 import { useFacets, useForecastList, useLocations } from '@/features/forecasts/hooks/useForecasts';
 import { TREND_THRESHOLD, type ForecastFilters } from '@/features/forecasts/types';
@@ -88,6 +89,10 @@ export function ProductsPage() {
                     {t('products.freeLimit', { count: limit })} <s-link href="/plans">{t('upgrade.upgrade')}</s-link>
                 </s-banner>
             )}
+            <SavedViews
+                current={Object.fromEntries(params.entries())}
+                onApply={(view) => setParams(view)}
+            />
             <s-section padding="none">
                 <s-table
                     loading={isPending || isFetching || undefined}

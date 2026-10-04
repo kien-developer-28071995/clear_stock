@@ -307,7 +307,7 @@ for (const plan of ['free', 'starter', 'growth'] as PlanKey[]) {
 
             // Put it back: cleared in the product settings.
             await open(app, `/products/${row.variant_id}`);
-            await app.getByRole('spinbutton', { name: 'Unit cost' }).fill('');
+            await app.locator('s-section[heading="Product settings"]').getByRole('spinbutton', { name: 'Unit cost' }).fill('');
             await saveBar(app, 'product-settings-save-bar');
             await expect.poll(async () => (await api<Detail>(app, `/forecasts/${row.variant_id}`)).data.settings.cost_override).toBeNull();
         });
@@ -552,7 +552,7 @@ for (const plan of ['free', 'starter', 'growth'] as PlanKey[]) {
             await app.locator('s-table-body s-table-row s-link').first().click();
             await settled(app);
             const variantId = Number(app.url().split('/').pop());
-            await app.getByRole('textbox', { name: "Supplier's product code" }).fill('E2E-SUP-1');
+            await app.locator('s-section[heading="Product settings"]').getByRole('textbox', { name: "Supplier's product code" }).fill('E2E-SUP-1');
             await saveBar(app, 'product-settings-save-bar');
             expect((await api<{ data: { settings: { supplier_sku: string | null } } }>(app, `/forecasts/${variantId}`)).data.settings.supplier_sku).toBe('E2E-SUP-1');
             await api(app, `/variants/${variantId}/settings`, { method: 'PUT', body: { supplier_sku: null } });
@@ -582,6 +582,80 @@ for (const plan of ['free', 'starter', 'growth'] as PlanKey[]) {
             await api(app, '/settings/locations', { method: 'PUT', body: { excluded_ids: [target.id] } });
             expect((await api<{ data: Loc[] }>(app, '/settings/locations')).data.find((l) => l.id === target.id)?.excluded).toBe(true);
             await api(app, '/settings/locations', { method: 'PUT', body: { excluded_ids: locations.filter((l) => l.excluded).map((l) => l.id) } });
+        });
+
+        test('a saved view applies its filters with one click', async ({ app }) => {
+            type View = { id: number; name: string; filters: Record<string, string> };
+            await open(app, '/products?status=reorder_now&sort=name');
+            await app.getByRole('textbox', { name: 'View name' }).fill('E2E due by name');
+            await app.locator('s-button', { hasText: 'Save view' }).click();
+            await expect.poll(async () => (await api<{ data: View[] }>(app, '/views')).data.find((v) => v.name === 'E2E due by name')?.filters).toEqual({ status: 'reorder_now', sort: 'name' });
+
+            await open(app, '/products');
+            await app.locator('s-button', { hasText: 'E2E due by name' }).click();
+            await expect(app).toHaveURL(/status=reorder_now/);
+            await expect(app).toHaveURL(/sort=name/);
+
+            const view = (await api<{ data: View[] }>(app, '/views')).data.find((v) => v.name === 'E2E due by name')!;
+            await api(app, `/views/${view.id}`, { method: 'DELETE' });
+        });
+
+        test('insights list what to clear and broken size runs', async ({ app }) => {
+            type Clearance = { data: { count: number } };
+            await open(app, '/insights');
+            const clearance = (await api<Clearance>(app, '/clearance')).data;
+            const runs = (await api<{ data: unknown[] }>(app, '/size-runs')).data;
+            await expect(app.locator('s-section[heading="What to clear"]')).toHaveCount(clearance.count > 0 ? 1 : 0);
+            await expect(app.locator('s-section[heading="Broken size runs"]')).toHaveCount(runs.length > 0 ? 1 : 0);
+            await app.screenshot({ path: `e2e-results/clearance-${plan}.png`, fullPage: true });
+        });
+
+        test('another supplier can be kept for a product and made its supplier', async ({ app }) => {
+            type Supplier = { id: number; name: string };
+            type Detail = { data: { settings: { supplier_id: number | null; lead_time_override: number | null; cost_override: number | null; supplier_sku: string | null }; alternate_suppliers: { supplier_id: number }[] } };
+            await open(app, '/products');
+            const suppliers = (await api<{ data: Supplier[] }>(app, '/suppliers')).data;
+            test.skip(suppliers.length < 2, 'dev store needs two suppliers');
+            const variantId = (await api<{ data: { variant_id: number }[] }>(app, '/forecasts')).data[0].variant_id;
+            const before = (await api<Detail>(app, `/forecasts/${variantId}`)).data;
+            const other = suppliers.find((s) => s.id !== before.settings.supplier_id)!;
+
+            await open(app, `/products/${variantId}`);
+            const section = app.locator('s-section[heading="Other suppliers"]');
+            await section.getByRole('combobox', { name: 'Add a supplier' }).selectOption(String(other.id));
+            await section.getByRole('spinbutton', { name: 'Lead time' }).fill('33');
+            await section.locator('s-button', { hasText: /^Add$/ }).click();
+            await expect.poll(async () => (await api<Detail>(app, `/forecasts/${variantId}`)).data.alternate_suppliers.map((a) => a.supplier_id)).toContain(other.id);
+
+            await section.locator('s-button', { hasText: 'Use as supplier' }).first().click();
+            await expect.poll(async () => (await api<Detail>(app, `/forecasts/${variantId}`)).data.settings.supplier_id).toBe(other.id);
+            expect((await api<Detail>(app, `/forecasts/${variantId}`)).data.settings.lead_time_override).toBe(33);
+
+            // Put the product back as it was.
+            await api(app, `/variants/${variantId}/suppliers`, { method: 'PUT', body: { suppliers: [] } });
+            await api(app, `/variants/${variantId}/settings`, { method: 'PUT', body: { supplier_id: before.settings.supplier_id, lead_time_override: before.settings.lead_time_override, supplier_sku: before.settings.supplier_sku, cost_override: before.settings.cost_override } });
+        });
+
+        test('a sales event can repeat every year', async ({ app }) => {
+            type Event = { id: number; name: string; repeats_yearly: boolean };
+            await open(app, '/events');
+            await api(app, '/sales-events', { method: 'POST', body: { name: 'E2E season', starts_on: '2025-12-01', ends_on: '2025-12-20', multiplier: 2, repeats_yearly: true, applies_to: 'all' } });
+            await open(app, '/events');
+            await expect(app.locator('s-table-row', { hasText: 'E2E season' }).locator('s-badge', { hasText: 'Every year' })).toBeVisible();
+            const event = (await api<{ data: Event[] }>(app, '/sales-events')).data.find((e) => e.name === 'E2E season')!;
+            expect(event.repeats_yearly).toBe(true);
+            await api(app, `/sales-events/${event.id}`, { method: 'DELETE' });
+        });
+
+        test('Shopify purchase orders ask for the permission first and follow the plan', async ({ app }) => {
+            await open(app, '/orders');
+            const section = app.locator('s-section[heading="Purchase orders in Shopify"]');
+            if (has.purchase_orders) {
+                await expect(section).toBeVisible();
+                await expect(section.locator('s-button', { hasText: 'Show Shopify purchase orders' })).toBeVisible();
+            } else {
+                await expect(section).toHaveCount(0);
+            }
         });
 
         test('default lead time is saved and used by forecasts', async ({ app }) => {
