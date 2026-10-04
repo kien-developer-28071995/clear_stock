@@ -134,7 +134,7 @@ Nguồn: review 1–4 sao của Prediko, Assisty, Inventory Planner, Sumtracker,
 - Ngách thời trang đang có app riêng (Restocked $19, Stovura $59): đường cong size, "size run" bị gãy.
 - Stockie: merchant phàn nàn PO chỉ có ở gói $60 → PO ở gói $4 của ta là điểm bán hàng cho listing.
 
-### Đề xuất (✅ = đã làm trên nhánh `feature/research-round-5`, chưa merge)
+### Đề xuất (✅ = đã làm, merge vào main 2026-10-05)
 
 **A. Khép vòng đặt hàng**
 32. ✅ (chỉ hiện PO đã đặt; API không có ngày dự kiến về và số đã nhận; tắt ở v1, chưa thử với API thật) **Đọc PO gốc Shopify qua API** (Starter, M): PO đang mở theo NCC, ngày dự kiến về, "hàng về kịp trước khi hết không"; thay cho việc merchant phải đánh dấu tay. Thêm scope `read_inventory_purchase_orders`.
@@ -176,6 +176,32 @@ Nguồn: review 1–4 sao của Prediko, Assisty, Inventory Planner, Sumtracker,
 #47 → #32 → #54 → #50 → #41 → #39 → #48/#49 → #33 → #34, phần còn lại theo phản hồi merchant sau khi ra mắt.
 
 Nguồn lần 5: https://community.shopify.dev/t/can-public-app-store-apps-use-read-inventory-purchase-orders-in-admin-api-2026-10/38081 · https://shopify.dev/docs/api/admin-graphql/2026-10/queries/inventoryPurchaseOrders · https://shopify.dev/changelog/release-notes/2026-10 · https://apps.shopify.com/prediko/reviews · https://apps.shopify.com/assisty/reviews · https://apps.shopify.com/inventory-planner/reviews · https://apps.shopify.com/sumtracker-fulfil-ship-track/reviews · https://apps.shopify.com/stockie/reviews · https://apps.shopify.com/stocky/reviews · https://community.shopify.com/t/expose-days-of-inventory-remaining-in-shopify-flow-as-a-trigger-condition/608333 · https://community.shopify.com/t/recommendations-for-inventory-demand-planning-apps-in-shopify-store/568432 · https://community.shopify.com/t/how-can-i-exclude-wholesale-orders-from-e-commerce-analytics/56106 · https://community.shopify.com/t/how-can-i-track-daily-inventory-value-for-my-store/82117 · https://www.salorworks.app/resources/shopify-stocky-shutdown-migration-checklist · https://sensible.tools/blog/stocky-deprecated-shopify-inventory-forecasting-alternatives · https://stockful.app/stocky-alternative · https://apps.shopify.com/logistified · https://apps.shopify.com/stockangel · https://apps.shopify.com/sensible-forecasting · https://apps.shopify.com/fabrikator · https://apps.shopify.com/restocked-3 · https://apps.shopify.com/stockpilot-9
+
+## Nghiên cứu bổ sung (2026-10-05, lần 6)
+
+Nguồn: Shopify Editions Spring '26, listing Stockcast và Forthcast (cập nhật), bài so sánh Sidekick với app tồn kho, yêu cầu Built for Shopify. Trang danh mục "newest" của App Store trả 404 và một nguồn về Sidekick trả 429, nên phần Sidekick dưới đây dựa trên trang Editions chính thức cộng một bài của đối thủ (có thiên vị).
+
+### Phát hiện
+- **Sidekick đã gợi ý nhập hàng và soạn PO ngay trong admin** (Spring '26: "Sidekick can generate purchase orders, which now automatically create transfers"). Đây là đối thủ miễn phí, có sẵn. Thứ Sidekick chưa làm (theo bài của Forthcast, cần tự kiểm chứng): tính lượng đặt theo lead time + MOQ, dự báo dài hạn, doanh thu mất do hết hàng. → Listing và onboarding phải nói rõ phần này; "giải thích từng con số" và "độ chính xác dự báo" là thứ một trợ lý chat không đưa ra được.
+- **"Sidekick works with your apps"** (Judge.me, Klaviyo, Loop, Smile "and more top partners"): Sidekick trả lời câu hỏi và thao tác trong app của bên thứ ba. Chưa rõ có mở cho mọi app hay chỉ đối tác được chọn.
+- **Webhook theo trường thay đổi** ("Configure triggers to fire webhooks only on specific field changes") và **bulk query đọc song song** ("up to four times faster"): hai thứ giảm tải hạ tầng trực tiếp cho gói $4.
+- **App Events API**: app gửi sự kiện cho Shopify, theo dõi ở Dev Dashboard. **Shopify App Pricing**: cấu hình giá ngay lúc nộp app.
+- Stockcast (ra mắt 2026-05-29) vẫn 0 review; có "audit logs". Forthcast $19.99, 2 review, liệt kê tích hợp Amazon, Notion, QuickBooks, Xero.
+- Built for Shopify: điểm ≥ 4.0 với đủ số review, phản hồi hỗ trợ trung vị < 24 giờ; yêu cầu LCP đang tạm dừng áp dụng.
+
+### Đề xuất (chưa làm), xếp theo giá trị
+57. **Ghi sự kiện dùng tính năng** (S): bảng `feature_events` (shop, tính năng, ngày, số lần) cho what-if, kế hoạch nhập, Phân tích, xuất file. Là điều kiện để `admin/` biết tính năng không lưu dữ liệu có ai dùng, và để quyết định bỏ hay đẩy tính năng.
+58. **Webhook tồn kho chỉ khi `available` đổi** (S): cảnh báo tức thời đang nhận mọi thay đổi của `inventory_levels/update`. Đọc docs bộ lọc webhook trước.
+59. **Bulk operation đọc song song** (S–M): đồng bộ đầu nhanh hơn, onboarding "5 phút" chắc hơn với shop lớn. Đọc docs trước.
+60. **Nhật ký thay đổi** (M): ai đổi lead time, min/max, điều chỉnh dự báo, khi nào; hiện trên trang sản phẩm. Hợp với lời hứa minh bạch; Stockcast đã có.
+61. **Nhờ đánh giá đúng lúc + hộp góp ý trong app** (S): hỏi review sau khi merchant xuất PO đầu tiên hoặc sau 14 ngày dùng, tối đa một lần; góp ý gửi về email hỗ trợ. Built for Shopify cần điểm và số review.
+62. **Tích hợp Sidekick** (chưa rõ công): tìm hiểu cách app khai báo dữ liệu/hành động cho Sidekick; nếu mở cho mọi app thì để Sidekick trả lời "cần nhập gì" bằng số của Clear Stock.
+63. **Việc còn dở của lần 5**: PO dạng PDF (#34), nhiều ngày giao cho một đơn (#35), tiền tệ NCC và bậc giá (#37), báo cáo CSV gửi định kỳ (#52), lọc theo tag/collection và cột tuỳ chọn (#53), chia lượng đặt theo tỷ lệ size (#44), ngưỡng ngày tồn tuỳ chọn cho Flow (#49).
+64. **Xuất PO theo mẫu Xero / QuickBooks** (S–M): chỉ là thêm định dạng CSV, không cần OAuth. Forthcast quảng cáo tích hợp này.
+65. **Admin: cohort giữ chân, phễu chuyển đổi, tin tóm tắt hằng ngày** (M): mục 2, 3, 6 trong kế hoạch ở `admin/README.md`.
+66. **Listing so với Sidekick** (việc Phase 7): một đoạn "khác gì gợi ý của Sidekick" kèm ảnh trang giải thích và độ chính xác.
+
+Nguồn lần 6: https://www.shopify.com/editions/spring2026 · https://www.forthcast.io/blog/shopify-sidekick-inventory-what-it-can-and-cant-do · https://apps.shopify.com/stockcast-inventory-forecast · https://apps.shopify.com/forthcast · https://community.shopify.dev/t/bfs-enforcement-update-reviewing-lcp-readings/21956
 
 ## Việc sắp tới (tổng hợp, theo thứ tự đề xuất)
 
