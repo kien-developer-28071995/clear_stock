@@ -106,6 +106,7 @@ class ForecastController extends Controller
         $entitlements = Entitlements::for($shop);
         $request->attributes->set('explanations', $entitlements->has(Feature::Explanations));
         $request->attributes->set('accuracy', $this->accuracy->forVariant($shop, $variantId));
+        $request->attributes->set('previous', $this->accuracy->previousWeek($shop, $variantId));
         $request->attributes->set('by_location', $entitlements->has(Feature::Locations)
             ? $this->query->byLocation($shop, $variantId)
             : null);

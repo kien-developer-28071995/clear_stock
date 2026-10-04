@@ -42,6 +42,10 @@ class SettingsService
                 // Growth only; the inventory webhook exists only while this is on.
                 'realtime_available' => Entitlements::for($shop)->has(Feature::RealtimeAlerts),
                 'realtime' => ($alert?->realtime ?? RealtimeAlertMode::Off)->value,
+                // Every plan; null when switched off app-wide.
+                'weekly_summary' => Entitlements::for($shop)->has(Feature::WeeklySummary) ? ($alert?->weekly_summary ?? false) : null,
+                'slack_webhook_url' => $alert?->slackUrl(),
+                'cover_days' => $alert?->cover_days,
             ],
             // Shopify Flow triggers (Growth): set up in the Flow app; `active` = a workflow uses one.
             'flow' => [
@@ -71,7 +75,8 @@ class SettingsService
 
         if (isset($data['alerts'])) {
             $before = $this->realtimeWanted($shop);
-            $this->alerts->upsert($shop, array_intersect_key($data['alerts'], array_flip(['email', 'enabled', 'frequency', 'weekly_day', 'realtime'])));
+            $this->alerts->upsert($shop, array_intersect_key($data['alerts'], array_flip(['email', 'enabled', 'frequency', 'weekly_day', 'realtime', 'slack_webhook_url', 'cover_days']))
+                + (isset($data['alerts']['weekly_summary']) ? ['weekly_summary' => (bool) $data['alerts']['weekly_summary']] : []));
             if ($this->realtimeWanted($shop) !== $before) {
                 SyncRealtimeWebhook::dispatch($shop->id);
             }

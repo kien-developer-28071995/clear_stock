@@ -32,6 +32,8 @@ export interface Entitlements {
     sales_events: boolean;
     /** Monthly purchasing budget and priorities (Starter and up). */
     order_budget: boolean;
+    /** One summary email a week (every plan, opt-in). */
+    weekly_summary: boolean;
     /** App-wide switches (backend config/features.php): off = hide, don't upsell. */
     features: FeatureSwitches;
 }
@@ -46,6 +48,7 @@ export type FeatureSwitch =
     | 'accuracy'
     | 'sales_events'
     | 'order_budget'
+    | 'weekly_summary'
     | 'purchase_orders'
     | 'supplier_emails'
     | 'locations'

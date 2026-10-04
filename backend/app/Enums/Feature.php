@@ -37,12 +37,14 @@ enum Feature: string
     case SalesEvents = 'sales_events';
     /** Monthly purchasing budget: what to reorder first when cash is short (Starter). */
     case OrderBudget = 'order_budget';
+    /** One summary email a week: what to order, cash tied up, lost sales (every plan, opt-in). */
+    case WeeklySummary = 'weekly_summary';
 
     /** The cheapest plan that includes it (for upgrade prompts). */
     public function minimumPlan(): Plan
     {
         return match ($this) {
-            self::Explanations, self::Abc, self::SpikeFilter, self::LostSales, self::Accuracy, self::SalesEvents => Plan::Free,
+            self::Explanations, self::Abc, self::SpikeFilter, self::LostSales, self::Accuracy, self::SalesEvents, self::WeeklySummary => Plan::Free,
             self::Locations, self::Transfers, self::RealtimeAlerts, self::SupplierAutoEmail, self::FlowTriggers => Plan::Growth,
             default => Plan::Starter,
         };

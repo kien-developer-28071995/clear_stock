@@ -24,8 +24,11 @@ beforeEach(function () {
     $this->vase = product($this->shop, $this->location, 'Vase', stock: 80, perDay: 4, attrs: ['unit_cost' => 1]);
     $this->bowl = product($this->shop, $this->location, 'Bowl', stock: 80, perDay: 4, attrs: ['unit_cost' => null]);
     app(ForecastService::class)->runForShop($this->shop);
-    $this->vase->update(['abc_class' => 'B']);
-    $this->bowl->update(['abc_class' => 'A']);
+    // abc_class is not fillable (the forecast run sets it from random factory prices): force it.
+    $this->mug->forceFill(['abc_class' => 'A'])->save();
+    $this->cup->forceFill(['abc_class' => 'A'])->save();
+    $this->vase->forceFill(['abc_class' => 'B'])->save();
+    $this->bowl->forceFill(['abc_class' => 'A'])->save();
 });
 
 it('ranks what is due and fills the monthly budget left, with a reason for each', function () {

@@ -29,6 +29,7 @@ const SalesEventsPage = page(() => import('@/features/events/pages/SalesEventsPa
 const ManualOrdersPage = page(() => import('@/features/orders/pages/ManualOrdersPage'), 'ManualOrdersPage');
 const CostsPage = page(() => import('@/features/costs/pages/CostsPage'), 'CostsPage');
 const BudgetPage = page(() => import('@/features/budget/pages/BudgetPage'), 'BudgetPage');
+const DataHealthPage = page(() => import('@/features/reports/pages/DataHealthPage'), 'DataHealthPage');
 const PlansPage = page(() => import('@/features/billing/pages/PlansPage'), 'PlansPage');
 
 /** A page of a feature switched off app-wide is simply not there. */
@@ -59,6 +60,7 @@ export function AppRouter() {
                 <Route path="/bundles" element={<BundlesPage />} />
                 <Route path="/settings" element={<SettingsPage />} />
                 <Route path="/costs" element={<CostsPage />} />
+                <Route path="/data-health" element={<DataHealthPage />} />
                 <Route path="/plans" element={<PlansPage />} />
                 <Route path="*" element={<NotFoundPage />} />
             </Routes>

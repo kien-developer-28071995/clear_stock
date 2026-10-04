@@ -305,7 +305,9 @@
     "units_other": "{{qty}} unidades",
     "units_many": "{{qty}} unidades",
     "onTheWay": "A caminho",
-    "incomingShort": "+{{qty}} a caminho"
+    "incomingShort": "+{{qty}} a caminho",
+    "rateUp": "Subiu de {{previous}}/dia na previsão da semana de {{date}} (agora {{current}}/dia).",
+    "rateDown": "Caiu de {{previous}}/dia na previsão da semana de {{date}} (agora {{current}}/dia)."
   },
   "why": {
     "heading": "Por que estes números?",
@@ -437,7 +439,15 @@
     "languageHeading": "Idioma",
     "language": "Idioma do app",
     "languageHelp": "Os e-mails de alerta são enviados em inglês.",
-    "languageAuto": "Igual ao admin da Shopify ({{language}})"
+    "languageAuto": "Igual ao admin da Shopify ({{language}})",
+    "coverDays": "Avisar também quando o estoque cobrir menos de",
+    "coverDaysHelp": "Opcional. Produtos com esta quantidade de dias de estoque entram no resumo antes mesmo da data de pedido. Vazio = apenas a data de pedido.",
+    "slackUrl": "URL do webhook do Slack",
+    "slackUrlHelp": "Opcional. O mesmo resumo é publicado neste canal do Slack. Crie um webhook de entrada no Slack e cole a URL.",
+    "summaryHeading": "Resumo semanal",
+    "summaryEnabled": "Enviar-me um resumo uma vez por semana",
+    "summaryHelp": "O que pedir primeiro, produtos esgotados, dinheiro parado em estoque lento, vendas perdidas e o valor do seu estoque. Um e-mail por semana, em todos os planos.",
+    "summaryEmail": "Enviar para"
   },
   "suppliers": {
     "add": "Adicionar fornecedor",
@@ -1293,5 +1303,89 @@
     "down": "Vende mais devagar",
     "badgeUp": "Ultimamente vende {{percent}}% mais rápido",
     "badgeDown": "Ultimamente vende {{percent}}% mais devagar"
+  },
+  "stockHistory": {
+    "heading": "Valor do estoque ao longo do tempo",
+    "units_one": "{{units}} unidade",
+    "units_other": "{{units}} unidades",
+    "units_many": "{{units}} unidades",
+    "inStock_one": "{{units}} unidades em {{count}} produto em estoque",
+    "inStock_other": "{{units}} unidades em {{count}} produtos em estoque",
+    "inStock_many": "{{units}} unidades em {{count}} produtos em estoque",
+    "up": "+{{amount}} desde {{date}}",
+    "down": "−{{amount}} desde {{date}}",
+    "chartLabel": "Estoque de {{from}} ({{first}}) a {{to}} ({{last}})",
+    "collecting": "O registro começou em {{date}}. O gráfico aparece quando houver dois dias para comparar.",
+    "period_one": "{{count}} dia",
+    "period_other": "{{count}} dias",
+    "period_many": "{{count}} dias",
+    "how": "Estoque disponível × custo unitário, registrado uma vez por dia desde a instalação do app (o Shopify não guarda histórico). Mantido por dois anos."
+  },
+  "health": {
+    "heading": "Verificação de dados",
+    "settingsBody": "Custos, SKUs ou fornecedores ausentes e estoque negativo tornam as previsões e os valores menos precisos.",
+    "settingsLink": "Verificar os dados dos meus produtos",
+    "intro_one": "Verificamos {{products}} produto rastreado. Corrigir o que está abaixo torna as previsões e os valores mais precisos.",
+    "intro_other": "Verificamos {{products}} produtos rastreados. Corrigir o que está abaixo torna as previsões e os valores mais precisos.",
+    "intro_many": "Verificamos {{products}} produtos rastreados. Corrigir o que está abaixo torna as previsões e os valores mais precisos.",
+    "allGood_one": "Verificamos {{products}} produto rastreado e não há nada a corrigir.",
+    "allGood_other": "Verificamos {{products}} produtos rastreados e não há nada a corrigir.",
+    "allGood_many": "Verificamos {{products}} produtos rastreados e não há nada a corrigir.",
+    "more_one": "…e mais {{count}}",
+    "more_other": "…e mais {{count}}",
+    "more_many": "…e mais {{count}}",
+    "findings": {
+      "negative_stock": {
+        "title_one": "Produto com estoque negativo",
+        "title_other": "Produtos com estoque negativo",
+        "title_many": "Produtos com estoque negativo",
+        "body": "O Shopify mostra menos de zero em estoque (venda a mais ou estoque nunca contado). Os dias restantes e os pedidos partem desse número: corrija a quantidade no Shopify."
+      },
+      "not_tracked": {
+        "title_one": "Produto sem rastreamento de estoque",
+        "title_other": "Produtos sem rastreamento de estoque",
+        "title_many": "Produtos sem rastreamento de estoque",
+        "body": "O Shopify não rastreia a quantidade, então não há o que prever. Ative \"Rastrear quantidade\" no produto no Shopify se você os mantém em estoque."
+      },
+      "missing_cost": {
+        "title_one": "Produto sem custo unitário",
+        "title_other": "Produtos sem custo unitário",
+        "title_many": "Produtos sem custo unitário",
+        "body": "Eles ficam fora de todos os valores: dinheiro parado, valor do estoque, plano de compras e orçamento.",
+        "fix": "Adicionar custos unitários"
+      },
+      "duplicate_sku": {
+        "title_one": "Produto com SKU repetido",
+        "title_other": "Produtos com SKU repetido",
+        "title_many": "Produtos com SKU repetido",
+        "body": "Pedidos de compra e importações CSV identificam os produtos pelo SKU; um SKU repetido pode atribuir quantidade ou custo ao produto errado. Dê a cada produto o seu próprio SKU no Shopify."
+      },
+      "missing_sku": {
+        "title_one": "Produto sem SKU",
+        "title_other": "Produtos sem SKU",
+        "title_many": "Produtos sem SKU",
+        "body": "Sem SKU (ou código de barras) o produto fica fora da exportação de pedidos de compra do Shopify e não pode ser identificado nas importações CSV."
+      },
+      "missing_price": {
+        "title_one": "Produto sem preço",
+        "title_other": "Produtos sem preço",
+        "title_many": "Produtos sem preço",
+        "body": "Sem classe ABC e sem estimativa de receita perdida por falta de estoque. O preço vem do Shopify na próxima sincronização."
+      },
+      "no_supplier": {
+        "title_one": "Produto sem fornecedor",
+        "title_other": "Produtos sem fornecedor",
+        "title_many": "Produtos sem fornecedor",
+        "body": "Os pedidos não podem ser agrupados por fornecedor, e o prazo, o pedido mínimo e os dias de pedido do fornecedor não se aplicam.",
+        "fix": "Configurar fornecedores"
+      },
+      "default_lead_time": {
+        "title_one": "Produto com o prazo de entrega padrão",
+        "title_other": "Produtos com o prazo de entrega padrão",
+        "title_many": "Produtos com o prazo de entrega padrão",
+        "body": "Nem o produto nem o fornecedor têm prazo de entrega, então o padrão de {{days}} dias decide quando pedir. Se isso corresponde aos seus fornecedores, tudo bem; caso contrário, informe o prazo real.",
+        "fix": "Informar prazos dos fornecedores"
+      }
+    }
   }
 }

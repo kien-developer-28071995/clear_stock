@@ -147,6 +147,8 @@ export interface ForecastDetail extends ForecastRow {
     defaults: { lead_time_days: number; safety_days: number; forecast_profile: ForecastProfile };
     /** Recent sales rate vs the weeks before (null = too little to compare). */
     trend: { direction: 'up' | 'down' | 'flat'; percent: number; recent_avg: number; baseline_avg: number } | null;
+    /** The rate forecast in an earlier week (null for a product first forecast this week). */
+    previous: { week_start: string; avg: number } | null;
     /** Latest judged week: the forecast then vs what really sold per in-stock day (null until there is one). */
     accuracy: {
         week_start: string;

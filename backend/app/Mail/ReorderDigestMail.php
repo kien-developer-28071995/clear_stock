@@ -21,8 +21,10 @@ class ReorderDigestMail extends QueuedMailable
     public function envelope(): Envelope
     {
         $what = $this->totalCount === 1 ? '1 product needs' : "{$this->totalCount} products need";
+        // Products listed only for their few days of stock left are not due for an order yet.
+        $lowCover = array_filter($this->items, fn ($i) => ($i['low_cover_days'] ?? null) !== null) !== [];
 
-        return new Envelope(subject: "{$what} reordering · ".($this->shop->name ?? $this->shop->domain));
+        return new Envelope(subject: "{$what} ".($lowCover ? 'attention' : 'reordering').' · '.($this->shop->name ?? $this->shop->domain));
     }
 
     public function content(): Content

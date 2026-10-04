@@ -58,6 +58,8 @@ class ForecastDetailResource extends ForecastResource
             'trend' => $this->explanation['trend'] ?? null,
             // Last judged forecast of this product next to what really sold (null until there is one).
             'accuracy' => $request->attributes->get('accuracy'),
+            // The rate forecast in an earlier week ({week_start, avg}), to show how it moved.
+            'previous' => $request->attributes->get('previous'),
         ];
     }
 

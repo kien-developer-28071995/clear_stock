@@ -40,6 +40,7 @@ return [
                 'accuracy' => true,             // forecast accuracy report
                 'sales_events' => true,         // promotions / Black Friday in the forecast
                 'order_budget' => false,        // monthly purchasing budget and priorities
+                'weekly_summary' => true,       // one summary email a week (opt-in)
             ],
         ],
         'starter' => [
@@ -66,6 +67,7 @@ return [
                 'accuracy' => true,
                 'sales_events' => true,
                 'order_budget' => true,
+                'weekly_summary' => true,
             ],
         ],
         'growth' => [
@@ -95,6 +97,7 @@ return [
                 'accuracy' => true,
                 'sales_events' => true,
                 'order_budget' => true,
+                'weekly_summary' => true,
             ],
         ],
     ],

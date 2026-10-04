@@ -36,6 +36,9 @@ interface ForecastQueryRepositoryInterface
     /** @return array{total: int, tracked: int, reorder_now: int, out_of_stock: int, slow: int, healthy: int} total = forecasted, tracked = forecastable products */
     public function counts(Shop $shop, string $today): array;
 
+    /** Selling products with at most $days of stock left whose reorder date is still ahead (not discontinued). */
+    public function lowCover(Shop $shop, string $today, int $days): Collection;
+
     /**
      * Products needing action by $until (out of stock, or reorder date reached), most urgent first.
      *
@@ -90,6 +93,9 @@ interface ForecastQueryRepositoryInterface
     public function discontinuedStock(Shop $shop): array;
 
     /** @return array<int, string> weeks (Y-m-d, newest first) with forecast snapshots, up to $latestStart */
+    /** The latest weekly snapshot of a product from before $weekStart: {week_start, avg} or null. */
+    public function previousSnapshot(Shop $shop, int $variantId, string $weekStart): ?array;
+
     public function snapshotWeeks(Shop $shop, string $latestStart, int $limit): array;
 
     /**

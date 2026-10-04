@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\BundleController;
 use App\Http\Controllers\Api\ClientErrorController;
 use App\Http\Controllers\Api\CostController;
 use App\Http\Controllers\Api\DashboardController;
+use App\Http\Controllers\Api\DataHealthController;
 use App\Http\Controllers\Api\ForecastAccuracyController;
 use App\Http\Controllers\Api\ForecastController;
 use App\Http\Controllers\Api\GrowthScenarioController;
@@ -19,6 +20,7 @@ use App\Http\Controllers\Api\SalesEventController;
 use App\Http\Controllers\Api\SettingsController;
 use App\Http\Controllers\Api\SetupGuideController;
 use App\Http\Controllers\Api\ShopController;
+use App\Http\Controllers\Api\StockHistoryController;
 use App\Http\Controllers\Api\SupplierController;
 use App\Http\Controllers\Api\SupplierEmailController;
 use App\Http\Controllers\Api\SyncController;
@@ -106,6 +108,10 @@ Route::middleware('shopify.session')->group(function () {
 
     // Forecast accuracy: past forecasts next to what really sold.
     Route::get('/accuracy', ForecastAccuracyController::class);
+
+    // Inventory units and value at cost, day by day; product data problems.
+    Route::get('/stock-history', StockHistoryController::class);
+    Route::get('/data-health', DataHealthController::class);
 
     Route::get('/purchase-orders/export', [PurchaseOrderController::class, 'export']);
 

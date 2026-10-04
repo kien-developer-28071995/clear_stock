@@ -10,6 +10,7 @@ return [
 
     // Products listed in one email (the rest are summarised as "and N more").
     'max_items' => 20,
+    'slack_max_items' => 15,
 
     // Automatic purchase order emails to a supplier: at most one per this many days.
     'supplier_auto_interval_days' => 7,

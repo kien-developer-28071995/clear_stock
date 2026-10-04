@@ -63,6 +63,16 @@ export function ForecastSummary({ f }: { f: ForecastDetail }) {
                     <Metric label={t('table.supplier')} value={f.supplier?.name ?? t('common.notSet')} />
                 </s-grid>
                 {discontinued && <s-text color="subdued">{t('discontinued.summary')}</s-text>}
+                {/* How the rate moved since the forecast of an earlier week. */}
+                {f.previous && !f.overrides.avg_daily_sales && Math.abs(f.avg_daily_sales - f.previous.avg) >= 0.05 && (
+                    <s-text color="subdued">
+                        {t(f.avg_daily_sales > f.previous.avg ? 'product.rateUp' : 'product.rateDown', {
+                            date: formatDate(f.previous.week_start),
+                            previous: formatNumber(f.previous.avg, 2),
+                            current: formatNumber(f.avg_daily_sales, 2),
+                        })}
+                    </s-text>
+                )}
                 {/* How the forecast of a few weeks ago compared with what really sold. */}
                 {f.accuracy && (
                     <s-text color="subdued">

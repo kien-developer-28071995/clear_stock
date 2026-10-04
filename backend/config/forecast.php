@@ -117,6 +117,9 @@ return [
         'keep_weeks' => 16,
     ],
 
+    // Daily inventory snapshots (units and value at cost) kept this long.
+    'stock_history_days' => 730,
+
     'confidence' => [
         'low_in_stock_days' => 14,  // fewer in-stock days in the last 90 => low
         'low_units' => 5,           // fewer units in the last 90 days => low

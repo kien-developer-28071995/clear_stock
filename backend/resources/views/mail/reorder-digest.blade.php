@@ -7,7 +7,7 @@
 | Product | In stock | Runs out | Order |
 |:--------|--------:|:---------|------:|
 @foreach ($items as $item)
-| {{ $item['new'] ? '🆕 ' : '' }}**{{ $item['name'] }}**{{ $item['sku'] ? ' · '.$item['sku'] : '' }}<br><small>{{ $item['why'] }}</small> | {{ $item['stock'] }} | {{ $item['out_of_stock'] ? 'Out of stock' : $item['stockout_date'] }} | **{{ $item['order_qty'] }}**{{ $item['order_by'] ? ' by '.$item['order_by'] : '' }} |
+| {{ $item['new'] ? '🆕 ' : '' }}**{{ $item['name'] }}**{{ $item['sku'] ? ' · '.$item['sku'] : '' }}<br><small>{{ $item['why'] }}</small> | {{ $item['stock'] }} | {{ $item['out_of_stock'] ? 'Out of stock' : $item['stockout_date'] }}{{ ($item['low_cover_days'] ?? null) !== null ? ' ('.$item['low_cover_days'].' days left)' : '' }} | **{{ $item['order_qty'] }}**{{ $item['order_by'] ? ' by '.$item['order_by'] : '' }} |
 @endforeach
 </x-mail::table>
 

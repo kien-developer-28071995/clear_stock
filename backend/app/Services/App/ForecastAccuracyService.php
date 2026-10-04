@@ -53,6 +53,19 @@ class ForecastAccuracyService
         return $base + ['available' => true, 'first_result_on' => null, 'latest' => $latest, 'trend' => $trend];
     }
 
+    /**
+     * The rate forecast in an earlier week (the latest snapshot before this week), so the product
+     * page can say how the number moved. Null for a product first forecast this week.
+     *
+     * @return ?array{week_start: string, avg: float}
+     */
+    public function previousWeek(Shop $shop, int $variantId): ?array
+    {
+        $monday = CarbonImmutable::now($shop->timezone)->startOfWeek(CarbonImmutable::MONDAY)->toDateString();
+
+        return $this->forecasts->previousSnapshot($shop, $variantId, $monday);
+    }
+
     /** The latest judged week of one product (product page), or null. */
     public function forVariant(Shop $shop, int $variantId): ?array
     {

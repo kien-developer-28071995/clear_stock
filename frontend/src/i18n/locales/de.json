@@ -289,7 +289,9 @@
     "units_one": "{{qty}} Stück",
     "units_other": "{{qty}} Stück",
     "onTheWay": "Unterwegs",
-    "incomingShort": "+{{qty}} unterwegs"
+    "incomingShort": "+{{qty}} unterwegs",
+    "rateUp": "Gestiegen von {{previous}}/Tag in der Prognose der Woche vom {{date}} (jetzt {{current}}/Tag).",
+    "rateDown": "Gesunken von {{previous}}/Tag in der Prognose der Woche vom {{date}} (jetzt {{current}}/Tag)."
   },
   "why": {
     "heading": "Warum diese Zahlen?",
@@ -418,7 +420,15 @@
     "languageHeading": "Sprache",
     "language": "App-Sprache",
     "languageHelp": "Warn-E-Mails werden auf Englisch gesendet.",
-    "languageAuto": "Wie Shopify-Adminbereich ({{language}})"
+    "languageAuto": "Wie Shopify-Adminbereich ({{language}})",
+    "coverDays": "Auch warnen, wenn der Bestand weniger reicht als",
+    "coverDaysHelp": "Optional. Produkte mit so vielen Tagen Bestand kommen schon vor ihrem Bestelldatum in die Zusammenfassung. Leer = nur das Bestelldatum.",
+    "slackUrl": "Slack-Webhook-URL",
+    "slackUrlHelp": "Optional. Dieselbe Zusammenfassung wird in diesen Slack-Kanal gepostet. Erstelle in Slack einen eingehenden Webhook und füge die URL ein.",
+    "summaryHeading": "Wöchentliche Zusammenfassung",
+    "summaryEnabled": "Mir einmal pro Woche eine Zusammenfassung senden",
+    "summaryHelp": "Was zuerst zu bestellen ist, ausverkaufte Produkte, gebundenes Kapital in Langsamdrehern, entgangene Verkäufe und dein Lagerwert. Eine E-Mail pro Woche, in jedem Tarif.",
+    "summaryEmail": "Senden an"
   },
   "suppliers": {
     "add": "Lieferant hinzufügen",
@@ -1179,5 +1189,75 @@
     "down": "Verkauft sich langsamer",
     "badgeUp": "Verkauft sich zuletzt {{percent}} % schneller",
     "badgeDown": "Verkauft sich zuletzt {{percent}} % langsamer"
+  },
+  "stockHistory": {
+    "heading": "Lagerwert im Zeitverlauf",
+    "units_one": "{{units}} Stück",
+    "units_other": "{{units}} Stück",
+    "inStock_one": "{{units}} Stück in {{count}} Produkt auf Lager",
+    "inStock_other": "{{units}} Stück in {{count}} Produkten auf Lager",
+    "up": "+{{amount}} seit {{date}}",
+    "down": "−{{amount}} seit {{date}}",
+    "chartLabel": "Bestand vom {{from}} ({{first}}) bis {{to}} ({{last}})",
+    "collecting": "Die Aufzeichnung begann am {{date}}. Das Diagramm erscheint, sobald zwei Tage zum Vergleichen vorliegen.",
+    "period_one": "{{count}} Tag",
+    "period_other": "{{count}} Tage",
+    "how": "Bestand × Stückkosten, einmal täglich aufgezeichnet, seit die App installiert wurde (Shopify speichert keinen Verlauf). Zwei Jahre aufbewahrt."
+  },
+  "health": {
+    "heading": "Datenprüfung",
+    "settingsBody": "Fehlende Kosten, SKUs oder Lieferanten und negativer Bestand machen Prognosen und Geldbeträge ungenauer.",
+    "settingsLink": "Meine Produktdaten prüfen",
+    "intro_one": "Wir haben {{products}} verfolgtes Produkt geprüft. Das Beheben der folgenden Punkte macht Prognosen und Beträge genauer.",
+    "intro_other": "Wir haben {{products}} verfolgte Produkte geprüft. Das Beheben der folgenden Punkte macht Prognosen und Beträge genauer.",
+    "allGood_one": "Wir haben {{products}} verfolgtes Produkt geprüft und nichts zu beheben gefunden.",
+    "allGood_other": "Wir haben {{products}} verfolgte Produkte geprüft und nichts zu beheben gefunden.",
+    "more_one": "…und {{count}} weiteres",
+    "more_other": "…und {{count}} weitere",
+    "findings": {
+      "negative_stock": {
+        "title_one": "Produkt mit negativem Bestand",
+        "title_other": "Produkte mit negativem Bestand",
+        "body": "Shopify zeigt weniger als null auf Lager (überverkauft oder nie gezählt). Resttage und Bestellmengen gehen von dieser Zahl aus: Korrigiere die Menge in Shopify."
+      },
+      "not_tracked": {
+        "title_one": "Produkt ohne Bestandsverfolgung",
+        "title_other": "Produkte ohne Bestandsverfolgung",
+        "body": "Shopify verfolgt ihre Menge nicht, daher gibt es nichts zu prognostizieren. Aktiviere „Menge verfolgen\" am Produkt in Shopify, wenn du sie lagerst."
+      },
+      "missing_cost": {
+        "title_one": "Produkt ohne Stückkosten",
+        "title_other": "Produkte ohne Stückkosten",
+        "body": "Sie fehlen in allen Geldbeträgen: gebundenes Kapital, Lagerwert, Einkaufsplan und Budget.",
+        "fix": "Stückkosten hinzufügen"
+      },
+      "duplicate_sku": {
+        "title_one": "Produkt mit doppelter SKU",
+        "title_other": "Produkte mit doppelter SKU",
+        "body": "Bestellungen und CSV-Importe ordnen Produkte per SKU zu; eine doppelte SKU kann Menge oder Kosten dem falschen Produkt zuweisen. Gib jedem Produkt in Shopify eine eigene SKU."
+      },
+      "missing_sku": {
+        "title_one": "Produkt ohne SKU",
+        "title_other": "Produkte ohne SKU",
+        "body": "Ohne SKU (oder Barcode) fehlt ein Produkt im Shopify-Bestellexport und kann in CSV-Importen nicht zugeordnet werden."
+      },
+      "missing_price": {
+        "title_one": "Produkt ohne Preis",
+        "title_other": "Produkte ohne Preis",
+        "body": "Keine ABC-Klasse und keine Schätzung des entgangenen Umsatzes. Der Preis kommt bei der nächsten Synchronisierung aus Shopify."
+      },
+      "no_supplier": {
+        "title_one": "Produkt ohne Lieferant",
+        "title_other": "Produkte ohne Lieferant",
+        "body": "Bestellungen lassen sich nicht nach Lieferant gruppieren, und dessen Lieferzeit, Mindestbestellung und Bestelltage gelten nicht.",
+        "fix": "Lieferanten einrichten"
+      },
+      "default_lead_time": {
+        "title_one": "Produkt mit Standard-Lieferzeit",
+        "title_other": "Produkte mit Standard-Lieferzeit",
+        "body": "Weder das Produkt noch sein Lieferant hat eine Lieferzeit, daher entscheidet der Standard von {{days}} Tagen über den Bestellzeitpunkt. Passt das zu deinen Lieferanten, ist es in Ordnung; sonst trage die echte Lieferzeit ein.",
+        "fix": "Lieferzeiten der Lieferanten eintragen"
+      }
+    }
   }
 }

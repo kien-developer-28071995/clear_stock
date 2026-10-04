@@ -108,6 +108,15 @@ class EloquentForecastQueryRepository implements ForecastQueryRepositoryInterfac
         return $query->orderBy('variants.product_title')->orderBy('variants.title')->get(['forecasts.*']);
     }
 
+    public function lowCover(Shop $shop, string $today, int $days): Collection
+    {
+        return $this->base($shop)->with('variant')
+            ->where('forecasts.avg_daily_sales', '>', 0)->where('variants.discontinued', false)
+            ->where('forecasts.current_stock', '>', 0)->where('forecasts.days_of_cover', '<=', $days)
+            ->where(fn ($q) => $q->whereNull('forecasts.reorder_date')->orWhere('forecasts.reorder_date', '>', $today))
+            ->orderBy('forecasts.days_of_cover')->orderBy('forecasts.id')->get(['forecasts.*']);
+    }
+
     public function counts(Shop $shop, string $today): array
     {
         // One query: every status is a conditional count over the same rows.
@@ -315,6 +324,14 @@ class EloquentForecastQueryRepository implements ForecastQueryRepositoryInterfac
             ->toBase()->first();
 
         return ['count' => (int) $row->n, 'units' => (int) $row->units, 'value' => round((float) $row->value, 2), 'missing_cost' => (int) $row->missing];
+    }
+
+    public function previousSnapshot(Shop $shop, int $variantId, string $weekStart): ?array
+    {
+        $row = DB::table('forecast_snapshots')->where('shop_id', $shop->id)->where('variant_id', $variantId)
+            ->where('week_start', '<', $weekStart)->orderByDesc('week_start')->first(['week_start', 'avg_daily_sales']);
+
+        return $row === null ? null : ['week_start' => substr((string) $row->week_start, 0, 10), 'avg' => (float) $row->avg_daily_sales];
     }
 
     public function snapshotWeeks(Shop $shop, string $latestStart, int $limit): array

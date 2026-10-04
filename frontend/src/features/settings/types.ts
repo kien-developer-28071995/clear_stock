@@ -18,6 +18,12 @@ export interface Settings {
         /** Growth: live stock emails, batched and capped (see backend config/alerts.php). */
         realtime_available: boolean;
         realtime: RealtimeAlertMode;
+        /** One summary email a week (every plan); null when switched off app-wide. */
+        weekly_summary: boolean | null;
+        /** Slack incoming webhook the reorder digest is also posted to. */
+        slack_webhook_url: string | null;
+        /** Also alert at this many days of stock left or fewer (null = reorder date only). */
+        cover_days: number | null;
     };
     /** Shopify Flow triggers (Growth); `active` = a workflow in Flow uses one of them. */
     flow: { available: boolean; active: boolean };

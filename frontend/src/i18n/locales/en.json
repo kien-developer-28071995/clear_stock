@@ -289,7 +289,9 @@
     "units_one": "{{qty}} unit",
     "units_other": "{{qty}} units",
     "onTheWay": "On the way",
-    "incomingShort": "+{{qty}} on the way"
+    "incomingShort": "+{{qty}} on the way",
+    "rateUp": "Up from {{previous}}/day in the forecast of the week of {{date}} (now {{current}}/day).",
+    "rateDown": "Down from {{previous}}/day in the forecast of the week of {{date}} (now {{current}}/day)."
   },
   "why": {
     "heading": "Why these numbers?",
@@ -418,7 +420,15 @@
     "languageHeading": "Language",
     "language": "App language",
     "languageHelp": "Alert emails are sent in English.",
-    "languageAuto": "Same as Shopify admin ({{language}})"
+    "languageAuto": "Same as Shopify admin ({{language}})",
+    "coverDays": "Also alert when stock covers fewer than",
+    "coverDaysHelp": "Optional. Products with this many days of stock left are added to the summary even before their reorder date. Empty = reorder date only.",
+    "slackUrl": "Slack webhook URL",
+    "slackUrlHelp": "Optional. The same summary is posted to this Slack channel. Create an incoming webhook in Slack and paste its URL.",
+    "summaryHeading": "Weekly summary",
+    "summaryEnabled": "Email me a summary once a week",
+    "summaryHelp": "What to order first, products out of stock, cash tied up in slow stock, sales missed and your inventory value. One email a week, on every plan.",
+    "summaryEmail": "Send it to"
   },
   "suppliers": {
     "add": "Add supplier",
@@ -1179,5 +1189,75 @@
     "down": "Selling slower",
     "badgeUp": "Selling {{percent}}% faster lately",
     "badgeDown": "Selling {{percent}}% slower lately"
+  },
+  "stockHistory": {
+    "heading": "Inventory value over time",
+    "units_one": "{{units}} unit",
+    "units_other": "{{units}} units",
+    "inStock_one": "{{units}} units across {{count}} product in stock",
+    "inStock_other": "{{units}} units across {{count}} products in stock",
+    "up": "+{{amount}} since {{date}}",
+    "down": "−{{amount}} since {{date}}",
+    "chartLabel": "Inventory from {{from}} ({{first}}) to {{to}} ({{last}})",
+    "collecting": "Recording started on {{date}}. The chart appears once there are two days to compare.",
+    "period_one": "{{count}} day",
+    "period_other": "{{count}} days",
+    "how": "Stock on hand × unit cost, recorded once a day since the app was installed (Shopify keeps no history to start from). Kept for two years."
+  },
+  "health": {
+    "heading": "Data check",
+    "settingsBody": "Missing costs, SKUs or suppliers and negative stock make forecasts and money figures less accurate.",
+    "settingsLink": "Check my product data",
+    "intro_one": "We checked {{products}} tracked product. Fixing what is listed below makes the forecasts and money figures more accurate.",
+    "intro_other": "We checked {{products}} tracked products. Fixing what is listed below makes the forecasts and money figures more accurate.",
+    "allGood_one": "We checked {{products}} tracked product and found nothing to fix.",
+    "allGood_other": "We checked {{products}} tracked products and found nothing to fix.",
+    "more_one": "…and {{count}} more",
+    "more_other": "…and {{count}} more",
+    "findings": {
+      "negative_stock": {
+        "title_one": "Product with negative stock",
+        "title_other": "Products with negative stock",
+        "body": "Shopify shows less than zero in stock (oversold, or stock never counted). Days left and order sizes start from that number: correct the quantity in Shopify."
+      },
+      "not_tracked": {
+        "title_one": "Product without inventory tracking",
+        "title_other": "Products without inventory tracking",
+        "body": "Shopify does not track their quantity, so there is nothing to forecast. Turn on \"Track quantity\" on the product in Shopify if you stock them."
+      },
+      "missing_cost": {
+        "title_one": "Product without a unit cost",
+        "title_other": "Products without a unit cost",
+        "body": "They are missing from every money figure: cash tied up, inventory value, purchase plan and budget.",
+        "fix": "Add unit costs"
+      },
+      "duplicate_sku": {
+        "title_one": "Product sharing a SKU with another",
+        "title_other": "Products sharing a SKU with another",
+        "body": "Purchase orders and CSV imports match products by SKU, so a shared SKU can put a quantity or cost on the wrong product. Give each product its own SKU in Shopify."
+      },
+      "missing_sku": {
+        "title_one": "Product without a SKU",
+        "title_other": "Products without a SKU",
+        "body": "Without a SKU (or barcode) a product is left out of the Shopify purchase order export and cannot be matched in CSV imports."
+      },
+      "missing_price": {
+        "title_one": "Product without a price",
+        "title_other": "Products without a price",
+        "body": "No ABC class and no estimate of revenue missed while out of stock. The price comes from Shopify at the next sync."
+      },
+      "no_supplier": {
+        "title_one": "Product without a supplier",
+        "title_other": "Products without a supplier",
+        "body": "Orders can't be grouped by supplier, and the supplier's lead time, minimum order and order days don't apply.",
+        "fix": "Set up suppliers"
+      },
+      "default_lead_time": {
+        "title_one": "Product using the store's default lead time",
+        "title_other": "Products using the store's default lead time",
+        "body": "Neither the product nor its supplier has a lead time, so the store default of {{days}} days decides when to reorder. Fine if that matches your suppliers; otherwise set the real lead time.",
+        "fix": "Set supplier lead times"
+      }
+    }
   }
 }

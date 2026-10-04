@@ -22,6 +22,7 @@ final class Features
         Feature::Accuracy->value => 'accuracy',
         Feature::SalesEvents->value => 'sales_events',
         Feature::OrderBudget->value => 'order_budget',
+        Feature::WeeklySummary->value => 'weekly_summary',
         Feature::PurchaseOrders->value => 'purchase_orders',
         Feature::SupplierEmails->value => 'supplier_emails',
         Feature::SupplierAutoEmail->value => 'supplier_emails',

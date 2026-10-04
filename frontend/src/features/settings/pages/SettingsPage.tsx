@@ -172,6 +172,26 @@ export function SettingsPage() {
                             ))}
                         </s-select>
                     )}
+                    <s-number-field
+                        label={t('settings.coverDays')}
+                        details={t('settings.coverDaysHelp')}
+                        suffix={t('common.daysSuffix')}
+                        min={1}
+                        max={365}
+                        disabled={!form.alerts.available || undefined}
+                        value={form.alerts.cover_days?.toString() ?? ''}
+                        error={fieldError(update.error, 'alerts.cover_days')}
+                        onInput={(e) => setAlerts({ cover_days: e.currentTarget.value.trim() === '' ? null : Number(e.currentTarget.value) })}
+                    />
+                    <s-url-field
+                        label={t('settings.slackUrl')}
+                        details={t('settings.slackUrlHelp')}
+                        placeholder="https://hooks.slack.com/services/…"
+                        disabled={!form.alerts.available || undefined}
+                        value={form.alerts.slack_webhook_url ?? ''}
+                        error={fieldError(update.error, 'alerts.slack_webhook_url')}
+                        onInput={(e) => setAlerts({ slack_webhook_url: e.currentTarget.value.trim() || null })}
+                    />
                     {realtimeExists && form.alerts.available && !form.alerts.realtime_available && (
                         <UpgradePrompt id="realtime-alerts" plan="growth">{t('settings.realtimeLocked')}</UpgradePrompt>
                     )}
@@ -186,6 +206,45 @@ export function SettingsPage() {
                         <s-option value="out_of_stock">{t('settings.realtimeOutOfStock')}</s-option>
                         <s-option value="all">{t('settings.realtimeAll')}</s-option>
                     </s-select>)}
+                </s-stack>
+            </s-section>
+
+            {form.alerts.weekly_summary !== null && (
+                <s-section heading={t('settings.summaryHeading')}>
+                    <s-stack gap="base">
+                        <s-switch
+                            label={t('settings.summaryEnabled')}
+                            details={t('settings.summaryHelp')}
+                            checked={form.alerts.weekly_summary || undefined}
+                            onChange={(e) => setAlerts({ weekly_summary: e.currentTarget.checked })}
+                        />
+                        {form.alerts.weekly_summary && (
+                            <>
+                                <s-email-field
+                                    label={t('settings.summaryEmail')}
+                                    value={form.alerts.email ?? ''}
+                                    error={fieldError(update.error, 'alerts.email')}
+                                    onInput={(e) => setAlerts({ email: e.currentTarget.value })}
+                                />
+                                <s-select
+                                    label={t('settings.sendOn')}
+                                    value={String(form.alerts.weekly_day)}
+                                    onChange={(e) => setAlerts({ weekly_day: Number(e.currentTarget.value) })}
+                                >
+                                    {[1, 2, 3, 4, 5, 6, 7].map((day) => (
+                                        <s-option key={day} value={String(day)}>{weekdayName(day)}</s-option>
+                                    ))}
+                                </s-select>
+                            </>
+                        )}
+                    </s-stack>
+                </s-section>
+            )}
+
+            <s-section heading={t('health.heading')}>
+                <s-stack gap="small-200">
+                    <s-paragraph>{t('health.settingsBody')}</s-paragraph>
+                    <s-link href="/data-health">{t('health.settingsLink')}</s-link>
                 </s-stack>
             </s-section>
 

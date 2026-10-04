@@ -26,6 +26,12 @@ class SettingsRequest extends FormRequest
             'alerts.frequency' => ['sometimes', Rule::enum(AlertFrequency::class)],
             'alerts.weekly_day' => ['sometimes', 'integer', 'between:1,7'],
             'alerts.realtime' => ['sometimes', Rule::enum(RealtimeAlertMode::class)],
+            // One summary email a week (every plan).
+            'alerts.weekly_summary' => ['sometimes', 'boolean'],
+            // Slack incoming webhook: only Slack's own host (never an arbitrary URL the server would call).
+            'alerts.slack_webhook_url' => ['sometimes', 'nullable', 'string', 'max:255', 'regex:#^https://hooks\.slack\.com/services/[A-Za-z0-9/_-]+$#'],
+            // Also alert at this many days of stock left or fewer.
+            'alerts.cover_days' => ['sometimes', 'nullable', 'integer', 'min:1', 'max:365'],
         ];
     }
 }

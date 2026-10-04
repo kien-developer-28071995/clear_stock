@@ -59,6 +59,11 @@ class CachedForecastQueryRepository implements ForecastQueryRepositoryInterface
         );
     }
 
+    public function lowCover(Shop $shop, string $today, int $days): Collection
+    {
+        return $this->inner->lowCover($shop, $today, $days);
+    }
+
     public function reorderList(Shop $shop, string $today, ?int $supplierId, ?int $locationId = null, ?array $variantIds = null): Collection
     {
         return $this->inner->reorderList($shop, $today, $supplierId, $locationId, $variantIds);
@@ -107,6 +112,11 @@ class CachedForecastQueryRepository implements ForecastQueryRepositoryInterface
     public function discontinuedStock(Shop $shop): array
     {
         return $this->remember($shop, 'any', 'discontinued', fn () => $this->inner->discontinuedStock($shop));
+    }
+
+    public function previousSnapshot(Shop $shop, int $variantId, string $weekStart): ?array
+    {
+        return $this->inner->previousSnapshot($shop, $variantId, $weekStart);
     }
 
     public function snapshotWeeks(Shop $shop, string $latestStart, int $limit): array

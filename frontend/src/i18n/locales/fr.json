@@ -305,7 +305,9 @@
     "units_other": "{{qty}} unités",
     "units_many": "{{qty}} unités",
     "onTheWay": "En cours d'acheminement",
-    "incomingShort": "+{{qty}} en route"
+    "incomingShort": "+{{qty}} en route",
+    "rateUp": "En hausse depuis {{previous}}/jour dans la prévision de la semaine du {{date}} (maintenant {{current}}/jour).",
+    "rateDown": "En baisse depuis {{previous}}/jour dans la prévision de la semaine du {{date}} (maintenant {{current}}/jour)."
   },
   "why": {
     "heading": "Pourquoi ces chiffres ?",
@@ -437,7 +439,15 @@
     "languageHeading": "Langue",
     "language": "Langue de l'application",
     "languageHelp": "Les e-mails d'alerte sont envoyés en anglais.",
-    "languageAuto": "Comme l'admin Shopify ({{language}})"
+    "languageAuto": "Comme l'admin Shopify ({{language}})",
+    "coverDays": "Alerter aussi quand le stock couvre moins de",
+    "coverDaysHelp": "Facultatif. Les produits ayant ce nombre de jours de stock sont ajoutés au résumé avant même leur date de commande. Vide = date de commande uniquement.",
+    "slackUrl": "URL du webhook Slack",
+    "slackUrlHelp": "Facultatif. Le même résumé est publié dans ce canal Slack. Créez un webhook entrant dans Slack et collez son URL.",
+    "summaryHeading": "Résumé hebdomadaire",
+    "summaryEnabled": "M'envoyer un résumé une fois par semaine",
+    "summaryHelp": "Quoi commander en premier, produits en rupture, argent immobilisé dans le stock lent, ventes manquées et valeur de votre stock. Un e-mail par semaine, dans toutes les offres.",
+    "summaryEmail": "Envoyer à"
   },
   "suppliers": {
     "add": "Ajouter un fournisseur",
@@ -1293,5 +1303,89 @@
     "down": "Se vend moins vite",
     "badgeUp": "Se vend {{percent}} % plus vite récemment",
     "badgeDown": "Se vend {{percent}} % moins vite récemment"
+  },
+  "stockHistory": {
+    "heading": "Valeur du stock dans le temps",
+    "units_one": "{{units}} unité",
+    "units_other": "{{units}} unités",
+    "units_many": "{{units}} unités",
+    "inStock_one": "{{units}} unités sur {{count}} produit en stock",
+    "inStock_other": "{{units}} unités sur {{count}} produits en stock",
+    "inStock_many": "{{units}} unités sur {{count}} produits en stock",
+    "up": "+{{amount}} depuis le {{date}}",
+    "down": "−{{amount}} depuis le {{date}}",
+    "chartLabel": "Stock du {{from}} ({{first}}) au {{to}} ({{last}})",
+    "collecting": "L'enregistrement a commencé le {{date}}. Le graphique apparaît dès qu'il y a deux jours à comparer.",
+    "period_one": "{{count}} jour",
+    "period_other": "{{count}} jours",
+    "period_many": "{{count}} jours",
+    "how": "Stock disponible × coût unitaire, enregistré une fois par jour depuis l'installation de l'application (Shopify ne conserve aucun historique). Conservé deux ans."
+  },
+  "health": {
+    "heading": "Vérification des données",
+    "settingsBody": "Des coûts, SKU ou fournisseurs manquants et un stock négatif rendent les prévisions et les montants moins précis.",
+    "settingsLink": "Vérifier mes données produits",
+    "intro_one": "Nous avons vérifié {{products}} produit suivi. Corriger ce qui suit rend les prévisions et les montants plus précis.",
+    "intro_other": "Nous avons vérifié {{products}} produits suivis. Corriger ce qui suit rend les prévisions et les montants plus précis.",
+    "intro_many": "Nous avons vérifié {{products}} produits suivis. Corriger ce qui suit rend les prévisions et les montants plus précis.",
+    "allGood_one": "Nous avons vérifié {{products}} produit suivi : rien à corriger.",
+    "allGood_other": "Nous avons vérifié {{products}} produits suivis : rien à corriger.",
+    "allGood_many": "Nous avons vérifié {{products}} produits suivis : rien à corriger.",
+    "more_one": "…et {{count}} autre",
+    "more_other": "…et {{count}} autres",
+    "more_many": "…et {{count}} autres",
+    "findings": {
+      "negative_stock": {
+        "title_one": "Produit avec un stock négatif",
+        "title_other": "Produits avec un stock négatif",
+        "title_many": "Produits avec un stock négatif",
+        "body": "Shopify affiche un stock inférieur à zéro (survente ou stock jamais compté). Les jours restants et les quantités à commander partent de ce chiffre : corrigez la quantité dans Shopify."
+      },
+      "not_tracked": {
+        "title_one": "Produit sans suivi de stock",
+        "title_other": "Produits sans suivi de stock",
+        "title_many": "Produits sans suivi de stock",
+        "body": "Shopify ne suit pas leur quantité : il n'y a rien à prévoir. Activez « Suivre la quantité » sur le produit dans Shopify si vous les stockez."
+      },
+      "missing_cost": {
+        "title_one": "Produit sans coût unitaire",
+        "title_other": "Produits sans coût unitaire",
+        "title_many": "Produits sans coût unitaire",
+        "body": "Ils manquent dans tous les montants : argent immobilisé, valeur du stock, plan d'achat et budget.",
+        "fix": "Ajouter les coûts unitaires"
+      },
+      "duplicate_sku": {
+        "title_one": "Produit partageant un SKU avec un autre",
+        "title_other": "Produits partageant un SKU avec un autre",
+        "title_many": "Produits partageant un SKU avec un autre",
+        "body": "Les bons de commande et les imports CSV identifient les produits par SKU : un SKU partagé peut attribuer une quantité ou un coût au mauvais produit. Donnez à chaque produit son propre SKU dans Shopify."
+      },
+      "missing_sku": {
+        "title_one": "Produit sans SKU",
+        "title_other": "Produits sans SKU",
+        "title_many": "Produits sans SKU",
+        "body": "Sans SKU (ou code-barres), un produit est exclu de l'export des bons de commande Shopify et ne peut pas être identifié dans les imports CSV."
+      },
+      "missing_price": {
+        "title_one": "Produit sans prix",
+        "title_other": "Produits sans prix",
+        "title_many": "Produits sans prix",
+        "body": "Pas de classe ABC ni d'estimation du chiffre d'affaires manqué en rupture. Le prix vient de Shopify à la prochaine synchronisation."
+      },
+      "no_supplier": {
+        "title_one": "Produit sans fournisseur",
+        "title_other": "Produits sans fournisseur",
+        "title_many": "Produits sans fournisseur",
+        "body": "Les commandes ne peuvent pas être regroupées par fournisseur, et son délai, son minimum de commande et ses jours de commande ne s'appliquent pas.",
+        "fix": "Configurer les fournisseurs"
+      },
+      "default_lead_time": {
+        "title_one": "Produit utilisant le délai par défaut",
+        "title_other": "Produits utilisant le délai par défaut",
+        "title_many": "Produits utilisant le délai par défaut",
+        "body": "Ni le produit ni son fournisseur n'ont de délai : le délai par défaut de {{days}} jours décide du moment de commander. Si cela correspond à vos fournisseurs, tout va bien ; sinon indiquez le délai réel.",
+        "fix": "Indiquer les délais des fournisseurs"
+      }
+    }
   }
 }

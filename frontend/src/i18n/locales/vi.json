@@ -273,7 +273,9 @@
     "reorderPoint": "Điểm đặt hàng lại",
     "units_other": "{{qty}} cái",
     "onTheWay": "Đang về",
-    "incomingShort": "+{{qty}} đang về"
+    "incomingShort": "+{{qty}} đang về",
+    "rateUp": "Tăng từ {{previous}}/ngày ở dự báo tuần {{date}} (nay {{current}}/ngày).",
+    "rateDown": "Giảm từ {{previous}}/ngày ở dự báo tuần {{date}} (nay {{current}}/ngày)."
   },
   "why": {
     "heading": "Vì sao ra các con số này?",
@@ -399,7 +401,15 @@
     "languageHeading": "Ngôn ngữ",
     "language": "Ngôn ngữ của app",
     "languageHelp": "Email cảnh báo được gửi bằng tiếng Anh.",
-    "languageAuto": "Giống Shopify admin ({{language}})"
+    "languageAuto": "Giống Shopify admin ({{language}})",
+    "coverDays": "Cảnh báo thêm khi tồn kho chỉ còn đủ bán dưới",
+    "coverDaysHelp": "Không bắt buộc. Sản phẩm còn đủ bán chừng này ngày sẽ có trong email tóm tắt dù chưa tới ngày cần đặt. Để trống = chỉ theo ngày cần đặt.",
+    "slackUrl": "URL webhook của Slack",
+    "slackUrlHelp": "Không bắt buộc. Bản tóm tắt cũng được gửi vào kênh Slack này. Tạo incoming webhook trong Slack rồi dán URL vào đây.",
+    "summaryHeading": "Tóm tắt hằng tuần",
+    "summaryEnabled": "Gửi cho tôi email tóm tắt mỗi tuần một lần",
+    "summaryHelp": "Cần đặt gì trước, sản phẩm hết hàng, tiền kẹt ở hàng bán chậm, doanh thu mất và giá trị tồn kho. Một email mỗi tuần, có ở mọi gói.",
+    "summaryEmail": "Gửi tới"
   },
   "suppliers": {
     "add": "Thêm nhà cung cấp",
@@ -1065,5 +1075,61 @@
     "down": "Đang bán chậm lại",
     "badgeUp": "Gần đây bán nhanh hơn {{percent}}%",
     "badgeDown": "Gần đây bán chậm hơn {{percent}}%"
+  },
+  "stockHistory": {
+    "heading": "Giá trị tồn kho theo thời gian",
+    "units_other": "{{units}} cái",
+    "inStock_other": "{{units}} cái ở {{count}} sản phẩm còn hàng",
+    "up": "+{{amount}} từ {{date}}",
+    "down": "−{{amount}} từ {{date}}",
+    "chartLabel": "Tồn kho từ {{from}} ({{first}}) đến {{to}} ({{last}})",
+    "collecting": "Bắt đầu ghi từ {{date}}. Biểu đồ sẽ hiện khi có hai ngày để so sánh.",
+    "period_other": "{{count}} ngày",
+    "how": "Tồn kho × giá vốn, ghi mỗi ngày một lần từ khi cài app (Shopify không lưu lịch sử để lấy lại). Giữ trong hai năm."
+  },
+  "health": {
+    "heading": "Kiểm tra dữ liệu",
+    "settingsBody": "Thiếu giá vốn, SKU, nhà cung cấp hoặc tồn kho âm làm dự báo và các con số tiền kém chính xác.",
+    "settingsLink": "Kiểm tra dữ liệu sản phẩm",
+    "intro_other": "Đã kiểm tra {{products}} sản phẩm đang theo dõi. Sửa các mục dưới đây giúp dự báo và các con số tiền chính xác hơn.",
+    "allGood_other": "Đã kiểm tra {{products}} sản phẩm đang theo dõi, không có gì cần sửa.",
+    "more_other": "…và {{count}} sản phẩm khác",
+    "findings": {
+      "negative_stock": {
+        "title_other": "Sản phẩm có tồn kho âm",
+        "body": "Shopify đang ghi tồn kho dưới 0 (bán vượt, hoặc chưa từng nhập số tồn). Số ngày còn hàng và lượng cần đặt tính từ con số này: hãy sửa số lượng trong Shopify."
+      },
+      "not_tracked": {
+        "title_other": "Sản phẩm không theo dõi tồn kho",
+        "body": "Shopify không theo dõi số lượng nên không có gì để dự báo. Bật \"Theo dõi số lượng\" cho sản phẩm trong Shopify nếu bạn có trữ hàng."
+      },
+      "missing_cost": {
+        "title_other": "Sản phẩm thiếu giá vốn",
+        "body": "Các sản phẩm này không có trong mọi con số tiền: tiền kẹt, giá trị tồn kho, kế hoạch nhập và ngân sách.",
+        "fix": "Thêm giá vốn"
+      },
+      "duplicate_sku": {
+        "title_other": "Sản phẩm trùng SKU với sản phẩm khác",
+        "body": "Đơn đặt hàng và nhập CSV khớp sản phẩm theo SKU, nên SKU trùng có thể gán số lượng hoặc giá vốn nhầm sản phẩm. Đặt SKU riêng cho từng sản phẩm trong Shopify."
+      },
+      "missing_sku": {
+        "title_other": "Sản phẩm thiếu SKU",
+        "body": "Không có SKU (hoặc barcode) thì sản phẩm bị bỏ qua khi xuất đơn đặt hàng Shopify và không khớp được khi nhập CSV."
+      },
+      "missing_price": {
+        "title_other": "Sản phẩm thiếu giá bán",
+        "body": "Không có nhóm ABC và không ước tính được doanh thu mất khi hết hàng. Giá bán lấy từ Shopify ở lần đồng bộ tới."
+      },
+      "no_supplier": {
+        "title_other": "Sản phẩm chưa có nhà cung cấp",
+        "body": "Không gom được đơn theo nhà cung cấp, và lead time, số lượng tối thiểu, ngày đặt hàng của nhà cung cấp không được áp dụng.",
+        "fix": "Thiết lập nhà cung cấp"
+      },
+      "default_lead_time": {
+        "title_other": "Sản phẩm đang dùng lead time mặc định của cửa hàng",
+        "body": "Sản phẩm và nhà cung cấp đều chưa có lead time, nên mặc định {{days}} ngày của cửa hàng quyết định khi nào đặt hàng. Nếu đúng với nhà cung cấp thì không sao; nếu không, hãy nhập lead time thực tế.",
+        "fix": "Nhập lead time của nhà cung cấp"
+      }
+    }
   }
 }

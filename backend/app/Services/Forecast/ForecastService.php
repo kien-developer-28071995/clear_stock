@@ -8,6 +8,7 @@ use App\Models\Shop;
 use App\Repositories\Contracts\CatalogRepositoryInterface;
 use App\Repositories\Contracts\DailySalesRepositoryInterface;
 use App\Repositories\Contracts\ForecastRepositoryInterface;
+use App\Repositories\Contracts\InventorySnapshotRepositoryInterface;
 use App\Repositories\Contracts\ShopRepositoryInterface;
 use App\Services\Sync\LocationSupport;
 use App\Support\Entitlements;
@@ -27,6 +28,7 @@ class ForecastService
         private readonly ForecastCalculator $calculator,
         private readonly DailySalesRepositoryInterface $sales,
         private readonly LocationSupport $locationSupport,
+        private readonly InventorySnapshotRepositoryInterface $inventorySnapshots,
     ) {}
 
     /**
@@ -106,6 +108,9 @@ class ForecastService
             // Variants no longer active/tracked keep no stale forecast.
             $stats['removed'] = $this->forecasts->deleteForecastsExcept($shop, $ids);
             $this->saveSnapshots($shop, $asOf, $snapshots);
+            // Today's stock units and value, for the inventory value history.
+            $this->inventorySnapshots->record($shop, $asOf->toDateString(), $stock);
+            $this->inventorySnapshots->prune($shop, $asOf->subDays((int) config('forecast.stock_history_days'))->toDateString());
             $shop = $this->shops->update($shop, ['forecasted_at' => $computedAt]);
         }
 
