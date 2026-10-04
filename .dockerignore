@@ -8,6 +8,7 @@
 **/*.log
 frontend/node_modules
 website
+admin
 frontend/.npm-cache
 backend/vendor
 backend/public/build

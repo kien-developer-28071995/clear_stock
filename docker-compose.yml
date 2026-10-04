@@ -108,6 +108,22 @@ services:
     environment:
       npm_config_cache: /app/website/.npm-cache
 
+  # Owner reports (admin/, plain Laravel + Blade, reads admin/.env): http://localhost:8090, this
+  # machine only. Reads the app's database (APPDB_* in admin/.env) and keeps its own SQLite file.
+  # First run: `make admin-setup`.
+  admin:
+    image: clear_stock-php-dev
+    working_dir: /var/www/admin
+    user: "${UID:-1000}:${GID:-1000}"
+    command: ["sh", "-c", "touch database/database.sqlite && php artisan migrate --force && (php artisan schedule:work &) && exec php artisan serve --host=0.0.0.0 --port=8090"]
+    ports:
+      - "127.0.0.1:${FORWARD_ADMIN_PORT:-8090}:8090"
+    volumes:
+      - ./admin:/var/www/admin
+    depends_on:
+      mysql:
+        condition: service_healthy
+
   mailpit:
     image: axllent/mailpit:latest
     ports:
