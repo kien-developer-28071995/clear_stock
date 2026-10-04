@@ -1,42 +1,42 @@
 import { useTranslation } from 'react-i18next';
-import { errorMessage } from '@/lib/http';
-import { useExcludeLocations, useStockLocations } from '@/features/settings/hooks/useSettings';
+import type { StockLocation } from '@/features/settings/types';
+
+interface Props {
+    locations: StockLocation[] | undefined;
+    /** Ids left out of the stock, as edited (saved with the rest of the Settings form). */
+    excluded: number[];
+    onChange: (excluded: number[]) => void;
+    error?: string;
+}
 
 /**
  * Which locations' stock the forecasts count. Shown with two or more locations: a returns
  * or damaged-goods location would otherwise make products look better stocked than they are.
- * Saved at once (a switch per location), forecasts are recomputed in the background.
  */
-export function StockLocationsSection() {
+export function StockLocationsSection({ locations, excluded, onChange, error }: Props) {
     const { t } = useTranslation();
-    const { data } = useStockLocations();
-    const exclude = useExcludeLocations();
-    if (!data || data.length < 2) return null;
+    if (!locations || locations.length < 2) return null;
 
-    const counted = data.filter((l) => !l.excluded).length;
-    const toggle = (id: number, count: boolean) =>
-        exclude.mutate(
-            data.filter((l) => (l.id === id ? !count : l.excluded)).map((l) => l.id),
-            {
-                onSuccess: () => shopify.toast.show(t('settings.locationsSaved')),
-                onError: (e) => shopify.toast.show(errorMessage(e), { isError: true }),
-            },
-        );
+    const counted = locations.length - excluded.length;
 
     return (
         <s-section heading={t('settings.locationsHeading')}>
             <s-stack gap="base">
                 <s-paragraph>{t('settings.locationsIntro')}</s-paragraph>
-                {data.map((l) => (
-                    <s-checkbox
-                        key={l.id}
-                        label={l.name}
-                        checked={!l.excluded || undefined}
-                        // The last counted location can't be switched off: there would be no stock to forecast from.
-                        disabled={exclude.isPending || (!l.excluded && counted === 1) || undefined}
-                        onChange={(e) => toggle(l.id, e.currentTarget.checked)}
-                    />
-                ))}
+                {locations.map((l) => {
+                    const isCounted = !excluded.includes(l.id);
+                    return (
+                        <s-checkbox
+                            key={l.id}
+                            label={l.name}
+                            checked={isCounted || undefined}
+                            // The last counted location stays: with none there would be no stock to forecast from.
+                            disabled={(isCounted && counted === 1) || undefined}
+                            onChange={(e) => onChange(e.currentTarget.checked ? excluded.filter((id) => id !== l.id) : [...excluded, l.id].sort((a, b) => a - b))}
+                        />
+                    );
+                })}
+                {error && <s-text tone="critical">{error}</s-text>}
             </s-stack>
         </s-section>
     );

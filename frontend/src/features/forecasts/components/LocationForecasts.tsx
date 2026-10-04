@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { ForecastDetail } from '@/features/forecasts/types';
 import { useSetLocationMinimums } from '@/features/forecasts/hooks/useForecasts';
+import { SaveBar } from '@/components/ui/SaveBar';
 import { ConfidenceBadge } from '@/components/ui/StatusBadge';
 import { Explanation } from '@/components/ui/Explanation';
 import { formatDate, formatNumber } from '@/utils/format';
@@ -20,6 +21,18 @@ export function LocationForecasts({ f }: { f: ForecastDetail }) {
 
     return (
         <s-section heading={t('locations.heading')}>
+            <SaveBar
+                id="location-minimums-save-bar"
+                dirty={Object.keys(mins).length > 0}
+                saving={saveMins.isPending}
+                onSave={() =>
+                    saveMins.mutate(
+                        Object.entries(mins).map(([id, value]) => ({ location_id: Number(id), min_stock: value.trim() === '' ? null : Number(value) })),
+                        { onSuccess: () => { setMins({}); shopify.toast.show(t('common.saved')); } },
+                    )
+                }
+                onDiscard={() => setMins({})}
+            />
             <s-stack gap="base">
                 {!forecasted && (
                     <s-text color="subdued">{t('locations.pending')}</s-text>
@@ -76,23 +89,6 @@ export function LocationForecasts({ f }: { f: ForecastDetail }) {
                             <Explanation lines={opened.forecast.explanation_lines} />
                         </s-stack>
                     </s-box>
-                )}
-                {Object.keys(mins).length > 0 && (
-                    <s-stack direction="inline" gap="small-200">
-                        <s-button
-                            variant="primary"
-                            loading={saveMins.isPending || undefined}
-                            onClick={() =>
-                                saveMins.mutate(
-                                    Object.entries(mins).map(([id, value]) => ({ location_id: Number(id), min_stock: value.trim() === '' ? null : Number(value) })),
-                                    { onSuccess: () => { setMins({}); shopify.toast.show(t('common.saved')); } },
-                                )
-                            }
-                        >
-                            {t('locations.saveMinimums')}
-                        </s-button>
-                        <s-button variant="tertiary" onClick={() => setMins({})}>{t('common.cancel')}</s-button>
-                    </s-stack>
                 )}
                 {forecasted && <s-text color="subdued">{t('locations.hint')}</s-text>}
             </s-stack>

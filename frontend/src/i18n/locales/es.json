@@ -338,8 +338,7 @@
     "why": "Por qué: {{location}}",
     "hint": "Selecciona una ubicación para ver el porqué. Los ajustes del ritmo de ventas solo se aplican al total de la tienda.",
     "minimum": "Mínimo aquí",
-    "minimumAt": "Stock mínimo en {{location}}",
-    "saveMinimums": "Guardar mínimos"
+    "minimumAt": "Stock mínimo en {{location}}"
   },
   "adjust": {
     "heading": "Ajustar el ritmo de ventas",
@@ -456,7 +455,6 @@
     "summaryEmail": "Enviar a",
     "locationsHeading": "Ubicaciones que cuentan como stock",
     "locationsIntro": "Desmarca una ubicación cuyo stock no está a la venta (devoluciones, productos dañados, un showroom). Sus unidades no cuentan en los días de stock ni en las sugerencias; las ventas enviadas desde ella siguen contando como demanda.",
-    "locationsSaved": "Guardado. Las previsiones se están actualizando.",
     "excludedHeading": "Pedidos excluidos de la previsión",
     "excludedIntro": "Los pedidos mayoristas o en tienda pueden inflar el ritmo de ventas online. Al guardar un cambio aquí se vuelve a leer el historial de pedidos, lo que tarda unos minutos.",
     "excludedTags": "Excluir pedidos con la etiqueta",
@@ -1369,7 +1367,8 @@
     "period_one": "{{count}} día",
     "period_other": "{{count}} días",
     "period_many": "{{count}} días",
-    "how": "Stock disponible × coste unitario, registrado una vez al día desde que se instaló la app (Shopify no guarda historial del que partir). Se conserva dos años."
+    "how": "Stock disponible × coste unitario, registrado una vez al día desde que se instaló la app (Shopify no guarda historial del que partir). Se conserva dos años.",
+    "periodLabel": "Periodo"
   },
   "health": {
     "heading": "Revisión de datos",
@@ -1479,7 +1478,9 @@
     "switched": "{{name}} es ahora el proveedor de este producto",
     "add": "Añadir un proveedor",
     "choose": "Elegir…",
-    "addButton": "Añadir"
+    "addButton": "Añadir",
+    "main": "Proveedor actual: {{name}}",
+    "addSuppliersFirst": "Añade proveedores primero"
   },
   "shopifyPo": {
     "heading": "Pedidos de compra en Shopify",
@@ -1491,5 +1492,23 @@
     "order": "Pedido de compra",
     "orderedOn": "Pedido el",
     "cost": "Coste"
+  },
+  "tabs": {
+    "product": {
+      "forecast": "Previsión",
+      "settings": "Ajustes",
+      "suppliers": "Proveedores"
+    },
+    "insights": {
+      "stock": "Stock",
+      "excess": "Stock lento y sobrante",
+      "products": "Productos y precisión",
+      "excessEmpty": "No hay stock lento ni sobrante ahora mismo."
+    },
+    "settings": {
+      "forecast": "Previsión",
+      "alerts": "Alertas y correos",
+      "general": "General"
+    }
   }
 }

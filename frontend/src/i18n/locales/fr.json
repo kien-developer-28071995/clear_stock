@@ -338,8 +338,7 @@
     "why": "Pourquoi : {{location}}",
     "hint": "Sélectionnez un emplacement pour voir pourquoi. Les ajustements du rythme de ventes s'appliquent uniquement au total de la boutique.",
     "minimum": "Minimum ici",
-    "minimumAt": "Stock minimum à {{location}}",
-    "saveMinimums": "Enregistrer les minimums"
+    "minimumAt": "Stock minimum à {{location}}"
   },
   "adjust": {
     "heading": "Ajuster le rythme de ventes",
@@ -456,7 +455,6 @@
     "summaryEmail": "Envoyer à",
     "locationsHeading": "Emplacements comptés dans le stock",
     "locationsIntro": "Décochez un emplacement dont le stock n'est pas à vendre (retours, articles abîmés, showroom). Ses unités ne comptent pas dans les jours de stock ni dans les suggestions ; les ventes expédiées depuis cet emplacement comptent toujours comme demande.",
-    "locationsSaved": "Enregistré. Les prévisions sont en cours de mise à jour.",
     "excludedHeading": "Commandes exclues de la prévision",
     "excludedIntro": "Les commandes de gros ou en magasin peuvent gonfler le rythme de vente en ligne. Enregistrer un changement ici relit l'historique des commandes, ce qui prend quelques minutes.",
     "excludedTags": "Exclure les commandes avec la balise",
@@ -1369,7 +1367,8 @@
     "period_one": "{{count}} jour",
     "period_other": "{{count}} jours",
     "period_many": "{{count}} jours",
-    "how": "Stock disponible × coût unitaire, enregistré une fois par jour depuis l'installation de l'application (Shopify ne conserve aucun historique). Conservé deux ans."
+    "how": "Stock disponible × coût unitaire, enregistré une fois par jour depuis l'installation de l'application (Shopify ne conserve aucun historique). Conservé deux ans.",
+    "periodLabel": "Période"
   },
   "health": {
     "heading": "Vérification des données",
@@ -1479,7 +1478,9 @@
     "switched": "{{name}} est maintenant le fournisseur de ce produit",
     "add": "Ajouter un fournisseur",
     "choose": "Choisir…",
-    "addButton": "Ajouter"
+    "addButton": "Ajouter",
+    "main": "Fournisseur actuel : {{name}}",
+    "addSuppliersFirst": "Ajoutez d'abord des fournisseurs"
   },
   "shopifyPo": {
     "heading": "Bons de commande dans Shopify",
@@ -1491,5 +1492,23 @@
     "order": "Bon de commande",
     "orderedOn": "Commandé le",
     "cost": "Coût"
+  },
+  "tabs": {
+    "product": {
+      "forecast": "Prévision",
+      "settings": "Réglages",
+      "suppliers": "Fournisseurs"
+    },
+    "insights": {
+      "stock": "Stock",
+      "excess": "Stock lent et excédentaire",
+      "products": "Produits et précision",
+      "excessEmpty": "Aucun stock lent ou excédentaire pour le moment."
+    },
+    "settings": {
+      "forecast": "Prévision",
+      "alerts": "Alertes et e-mails",
+      "general": "Général"
+    }
   }
 }

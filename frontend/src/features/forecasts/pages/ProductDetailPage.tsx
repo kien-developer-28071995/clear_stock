@@ -14,6 +14,9 @@ import { AlternateSuppliers } from '@/features/forecasts/components/AlternateSup
 import { LocationForecasts } from '@/features/forecasts/components/LocationForecasts';
 import { MarkOrderedModal } from '@/features/orders/components/MarkOrderedModal';
 import { useModal } from '@/hooks/useModal';
+import { TabPanel, Tabs, useTab } from '@/components/ui/Tabs';
+
+const PRODUCT_TABS = ['forecast', 'settings', 'suppliers'] as const;
 
 export function ProductDetailPage() {
     const { t } = useTranslation();
@@ -22,6 +25,7 @@ export function ProductDetailPage() {
     const guide = useSetupGuide();
     const record = useRecordSetupEvent();
     const markModal = useModal();
+    const [tab, setTab] = useTab(PRODUCT_TABS);
 
     // Setup guide step "See why a product needs reordering" completes on the first visit.
     const reviewed = guide.data?.steps.find((s) => s.key === 'review_forecast')?.done;
@@ -55,12 +59,28 @@ export function ProductDetailPage() {
                 items={[{ variant_id: f.variant_id, name: f.name, quantity: Math.max(1, f.suggested_qty) }]}
             />
             <ForecastSummary f={f} />
-            <LocationForecasts f={f} />
-            <Tip id="product_explanation">{t('tips.product_explanation')}</Tip>
-            <WhyThisNumber f={f} />
-            <AdjustForecastForm f={f} />
-            <ProductSettingsForm f={f} />
-            <AlternateSuppliers f={f} />
+            <Tabs
+                label={t('product.heading')}
+                value={tab}
+                onChange={setTab}
+                tabs={[
+                    { id: 'forecast', label: t('tabs.product.forecast') },
+                    { id: 'settings', label: t('tabs.product.settings') },
+                    { id: 'suppliers', label: t('tabs.product.suppliers') },
+                ]}
+            />
+            <TabPanel active={tab === 'forecast'}>
+                <Tip id="product_explanation">{t('tips.product_explanation')}</Tip>
+                <WhyThisNumber f={f} />
+                <AdjustForecastForm f={f} />
+                <LocationForecasts f={f} />
+            </TabPanel>
+            <TabPanel active={tab === 'settings'}>
+                <ProductSettingsForm f={f} />
+            </TabPanel>
+            <TabPanel active={tab === 'suppliers'}>
+                <AlternateSuppliers f={f} />
+            </TabPanel>
         </s-page>
     );
 }

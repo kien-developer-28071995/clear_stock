@@ -338,8 +338,7 @@
     "why": "Por quê: {{location}}",
     "hint": "Selecione um local para ver o porquê. Os ajustes do ritmo de vendas valem só para o total da loja.",
     "minimum": "Mínimo aqui",
-    "minimumAt": "Estoque mínimo em {{location}}",
-    "saveMinimums": "Salvar mínimos"
+    "minimumAt": "Estoque mínimo em {{location}}"
   },
   "adjust": {
     "heading": "Ajustar o ritmo de vendas",
@@ -456,7 +455,6 @@
     "summaryEmail": "Enviar para",
     "locationsHeading": "Locais contados como estoque",
     "locationsIntro": "Desmarque um local cujo estoque não está à venda (devoluções, itens danificados, showroom). As unidades dele ficam fora dos dias de estoque e das sugestões; as vendas enviadas de lá continuam contando como demanda.",
-    "locationsSaved": "Salvo. As previsões estão sendo atualizadas.",
     "excludedHeading": "Pedidos fora da previsão",
     "excludedIntro": "Pedidos de atacado ou na loja física podem inflar o ritmo de vendas online. Ao salvar uma alteração aqui, o histórico de pedidos é relido, o que leva alguns minutos.",
     "excludedTags": "Excluir pedidos com a tag",
@@ -1369,7 +1367,8 @@
     "period_one": "{{count}} dia",
     "period_other": "{{count}} dias",
     "period_many": "{{count}} dias",
-    "how": "Estoque disponível × custo unitário, registrado uma vez por dia desde a instalação do app (o Shopify não guarda histórico). Mantido por dois anos."
+    "how": "Estoque disponível × custo unitário, registrado uma vez por dia desde a instalação do app (o Shopify não guarda histórico). Mantido por dois anos.",
+    "periodLabel": "Período"
   },
   "health": {
     "heading": "Verificação de dados",
@@ -1479,7 +1478,9 @@
     "switched": "{{name}} agora é o fornecedor deste produto",
     "add": "Adicionar fornecedor",
     "choose": "Escolher…",
-    "addButton": "Adicionar"
+    "addButton": "Adicionar",
+    "main": "Fornecedor atual: {{name}}",
+    "addSuppliersFirst": "Adicione fornecedores primeiro"
   },
   "shopifyPo": {
     "heading": "Pedidos de compra no Shopify",
@@ -1491,5 +1492,23 @@
     "order": "Pedido de compra",
     "orderedOn": "Pedido em",
     "cost": "Custo"
+  },
+  "tabs": {
+    "product": {
+      "forecast": "Previsão",
+      "settings": "Configurações",
+      "suppliers": "Fornecedores"
+    },
+    "insights": {
+      "stock": "Estoque",
+      "excess": "Estoque lento e excedente",
+      "products": "Produtos e precisão",
+      "excessEmpty": "Não há estoque lento ou excedente no momento."
+    },
+    "settings": {
+      "forecast": "Previsão",
+      "alerts": "Alertas e e-mails",
+      "general": "Geral"
+    }
   }
 }

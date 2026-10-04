@@ -321,8 +321,7 @@
     "why": "Warum: {{location}}",
     "hint": "Wähle einen Standort, um das Warum zu sehen. Anpassungen der Verkaufsrate gelten nur für die Shop-Summe.",
     "minimum": "Minimum hier",
-    "minimumAt": "Mindestbestand in {{location}}",
-    "saveMinimums": "Mindestbestände speichern"
+    "minimumAt": "Mindestbestand in {{location}}"
   },
   "adjust": {
     "heading": "Verkaufsrate anpassen",
@@ -437,7 +436,6 @@
     "summaryEmail": "Senden an",
     "locationsHeading": "Standorte, die als Bestand zählen",
     "locationsIntro": "Entferne das Häkchen bei einem Standort, dessen Bestand nicht zum Verkauf steht (Retouren, beschädigte Ware, Showroom). Seine Stückzahlen zählen nicht für Reichweite und Bestellvorschläge; von dort versandte Verkäufe zählen weiter als Nachfrage.",
-    "locationsSaved": "Gespeichert. Die Prognosen werden aktualisiert.",
     "excludedHeading": "Von der Prognose ausgeschlossene Bestellungen",
     "excludedIntro": "Großhandels- oder Ladenbestellungen können die Verkaufsrate deines Onlineshops aufblähen. Beim Speichern einer Änderung wird der Bestellverlauf neu gelesen, das dauert einige Minuten.",
     "excludedTags": "Bestellungen mit diesem Tag ausschließen",
@@ -1247,7 +1245,8 @@
     "collecting": "Die Aufzeichnung begann am {{date}}. Das Diagramm erscheint, sobald zwei Tage zum Vergleichen vorliegen.",
     "period_one": "{{count}} Tag",
     "period_other": "{{count}} Tage",
-    "how": "Bestand × Stückkosten, einmal täglich aufgezeichnet, seit die App installiert wurde (Shopify speichert keinen Verlauf). Zwei Jahre aufbewahrt."
+    "how": "Bestand × Stückkosten, einmal täglich aufgezeichnet, seit die App installiert wurde (Shopify speichert keinen Verlauf). Zwei Jahre aufbewahrt.",
+    "periodLabel": "Zeitraum"
   },
   "health": {
     "heading": "Datenprüfung",
@@ -1342,7 +1341,9 @@
     "switched": "{{name}} ist jetzt der Lieferant dieses Produkts",
     "add": "Lieferanten hinzufügen",
     "choose": "Auswählen…",
-    "addButton": "Hinzufügen"
+    "addButton": "Hinzufügen",
+    "main": "Aktueller Lieferant: {{name}}",
+    "addSuppliersFirst": "Zuerst Lieferanten hinzufügen"
   },
   "shopifyPo": {
     "heading": "Bestellungen in Shopify",
@@ -1354,5 +1355,23 @@
     "order": "Bestellung",
     "orderedOn": "Bestellt am",
     "cost": "Kosten"
+  },
+  "tabs": {
+    "product": {
+      "forecast": "Prognose",
+      "settings": "Einstellungen",
+      "suppliers": "Lieferanten"
+    },
+    "insights": {
+      "stock": "Bestand",
+      "excess": "Langsamdreher und Überbestand",
+      "products": "Produkte und Genauigkeit",
+      "excessEmpty": "Derzeit keine Langsamdreher oder Überbestände."
+    },
+    "settings": {
+      "forecast": "Prognose",
+      "alerts": "Benachrichtigungen und E-Mails",
+      "general": "Allgemein"
+    }
   }
 }

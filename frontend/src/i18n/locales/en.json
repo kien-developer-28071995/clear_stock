@@ -321,8 +321,7 @@
     "why": "Why: {{location}}",
     "hint": "Select a location to see why. Sales-rate adjustments apply to the store total only.",
     "minimum": "Minimum here",
-    "minimumAt": "Minimum stock at {{location}}",
-    "saveMinimums": "Save minimums"
+    "minimumAt": "Minimum stock at {{location}}"
   },
   "adjust": {
     "heading": "Adjust the sales rate",
@@ -437,7 +436,6 @@
     "summaryEmail": "Send it to",
     "locationsHeading": "Locations counted as stock",
     "locationsIntro": "Untick a location whose stock is not for sale (returns, damaged goods, a showroom). Its units are left out of days of stock and order suggestions; sales shipped from it still count as demand.",
-    "locationsSaved": "Saved. Forecasts are being updated.",
     "excludedHeading": "Orders left out of the forecast",
     "excludedIntro": "Wholesale or in-store orders can inflate the sales rate of your online store. Saving a change here re-reads your order history, which takes a few minutes.",
     "excludedTags": "Leave out orders tagged",
@@ -1247,7 +1245,8 @@
     "collecting": "Recording started on {{date}}. The chart appears once there are two days to compare.",
     "period_one": "{{count}} day",
     "period_other": "{{count}} days",
-    "how": "Stock on hand × unit cost, recorded once a day since the app was installed (Shopify keeps no history to start from). Kept for two years."
+    "how": "Stock on hand × unit cost, recorded once a day since the app was installed (Shopify keeps no history to start from). Kept for two years.",
+    "periodLabel": "Period"
   },
   "health": {
     "heading": "Data check",
@@ -1342,7 +1341,9 @@
     "switched": "{{name}} is now this product's supplier",
     "add": "Add a supplier",
     "choose": "Choose…",
-    "addButton": "Add"
+    "addButton": "Add",
+    "main": "Current supplier: {{name}}",
+    "addSuppliersFirst": "Add suppliers first"
   },
   "shopifyPo": {
     "heading": "Purchase orders in Shopify",
@@ -1354,5 +1355,23 @@
     "order": "Purchase order",
     "orderedOn": "Ordered",
     "cost": "Cost"
+  },
+  "tabs": {
+    "product": {
+      "forecast": "Forecast",
+      "settings": "Settings",
+      "suppliers": "Suppliers"
+    },
+    "insights": {
+      "stock": "Stock",
+      "excess": "Slow and excess stock",
+      "products": "Products and accuracy",
+      "excessEmpty": "No slow or excess stock right now."
+    },
+    "settings": {
+      "forecast": "Forecast",
+      "alerts": "Alerts and emails",
+      "general": "General"
+    }
   }
 }
