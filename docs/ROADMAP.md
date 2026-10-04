@@ -203,6 +203,44 @@ Nguồn: Shopify Editions Spring '26, listing Stockcast và Forthcast (cập nh�
 
 Nguồn lần 6: https://www.shopify.com/editions/spring2026 · https://www.forthcast.io/blog/shopify-sidekick-inventory-what-it-can-and-cant-do · https://apps.shopify.com/stockcast-inventory-forecast · https://apps.shopify.com/forthcast · https://community.shopify.dev/t/bfs-enforcement-update-reviewing-lcp-readings/21956
 
+## Phase tiếp theo: tối ưu UI/UX và hiệu năng (kế hoạch, 2026-10-05)
+
+Dựa trên: yêu cầu Built for Shopify (bản hiện hành), hướng dẫn thiết kế app của Shopify (layout, onboarding), ảnh chụp 22 màn hình ở `docs/screens/`, và số đo trên store dev (19 sản phẩm, bản dev của Vite, mạng nội bộ).
+
+### Số đo hiện tại
+- API: mọi endpoint chính 9–35 ms, payload lớn nhất 12 KB (`/manual-orders`), 10 KB (`/purchase-plan`). **Store dev quá nhỏ**: chưa có số đo với shop 5.000–20.000 biến thể.
+- Bundle production: `main` 238 KB (74 KB gzip), mỗi ngôn ngữ 68–93 KB (21–25 KB gzip), một chunk dùng chung tên `ErrorBanner` 72 KB (24 KB gzip) cần xem bên trong có gì.
+- Thác request: mọi trang gọi `/shop` trước, **xong mới** gọi dữ liệu của trang; chunk của trang cũng chỉ tải sau đó. Trên mạng thật mỗi bước là một vòng đi về.
+- Trang Phân tích gọi 6 API ngay khi mở, kể cả dữ liệu của tab đang ẩn. Cài đặt gọi 4.
+- CLS đo được 0,000 (Home, Cài đặt); LCP Home 360 ms. Đây là số máy nội bộ ngoài admin, **không phải** số Shopify dùng để xét (p75 trong admin thật, cần ≥ 100 lượt/28 ngày).
+
+### Ngưỡng Built for Shopify cần giữ
+LCP ≤ 2,5 s, CLS ≤ 0,1, INP ≤ 200 ms (p75, 28 ngày). 4.1.5 lưu form bằng contextual save bar. 4.2.2 onboarding gọn, tối đa 5 bước, bỏ qua được. 4.2.3 trang chủ có trạng thái setup và chỉ số. 4.3.4 không gây quá tải: chia nhỏ form, hạn chế banner, chữ ngắn. Bố cục: một cột cho trang danh sách, không đổi mật độ thông tin trong cùng một trang, mỗi thẻ tối đa một nút primary, bảng dùng nút phụ.
+
+### A. Hiệu năng (đo trước, sửa sau)
+1. **Gửi Web Vitals thật về backend**: App Bridge có `shopify.webVitals.onReport` (LCP, CLS, INP theo trang). Lưu tổng hợp theo ngày, hiện ở `admin/`. Không có bước này thì mọi tối ưu khác không kiểm chứng được.
+2. **Shop giả 10.000 biến thể** (`dev:seed-large`) để đo API, forecast và sync ở quy mô thật; đặt ngưỡng (vd. danh sách < 200 ms, dashboard < 300 ms) và thêm test chặn N+1.
+3. **Bỏ thác `/shop` → dữ liệu trang**: gọi song song, và tải trước chunk của trang theo URL ngay từ đầu.
+4. **Tải dữ liệu theo tab**: Phân tích và Cài đặt chỉ gọi API của tab đang mở.
+5. **Xem lại chunk dùng chung 72 KB** và việc tải ngôn ngữ dự phòng (EN) khi merchant dùng ngôn ngữ khác.
+6. **Prefetch khi rê chuột vào menu/liên kết** sản phẩm (React Query `prefetchQuery`).
+7. Từ roadmap lần 6: webhook tồn kho chỉ khi `available` đổi (#58), bulk operation đọc song song (#59).
+
+### B. UI/UX
+8. **Menu 12 mục → khoảng 7**: Home, Cần nhập hàng, Sản phẩm, Phân tích, Kế hoạch (gộp Kế hoạch nhập + Ngân sách + Mô phỏng + Sự kiện thành tab), Nhà cung cấp (gộp Combo, Đơn đã đặt), Cài đặt (gộp Gói). Cùng cách chia tab vừa làm cho 3 trang dài.
+9. **Trang sản phẩm**: câu kết luận lên đầu ("Đặt 52 cái trước 4/10"), lưới chỉ số 4 cột thay vì 2 cột thưa; tab Cài đặt chia nhóm (NCC và lead time / Quy tắc đặt hàng / Min–Max / Dự báo / Cảnh báo).
+10. **Danh sách sản phẩm**: 7 ô lọc trên một hàng → giữ Tìm kiếm, Trạng thái, Sắp xếp; phần còn lại vào "Thêm bộ lọc". Trên điện thoại mỗi sản phẩm đang chiếm 8 dòng (trang 390px dài 5.750px) → còn 3–4 dòng.
+11. **Bảng và nút**: rà mỗi thẻ chỉ một nút primary, hành động trong bảng dùng nút phụ hoặc menu "…" (trang Nhà cung cấp đang có 5 nút mỗi dòng).
+12. **Trạng thái rỗng và đang tải** cho các mục mới (xả hàng, lệch size, lịch sử tồn, PO Shopify, NCC khác).
+13. **Rà chữ**: câu ngắn, bỏ lặp, soát 5 ngôn ngữ ngoài EN do máy dịch (ES/DE/FR/PT chưa có người bản ngữ đọc).
+14. **Kiểm tra trong admin thật** (cần `make tunnel`): thanh tiêu đề, save bar, điều hướng, màn hình điện thoại của app Shopify. Bộ E2E chạy ngoài admin nên không thấy các phần này.
+15. **Khả năng truy cập**: tương phản WCAG AA cho biểu đồ tự vẽ, nhãn cho biểu đồ, điều hướng bàn phím qua tab.
+
+### Thứ tự đề xuất
+A1 → A2 (có số đo) → B8, B9, B10 (thay đổi merchant thấy rõ nhất) → A3, A4 → B11–B13 → B14 → phần còn lại.
+
+Nguồn: https://shopify.dev/docs/apps/launch/built-for-shopify/requirements · https://shopify.dev/docs/apps/design/layout · https://shopify.dev/docs/apps/design/user-experience/onboarding · https://shopify.dev/docs/api/app-home/apis/device-and-platform-integration/web-vitals-api · https://community.shopify.dev/t/improve-admin-performance-faq/1100
+
 ## Việc sắp tới (tổng hợp, theo thứ tự đề xuất)
 
 1. ~~**#11 Tạo Purchase Order gốc của Shopify từ gợi ý**~~ — xong: nút xuất PO có thêm định dạng "Đơn đặt hàng Shopify" đúng mẫu `SKU,Barcode,Supplier SKU,Quantity,Cost,Tax` (không có API tạo PO), đồng bộ `variants.barcode`, bỏ qua sản phẩm không có SKU lẫn barcode và báo số lượng.
