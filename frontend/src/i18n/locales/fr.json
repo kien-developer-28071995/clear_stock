@@ -723,7 +723,17 @@
     "event_upcoming_lower_many": "{{name}} ({{from_date}} – {{to_date}}, ×{{multiplier}}) retire {{count}} unités de la quantité à commander.",
     "ordered_manual_one": "Vous avez marqué {{count}} unité comme commandée (attendue le {{expected_date}}) : comptée comme en route.",
     "ordered_manual_other": "Vous avez marqué {{count}} unités comme commandées (attendues le {{expected_date}}) : comptées comme en route.",
-    "ordered_manual_many": "Vous avez marqué {{count}} unités comme commandées (attendues le {{expected_date}}) : comptées comme en route."
+    "ordered_manual_many": "Vous avez marqué {{count}} unités comme commandées (attendues le {{expected_date}}) : comptées comme en route.",
+    "profile_recent": "Réglage de la boutique « Suivre les ventes récentes » : les 7 derniers jours comptent le plus.",
+    "profile_recent_product": "Ce produit suit les ventes récentes : les 7 derniers jours comptent le plus.",
+    "profile_steady": "Réglage de la boutique « Stable » : le rythme est calculé sur un an au maximum.",
+    "profile_steady_product": "Ce produit est réglé sur « Stable » : le rythme est calculé sur un an au maximum.",
+    "trend_up_one": "Se vend {{percent}} % plus vite sur le dernier jour ({{recent}}/jour) que sur les {{days}} jours précédents ({{baseline}}/jour).",
+    "trend_up_other": "Se vend {{percent}} % plus vite sur les {{count}} derniers jours ({{recent}}/jour) que sur les {{days}} jours précédents ({{baseline}}/jour).",
+    "trend_up_many": "Se vend {{percent}} % plus vite sur les {{count}} derniers jours ({{recent}}/jour) que sur les {{days}} jours précédents ({{baseline}}/jour).",
+    "trend_down_one": "Se vend {{percent}} % moins vite sur le dernier jour ({{recent}}/jour) que sur les {{days}} jours précédents ({{baseline}}/jour).",
+    "trend_down_other": "Se vend {{percent}} % moins vite sur les {{count}} derniers jours ({{recent}}/jour) que sur les {{days}} jours précédents ({{baseline}}/jour).",
+    "trend_down_many": "Se vend {{percent}} % moins vite sur les {{count}} derniers jours ({{recent}}/jour) que sur les {{days}} jours précédents ({{baseline}}/jour)."
   },
   "import": {
     "fromStocky": "Importer depuis Stocky",
@@ -1265,5 +1275,23 @@
       "reorder_point": "Point de commande atteint"
     },
     "noCost": "Pas de coût"
+  },
+  "forecastProfile": {
+    "label": "Comment le rythme de vente est calculé",
+    "help": "Équilibré convient à la plupart des produits. Chaque prévision indique les jours et les poids utilisés ; un produit peut avoir son propre réglage.",
+    "productLabel": "Rythme de vente de ce produit",
+    "productHelp": "Choisissez « Suivre les ventes récentes » pour un produit nouveau ou en forte croissance, « Stable » pour un produit qui se vend lentement ou irrégulièrement.",
+    "storeDefault": "Réglage de la boutique ({{name}})",
+    "balanced": "Équilibré (7, 30 et 90 jours)",
+    "recent": "Suivre les ventes récentes (les 7 derniers jours comptent le plus)",
+    "steady": "Stable (jusqu'à un an de ventes)"
+  },
+  "trend": {
+    "filter": "Tendance",
+    "all": "Toute tendance",
+    "up": "Se vend plus vite",
+    "down": "Se vend moins vite",
+    "badgeUp": "Se vend {{percent}} % plus vite récemment",
+    "badgeDown": "Se vend {{percent}} % moins vite récemment"
   }
 }

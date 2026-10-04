@@ -156,6 +156,7 @@ class ForecastService
             'target_stock' => $r->targetStock,
             'excess_units' => $r->excessUnits,
             'lost_units_30d' => $r->lostUnits30d,
+            'trend_percent' => $r->trendPercent,
             'confidence' => $r->confidence->value,
             'explanation' => json_encode($r->explanation, JSON_THROW_ON_ERROR),
             'computed_at' => $computedAt,

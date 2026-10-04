@@ -17,6 +17,7 @@ class SettingsRequest extends FormRequest
             'default_safety_days' => ['sometimes', 'integer', 'min:0', 'max:365'],
             // null = switched off app-wide (the settings page sends back what it got)
             'filter_sales_spikes' => ['sometimes', 'nullable', 'boolean'],
+            'forecast_profile' => ['sometimes', Rule::in(array_keys(config('forecast.profiles')))],
             // null = follow the Shopify admin language
             'locale' => ['sometimes', 'nullable', Rule::in(Locales::supported())],
             'alerts' => ['sometimes', 'array'],

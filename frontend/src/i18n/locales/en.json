@@ -672,7 +672,15 @@
     "event_upcoming_lower_one": "{{name}} ({{from_date}} – {{to_date}}, ×{{multiplier}}) takes {{count}} unit off what to order.",
     "event_upcoming_lower_other": "{{name}} ({{from_date}} – {{to_date}}, ×{{multiplier}}) takes {{count}} units off what to order.",
     "ordered_manual_one": "You marked {{count}} unit as ordered (expected {{expected_date}}): counted as on the way.",
-    "ordered_manual_other": "You marked {{count}} units as ordered (expected {{expected_date}}): counted as on the way."
+    "ordered_manual_other": "You marked {{count}} units as ordered (expected {{expected_date}}): counted as on the way.",
+    "profile_recent": "Store setting \"Follow recent sales\": the last 7 days count most.",
+    "profile_recent_product": "This product follows recent sales: the last 7 days count most.",
+    "profile_steady": "Store setting \"Steady\": the rate is averaged over up to a year.",
+    "profile_steady_product": "This product is set to \"Steady\": the rate is averaged over up to a year.",
+    "trend_up_one": "Selling {{percent}}% faster in the last {{count}} day ({{recent}}/day) than in the {{days}} days before ({{baseline}}/day).",
+    "trend_up_other": "Selling {{percent}}% faster in the last {{count}} days ({{recent}}/day) than in the {{days}} days before ({{baseline}}/day).",
+    "trend_down_one": "Selling {{percent}}% slower in the last {{count}} day ({{recent}}/day) than in the {{days}} days before ({{baseline}}/day).",
+    "trend_down_other": "Selling {{percent}}% slower in the last {{count}} days ({{recent}}/day) than in the {{days}} days before ({{baseline}}/day)."
   },
   "import": {
     "fromStocky": "Import from Stocky",
@@ -1153,5 +1161,23 @@
       "reorder_point": "Reached reorder point"
     },
     "noCost": "No cost"
+  },
+  "forecastProfile": {
+    "label": "How the sales rate is averaged",
+    "help": "Balanced suits most products. Each forecast shows the days and weights used; a product can have its own setting.",
+    "productLabel": "Sales rate for this product",
+    "productHelp": "Use \"Follow recent sales\" for a new or fast-growing product, \"Steady\" for one that sells slowly or unevenly.",
+    "storeDefault": "Store setting ({{name}})",
+    "balanced": "Balanced (7, 30 and 90 days)",
+    "recent": "Follow recent sales (last 7 days count most)",
+    "steady": "Steady (up to a year of sales)"
+  },
+  "trend": {
+    "filter": "Trend",
+    "all": "Any trend",
+    "up": "Selling faster",
+    "down": "Selling slower",
+    "badgeUp": "Selling {{percent}}% faster lately",
+    "badgeDown": "Selling {{percent}}% slower lately"
   }
 }

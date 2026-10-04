@@ -37,7 +37,7 @@ class ForecastController extends Controller
         // Resources read the container's base request, not this FormRequest copy.
         request()->attributes->set('today', $this->query->today($shop));
 
-        $filters = $request->safe()->only(['status', 'search', 'sort', 'vendor', 'product_type', 'abc']);
+        $filters = $request->safe()->only(['status', 'search', 'sort', 'vendor', 'product_type', 'abc', 'trend']);
         if (! Features::enabled(Feature::Abc)) {
             unset($filters['abc']); // ABC switched off app-wide: ignore a stale filter / sort in a saved URL
             if (($filters['sort'] ?? null) === 'revenue') {
@@ -101,6 +101,7 @@ class ForecastController extends Controller
         $request->attributes->set('shop_defaults', [
             'lead_time_days' => $shop->default_lead_time_days,
             'safety_days' => $shop->default_safety_days,
+            'forecast_profile' => $shop->forecast_profile,
         ]);
         $entitlements = Entitlements::for($shop);
         $request->attributes->set('explanations', $entitlements->has(Feature::Explanations));

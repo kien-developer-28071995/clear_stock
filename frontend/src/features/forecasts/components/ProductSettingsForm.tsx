@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { fieldError } from '@/lib/http';
 import { useUpdateVariantSettings } from '@/features/forecasts/hooks/useForecasts';
-import type { ForecastDetail } from '@/features/forecasts/types';
+import { FORECAST_PROFILES, type ForecastDetail, type ForecastProfile } from '@/features/forecasts/types';
 import { formatNumber } from '@/utils/format';
 import { SaveBar } from '@/components/ui/SaveBar';
 import { useSuppliers } from '@/features/settings/hooks/useSettings';
@@ -31,6 +31,7 @@ export function ProductSettingsForm({ f }: { f: ForecastDetail }) {
     const [muted, setMuted] = useState(false);
     const [discontinued, setDiscontinued] = useState(false);
     const [cost, setCost] = useState('');
+    const [profile, setProfile] = useState('');
     // Similar product: local id (saved) or Shopify gid (just picked); null = none.
     const [reference, setReference] = useState<{ id: number | string; name: string } | null>(null);
     const [referencePercent, setReferencePercent] = useState('');
@@ -48,6 +49,7 @@ export function ProductSettingsForm({ f }: { f: ForecastDetail }) {
         muted: f.settings.alerts_muted,
         discontinued: f.settings.discontinued,
         cost: f.settings.cost_override?.toString() ?? '',
+        profile: f.settings.forecast_profile ?? '',
         reference: f.settings.reference_variant_id ? { id: f.settings.reference_variant_id, name: f.settings.reference_name ?? '' } : null,
         referencePercent: f.settings.reference_percent?.toString() ?? '',
     };
@@ -62,12 +64,13 @@ export function ProductSettingsForm({ f }: { f: ForecastDetail }) {
         setMuted(saved.muted);
         setDiscontinued(saved.discontinued);
         setCost(saved.cost);
+        setProfile(saved.profile);
         setReference(saved.reference);
         setReferencePercent(saved.referencePercent);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(reset, [f.settings]);
-    const current = { supplierId, leadTime, safety, minOrder, pack, minStock, maxStock, muted, discontinued, cost, reference, referencePercent };
+    const current = { supplierId, leadTime, safety, minOrder, pack, minStock, maxStock, muted, discontinued, cost, profile, reference, referencePercent };
     const pickReference = async () => {
         const [picked] = await pickVariants();
         if (picked) setReference({ id: picked.gid, name: picked.name });
@@ -89,6 +92,7 @@ export function ProductSettingsForm({ f }: { f: ForecastDetail }) {
                 max_stock: toNumberOrNull(maxStock),
                 alerts_muted: muted,
                 discontinued,
+                forecast_profile: (profile || null) as ForecastProfile | null,
                 ...(cost !== saved.cost ? { cost_override: cost.trim() === '' ? null : Number(cost.replace(',', '.')) } : {}),
                 // Only sent when changed: a Free shop can still save its other settings.
                 ...(reference?.id !== saved.reference?.id ? { reference_variant: reference?.id ?? null } : {}),
@@ -188,6 +192,18 @@ export function ProductSettingsForm({ f }: { f: ForecastDetail }) {
                         onInput={(e) => setCost(e.currentTarget.value)}
                     />
                 </s-box>
+                <s-select
+                    label={t('forecastProfile.productLabel')}
+                    details={t('forecastProfile.productHelp')}
+                    value={optionValue(profile)}
+                    error={fieldError(update.error, 'forecast_profile')}
+                    onChange={(e) => setProfile(fromOption(e.currentTarget.value))}
+                >
+                    <s-option value={NO_VALUE}>{t('forecastProfile.storeDefault', { name: t(`forecastProfile.${f.defaults.forecast_profile}`) })}</s-option>
+                    {FORECAST_PROFILES.map((p) => (
+                        <s-option key={p} value={p}>{t(`forecastProfile.${p}`)}</s-option>
+                    ))}
+                </s-select>
                 {referenceExists && (<s-stack gap="small-200">
                     <s-text type="strong">{t('productSettings.reference')}</s-text>
                     {!canReference && <UpgradePrompt id="reference-products" plan="starter">{t('productSettings.referenceLocked')}</UpgradePrompt>}

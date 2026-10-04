@@ -8,7 +8,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useFeature } from '@/hooks/useEntitlements';
 import { AbcBadge } from '@/features/forecasts/components/AbcBadge';
 import { useFacets, useForecastList, useLocations } from '@/features/forecasts/hooks/useForecasts';
-import type { ForecastFilters } from '@/features/forecasts/types';
+import { TREND_THRESHOLD, type ForecastFilters } from '@/features/forecasts/types';
 import { formatDate, formatNumber } from '@/utils/format';
 import { NO_VALUE, fromOption, optionValue } from '@/utils/select';
 
@@ -27,6 +27,7 @@ export function ProductsPage() {
         vendor: params.get('vendor') ?? '',
         product_type: params.get('product_type') ?? '',
         abc: (params.get('abc') ?? '') as ForecastFilters['abc'],
+        trend: (params.get('trend') ?? '') as ForecastFilters['trend'],
         search: params.get('search') ?? '',
         sort: (params.get('sort') ?? 'urgency') as ForecastFilters['sort'],
         page: Number(params.get('page') ?? 1),
@@ -42,7 +43,7 @@ export function ProductsPage() {
     const showTypes = (facets?.product_types.length ?? 0) > 1;
     const abc = useFeature('abc');
     const sortOptions = SORT_OPTIONS.filter((o) => abc || o !== 'revenue');
-    const selects = (abc ? 3 : 2) + [showLocations, showVendors, showTypes].filter(Boolean).length;
+    const selects = (abc ? 4 : 3) + [showLocations, showVendors, showTypes].filter(Boolean).length;
 
     const update = (patch: Partial<ForecastFilters>) => {
         const next = { ...filters, page: 1, ...patch };
@@ -140,6 +141,16 @@ export function ProductsPage() {
                             ))}
                         </s-select>)}
                         <s-select
+                            label={t('trend.filter')}
+                            labelAccessibilityVisibility="exclusive"
+                            value={optionValue(filters.trend)}
+                            onChange={(e) => update({ trend: fromOption(e.currentTarget.value) as ForecastFilters['trend'] })}
+                        >
+                            <s-option value={NO_VALUE}>{t('trend.all')}</s-option>
+                            <s-option value="up">{t('trend.up')}</s-option>
+                            <s-option value="down">{t('trend.down')}</s-option>
+                        </s-select>
+                        <s-select
                             label={t('products.status')}
                             labelAccessibilityVisibility="exclusive"
                             value={optionValue(filters.status)}
@@ -199,7 +210,18 @@ export function ProductsPage() {
                                         )}
                                     </s-stack>
                                 </s-table-cell>
-                                <s-table-cell>{formatNumber(row.avg_daily_sales, 2)}</s-table-cell>
+                                <s-table-cell>
+                                    <s-stack gap="small-100">
+                                        <s-text>{formatNumber(row.avg_daily_sales, 2)}</s-text>
+                                        {row.trend_percent !== null && Math.abs(row.trend_percent) >= TREND_THRESHOLD && (
+                                            <s-text color="subdued">
+                                                <span title={t(row.trend_percent > 0 ? 'trend.badgeUp' : 'trend.badgeDown', { percent: Math.abs(row.trend_percent) })}>
+                                                    {row.trend_percent > 0 ? '↑' : '↓'} {Math.abs(row.trend_percent)}%
+                                                </span>
+                                            </s-text>
+                                        )}
+                                    </s-stack>
+                                </s-table-cell>
                                 <s-table-cell>{row.days_of_cover === null ? '∞' : formatNumber(row.days_of_cover, 0)}</s-table-cell>
                                 <s-table-cell>{row.avg_daily_sales > 0 ? formatDate(row.reorder_date) : '—'}</s-table-cell>
                                 <s-table-cell>{formatNumber(row.suggested_qty, 0)}</s-table-cell>

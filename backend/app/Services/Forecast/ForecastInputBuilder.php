@@ -87,6 +87,8 @@ class ForecastInputBuilder
                     discontinued: $base->discontinued,
                     orderWeekdays: $base->orderWeekdays,
                     events: $base->events,
+                    profile: $base->profile,
+                    profileSource: $base->profileSource,
                 )];
             }
         }
@@ -176,6 +178,8 @@ class ForecastInputBuilder
                 orderWeekdays: $variant->supplier?->order_weekdays,
                 events: $events->for($id, $variant->supplier_id),
                 ordered: $ordered[$id] ?? null,
+                profile: $variant->forecast_profile ?? $shop->forecast_profile ?? 'balanced',
+                profileSource: $variant->forecast_profile !== null ? 'variant' : 'shop',
             );
         }
 

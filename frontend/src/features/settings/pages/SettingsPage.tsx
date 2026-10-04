@@ -15,6 +15,7 @@ import { FlowSection } from '@/features/settings/components/FlowSection';
 import { useSettings, useUpdateSettings } from '@/features/settings/hooks/useSettings';
 import type { RealtimeAlertMode, Settings } from '@/features/settings/types';
 import { NO_VALUE, fromOption, optionValue } from '@/utils/select';
+import { FORECAST_PROFILES } from '@/features/forecasts/types';
 
 /** ISO weekday (1 = Monday) → name in the current language. 2024-01-01 was a Monday. */
 const weekdayName = (iso: number) =>
@@ -87,6 +88,17 @@ export function SettingsPage() {
                         error={fieldError(update.error, 'default_safety_days')}
                         onInput={(e) => setForm({ ...form, default_safety_days: Number(e.currentTarget.value) })}
                     />
+                    <s-select
+                        label={t('forecastProfile.label')}
+                        details={t('forecastProfile.help')}
+                        value={form.forecast_profile}
+                        error={fieldError(update.error, 'forecast_profile')}
+                        onChange={(e) => setForm({ ...form, forecast_profile: e.currentTarget.value as Settings['forecast_profile'] })}
+                    >
+                        {FORECAST_PROFILES.map((p) => (
+                            <s-option key={p} value={p}>{t(`forecastProfile.${p}`)}</s-option>
+                        ))}
+                    </s-select>
                     {form.filter_sales_spikes !== null && (
                         <s-switch
                             label={t('settings.filterSpikes')}

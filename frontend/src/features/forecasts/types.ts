@@ -4,6 +4,12 @@ import type { Confidence, ForecastStatus } from '@/types/forecast';
 /** A = the products making up the first 80% of recent revenue, B = up to 95%, C = the rest. */
 export type AbcClass = 'A' | 'B' | 'C';
 
+/** Averaging windows and weights (backend config forecast.profiles). */
+export type ForecastProfile = 'balanced' | 'recent' | 'steady';
+export const FORECAST_PROFILES: ForecastProfile[] = ['balanced', 'recent', 'steady'];
+/** A change of at least this many percent counts as selling faster / slower (backend forecast.trend.threshold). */
+export const TREND_THRESHOLD = 25;
+
 export interface ForecastRow {
     variant_id: number;
     name: string;
@@ -53,7 +59,7 @@ export type ForecastListRow = Pick<
     | 'reorder_date'
     | 'suggested_qty'
     | 'excess_units'
-> & { abc_class: AbcClass | null };
+> & { abc_class: AbcClass | null; /** Recent sales vs the weeks before, in percent (null = too little to tell). */ trend_percent: number | null };
 
 export interface Paginated<T> {
     data: T[];
@@ -128,6 +134,8 @@ export interface ForecastDetail extends ForecastRow {
         alerts_muted: boolean;
         /** No longer reordered: sells through what is left (no suggestion, alert or plan). */
         discontinued: boolean;
+        /** Window mix for this product; null = the store's. */
+        forecast_profile: ForecastProfile | null;
         /** Unit cost entered in the app (wins), and Shopify's. */
         cost_override: number | null;
         shopify_cost: number | null;
@@ -136,7 +144,9 @@ export interface ForecastDetail extends ForecastRow {
         reference_name: string | null;
         reference_percent: number | null;
     };
-    defaults: { lead_time_days: number; safety_days: number };
+    defaults: { lead_time_days: number; safety_days: number; forecast_profile: ForecastProfile };
+    /** Recent sales rate vs the weeks before (null = too little to compare). */
+    trend: { direction: 'up' | 'down' | 'flat'; percent: number; recent_avg: number; baseline_avg: number } | null;
     /** Latest judged week: the forecast then vs what really sold per in-stock day (null until there is one). */
     accuracy: {
         week_start: string;
@@ -171,6 +181,7 @@ export interface ForecastFilters {
     vendor?: string;
     product_type?: string;
     abc?: AbcClass | '';
+    trend?: 'up' | 'down' | '';
     search?: string;
     sort?: 'urgency' | 'cover' | 'name' | 'suggested' | 'value' | 'revenue';
     page?: number;
@@ -189,6 +200,7 @@ export interface VariantSettingsInput {
     max_stock?: number | null;
     alerts_muted?: boolean;
     discontinued?: boolean;
+    forecast_profile?: ForecastProfile | null;
     cost_override?: number | null;
     /** Local id or Shopify variant gid (resource picker); null removes it. */
     reference_variant?: number | string | null;

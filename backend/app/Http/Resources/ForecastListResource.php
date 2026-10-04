@@ -35,6 +35,7 @@ class ForecastListResource extends JsonResource
             'reorder_date' => $this->reorder_date?->toDateString(),
             'suggested_qty' => $this->suggested_qty,
             'excess_units' => $this->excess_units,
+            'trend_percent' => $this->trend_percent,
         ];
     }
 }

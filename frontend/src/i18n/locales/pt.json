@@ -723,7 +723,17 @@
     "event_upcoming_lower_many": "{{name}} ({{from_date}} – {{to_date}}, ×{{multiplier}}) tira {{count}} unidades do que pedir.",
     "ordered_manual_one": "Você marcou {{count}} unidade como pedida (chega em {{expected_date}}): conta como a caminho.",
     "ordered_manual_other": "Você marcou {{count}} unidades como pedidas (chegam em {{expected_date}}): contam como a caminho.",
-    "ordered_manual_many": "Você marcou {{count}} unidades como pedidas (chegam em {{expected_date}}): contam como a caminho."
+    "ordered_manual_many": "Você marcou {{count}} unidades como pedidas (chegam em {{expected_date}}): contam como a caminho.",
+    "profile_recent": "Configuração da loja \"Seguir as vendas recentes\": os últimos 7 dias pesam mais.",
+    "profile_recent_product": "Este produto segue as vendas recentes: os últimos 7 dias pesam mais.",
+    "profile_steady": "Configuração da loja \"Estável\": o ritmo é calculado até um ano.",
+    "profile_steady_product": "Este produto está em \"Estável\": o ritmo é calculado até um ano.",
+    "trend_up_one": "Vende {{percent}}% mais rápido no último dia ({{recent}}/dia) do que nos {{days}} dias anteriores ({{baseline}}/dia).",
+    "trend_up_other": "Vende {{percent}}% mais rápido nos últimos {{count}} dias ({{recent}}/dia) do que nos {{days}} dias anteriores ({{baseline}}/dia).",
+    "trend_up_many": "Vende {{percent}}% mais rápido nos últimos {{count}} dias ({{recent}}/dia) do que nos {{days}} dias anteriores ({{baseline}}/dia).",
+    "trend_down_one": "Vende {{percent}}% mais devagar no último dia ({{recent}}/dia) do que nos {{days}} dias anteriores ({{baseline}}/dia).",
+    "trend_down_other": "Vende {{percent}}% mais devagar nos últimos {{count}} dias ({{recent}}/dia) do que nos {{days}} dias anteriores ({{baseline}}/dia).",
+    "trend_down_many": "Vende {{percent}}% mais devagar nos últimos {{count}} dias ({{recent}}/dia) do que nos {{days}} dias anteriores ({{baseline}}/dia)."
   },
   "import": {
     "fromStocky": "Importar do Stocky",
@@ -1265,5 +1275,23 @@
       "reorder_point": "Chegou ao ponto de pedido"
     },
     "noCost": "Sem custo"
+  },
+  "forecastProfile": {
+    "label": "Como o ritmo de vendas é calculado",
+    "help": "Equilibrado serve para a maioria dos produtos. Cada previsão mostra os dias e pesos usados; um produto pode ter a sua própria configuração.",
+    "productLabel": "Ritmo de vendas deste produto",
+    "productHelp": "Use \"Seguir as vendas recentes\" para um produto novo ou em rápido crescimento, \"Estável\" para um que vende devagar ou de forma irregular.",
+    "storeDefault": "Configuração da loja ({{name}})",
+    "balanced": "Equilibrado (7, 30 e 90 dias)",
+    "recent": "Seguir as vendas recentes (os últimos 7 dias pesam mais)",
+    "steady": "Estável (até um ano de vendas)"
+  },
+  "trend": {
+    "filter": "Tendência",
+    "all": "Qualquer tendência",
+    "up": "Vende mais rápido",
+    "down": "Vende mais devagar",
+    "badgeUp": "Ultimamente vende {{percent}}% mais rápido",
+    "badgeDown": "Ultimamente vende {{percent}}% mais devagar"
   }
 }

@@ -31,6 +31,7 @@ class SettingsService
             'default_safety_days' => $shop->default_safety_days,
             // One-off sales spikes capped before averaging (hidden when switched off app-wide).
             'filter_sales_spikes' => Entitlements::for($shop)->has(Feature::SpikeFilter) ? $shop->filter_sales_spikes : null,
+            'forecast_profile' => $shop->forecast_profile,
             'locale' => $shop->locale,
             'alerts' => [
                 'available' => Entitlements::for($shop)->has(Feature::Alerts),
@@ -53,7 +54,7 @@ class SettingsService
     public function update(Shop $shop, array $data): array
     {
         $defaults = array_filter(
-            array_intersect_key($data, array_flip(['default_lead_time_days', 'default_safety_days', 'filter_sales_spikes'])),
+            array_intersect_key($data, array_flip(['default_lead_time_days', 'default_safety_days', 'filter_sales_spikes', 'forecast_profile'])),
             fn ($v) => $v !== null,
         );
         if ($defaults !== []) {

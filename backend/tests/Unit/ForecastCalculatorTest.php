@@ -632,3 +632,54 @@ it('counts past event days at their normal level', function () {
     expect(collect((new ExplanationFormatter)->lines($r->explanation))->firstWhere('code', 'event_past')['params'])
         ->toMatchArray(['name' => 'Summer sale', 'count' => 5]);
 });
+
+it('weights the windows by the forecast profile', function () {
+    // 2/day for a long time, 10/day in the last 7 days.
+    $days = history(380, fn ($ago) => $ago <= 7 ? 10 : 2);
+
+    $balanced = calc(input($days));
+    $recent = calc(input($days, extra: ['profile' => 'recent', 'profileSource' => 'variant']));
+    $steady = calc(input($days, extra: ['profile' => 'steady']));
+
+    // 7d = 10, 30d = (70 + 46) / 30 = 3.87, 90d = (70 + 166) / 90 = 2.62, 365d = (70 + 716) / 365 = 2.15
+    expect($balanced->avgDailySales)->toBe(4.72)       // 10 x .2 + 3.87 x .5 + 2.62 x .3
+        ->and($recent->avgDailySales)->toBe(6.81)      // 10 x .5 + 3.87 x .4 + 2.62 x .1
+        ->and($steady->avgDailySales)->toBe(2.68)      // 3.87 x .2 + 2.62 x .4 + 2.15 x .4
+        ->and(array_column($steady->explanation['windows'], 'days'))->toBe([30, 90, 365])
+        ->and($recent->explanation['profile'])->toBe(['name' => 'recent', 'source' => 'variant']);
+
+    $codes = fn ($r) => array_column((new ExplanationFormatter)->lines($r->explanation), 'code');
+    expect($codes($recent))->toContain('profile_recent_product')
+        ->and($codes($steady))->toContain('profile_steady')
+        ->and($codes($balanced))->not->toContain('profile_balanced');
+});
+
+it('falls back to the balanced windows for an unknown profile or a short history', function () {
+    $r = calc(input(history(60, 3), extra: ['profile' => 'nope']));
+    expect($r->explanation['profile']['name'])->toBe('balanced')->and($r->avgDailySales)->toBe(3.0);
+
+    // Steady needs 120 in-stock days for its 365-day window: with 60 the other windows share the weight.
+    $steady = calc(input(history(60, 3), extra: ['profile' => 'steady']));
+    expect($steady->avgDailySales)->toBe(3.0)
+        ->and(collect($steady->explanation['windows'])->firstWhere('days', 365)['weight'])->toBe(0.0);
+});
+
+it('reports a rising or falling trend without changing the rate', function () {
+    $up = calc(input(history(120, fn ($ago) => $ago <= 14 ? 6 : 4)));
+    expect($up->trendPercent)->toBe(50)
+        ->and($up->explanation['trend'])->toMatchArray(['direction' => 'up', 'percent' => 50, 'recent_avg' => 6.0, 'baseline_avg' => 4.0]);
+    expect(array_column((new ExplanationFormatter)->lines($up->explanation), 'code'))->toContain('trend_up');
+
+    $down = calc(input(history(120, fn ($ago) => $ago <= 14 ? 2 : 4)));
+    expect($down->trendPercent)->toBe(-50)->and($down->explanation['trend']['direction'])->toBe('down');
+
+    $flat = calc(input(history(120, 4)));
+    expect($flat->trendPercent)->toBe(0)->and($flat->explanation['trend']['direction'])->toBe('flat');
+    expect(array_column((new ExplanationFormatter)->lines($flat->explanation), 'code'))->not->toContain('trend_up', 'trend_down');
+});
+
+it('reports no trend with too little to compare', function () {
+    expect(calc(input(history(30, 4)))->trendPercent)->toBeNull()                                           // baseline too short
+        ->and(calc(input(history(120, fn ($ago) => $ago % 30 === 0 ? 1 : 0)))->trendPercent)->toBeNull()     // hardly sells
+        ->and(calc(input(history(120, fn ($ago) => $ago <= 14 ? ['sold' => 0, 'in_stock' => false] : 4)))->trendPercent)->toBeNull(); // out of stock lately
+});

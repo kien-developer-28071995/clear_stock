@@ -122,6 +122,61 @@ Nguồn lần 2: https://community.shopify.dev/t/feature-request-expose-the-exis
 31. ✅ **Thêm tính năng trên trang sản phẩm Shopify** (2026-09-27; nghiên cứu các target: `admin.product-details.block/action/print-action/configuration/reorder.render`, `admin.product-variant-details.block/action.render`; `reorder.render` chưa có tài liệu rõ nên không dùng): (a) khối dự báo hiện cả trên **trang biến thể**, có dòng "đã đặt N"; (b) extension mới `product-order-action` — **Đánh dấu đã đặt** từ More actions của trang sản phẩm/biến thể (số lượng gợi ý điền sẵn, ngày dự kiến, mã đơn); (c) **Cài đặt nhập hàng** chạy cả trên trang sản phẩm (More actions) và thêm MOQ, quy cách thùng, Ngừng nhập. API `/api/extension/variants/{id}`, `/api/extension/manual-orders`. `shopify.app.production.toml` có thêm extension thứ 3.
 23. ✅ **Xuất đơn hàng từ kế hoạch nhập** (Starter, cần cả `purchase_plan` và `purchase_orders`): nút "Xuất đơn hàng (CSV)" ở trang Kế hoạch nhập, mỗi dòng = một lần đặt (ngày, tuần, NCC, sản phẩm, SKU, số lượng, giá vốn, thành tiền), theo bộ lọc đang chọn.
 
+## Nghiên cứu bổ sung (2026-10-04, lần 5): 25 tính năng merchant cần
+
+Nguồn: review 1–4 sao của Prediko, Assisty, Inventory Planner, Sumtracker, Stockie, IFH, Monocle, Stocky; diễn đàn Shopify Community; listing của Stockful, Logistified, Sensible, StockAngel, Fabrikatör, Restocked, Stovura; changelog Shopify 2026-10. Chưa đọc được Reddit (công cụ tìm kiếm không trả kết quả). Công sức: S ≤ 1 ngày, M 2–4 ngày, L ≥ 1 tuần.
+
+### Phát hiện
+- **Shopify đã mở API Purchase Order (chỉ đọc) ở bản 2026-10**: query `inventoryPurchaseOrders` / `inventoryPurchaseOrder`, scope `read_inventory_purchase_orders`, nhân viên Shopify xác nhận dùng được cho mọi app công khai. Chưa thấy mutation tạo PO. **Chưa xem danh sách field của `InventoryPurchaseOrder`: đọc docs trước khi làm.**
+- **Email tóm tắt hằng tuần** là thứ người dùng Stocky mất và Shopify admin không có; Sensible ($29), StockAngel ($19) đều bán tính năng này.
+- Than phiền mới nhất về Prediko (2026-09-14): "hộp đen", ít tuỳ chỉnh, bị ép tính năng AI, bảng tốn chỗ. Assisty (2026-08-04): thiếu bộ lọc loại trừ và mức tồn tối thiểu theo kho. Inventory Planner: không tách được phương pháp cho hàng mùa vụ và hàng mới bán nhanh, không lập kế hoạch theo doanh số thuần, không xem theo tuần/tháng.
+- Diễn đàn Shopify: merchant muốn cảnh báo theo **số ngày tồn còn lại với ngưỡng tự chọn** (vd. 35 ngày) và **cửa sổ tính dài hơn 30 ngày**; muốn **loại đơn sỉ khỏi số liệu**; muốn theo dõi **giá trị tồn kho theo ngày**.
+- Ngách thời trang đang có app riêng (Restocked $19, Stovura $59): đường cong size, "size run" bị gãy.
+- Stockie: merchant phàn nàn PO chỉ có ở gói $60 → PO ở gói $4 của ta là điểm bán hàng cho listing.
+
+### Đề xuất (chưa làm)
+
+**A. Khép vòng đặt hàng**
+32. **Đọc PO gốc Shopify qua API** (Starter, M): PO đang mở theo NCC, ngày dự kiến về, "hàng về kịp trước khi hết không"; thay cho việc merchant phải đánh dấu tay. Thêm scope `read_inventory_purchase_orders`.
+33. **Lead time thực tế + độ tin cậy NCC** (mọi gói, M): đo từ PO Shopify và `manual_orders` (ngày đặt → ngày nhận), gợi ý "lead time đang cài 14, thực tế trung vị 19", số ngày an toàn theo độ dao động. (Checklist chuyển từ Stocky: lead time phải dựng lại bằng tay.)
+34. **PO dạng PDF + mã hàng của NCC + mô tả sản phẩm** (Starter, M): `variants.supplier_sku`, đính PDF vào email NCC. (Stocky 2026-02: không thấy mô tả khi tạo đơn; Logistified gửi PDF/XLSX/CSV; mẫu CSV PO của Shopify có cột Supplier SKU.)
+35. **Nhận hàng từng phần + giao nhiều đợt** cho đơn đã đặt (mọi gói, M): mỗi dòng có số đã nhận, nhiều ngày dự kiến. (Salorworks: đối chiếu đặt/nhận là chỗ khó nhất khi rời Stocky; Prediko 4 sao 2025-03: thiếu "blanket PO / shipment plan".)
+36. **Nhiều NCC cho một sản phẩm** (Starter, L): NCC chính + dự phòng, giá và lead time riêng. (Sensible, Logistified, Monocle có.)
+37. **Điều kiện mua theo NCC** (Starter, M): tiền tệ của NCC, giá trị đơn tối thiểu, bậc giá theo số lượng; gợi ý thêm hàng cho đủ ngưỡng. (Stockful "price lists"; phần "lấp đơn cho đủ ngưỡng" là suy luận của ta từ MOQ.)
+38. **Landed cost đơn giản** (Starter, S): % hoặc phí mỗi đơn vị theo NCC cộng vào giá vốn khi tính tiền. (Stockful; LandedCostSync bán riêng $12/tháng.)
+
+**B. Dự báo đúng hơn, chỉnh được hơn**
+39. **Loại kênh bán / đơn theo tag khỏi dự báo** (mọi gói, L): bỏ đơn sỉ, POS, draft order. Cần lưu tổng hợp theo kênh (thêm cột hoặc bảng, vẫn không lưu đơn thô). (Shopify Community; Inventory Planner 2024-12.)
+40. **Backorder / pre-order** (mọi gói, M): tồn âm cộng vào lượng cần nhập; ngày bán pre-order không bị coi là hết hàng. **Kiểm tra code hiện tại xử lý `available` âm thế nào trước.** (Fabrikatör sống nhờ tính năng này; Prediko không có.)
+41. **Hồ sơ dự báo theo sản phẩm** (mọi gói, M): Ổn định / Theo mùa / Mới bán nhanh / Bán thưa, mỗi hồ sơ là một bộ trọng số 7/30/90/365 ghi rõ trong giải thích; shop chọn mặc định. (Prediko 2026-09, Inventory Planner 2024-08, Flow thread "30 ngày không đủ".)
+42. **Chỉ báo xu hướng** (mọi gói, S): "7 ngày gần đây cao hơn 40% so với 30 ngày", lọc "đang tăng / đang giảm". (StockAngel, Monocle; Community "trend analysis".)
+43. **Đường mùa vụ 12 tháng chỉnh được** (Starter, M): hệ số theo tháng cho sản phẩm / loại sản phẩm, gợi ý từ lịch sử, thay hệ số 28 ngày khi merchant đã đặt. (Inventory Planner: hàng mùa vụ dự báo sai là than phiền lặp lại.)
+44. **Xem theo sản phẩm cha + đường cong size** (Starter, L): gom biến thể, cảnh báo size chủ lực sắp hết trong khi size khác thừa, chia lượng đặt theo tỷ lệ size. (Restocked, Stovura, Shopify Community.)
+45. **Mức tồn tối thiểu theo từng chi nhánh** (Growth, M): hiện Min/Max chỉ áp dụng dự báo tổng. (Assisty 2026-08.)
+46. **Loại chi nhánh khỏi tồn khả dụng** (mọi gói, S): kho 3PL trả hàng, kho hàng lỗi, showroom. **Kiểm tra xem đã có chưa.** (Inventory Planner 2024-10.)
+
+**C. Báo cáo và thông báo**
+47. **Email tóm tắt hằng tuần** (Free trở lên, S–M): 1 email/tuần, bật tay: cần đặt tuần này, sắp hết, tiền kẹt, doanh thu mất, độ chính xác. (Stocky cũ, Sensible, StockAngel.)
+48. **Cảnh báo qua Slack / webhook** (Starter, S): cùng nội dung digest, cùng luật chống spam. (iAlert, Restoket, Stockup, Stockful.)
+49. **Ngưỡng "còn N ngày tồn" tự chọn** cho cảnh báo và Flow (Starter, S): theo shop hoặc sản phẩm, thay ngưỡng cứng 30/14/7/0. (Flow feature request, vd. 35 ngày.)
+50. **Lịch sử tồn kho và giá trị tồn theo ngày** (mọi gói, S–M): biểu đồ 400 ngày từ `daily_sales.end_of_day_stock` × giá vốn, đã có sẵn dữ liệu. (Community "track daily inventory value"; Stockful bán "daily snapshots 2 năm"; Shopify chỉ giữ 180 ngày.)
+51. **Sell-through, vòng quay, tuổi tồn + danh sách xả hàng** (Starter, M): xuất CSV sản phẩm cần giảm giá. (Stovura "aged stock"; mọi đối thủ quảng cáo dead stock.)
+52. **Báo cáo định kỳ + xuất mọi bảng** (Starter, M): CSV gửi email theo lịch, hoặc link CSV cho Google Sheets `IMPORTDATA`. (Assisty 2024-02: bỏ export là mất quy trình; Inventory Planner xin export.)
+53. **Chế độ xem đã lưu, cột tuỳ chọn, bộ lọc loại trừ, lọc theo tag / collection** (mọi gói, M). (Assisty 2026-08, Prediko 2026-09, IFH 2024-12, Logistified.)
+
+**D. Tin cậy và ngách**
+54. **Kiểm tra sức khoẻ dữ liệu** (mọi gói, S–M): thiếu SKU / giá vốn / NCC, không theo dõi tồn, tồn âm, lead time còn mặc định, SKU trùng; mỗi dòng có link sửa. (Stockful "Health Checks"; Assisty 2024-10 và Prediko 2026-09: phải tự đối chiếu số với Shopify.)
+55. **"Vì sao con số đổi so với tuần trước"** (mọi gói, S): so `forecast_snapshots` với hiện tại. (Bằng chứng yếu hơn: suy ra từ than phiền "hộp đen".)
+56. **Nguyên liệu / BOM nhẹ** (Starter, L): dùng lại `bundle_components` cho hàng tự sản xuất, "làm được bao nhiêu từ nguyên liệu đang có". (Sumtracker 2025-06, Prediko 2025-02; Katana $179, Craftybase $20.)
+
+### Quyết định không làm (giữ nguyên)
+Đồng bộ đa kênh Amazon/eBay/Etsy, kiểm kho bằng barcode, in nhãn: nhiều review Sumtracker 1 sao là do app ghi đè tồn kho; ta chỉ đọc, không ghi tồn.
+
+### Thứ tự đề xuất
+#47 → #32 → #54 → #50 → #41 → #39 → #48/#49 → #33 → #34, phần còn lại theo phản hồi merchant sau khi ra mắt.
+
+Nguồn lần 5: https://community.shopify.dev/t/can-public-app-store-apps-use-read-inventory-purchase-orders-in-admin-api-2026-10/38081 · https://shopify.dev/docs/api/admin-graphql/2026-10/queries/inventoryPurchaseOrders · https://shopify.dev/changelog/release-notes/2026-10 · https://apps.shopify.com/prediko/reviews · https://apps.shopify.com/assisty/reviews · https://apps.shopify.com/inventory-planner/reviews · https://apps.shopify.com/sumtracker-fulfil-ship-track/reviews · https://apps.shopify.com/stockie/reviews · https://apps.shopify.com/stocky/reviews · https://community.shopify.com/t/expose-days-of-inventory-remaining-in-shopify-flow-as-a-trigger-condition/608333 · https://community.shopify.com/t/recommendations-for-inventory-demand-planning-apps-in-shopify-store/568432 · https://community.shopify.com/t/how-can-i-exclude-wholesale-orders-from-e-commerce-analytics/56106 · https://community.shopify.com/t/how-can-i-track-daily-inventory-value-for-my-store/82117 · https://www.salorworks.app/resources/shopify-stocky-shutdown-migration-checklist · https://sensible.tools/blog/stocky-deprecated-shopify-inventory-forecasting-alternatives · https://stockful.app/stocky-alternative · https://apps.shopify.com/logistified · https://apps.shopify.com/stockangel · https://apps.shopify.com/sensible-forecasting · https://apps.shopify.com/fabrikator · https://apps.shopify.com/restocked-3 · https://apps.shopify.com/stockpilot-9
+
 ## Việc sắp tới (tổng hợp, theo thứ tự đề xuất)
 
 1. ~~**#11 Tạo Purchase Order gốc của Shopify từ gợi ý**~~ — xong: nút xuất PO có thêm định dạng "Đơn đặt hàng Shopify" đúng mẫu `SKU,Barcode,Supplier SKU,Quantity,Cost,Tax` (không có API tạo PO), đồng bộ `variants.barcode`, bỏ qua sản phẩm không có SKU lẫn barcode và báo số lượng.

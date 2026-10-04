@@ -43,6 +43,8 @@ final readonly class ForecastInput
         public ?array $orderWeekdays = null,    // ISO weekdays the supplier's orders are placed on (null = any day)
         public array $events = [],              // sales events for this product: [{name, from, to, multiplier}]
         public ?array $ordered = null,          // placed outside Shopify, part of incomingStock: {units, expected_on, orders}
+        public string $profile = 'balanced',    // window mix (config forecast.profiles)
+        public string $profileSource = 'shop',  // 'variant' when set for this product
     ) {}
 
     public function override(OverrideField $field): ?array

@@ -27,6 +27,14 @@ class EloquentForecastQueryRepository implements ForecastQueryRepositoryInterfac
             $query->where('variants.abc_class', $filters['abc']);
         }
 
+        // Selling clearly faster / slower than in the weeks before.
+        $threshold = (int) round((float) config('forecast.trend.threshold') * 100);
+        match ($filters['trend'] ?? null) {
+            'up' => $query->where('forecasts.trend_percent', '>=', $threshold),
+            'down' => $query->where('forecasts.trend_percent', '<=', -$threshold),
+            default => null,
+        };
+
         foreach (['vendor', 'product_type'] as $field) {
             if (($filters[$field] ?? '') !== '') {
                 $query->where("variants.{$field}", $filters[$field]);

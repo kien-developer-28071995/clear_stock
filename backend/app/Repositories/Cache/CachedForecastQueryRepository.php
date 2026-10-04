@@ -31,7 +31,10 @@ class CachedForecastQueryRepository implements ForecastQueryRepositoryInterface
             return $this->inner->paginate($shop, $filters, $today, $perPage, $page);
         }
 
-        $hash = md5(json_encode([$filters['status'] ?? null, $filters['sort'] ?? null, $filters['location_id'] ?? null, $filters['vendor'] ?? null, $filters['product_type'] ?? null, $filters['abc'] ?? null, $perPage, $page]));
+        // Every filter is part of the key (a new filter can't be forgotten here).
+        $used = array_filter($filters, fn ($v) => $v !== null && $v !== '');
+        ksort($used);
+        $hash = md5(json_encode([$used, $perPage, $page]));
         $key = CacheKeys::forecastPage($shop->id, $this->forecastVersion($shop), CacheVersion::catalog($shop->id), $today, $hash);
 
         return $this->cache->remember($key, CacheKeys::TTL_DASHBOARD, fn () => $this->inner->paginate($shop, $filters, $today, $perPage, $page));

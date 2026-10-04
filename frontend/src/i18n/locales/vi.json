@@ -621,7 +621,13 @@
     "event_past_other": "{{name}} (×{{multiplier}}): {{count}} ngày được tính theo mức bình thường.",
     "event_upcoming_other": "{{name}} ({{from_date}} – {{to_date}}, ×{{multiplier}}) cộng thêm {{count}} cái vào lượng cần đặt.",
     "event_upcoming_lower_other": "{{name}} ({{from_date}} – {{to_date}}, ×{{multiplier}}) giảm {{count}} cái khỏi lượng cần đặt.",
-    "ordered_manual_other": "Bạn đã đánh dấu đặt {{count}} cái (dự kiến về {{expected_date}}): tính là hàng đang về."
+    "ordered_manual_other": "Bạn đã đánh dấu đặt {{count}} cái (dự kiến về {{expected_date}}): tính là hàng đang về.",
+    "profile_recent": "Cài đặt cửa hàng \"Theo doanh số gần đây\": 7 ngày gần nhất tính nhiều nhất.",
+    "profile_recent_product": "Sản phẩm này tính theo doanh số gần đây: 7 ngày gần nhất tính nhiều nhất.",
+    "profile_steady": "Cài đặt cửa hàng \"Ổn định\": tốc độ bán lấy trung bình tới một năm.",
+    "profile_steady_product": "Sản phẩm này đặt \"Ổn định\": tốc độ bán lấy trung bình tới một năm.",
+    "trend_up_other": "{{count}} ngày gần đây bán nhanh hơn {{percent}}% ({{recent}}/ngày) so với {{days}} ngày trước đó ({{baseline}}/ngày).",
+    "trend_down_other": "{{count}} ngày gần đây bán chậm hơn {{percent}}% ({{recent}}/ngày) so với {{days}} ngày trước đó ({{baseline}}/ngày)."
   },
   "import": {
     "fromStocky": "Nhập từ Stocky",
@@ -1041,5 +1047,23 @@
       "reorder_point": "Đã tới điểm đặt lại"
     },
     "noCost": "Chưa có giá vốn"
+  },
+  "forecastProfile": {
+    "label": "Cách tính tốc độ bán",
+    "help": "Cân bằng phù hợp với hầu hết sản phẩm. Mỗi dự báo ghi rõ số ngày và trọng số đã dùng; từng sản phẩm có thể đặt riêng.",
+    "productLabel": "Tốc độ bán của sản phẩm này",
+    "productHelp": "Chọn \"Theo doanh số gần đây\" cho sản phẩm mới hoặc đang tăng nhanh, \"Ổn định\" cho sản phẩm bán chậm hoặc không đều.",
+    "storeDefault": "Theo cài đặt cửa hàng ({{name}})",
+    "balanced": "Cân bằng (7, 30 và 90 ngày)",
+    "recent": "Theo doanh số gần đây (7 ngày gần nhất tính nhiều nhất)",
+    "steady": "Ổn định (tới một năm doanh số)"
+  },
+  "trend": {
+    "filter": "Xu hướng",
+    "all": "Mọi xu hướng",
+    "up": "Đang bán nhanh hơn",
+    "down": "Đang bán chậm lại",
+    "badgeUp": "Gần đây bán nhanh hơn {{percent}}%",
+    "badgeDown": "Gần đây bán chậm hơn {{percent}}%"
   }
 }

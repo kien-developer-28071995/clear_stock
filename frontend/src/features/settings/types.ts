@@ -5,6 +5,8 @@ export interface Settings {
     default_safety_days: number;
     /** Cap one-off sales spikes before averaging; null when switched off app-wide. */
     filter_sales_spikes: boolean | null;
+    /** Default averaging windows (a product's own setting wins). */
+    forecast_profile: 'balanced' | 'recent' | 'steady';
     /** null = follow the Shopify admin language */
     locale: string | null;
     alerts: {

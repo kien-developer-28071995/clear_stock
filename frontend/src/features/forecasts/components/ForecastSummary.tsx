@@ -28,6 +28,11 @@ export function ForecastSummary({ f }: { f: ForecastDetail }) {
                     <StatusBadge status={f.status} />
                     <ConfidenceBadge confidence={f.confidence} />
                     {abc && <AbcBadge abc={abc.class} />}
+                    {f.trend && f.trend.direction !== 'flat' && (
+                        <s-badge tone={f.trend.direction === 'up' ? 'success' : 'warning'}>
+                            {t(f.trend.direction === 'up' ? 'trend.badgeUp' : 'trend.badgeDown', { percent: Math.abs(f.trend.percent) })}
+                        </s-badge>
+                    )}
                     {f.overrides.avg_daily_sales && <s-badge tone="info">{t('product.adjustedByYou')}</s-badge>}
                     {f.sku && <s-text color="subdued">{t('product.sku', { sku: f.sku })}</s-text>}
                 </s-stack>

@@ -19,6 +19,7 @@ class ForecastIndexRequest extends FormRequest
             'vendor' => ['nullable', 'string', 'max:255'],
             'product_type' => ['nullable', 'string', 'max:255'],
             'abc' => ['nullable', Rule::in(['A', 'B', 'C'])],
+            'trend' => ['nullable', Rule::in(['up', 'down'])],
         ];
     }
 }

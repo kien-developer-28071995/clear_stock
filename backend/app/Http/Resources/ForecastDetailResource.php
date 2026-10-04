@@ -45,6 +45,7 @@ class ForecastDetailResource extends ForecastResource
                 'max_stock' => $v->max_stock,
                 'alerts_muted' => $v->alerts_muted,
                 'discontinued' => $v->discontinued,
+                'forecast_profile' => $v->forecast_profile,
                 // Cost entered in the app (wins) and Shopify's own.
                 'cost_override' => $v->cost_override !== null ? (float) $v->cost_override : null,
                 'shopify_cost' => $v->shopify_unit_cost !== null ? (float) $v->shopify_unit_cost : null,
@@ -54,6 +55,7 @@ class ForecastDetailResource extends ForecastResource
                 'reference_percent' => $v->reference_percent,
             ],
             'defaults' => $shop,
+            'trend' => $this->explanation['trend'] ?? null,
             // Last judged forecast of this product next to what really sold (null until there is one).
             'accuracy' => $request->attributes->get('accuracy'),
         ];

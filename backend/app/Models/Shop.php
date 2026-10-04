@@ -36,6 +36,7 @@ use Illuminate\Support\Carbon;
  * @property int $default_lead_time_days
  * @property int $default_safety_days
  * @property bool $filter_sales_spikes cap one-off sales spikes before averaging
+ * @property string $forecast_profile default window mix (config forecast.profiles)
  * @property ?Carbon $onboarded_at
  * @property ?array{events?: array<string, string>, skipped?: array<int, string>, dismissed_at?: ?string, tips_dismissed?: array<int, string>} $setup_guide
  * @property SyncStatus $sync_status
@@ -56,7 +57,7 @@ class Shop extends Model
     protected $fillable = [
         'domain', 'name',
         'access_token', 'access_token_expires_at', 'refresh_token', 'refresh_token_expires_at', 'scopes',
-        'plan', 'plan_interval', 'subscription_id', 'subscription_status', 'plan_renews_at', 'trial_started_at', 'currency', 'timezone', 'locale', 'default_lead_time_days', 'default_safety_days', 'filter_sales_spikes', 'order_budget', 'onboarded_at', 'setup_guide',
+        'plan', 'plan_interval', 'subscription_id', 'subscription_status', 'plan_renews_at', 'trial_started_at', 'currency', 'timezone', 'locale', 'default_lead_time_days', 'default_safety_days', 'filter_sales_spikes', 'forecast_profile', 'order_budget', 'onboarded_at', 'setup_guide',
         'sync_status', 'sync_error', 'sync_failure_notified_at', 'last_synced_at', 'forecasted_at', 'realtime_webhook_id',
         'installed_at', 'uninstalled_at',
     ];
@@ -70,6 +71,7 @@ class Shop extends Model
         'default_lead_time_days' => 14,
         'default_safety_days' => 7,
         'filter_sales_spikes' => true,
+        'forecast_profile' => 'balanced',
     ];
 
     protected function casts(): array

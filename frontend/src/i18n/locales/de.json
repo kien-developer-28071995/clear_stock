@@ -672,7 +672,15 @@
     "event_upcoming_lower_one": "{{name}} ({{from_date}} – {{to_date}}, ×{{multiplier}}) zieht {{count}} Stück von der Bestellmenge ab.",
     "event_upcoming_lower_other": "{{name}} ({{from_date}} – {{to_date}}, ×{{multiplier}}) zieht {{count}} Stück von der Bestellmenge ab.",
     "ordered_manual_one": "Du hast {{count}} Stück als bestellt markiert (erwartet am {{expected_date}}): zählt als unterwegs.",
-    "ordered_manual_other": "Du hast {{count}} Stück als bestellt markiert (erwartet am {{expected_date}}): zählt als unterwegs."
+    "ordered_manual_other": "Du hast {{count}} Stück als bestellt markiert (erwartet am {{expected_date}}): zählt als unterwegs.",
+    "profile_recent": "Shop-Einstellung „Aktuellen Verkäufen folgen\": Die letzten 7 Tage zählen am meisten.",
+    "profile_recent_product": "Dieses Produkt folgt den aktuellen Verkäufen: Die letzten 7 Tage zählen am meisten.",
+    "profile_steady": "Shop-Einstellung „Stabil\": Die Rate wird über bis zu ein Jahr gemittelt.",
+    "profile_steady_product": "Dieses Produkt steht auf „Stabil\": Die Rate wird über bis zu ein Jahr gemittelt.",
+    "trend_up_one": "Verkauft sich am letzten Tag {{percent}} % schneller ({{recent}}/Tag) als in den {{days}} Tagen davor ({{baseline}}/Tag).",
+    "trend_up_other": "Verkauft sich in den letzten {{count}} Tagen {{percent}} % schneller ({{recent}}/Tag) als in den {{days}} Tagen davor ({{baseline}}/Tag).",
+    "trend_down_one": "Verkauft sich am letzten Tag {{percent}} % langsamer ({{recent}}/Tag) als in den {{days}} Tagen davor ({{baseline}}/Tag).",
+    "trend_down_other": "Verkauft sich in den letzten {{count}} Tagen {{percent}} % langsamer ({{recent}}/Tag) als in den {{days}} Tagen davor ({{baseline}}/Tag)."
   },
   "import": {
     "fromStocky": "Aus Stocky importieren",
@@ -1153,5 +1161,23 @@
       "reorder_point": "Meldebestand erreicht"
     },
     "noCost": "Keine Kosten"
+  },
+  "forecastProfile": {
+    "label": "Wie die Verkaufsrate gemittelt wird",
+    "help": "Ausgewogen passt für die meisten Produkte. Jede Prognose zeigt die verwendeten Tage und Gewichte; ein Produkt kann eine eigene Einstellung haben.",
+    "productLabel": "Verkaufsrate für dieses Produkt",
+    "productHelp": "Nutze „Aktuellen Verkäufen folgen\" für ein neues oder schnell wachsendes Produkt, „Stabil\" für eines, das langsam oder unregelmäßig verkauft wird.",
+    "storeDefault": "Shop-Einstellung ({{name}})",
+    "balanced": "Ausgewogen (7, 30 und 90 Tage)",
+    "recent": "Aktuellen Verkäufen folgen (die letzten 7 Tage zählen am meisten)",
+    "steady": "Stabil (bis zu ein Jahr Verkäufe)"
+  },
+  "trend": {
+    "filter": "Trend",
+    "all": "Jeder Trend",
+    "up": "Verkauft sich schneller",
+    "down": "Verkauft sich langsamer",
+    "badgeUp": "Verkauft sich zuletzt {{percent}} % schneller",
+    "badgeDown": "Verkauft sich zuletzt {{percent}} % langsamer"
   }
 }
