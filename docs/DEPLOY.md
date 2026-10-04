@@ -155,6 +155,14 @@ Nếu **mất hẳn key cũ**: token không giải mã được nữa; shop vẫ
 - Image cũ không còn dùng và cũ hơn 7 ngày được xóa sau mỗi lần deploy thành công, nên ổ đĩa không đầy dần; image 7 ngày gần nhất vẫn còn để quay lại nhanh.
 - Deploy có thể lâu hơn bình thường (tối đa khoảng 10 phút) nếu đúng lúc đó đang có job đồng bộ lớn: Horizon chờ job xong rồi mới dừng.
 
+## 4b. Báo cáo cho chủ app (`admin/`)
+
+Container `admin` chạy cạnh app, chỉ mở `127.0.0.1:8090` trên server. Cài một lần trong thư mục deploy: `bash admin-setup.sh` (tạo `admin/.env` và user MySQL `report` chỉ đọc); lần deploy sau tự bật. Tạo tài khoản: `docker compose -f docker-compose.prod.yml exec admin php artisan admin:user you@example.com`. Mở từ máy cá nhân: `ssh -N -L 8090:127.0.0.1:8090 <user>@<server>` rồi vào http://localhost:8090. Chi tiết và cách gắn domain riêng: `admin/README.md`.
+
+- Admin lỗi không chặn và không rollback deploy của app.
+- Rollback về image cũ hơn bản có admin: bước admin báo "did not start", app vẫn chạy.
+- Backup: sổ cài/gỡ nằm trong volume `clear_stock_admin-data` (file `admin.sqlite`). Backup database hằng ngày ở mục 5 **không** gồm file này.
+
 ## 5. Backup database hằng ngày
 
 Thêm vào crontab của user `deploy` (`crontab -e`): backup lúc 3h sáng, giữ 14 ngày.
