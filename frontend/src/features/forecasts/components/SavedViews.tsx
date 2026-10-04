@@ -33,7 +33,7 @@ export function SavedViews({ current, onApply }: Props) {
             <s-stack direction="inline" gap="small-200" alignItems="end">
                 {views.data?.map((v) => (
                     <s-button-group key={v.id}>
-                        <s-button slot="secondary-actions" variant={same(v.filters) ? 'primary' : 'secondary'} onClick={() => onApply(v.filters)}>{v.name}</s-button>
+                        <s-button slot="secondary-actions" icon={same(v.filters) ? 'check' : undefined} onClick={() => onApply(v.filters)}>{v.name}</s-button>
                         <s-button slot="secondary-actions" icon="x" accessibilityLabel={t('views.delete', { name: v.name })} onClick={() => remove.mutate(v.id)} />
                     </s-button-group>
                 ))}

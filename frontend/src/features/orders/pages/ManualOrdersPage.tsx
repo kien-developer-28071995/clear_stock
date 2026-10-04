@@ -80,7 +80,7 @@ export function ManualOrdersPage() {
                                                 onInput={(e) => setPart({ id: o.id, value: e.currentTarget.value })}
                                             />
                                         </s-box>
-                                        <s-button variant="primary" loading={update.isPending || undefined} onClick={() => savePart(o)}>{t('common.save')}</s-button>
+                                        <s-button loading={update.isPending || undefined} onClick={() => savePart(o)}>{t('common.save')}</s-button>
                                         <s-button variant="tertiary" onClick={() => setPart(null)}>{t('common.cancel')}</s-button>
                                     </s-stack>
                                 ) : (

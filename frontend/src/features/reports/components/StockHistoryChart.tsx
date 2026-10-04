@@ -78,13 +78,13 @@ export function StockHistoryChart() {
                 ) : (
                     <s-text color="subdued">{t('stockHistory.collecting', { date: formatDate(data.latest.date) })}</s-text>
                 )}
-                <s-stack direction="inline" gap="small-200" alignItems="center">
-                    {PERIODS.map((p) => (
-                        <s-button key={p} variant={p === days ? 'primary' : 'tertiary'} onClick={() => setDays(p)}>
-                            {t('stockHistory.period', { count: p })}
-                        </s-button>
-                    ))}
-                </s-stack>
+                <s-box maxInlineSize="200px">
+                    <s-select label={t('stockHistory.periodLabel')} value={String(days)} onChange={(e) => setDays(Number(e.currentTarget.value))}>
+                        {PERIODS.map((p) => (
+                            <s-option key={p} value={String(p)}>{t('stockHistory.period', { count: p })}</s-option>
+                        ))}
+                    </s-select>
+                </s-box>
                 <s-text color="subdued">{t('stockHistory.how')}</s-text>
             </s-stack>
         </s-section>

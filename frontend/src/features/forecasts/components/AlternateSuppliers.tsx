@@ -28,8 +28,6 @@ export function AlternateSuppliers({ f }: { f: ForecastDetail }) {
     const list = f.alternate_suppliers;
     const taken = new Set([f.settings.supplier_id, ...list.map((a) => a.supplier_id)]);
     const options = suppliers.data?.filter((s) => !taken.has(s.id)) ?? [];
-    // Nothing to offer and nothing saved: the section would only be noise.
-    if (list.length === 0 && options.length === 0) return null;
 
     const toast = { onError: (e: unknown) => shopify.toast.show(errorMessage(e), { isError: true }) };
     const stripName = list.map(({ name: _name, ...rest }) => rest);
@@ -42,7 +40,9 @@ export function AlternateSuppliers({ f }: { f: ForecastDetail }) {
     return (
         <s-section heading={t('alternates.heading')}>
             <s-stack gap="base">
+                <s-text>{t('alternates.main', { name: f.supplier?.name ?? t('common.notSet') })}</s-text>
                 <s-paragraph>{t('alternates.intro')}</s-paragraph>
+                {list.length === 0 && options.length === 0 && <s-link href="/suppliers">{t('alternates.addSuppliersFirst')}</s-link>}
                 {list.length > 0 && (
                     <s-table>
                         <s-table-header-row>

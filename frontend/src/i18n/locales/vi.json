@@ -304,8 +304,7 @@
     "why": "Vì sao: {{location}}",
     "hint": "Chọn một chi nhánh để xem giải thích. Việc chỉnh tốc độ bán chỉ áp dụng cho tổng cửa hàng.",
     "minimum": "Tồn tối thiểu tại đây",
-    "minimumAt": "Tồn tối thiểu tại {{location}}",
-    "saveMinimums": "Lưu mức tối thiểu"
+    "minimumAt": "Tồn tối thiểu tại {{location}}"
   },
   "adjust": {
     "heading": "Chỉnh tốc độ bán",
@@ -418,7 +417,6 @@
     "summaryEmail": "Gửi tới",
     "locationsHeading": "Chi nhánh được tính tồn kho",
     "locationsIntro": "Bỏ chọn chi nhánh có hàng không để bán (hàng trả về, hàng lỗi, showroom). Tồn ở đó không tính vào số ngày còn hàng và gợi ý đặt hàng; đơn giao từ đó vẫn tính là nhu cầu.",
-    "locationsSaved": "Đã lưu. Dự báo đang được cập nhật.",
     "excludedHeading": "Đơn hàng không tính vào dự báo",
     "excludedIntro": "Đơn sỉ hoặc đơn tại quầy có thể làm tốc độ bán online bị đội lên. Khi lưu thay đổi ở đây, app đọc lại lịch sử đơn hàng, mất vài phút.",
     "excludedTags": "Bỏ qua đơn có tag",
@@ -1125,7 +1123,8 @@
     "chartLabel": "Tồn kho từ {{from}} ({{first}}) đến {{to}} ({{last}})",
     "collecting": "Bắt đầu ghi từ {{date}}. Biểu đồ sẽ hiện khi có hai ngày để so sánh.",
     "period_other": "{{count}} ngày",
-    "how": "Tồn kho × giá vốn, ghi mỗi ngày một lần từ khi cài app (Shopify không lưu lịch sử để lấy lại). Giữ trong hai năm."
+    "how": "Tồn kho × giá vốn, ghi mỗi ngày một lần từ khi cài app (Shopify không lưu lịch sử để lấy lại). Giữ trong hai năm.",
+    "periodLabel": "Khoảng thời gian"
   },
   "health": {
     "heading": "Kiểm tra dữ liệu",
@@ -1205,7 +1204,9 @@
     "switched": "{{name}} giờ là nhà cung cấp của sản phẩm này",
     "add": "Thêm nhà cung cấp",
     "choose": "Chọn…",
-    "addButton": "Thêm"
+    "addButton": "Thêm",
+    "main": "Nhà cung cấp hiện tại: {{name}}",
+    "addSuppliersFirst": "Thêm nhà cung cấp trước"
   },
   "shopifyPo": {
     "heading": "Đơn đặt hàng trong Shopify",
@@ -1217,5 +1218,23 @@
     "order": "Đơn đặt hàng",
     "orderedOn": "Ngày đặt",
     "cost": "Chi phí"
+  },
+  "tabs": {
+    "product": {
+      "forecast": "Dự báo",
+      "settings": "Cài đặt",
+      "suppliers": "Nhà cung cấp"
+    },
+    "insights": {
+      "stock": "Tồn kho",
+      "excess": "Hàng chậm và tồn thừa",
+      "products": "Sản phẩm và độ chính xác",
+      "excessEmpty": "Hiện không có hàng bán chậm hay tồn thừa."
+    },
+    "settings": {
+      "forecast": "Dự báo",
+      "alerts": "Cảnh báo và email",
+      "general": "Chung"
+    }
   }
 }

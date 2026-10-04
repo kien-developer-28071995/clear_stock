@@ -130,7 +130,7 @@ for (const plan of ['free', 'starter', 'growth'] as PlanKey[]) {
             await expect(app.getByText(/^Class A: .*% of your revenue in the last 90 days/)).toBeVisible();
             await app.screenshot({ path: 'e2e-results/abc-detail.png', fullPage: true });
 
-            await open(app, '/insights');
+            await open(app, '/insights?tab=products');
             const section = app.locator('s-section[heading="ABC classes"]');
             await expect(section).toBeVisible();
             await expect(section.getByText('Never let these run out')).toBeVisible();
@@ -306,7 +306,7 @@ for (const plan of ['free', 'starter', 'growth'] as PlanKey[]) {
             expect((await api<Detail>(app, `/forecasts/${row.variant_id}`)).data.settings.cost_override).toBe(7.25);
 
             // Put it back: cleared in the product settings.
-            await open(app, `/products/${row.variant_id}`);
+            await open(app, `/products/${row.variant_id}?tab=settings`);
             await app.locator('s-section[heading="Product settings"]').getByRole('spinbutton', { name: 'Unit cost' }).fill('');
             await saveBar(app, 'product-settings-save-bar');
             await expect.poll(async () => (await api<Detail>(app, `/forecasts/${row.variant_id}`)).data.settings.cost_override).toBeNull();
@@ -337,7 +337,7 @@ for (const plan of ['free', 'starter', 'growth'] as PlanKey[]) {
 
         test('insights show forecast accuracy (or when it starts)', async ({ app }) => {
             type Accuracy = { data: { available: boolean; latest: { products: number } | null } };
-            await open(app, '/insights');
+            await open(app, '/insights?tab=products');
             const report = (await api<Accuracy>(app, '/accuracy')).data;
             const section = app.locator('s-section[heading="Forecast accuracy"]');
             await expect(section).toBeVisible();
@@ -351,6 +351,7 @@ for (const plan of ['free', 'starter', 'growth'] as PlanKey[]) {
             await app.locator('s-table-body s-table-row s-link').first().click();
             await settled(app);
             const variantId = Number(app.url().split('/').pop());
+            await app.locator('s-press-button', { hasText: 'Settings' }).click();
 
             await app.getByRole('checkbox', { name: 'Discontinued: stop reordering this product' }).check();
             await saveBar(app, 'product-settings-save-bar');
@@ -363,7 +364,7 @@ for (const plan of ['free', 'starter', 'growth'] as PlanKey[]) {
             await open(app, '/products?status=discontinued');
             await expect(app.locator('s-table-body s-table-row')).toHaveCount(1);
 
-            await open(app, `/products/${variantId}`);
+            await open(app, `/products/${variantId}?tab=settings`);
             await app.getByRole('checkbox', { name: 'Discontinued: stop reordering this product' }).uncheck();
             await saveBar(app, 'product-settings-save-bar');
             await expect.poll(async () => (await api<Detail>(app, `/forecasts/${variantId}`)).data.settings.discontinued).toBe(false);
@@ -382,7 +383,7 @@ for (const plan of ['free', 'starter', 'growth'] as PlanKey[]) {
         });
 
         test('Shopify Flow section follows the plan', async ({ app }) => {
-            await open(app, '/settings');
+            await open(app, '/settings?tab=alerts');
             const section = app.locator('s-section[heading="Shopify Flow"]');
             await expect(section).toContainText('Product reorder date reached');
             if (has.flow_triggers) await expect(section.locator('s-link', { hasText: 'Open Shopify Flow' })).toBeVisible();
@@ -395,6 +396,7 @@ for (const plan of ['free', 'starter', 'growth'] as PlanKey[]) {
             await app.locator('s-table-body s-table-row s-link').first().click();
             await settled(app);
             const variantId = Number(app.url().split('/').pop());
+            await app.locator('s-press-button', { hasText: 'Settings' }).click();
             const pick = app.locator('s-button', { hasText: 'Choose product' });
 
             if (!has.reference_products) {
@@ -442,6 +444,7 @@ for (const plan of ['free', 'starter', 'growth'] as PlanKey[]) {
             await app.locator('s-table-body s-table-row s-link').first().click();
             await settled(app);
             const variantId = Number(app.url().split('/').pop());
+            await app.locator('s-press-button', { hasText: 'Settings' }).click();
 
             await app.locator('s-select[label="Sales rate for this product"]').locator('select').selectOption('steady').catch(async () => {
                 await app.getByRole('combobox', { name: 'Sales rate for this product' }).selectOption('steady');
@@ -486,7 +489,7 @@ for (const plan of ['free', 'starter', 'growth'] as PlanKey[]) {
 
         test('data check lists what to fix in the product data', async ({ app }) => {
             type Health = { data: { checked: number; findings: { code: string; count: number }[] } };
-            await open(app, '/settings');
+            await open(app, '/settings?tab=general');
             await app.locator('s-link', { hasText: 'Check my product data' }).click();
             await expect(app.locator('s-page[heading="Data check"]')).toBeVisible();
             await settled(app);
@@ -552,6 +555,7 @@ for (const plan of ['free', 'starter', 'growth'] as PlanKey[]) {
             await app.locator('s-table-body s-table-row s-link').first().click();
             await settled(app);
             const variantId = Number(app.url().split('/').pop());
+            await app.locator('s-press-button', { hasText: 'Settings' }).click();
             await app.locator('s-section[heading="Product settings"]').getByRole('textbox', { name: "Supplier's product code" }).fill('E2E-SUP-1');
             await saveBar(app, 'product-settings-save-bar');
             expect((await api<{ data: { settings: { supplier_sku: string | null } } }>(app, `/forecasts/${variantId}`)).data.settings.supplier_sku).toBe('E2E-SUP-1');
@@ -602,7 +606,7 @@ for (const plan of ['free', 'starter', 'growth'] as PlanKey[]) {
 
         test('insights list what to clear and broken size runs', async ({ app }) => {
             type Clearance = { data: { count: number } };
-            await open(app, '/insights');
+            await open(app, '/insights?tab=excess');
             const clearance = (await api<Clearance>(app, '/clearance')).data;
             const runs = (await api<{ data: unknown[] }>(app, '/size-runs')).data;
             await expect(app.locator('s-section[heading="What to clear"]')).toHaveCount(clearance.count > 0 ? 1 : 0);
@@ -620,7 +624,7 @@ for (const plan of ['free', 'starter', 'growth'] as PlanKey[]) {
             const before = (await api<Detail>(app, `/forecasts/${variantId}`)).data;
             const other = suppliers.find((s) => s.id !== before.settings.supplier_id)!;
 
-            await open(app, `/products/${variantId}`);
+            await open(app, `/products/${variantId}?tab=suppliers`);
             const section = app.locator('s-section[heading="Other suppliers"]');
             await section.getByRole('combobox', { name: 'Add a supplier' }).selectOption(String(other.id));
             await section.getByRole('spinbutton', { name: 'Lead time' }).fill('33');
@@ -672,14 +676,14 @@ for (const plan of ['free', 'starter', 'growth'] as PlanKey[]) {
         });
 
         test('language can be switched to Vietnamese and back', async ({ app }) => {
-            await open(app, '/settings');
+            await open(app, '/settings?tab=general');
             await app.getByRole('combobox', { name: 'Language' }).selectOption('vi');
             await saveBar(app, 'settings-save-bar');
             await expect(app.locator('s-page[heading="Cài đặt"]')).toBeVisible();
             await open(app, '/products');
             await expect(app.locator('s-page[heading="Sản phẩm"]')).toBeVisible();
 
-            await open(app, '/settings');
+            await open(app, '/settings?tab=general');
             await app.getByRole('combobox', { name: 'Ngôn ngữ' }).selectOption({ index: 0 });
             await saveBar(app, 'settings-save-bar');
             await expect(app.locator('s-page[heading="Settings"]')).toBeVisible();
@@ -694,7 +698,7 @@ for (const plan of ['free', 'starter', 'growth'] as PlanKey[]) {
             ];
             let label = 'App language';
             for (const [locale, settings, products, languageLabel] of languages) {
-                await open(app, '/settings');
+                await open(app, '/settings?tab=general');
                 await app.getByRole('combobox', { name: label }).selectOption(locale);
                 await saveBar(app, 'settings-save-bar');
                 await expect(app.locator(`s-page[heading="${settings}"]`)).toBeVisible();
@@ -706,7 +710,7 @@ for (const plan of ['free', 'starter', 'growth'] as PlanKey[]) {
                 await expect(app.locator('body')).not.toContainText('explanation.');
                 label = languageLabel;
             }
-            await open(app, '/settings');
+            await open(app, '/settings?tab=general');
             await app.getByRole('combobox', { name: label }).selectOption({ index: 0 });
             await saveBar(app, 'settings-save-bar');
             await expect(app.locator('s-page[heading="Settings"]')).toBeVisible();
