@@ -39,7 +39,7 @@ export function StockHistoryChart() {
         <s-section heading={t('stockHistory.heading')}>
             <s-stack gap="base">
                 <s-stack direction="inline" gap="small-200" alignItems="center">
-                    <s-text type="strong">{show(data.latest)}</s-text>
+                    {byValue && <s-text type="strong">{show(data.latest)}</s-text>}
                     <s-text color="subdued">
                         {t('stockHistory.inStock', { count: data.latest.products_in_stock, units: formatNumber(data.latest.units, 0) })}
                     </s-text>

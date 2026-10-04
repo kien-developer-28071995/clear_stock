@@ -31,6 +31,8 @@ export default defineConfig(({ mode }) => {
             port: 5173,
             strictPort: true,
             allowedHosts: true,
+            // Playwright writes traces and reports here while the app is open: not source, no reload.
+            watch: { ignored: ['**/e2e-results/**', '**/e2e-report/**'] },
             origin: viaTunnel ? appUrl!.origin : undefined,
             hmr: viaTunnel
                 ? { protocol: 'wss', host: appUrl!.hostname, clientPort: 443, path: '/__vite_hmr' }

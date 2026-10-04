@@ -42,6 +42,7 @@ const PAGES: [string, string][] = [
     ['/orders', 'Orders placed'],
     ['/costs', 'Unit costs'],
     ['/budget', 'Order budget'],
+    ['/data-health', 'Data check'],
     ['/plans', 'Plans'],
 ];
 
@@ -105,7 +106,7 @@ for (const plan of ['free', 'starter', 'growth'] as PlanKey[]) {
             const list = await api<{ data: Record<string, unknown>[]; meta: Record<string, number> }>(app, '/forecasts');
             expect(Object.keys(list.meta).sort()).toEqual(['current_page', 'last_page', 'per_page', 'total']);
             expect(Object.keys(list.data[0]).sort()).toEqual(
-                ['abc_class', 'avg_daily_sales', 'current_stock', 'days_of_cover', 'excess_units', 'incoming_stock', 'name', 'reorder_date', 'sku', 'status', 'suggested_qty', 'variant_id', 'vendor'].sort(),
+                ['abc_class', 'avg_daily_sales', 'current_stock', 'days_of_cover', 'excess_units', 'incoming_stock', 'name', 'reorder_date', 'sku', 'status', 'suggested_qty', 'trend_percent', 'variant_id', 'vendor'].sort(),
             );
             await expect(app.locator('s-table-body s-table-row')).toHaveCount(Math.min(list.meta.total, list.meta.per_page));
         });
@@ -433,6 +434,94 @@ for (const plan of ['free', 'starter', 'growth'] as PlanKey[]) {
 
             await app.locator('s-button', { hasText: 'Use automatic forecast' }).click();
             await expect.poll(async () => (await api<{ data: { overrides: { avg_daily_sales: unknown } } }>(app, `/forecasts/${variantId}`)).data.overrides.avg_daily_sales).toBeNull();
+        });
+
+        test('forecast profile: the store setting and a product\'s own change the windows used', async ({ app }) => {
+            type Detail = { data: { explanation: { profile: { name: string; source: string }; windows: { days: number }[] }; settings: { forecast_profile: string | null } } };
+            await open(app, '/products?sort=suggested');
+            await app.locator('s-table-body s-table-row s-link').first().click();
+            await settled(app);
+            const variantId = Number(app.url().split('/').pop());
+
+            await app.locator('s-select[label="Sales rate for this product"]').locator('select').selectOption('steady').catch(async () => {
+                await app.getByRole('combobox', { name: 'Sales rate for this product' }).selectOption('steady');
+            });
+            await saveBar(app, 'product-settings-save-bar');
+            let detail = (await api<Detail>(app, `/forecasts/${variantId}`)).data;
+            expect(detail.settings.forecast_profile).toBe('steady');
+            expect(detail.explanation.profile).toEqual({ name: 'steady', source: 'variant' });
+            expect(detail.explanation.windows.map((w) => w.days)).toEqual([30, 90, 365]);
+
+            await api(app, `/variants/${variantId}/settings`, { method: 'PUT', body: { forecast_profile: null } });
+            detail = (await api<Detail>(app, `/forecasts/${variantId}`)).data;
+            expect(detail.explanation.profile).toEqual({ name: 'balanced', source: 'shop' });
+            expect(detail.explanation.windows.map((w) => w.days)).toEqual([7, 30, 90]);
+        });
+
+        test('trend filter lists only products selling clearly faster or slower', async ({ app }) => {
+            type Row = { trend_percent: number | null };
+            await open(app, '/products');
+            const all = (await api<{ data: Row[] }>(app, '/forecasts')).data;
+            for (const [option, keep] of [['up', (r: Row) => (r.trend_percent ?? 0) >= 25], ['down', (r: Row) => (r.trend_percent ?? 0) <= -25]] as const) {
+                await app.getByRole('combobox', { name: 'Trend' }).selectOption(option);
+                await expect(app).toHaveURL(new RegExp(`trend=${option}`));
+                await settled(app);
+                const listed = (await api<{ data: Row[]; meta: { total: number } }>(app, `/forecasts?trend=${option}`));
+                expect(listed.data.every(keep)).toBe(true);
+                expect(listed.meta.total).toBe(all.filter(keep).length);
+                await expect(app.locator('s-table-body s-table-row')).toHaveCount(listed.meta.total);
+            }
+        });
+
+        test('insights show the inventory value history', async ({ app }) => {
+            type History = { data: { latest: { units: number } | null; points: unknown[] } };
+            await open(app, '/insights');
+            const history = (await api<History>(app, '/stock-history?days=90')).data;
+            expect(history.latest).not.toBeNull();   // a forecast run records today's stock
+            const section = app.locator('s-section[heading="Inventory value over time"]');
+            await expect(section).toBeVisible();
+            await expect(section).toContainText('in stock');
+            await app.screenshot({ path: `e2e-results/stock-history-${plan}.png`, fullPage: true });
+        });
+
+        test('data check lists what to fix in the product data', async ({ app }) => {
+            type Health = { data: { checked: number; findings: { code: string; count: number }[] } };
+            await open(app, '/settings');
+            await app.locator('s-link', { hasText: 'Check my product data' }).click();
+            await expect(app.locator('s-page[heading="Data check"]')).toBeVisible();
+            await settled(app);
+            const health = (await api<Health>(app, '/data-health')).data;
+            await expect(app.locator('s-section')).toHaveCount(health.findings.length + 1);
+            if (health.findings.length === 0) await expect(app.locator('s-page')).toContainText('nothing to fix');
+            await app.screenshot({ path: `e2e-results/data-health-${plan}.png`, fullPage: true });
+        });
+
+        test('weekly summary can be switched on from Settings on every plan', async ({ app }) => {
+            type S = { data: { alerts: { weekly_summary: boolean; email: string | null; weekly_day: number } } };
+            await open(app, '/settings');
+            const before = (await api<S>(app, '/settings')).data.alerts;
+            const toggle = app.locator('s-switch[label="Email me a summary once a week"]');
+            await expect(toggle).not.toHaveAttribute('disabled');
+            await api(app, '/settings', { method: 'PUT', body: { alerts: { weekly_summary: true, email: 'owner@example.com' } } });
+            expect((await api<S>(app, '/settings')).data.alerts.weekly_summary).toBe(true);
+            await api(app, '/settings', { method: 'PUT', body: { alerts: { weekly_summary: before.weekly_summary, email: before.email } } });
+        });
+
+        test('Slack webhook and days-left threshold are saved with the alert settings', async ({ app }) => {
+            type S = { data: { alerts: { slack_webhook_url: string | null; cover_days: number | null } } };
+            await open(app, '/settings');
+            const slack = app.locator('s-url-field[label="Slack webhook URL"]');
+            if (has.alerts) await expect(slack).not.toHaveAttribute('disabled');
+            else await expect(slack).toHaveAttribute('disabled');
+
+            const bad = await app.evaluate(async () => {
+                const res = await fetch('/api/settings', { method: 'PUT', headers: { Authorization: `Bearer ${await window.shopify.idToken()}`, 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify({ alerts: { slack_webhook_url: 'https://example.com/hook' } }) });
+                return res.status;
+            });
+            expect(bad).toBe(422);
+            await api(app, '/settings', { method: 'PUT', body: { alerts: { slack_webhook_url: 'https://hooks.slack.com/services/T0/B0/e2e', cover_days: 30 } } });
+            expect((await api<S>(app, '/settings')).data.alerts).toMatchObject({ slack_webhook_url: 'https://hooks.slack.com/services/T0/B0/e2e', cover_days: 30 });
+            await api(app, '/settings', { method: 'PUT', body: { alerts: { slack_webhook_url: null, cover_days: null } } });
         });
 
         test('default lead time is saved and used by forecasts', async ({ app }) => {
