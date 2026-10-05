@@ -82,6 +82,15 @@ test.beforeAll(() => {
     execFileSync('npm', ['run', 'extensions:bundle', '--silent'], { cwd: ROOT });
 });
 
+/**
+ * Recomputes the forecasts of the shop under test only: with another shop in the dev database
+ * (a large one seeded to measure performance) a run for everyone takes most of a test's timeout.
+ */
+function recompute(): void {
+    const domain = php<{ domain: string }>('echo json_encode(["domain" => App\\Models\\Shop::query()->whereNull("uninstalled_at")->first()->domain]);').domain;
+    artisan('forecast:run', `--shop=${domain}`);
+}
+
 /** A synced product whose (first) variant has to be reordered now. */
 function productToReorder(): { productId: number; variantId: number } {
     return php(
@@ -144,7 +153,7 @@ test.describe('product list bulk action', () => {
             await expect.poll(() => page.evaluate(() => (window as unknown as { __closed: boolean }).__closed)).toBe(true);
         } finally {
             php(`App\\Models\\Variant::where("shopify_product_id", ${productId})->update(["lead_time_override" => ${before ?? 'null'}]); echo json_encode(true);`);
-            artisan('forecast:run');
+            recompute();
         }
         void errors;
     });
@@ -182,7 +191,7 @@ test.describe('product page: mark as ordered', () => {
             await expect(page.locator('s-link[href="app:orders"]')).toBeVisible();
         } finally {
             php(`App\\Models\\ManualOrder::where("variant_id", ${variantId})->where("status", "open")->update(["status" => "cancelled", "closed_at" => now()]); echo json_encode(true);`);
-            artisan('forecast:run');
+            recompute();
         }
         void errors;
     });
@@ -208,7 +217,7 @@ test.describe('product page: reorder settings', () => {
             expect(v).toEqual({ pack: 12, discontinued: true });
         } finally {
             php(`App\\Models\\Variant::where("shopify_product_id", ${productId})->update(["pack_size" => null, "discontinued" => false]); echo json_encode(true);`);
-            artisan('forecast:run');
+            recompute();
         }
         void errors;
     });

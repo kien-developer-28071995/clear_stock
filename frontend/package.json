@@ -5,6 +5,7 @@
     "scripts": {
         "dev": "vite",
         "build": "node scripts/check-i18n.mjs && tsc --noEmit && vite build",
+        "build:check": "node scripts/check-build.mjs",
         "typecheck": "tsc --noEmit",
         "i18n:check": "node scripts/check-i18n.mjs"
     },

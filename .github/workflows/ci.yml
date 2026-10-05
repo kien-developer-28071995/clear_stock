@@ -55,7 +55,7 @@ jobs:
       - name: Admin extension locales copied from the app
         run: node extensions/scripts/sync-locales.mjs --check
       - name: Build (static site, as the Deploy workflow publishes it)
-        run: npm run build && test -f dist/index.html
+        run: npm run build && npm run build:check
         working-directory: frontend
         env:
           VITE_API_URL: https://api.example.test
@@ -135,6 +135,14 @@ jobs:
           cache-to: type=gha,scope=admin,mode=max
 
   # backend/.env template renders (deploy/envtool.py) with every required value present.
+  # The web servers in front of the app, run for real: nginx configs parse, and the Caddyfile's
+  # frontend block sends the iframe protection header per shop and serves client-side routes.
+  web-config:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - run: bash deploy/check-web-config.sh
+
   env-template:
     runs-on: ubuntu-latest
     steps:

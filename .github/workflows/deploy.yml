@@ -143,7 +143,7 @@ jobs:
           VITE_SHOPIFY_API_KEY: ${{ vars.SHOPIFY_API_KEY || secrets.SHOPIFY_API_KEY }}
           VITE_APP_NAME: ${{ vars.SHOPIFY_APP_NAME || 'Clear Stock' }}
           VITE_WEBSITE_URL: ${{ vars.WEBSITE_URL }}
-        run: npm ci && npm run build
+        run: npm ci && npm run build && npm run build:check
       - name: Publish the app frontend (swapped in whole)
         if: inputs.tag == ''
         env:
@@ -161,6 +161,21 @@ jobs:
           scp -i "$key" -P "$PORT" "$RUNNER_TEMP/frontend.tgz" "$SSH_USER@$HOST:$TARGET/frontend.tgz"
           ssh -i "$key" -p "$PORT" "$SSH_USER@$HOST" \
             "cd '$TARGET' && rm -rf frontend.new frontend.old && mkdir frontend.new && tar -xzf frontend.tgz -C frontend.new && rm frontend.tgz && chmod -R a+rX frontend.new && { [ ! -d frontend ] || mv frontend frontend.old; } && mv frontend.new frontend && rm -rf frontend.old"
+      # The live split, as a browser meets it: the frontend's page with the iframe protection
+      # header for a shop, and the API on the backend's domain answering a cross-origin preflight.
+      - name: Check the live frontend and API
+        if: inputs.tag == ''
+        env:
+          FRONTEND_URL: ${{ vars.FRONTEND_URL }}
+          API_URL: ${{ vars.APP_URL }}
+        run: |
+          page=$(curl -fsS -D "$RUNNER_TEMP/h" "$FRONTEND_URL/?shop=check.myshopify.com&embedded=1")
+          echo "$page" | grep -q 'name="shopify-api-key"' || { echo "::error::$FRONTEND_URL does not serve the app's page"; exit 1; }
+          tr -d '\r' < "$RUNNER_TEMP/h" | grep -qi '^content-security-policy: frame-ancestors https://check.myshopify.com https://admin.shopify.com' \
+            || { echo "::error::$FRONTEND_URL does not send the frame-ancestors header for the shop (deploy/Caddyfile)"; exit 1; }
+          curl -fsS -o /dev/null -X OPTIONS -H "Origin: $FRONTEND_URL" -H 'Access-Control-Request-Method: GET' -H 'Access-Control-Request-Headers: authorization' -D "$RUNNER_TEMP/c" "$API_URL/api/shop"
+          tr -d '\r' < "$RUNNER_TEMP/c" | grep -qi '^access-control-allow-origin:' || { echo "::error::$API_URL/api does not answer cross-origin requests"; exit 1; }
+          [ "$(curl -s -o /dev/null -w '%{http_code}' "$API_URL/api/shop")" = 401 ] || { echo "::error::$API_URL/api/shop should refuse a call without a session token (401)"; exit 1; }
       - uses: actions/setup-node@v5
         if: inputs.tag == '' && vars.WEBSITE_URL != ''
         with:
