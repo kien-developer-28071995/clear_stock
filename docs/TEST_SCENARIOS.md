@@ -112,6 +112,14 @@ Quy tắc: mọi lỗi tìm thấy bằng **M** hoặc **S** phải có thêm m�
 | 6b.7 | 30 shop ngẫu nhiên (tồn âm, bán thưa, đột biến, mọi quy tắc đặt hàng) | Các bất biến luôn đúng: không gợi ý âm, không ngày trong quá khứ, đủ thùng/MOQ, nhãn = bộ lọc = số đếm, tổng kế hoạch khớp | A (`ForecastInvariantsTest`) |
 | 6b.8 | Bán cực chậm + tồn cực lớn | Không có ngày (quá 10 năm), không gợi ý đặt, không tràn cột | A |
 | 6b.9 | Sản phẩm không ai mua có đặt max / quy cách thùng / tồn âm | Không gợi ý đặt hàng | A |
+| 6b.11 | Webhook có chữ ký đúng nhưng nội dung rác (mọi topic, shop chưa cài) | Luôn nhận, xử lý không sập | A (`HostileWebhookTest`) |
+| 6b.12 | File xuất của Shopify có dòng thiếu trường / sai kiểu / số âm / số cực lớn | Nhập phần hợp lệ, bỏ phần rác, không dừng đồng bộ (dòng không phải JSON vẫn làm hỏng lần đọc: file tải dở phải tải lại) | A |
+| 6b.13 | File CSV tải lên: rỗng, nhị phân, sai mã hoá, công thức, 6.000 dòng, ô 200.000 ký tự | Không lỗi 500 | A |
+| 6b.14 | Lệnh theo lịch khi có shop đã gỡ / chưa đồng bộ / token hết hạn / múi giờ lạ, và Shopify lỗi 503, 401, trả rác, không kết nối được | Lệnh chạy xong cho mọi shop; job chỉ thất bại vì Shopify (để thử lại), không sập vì mã của ta | A (`ScheduledTasksTest`) |
+| 6b.15 | Tên sản phẩm 255 ký tự có mã HTML, emoji, chữ Do Thái | Hiện thành chữ, không chạy mã, không tràn ngang ở 1280px và 390px | A |
+| 6b.16 | Tiêu đề email có ký tự xuống dòng từ tên shop | Một dòng sạch | A |
+| 6b.17 | Hệ thống báo cáo (`admin/`): tham số là mảng, mã HTML trong tên shop, khách chưa đăng nhập | Không 500, không chạy mã, chuyển về trang đăng nhập | A |
+| 6b.18 | Cả bộ E2E ở khổ điện thoại (`E2E_PHONE=1`) | Mọi thao tác làm được; 3 test trượt là do bố cục hẹp cố ý ẩn cột ABC và rút danh sách còn 4 dòng | M (chạy tay khi đổi bố cục) |
 | 6b.10 | Toàn bộ test trên MySQL | Qua như trên SQLite | A (`make test-mysql`, CI `backend-mysql`) |
 
 ## 7. Chống làm phiền và an toàn dữ liệu

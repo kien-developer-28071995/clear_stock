@@ -19,6 +19,8 @@ export default defineConfig({
     use: {
         baseURL: process.env.E2E_BASE_URL ?? 'http://localhost:8080',
         ...devices['Desktop Chrome'],
+        // E2E_PHONE=1: the same suite on a phone-sized screen (what works on a desktop must be reachable there too).
+        ...(process.env.E2E_PHONE ? { viewport: { width: 390, height: 844 } } : {}),
         trace: 'retain-on-failure',
         screenshot: 'only-on-failure',
     },
