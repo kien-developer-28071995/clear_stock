@@ -22,7 +22,7 @@ class WeeklySummaryMail extends QueuedMailable
             default => "{$due} products to reorder",
         };
 
-        return new Envelope(subject: "Your stock this week: {$what} · ".($this->shop->name ?? $this->shop->domain));
+        return new Envelope(subject: self::subjectLine("Your stock this week: {$what} · ".($this->shop->name ?? $this->shop->domain)));
     }
 
     public function content(): Content

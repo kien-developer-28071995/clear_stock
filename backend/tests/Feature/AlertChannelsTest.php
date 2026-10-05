@@ -138,3 +138,19 @@ it('sends no digest at all when alerts are switched off app-wide', function () {
     Mail::assertNothingQueued();
     Queue::assertNotPushed(PostAlertDigestToSlack::class);
 });
+
+it('shows product and shop names as text in emails, whatever they contain', function () {
+    $evil = '<script>alert(1)</script><img src=x onerror=alert(2)>';
+    $this->mug->update(['product_title' => "Mug {$evil}", 'sku' => '"><b>sku</b>']);
+    $this->shop->update(['name' => "Demo\r\nBcc: attacker@evil.test {$evil}"]);
+
+    expect($this->alerts->sendIfDue($this->shop->fresh(), $this->now))->toBe('sent');
+    Mail::assertQueued(ReorderDigestMail::class, function (ReorderDigestMail $mail) {
+        $html = $mail->render();
+        $subject = $mail->envelope()->subject;
+
+        return ! str_contains($html, '<script>alert(1)</script>') && ! str_contains($html, '<img src=x onerror')
+            && str_contains($html, '&lt;script&gt;')
+            && ! str_contains($subject, "\n") && ! str_contains($subject, "\r");   // one header line: nothing can be appended to the email's headers
+    });
+});

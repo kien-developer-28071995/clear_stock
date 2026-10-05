@@ -24,7 +24,7 @@ class ReorderDigestMail extends QueuedMailable
         // Products listed only for their few days of stock left are not due for an order yet.
         $lowCover = array_filter($this->items, fn ($i) => ($i['low_cover_days'] ?? null) !== null) !== [];
 
-        return new Envelope(subject: "{$what} ".($lowCover ? 'attention' : 'reordering').' · '.($this->shop->name ?? $this->shop->domain));
+        return new Envelope(subject: self::subjectLine("{$what} ".($lowCover ? 'attention' : 'reordering').' · '.($this->shop->name ?? $this->shop->domain)));
     }
 
     public function content(): Content

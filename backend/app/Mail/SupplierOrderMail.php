@@ -27,7 +27,7 @@ class SupplierOrderMail extends QueuedMailable
         return new Envelope(
             from: new Address(config('mail.from.address'), "{$store} via ".config('shopify.app_name')),
             replyTo: $this->replyToAddress ? [new Address($this->replyToAddress, $store)] : [],
-            subject: "Purchase order from {$store} · ".now($this->shop->timezone)->toDateString(),
+            subject: self::subjectLine("Purchase order from {$store} · ".now($this->shop->timezone)->toDateString()),
         );
     }
 
