@@ -12,3 +12,7 @@ Thumbs.db
 /extensions/dist/
 /extensions/*/dist/
 /extensions/*/manifest.json
+
+# Screenshots for review (make feature-screenshots, UI audits): regenerated, not kept in the repo
+/docs/screens/
+/docs/screen-feature/
