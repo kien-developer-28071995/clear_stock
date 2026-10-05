@@ -14,7 +14,7 @@ import { AbcBadge } from '@/features/forecasts/components/AbcBadge';
 import { useFacets, useForecastList, useLocations, useSavedViews } from '@/features/forecasts/hooks/useForecasts';
 import { TREND_THRESHOLD, type ForecastFilters } from '@/features/forecasts/types';
 import { formatDate, formatNumber } from '@/utils/format';
-import { NO_VALUE, fromOption, optionValue } from '@/utils/select';
+import { NO_VALUE, fromOption, optionValue, optionsKey } from '@/utils/select';
 
 const STATUS_OPTIONS = ['reorder_now', 'out_of_stock', 'overstock', 'slow', 'healthy', 'discontinued'] as const;
 const SORT_OPTIONS = ['urgency', 'cover', 'suggested', 'value', 'revenue', 'name'] as const;
@@ -151,6 +151,7 @@ export function ProductsPage() {
                                 <s-stack direction="inline" gap="small-200">
                                 {showLocations && (
                                     <s-select
+                                        key={optionsKey(locations.data?.length ?? 0)}
                                         label={t('locations.location')}
                                         labelAccessibilityVisibility="exclusive"
                                         value={optionValue(filters.location_id)}
@@ -164,6 +165,7 @@ export function ProductsPage() {
                                 )}
                                 {showVendors && (
                                     <s-select
+                                        key={optionsKey(facets?.vendors.length ?? 0)}
                                         label={t('products.vendor')}
                                         labelAccessibilityVisibility="exclusive"
                                         value={optionValue(filters.vendor)}
@@ -177,6 +179,7 @@ export function ProductsPage() {
                                 )}
                                 {showTypes && (
                                     <s-select
+                                        key={optionsKey(facets?.product_types.length ?? 0)}
                                         label={t('products.productType')}
                                         labelAccessibilityVisibility="exclusive"
                                         value={optionValue(filters.product_type)}

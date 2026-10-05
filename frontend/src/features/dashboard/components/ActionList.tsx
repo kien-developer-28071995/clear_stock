@@ -29,7 +29,7 @@ function Row({ item, today, checked, onToggle }: { item: ActionItem; today: stri
     return (
         <s-box padding="small-200 base" borderWidth="small none none none" borderColor="base">
             <s-grid gridTemplateColumns="auto minmax(0, 1fr)" gap="base" alignItems="center">
-                <s-checkbox label={t('actions.select')} labelAccessibilityVisibility="exclusive" checked={checked || undefined} onChange={onToggle} />
+                <s-checkbox label={t('actions.select')} labelAccessibilityVisibility="exclusive" checked={(checked && item.suggested_qty > 0) || undefined} disabled={item.suggested_qty <= 0 || undefined} onChange={onToggle} />
                 {/* Narrow screens: stock and order quantity move under the product name. */}
                 <s-query-container><s-grid gridTemplateColumns="@container (inline-size > 460px) 1fr auto, 1fr" gap="small-200" alignItems="center">
                     <s-stack gap="small-100">
@@ -39,8 +39,12 @@ function Row({ item, today, checked, onToggle }: { item: ActionItem; today: stri
                     <s-stack direction="inline" gap="base" alignItems="start">
                         <s-text tone={item.current_stock <= 0 ? 'critical' : undefined}>{stock}</s-text>
                         <s-stack gap="small-100">
-                            <s-text type="strong">{t('actions.order', { qty: formatNumber(item.suggested_qty, 0) })}</s-text>
-                            {item.reorder_date && item.reorder_date > today && (
+                            {item.suggested_qty > 0 ? (
+                                <s-text type="strong">{t('actions.order', { qty: formatNumber(item.suggested_qty, 0) })}</s-text>
+                            ) : (
+                                <s-text color="subdued">{t('actions.nothingMore')}</s-text>
+                            )}
+                            {item.suggested_qty > 0 && item.reorder_date && item.reorder_date > today && (
                                 <s-text color="subdued">{t('actions.orderBy', { date: formatDate(item.reorder_date) })}</s-text>
                             )}
                         </s-stack>
@@ -60,7 +64,8 @@ export function ActionList({ dashboard }: { dashboard: Dashboard }) {
     const ordersExist = useFeature('manual_orders');
     const { actions, today } = dashboard;
     const initial = useMemo(
-        () => new Set([...actions.out_of_stock, ...actions.order_today].map((i) => i.variant_id)),
+        // Only what there is something to order for (an out-of-stock product whose order is already on the way stays listed).
+        () => new Set([...actions.out_of_stock, ...actions.order_today].filter((i) => i.suggested_qty > 0).map((i) => i.variant_id)),
         [actions],
     );
     const [selected, setSelected] = useState<Set<number>>(initial);

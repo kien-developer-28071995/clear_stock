@@ -18,3 +18,4 @@ Thumbs.db
 /docs/screen-feature/
 /frontend/dist/
 /frontend/.preview.pid
+/frontend/preview.html

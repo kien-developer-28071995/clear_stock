@@ -197,7 +197,8 @@
         "title": "Pedir esta semana",
         "hint": "Data de pedido nos próximos 7 dias"
       }
-    }
+    },
+    "nothingMore": "Nada mais a encomendar"
   },
   "runway": {
     "heading": "Cobertura do estoque",
@@ -1279,7 +1280,10 @@
     "link_many": "Pedidos feitos ({{count}})",
     "receivePart": "Recebido em parte",
     "receivedSoFar": "Recebido até agora",
-    "partReceived": "{{received}} recebidas, o restante está a caminho"
+    "partReceived": "{{received}} recebidas, o restante está a caminho",
+    "confirmCancelHeading": "Cancelar esta encomenda?",
+    "confirmCancel": "\"{{name}}\" ({{qty}} unidades) deixa de contar como a caminho e pode voltar a ser sugerido.",
+    "keep": "Manter encomenda"
   },
   "costs": {
     "intro": "O valor do estoque, o dinheiro parado e os totais de pedidos de compra e do plano precisam do custo unitário de cada produto. Informe aqui os custos dos produtos que não têm custo na Shopify, ou para usar seu custo real com frete. Eles têm prioridade sobre o custo da Shopify no app; a Shopify não é alterada.",

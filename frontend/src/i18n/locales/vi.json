@@ -183,7 +183,8 @@
         "title": "Nhập trong tuần",
         "hint": "Hạn đặt hàng trong 7 ngày tới"
       }
-    }
+    },
+    "nothingMore": "Không cần đặt thêm"
   },
   "runway": {
     "heading": "Số ngày còn hàng",
@@ -1057,7 +1058,10 @@
     "link_other": "Đơn đã đặt ({{count}})",
     "receivePart": "Nhận một phần",
     "receivedSoFar": "Đã nhận",
-    "partReceived": "Đã nhận {{received}}, phần còn lại đang về"
+    "partReceived": "Đã nhận {{received}}, phần còn lại đang về",
+    "confirmCancelHeading": "Huỷ đơn này?",
+    "confirmCancel": "\"{{name}}\" ({{qty}} cái) sẽ không còn được tính là đang về, nên có thể được gợi ý đặt lại.",
+    "keep": "Giữ đơn"
   },
   "costs": {
     "intro": "Giá trị tồn kho, tiền kẹt, tổng tiền đơn đặt hàng và kế hoạch nhập đều cần giá vốn của từng sản phẩm. Nhập ở đây cho các sản phẩm chưa có giá vốn trên Shopify, hoặc để dùng giá vốn thực tế (gồm vận chuyển). Giá vốn nhập trong app được ưu tiên hơn giá trên Shopify; Shopify không bị thay đổi.",

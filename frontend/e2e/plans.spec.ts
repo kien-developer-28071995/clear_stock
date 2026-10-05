@@ -297,6 +297,59 @@ for (const plan of ['free', 'starter', 'growth'] as PlanKey[]) {
             for (const o of (await api<Orders>(app, '/manual-orders')).data.open) expect(await call(`/manual-orders/${o.id}`, 'PATCH', { status: 'cancelled' })).toBe(200);
         });
 
+        // Found by using the app by hand (2026-10-05); each was invisible to the tests above.
+        test('dialogs close after saving, cancelling an order asks first, and forms forget what was abandoned', async ({ app }) => {
+            type Orders = { data: { open: { id: number; variant_id: number }[] } };
+            const dialogOpen = (id: string) => app.locator(`s-modal#${id}`).evaluate((el) => !!el.shadowRoot?.querySelector('dialog[open]'));
+            const openOrders = async () => (await api<Orders>(app, '/manual-orders')).data.open;
+
+            // Reorder list: what is due starts selected; marking it as ordered closes the dialog.
+            await open(app, '/reorder');
+            await app.locator('s-button', { hasText: 'Mark as ordered' }).first().click();
+            await expect.poll(() => dialogOpen('mark-ordered-selected')).toBe(true);
+            await app.locator('s-modal#mark-ordered-selected s-button[slot="primary-action"]').click();
+            await expect.poll(() => toasts(app)).toContainEqual(expect.stringContaining('marked as ordered'));
+            await expect.poll(() => dialogOpen('mark-ordered-selected')).toBe(false);
+            const placed = await openOrders();
+            expect(placed.length).toBeGreaterThan(0);
+            // An out-of-stock product stays listed, but with nothing left to order or to tick.
+            await expect(app.getByText('Order 0', { exact: true })).toHaveCount(0);
+
+            // Orders placed: "Cancel order" asks first; backing out keeps the order.
+            await open(app, '/reorder/orders');
+            await app.locator('s-button', { hasText: 'Cancel order' }).first().click();
+            await expect(app.getByText('Cancel this order?')).toBeVisible();
+            await app.locator('s-button', { hasText: 'Keep order' }).click();
+            expect(await openOrders()).toHaveLength(placed.length);
+            for (let left = placed.length; left > 0; left--) {
+                await app.locator('s-table-row s-button', { hasText: 'Cancel order' }).first().click();
+                await app.locator('s-modal s-button[slot="primary-action"]', { hasText: 'Cancel order' }).click();
+                await expect.poll(async () => (await openOrders()).length).toBe(left - 1);
+            }
+
+            // A product's supplier shows in its settings (the list of suppliers loads after the product).
+            const withSupplier = (await api<{ data: { variant_id: number; supplier: string | null }[] }>(app, '/forecasts?per_page=50')).data.find((r) => r.supplier);
+            if (withSupplier) {
+                await open(app, `/products/${withSupplier.variant_id}?tab=settings`);
+                const shown = () => app.locator('s-section[heading="Product settings"] s-select[label="Supplier"]').evaluate((el) => el.shadowRoot?.querySelector('select')?.selectedOptions[0]?.textContent?.trim());
+                await expect.poll(shown).toBe(withSupplier.supplier);
+            }
+
+            // A form dismissed half-filled starts empty the next time.
+            if (await app.evaluate(async () => (await (await fetch('/api/shop', { headers: { Authorization: `Bearer ${await window.shopify.idToken()}` } })).json()).data.entitlements.features.sales_events)) {
+                await open(app, '/planning/events');
+                const add = app.locator('s-button', { hasText: 'Add event' }).first();
+                await add.evaluate((el: HTMLElement) => el.click());
+                const name = app.locator('s-modal#sales-event-modal').getByRole('textbox', { name: 'Name' });
+                await name.fill('Abandoned');
+                await app.keyboard.press('Escape');
+                await expect.poll(() => dialogOpen('sales-event-modal')).toBe(false);
+                await add.evaluate((el: HTMLElement) => el.click());
+                await expect(name).toHaveValue('');
+                await app.keyboard.press('Escape');
+            }
+        });
+
         test('unit costs can be entered in the app and feed the money figures', async ({ app }) => {
             type Costs = { data: { counts: { missing: number }; items: { variant_id: number; name: string; app_cost: number | null; cost: number | null }[] } };
             await open(app, '/costs');

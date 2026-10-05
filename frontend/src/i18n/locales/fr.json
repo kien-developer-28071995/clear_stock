@@ -197,7 +197,8 @@
         "title": "À commander cette semaine",
         "hint": "Date de commande dans les 7 prochains jours"
       }
-    }
+    },
+    "nothingMore": "Rien de plus à commander"
   },
   "runway": {
     "heading": "Autonomie du stock",
@@ -1279,7 +1280,10 @@
     "link_many": "Commandes passées ({{count}})",
     "receivePart": "Reçu en partie",
     "receivedSoFar": "Reçu à ce jour",
-    "partReceived": "{{received}} reçues, le reste est en route"
+    "partReceived": "{{received}} reçues, le reste est en route",
+    "confirmCancelHeading": "Annuler cette commande ?",
+    "confirmCancel": "« {{name}} » ({{qty}} unités) ne comptera plus comme en route et pourra être suggéré à nouveau.",
+    "keep": "Garder la commande"
   },
   "costs": {
     "intro": "La valeur du stock, la trésorerie immobilisée et les totaux des bons de commande et du plan nécessitent le coût unitaire de chaque produit. Saisissez ici les coûts des produits qui n'en ont pas dans Shopify, ou pour utiliser votre coût de revient réel. Ils priment sur le coût Shopify dans l'application ; Shopify n'est pas modifié.",

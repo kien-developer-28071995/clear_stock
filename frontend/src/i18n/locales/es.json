@@ -197,7 +197,8 @@
         "title": "Pedir esta semana",
         "hint": "Fecha de pedido en los próximos 7 días"
       }
-    }
+    },
+    "nothingMore": "Nada más que pedir"
   },
   "runway": {
     "heading": "Autonomía del stock",
@@ -1279,7 +1280,10 @@
     "link_many": "Pedidos realizados ({{count}})",
     "receivePart": "Recibido en parte",
     "receivedSoFar": "Recibido hasta ahora",
-    "partReceived": "{{received}} recibidas, el resto está en camino"
+    "partReceived": "{{received}} recibidas, el resto está en camino",
+    "confirmCancelHeading": "¿Cancelar este pedido?",
+    "confirmCancel": "\"{{name}}\" ({{qty}} unidades) dejará de contar como en camino, por lo que puede volver a sugerirse.",
+    "keep": "Mantener pedido"
   },
   "costs": {
     "intro": "El valor del stock, el dinero inmovilizado y los totales de órdenes de compra y del plan necesitan el costo unitario de cada producto. Introduce aquí los costos de los productos que no lo tienen en Shopify, o para usar tu costo real con envío. Tienen prioridad sobre el costo de Shopify en la app; Shopify no cambia.",

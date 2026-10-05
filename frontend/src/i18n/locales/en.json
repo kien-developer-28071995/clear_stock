@@ -190,7 +190,8 @@
         "title": "Order this week",
         "hint": "Reorder date in the next 7 days"
       }
-    }
+    },
+    "nothingMore": "Nothing more to order"
   },
   "runway": {
     "heading": "Stock runway",
@@ -1168,7 +1169,10 @@
     "link_other": "Orders placed ({{count}})",
     "receivePart": "Part received",
     "receivedSoFar": "Received so far",
-    "partReceived": "{{received}} received, the rest is on the way"
+    "partReceived": "{{received}} received, the rest is on the way",
+    "confirmCancelHeading": "Cancel this order?",
+    "confirmCancel": "\"{{name}}\" ({{qty}} units) will no longer count as on the way, so it can be suggested again.",
+    "keep": "Keep order"
   },
   "costs": {
     "intro": "Stock value, cash tied up, purchase order and plan totals need each product's unit cost. Enter costs here for products without one in Shopify, or to use your real landed cost. They win over Shopify's cost in the app; Shopify itself is not changed.",

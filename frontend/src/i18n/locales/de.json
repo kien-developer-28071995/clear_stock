@@ -190,7 +190,8 @@
         "title": "Diese Woche bestellen",
         "hint": "Bestelldatum in den nächsten 7 Tagen"
       }
-    }
+    },
+    "nothingMore": "Nichts weiter zu bestellen"
   },
   "runway": {
     "heading": "Bestandsreichweite",
@@ -1168,7 +1169,10 @@
     "link_other": "Aufgegebene Bestellungen ({{count}})",
     "receivePart": "Teilweise erhalten",
     "receivedSoFar": "Bisher erhalten",
-    "partReceived": "{{received}} erhalten, der Rest ist unterwegs"
+    "partReceived": "{{received}} erhalten, der Rest ist unterwegs",
+    "confirmCancelHeading": "Diese Bestellung stornieren?",
+    "confirmCancel": "„{{name}}“ ({{qty}} Stück) zählt nicht mehr als unterwegs und kann wieder vorgeschlagen werden.",
+    "keep": "Bestellung behalten"
   },
   "costs": {
     "intro": "Lagerwert, gebundenes Kapital sowie Bestell- und Plansummen brauchen die Stückkosten jedes Produkts. Gib hier Kosten für Produkte ein, die in Shopify keine haben, oder um deine echten Einstandskosten zu verwenden. Sie haben in der App Vorrang vor den Shopify-Kosten; Shopify selbst wird nicht geändert.",

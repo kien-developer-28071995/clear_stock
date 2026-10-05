@@ -14,3 +14,13 @@ export function optionValue(value: string | number | null | undefined): string {
 export function fromOption(value: string): string {
     return value === NO_VALUE ? '' : value;
 }
+
+/**
+ * `key` for an `<s-select>` whose options come from the API. The component shows the option
+ * matching its value only among the options it had when the value was set: with options that
+ * arrive later it keeps showing the first one ("No supplier" for a product that has one).
+ * A new key when the options change builds it again with value and options together.
+ */
+export function optionsKey(count: number): string {
+    return `options-${count}`;
+}

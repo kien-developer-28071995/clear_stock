@@ -34,7 +34,9 @@ export function SupplierModal({ modalRef, supplier, onDone }: Props) {
     const canAutoEmail = useEntitlements().supplier_auto_email;
     const emailsExist = useFeature('supplier_emails');
 
-    useEffect(() => {
+    // Back to what is saved (or empty for a new one): when another one is opened, and each time the
+    // dialog opens, so reopening the same one never shows what was typed and abandoned before.
+    const reset = () => {
         setName(supplier?.name ?? '');
         setEmail(supplier?.email ?? '');
         setLead(supplier?.lead_time_days?.toString() ?? '');
@@ -47,6 +49,9 @@ export function SupplierModal({ modalRef, supplier, onDone }: Props) {
         setAutoEmail(supplier?.auto_email ?? false);
         create.reset();
         update.reset();
+    };
+    useEffect(() => {
+        reset();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [supplier]);
 
@@ -69,7 +74,7 @@ export function SupplierModal({ modalRef, supplier, onDone }: Props) {
     };
 
     return (
-        <s-modal ref={modalRef} id="supplier-modal" heading={supplier ? t('suppliers.edit') : t('suppliers.add')}>
+        <s-modal ref={modalRef} id="supplier-modal" onShow={reset} heading={supplier ? t('suppliers.edit') : t('suppliers.add')}>
             <s-stack gap="base">
                 <s-text-field label={t('suppliers.name')} value={name} error={fieldError(mutation.error, 'name')} onInput={(e) => setName(e.currentTarget.value)} />
                 <s-number-field
