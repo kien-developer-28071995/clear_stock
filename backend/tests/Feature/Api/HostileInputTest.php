@@ -4,6 +4,7 @@ use App\Models\Location;
 use App\Models\Shop;
 use App\Models\Supplier;
 use App\Services\Forecast\ForecastService;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Routing\Middleware\ThrottleRequests;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Queue;
@@ -126,3 +127,37 @@ it('never shows one shop the rows of another, whatever id is asked for', functio
         ->and($theirs->fresh()->lead_time_override)->toBeNull()
         ->and($theirSupplier->fresh()->name)->toBe('Secret supplier');
 });
+
+it('takes any file a merchant uploads without a server error', function (string $name, string $content) {
+    $file = fn () => UploadedFile::fake()->createWithContent($name, $content);
+    $failures = [];
+    foreach ([
+        ['/api/costs/import', ['file' => $file()]],
+        ['/api/imports/purchase-orders/preview', ['file' => $file()]],
+        ['/api/imports/purchase-orders/apply', ['file' => $file(), 'mapping' => ['supplier' => 0, 'sku' => 1, 'ordered_at' => 2, 'received_at' => 3]]],
+        ['/api/imports/purchase-orders/apply', ['file' => $file(), 'mapping' => ['supplier' => 999, 'sku' => -1, 'ordered_at' => 'x', 'received_at' => null]]],
+    ] as [$url, $body]) {
+        try {
+            $status = $this->post($url, $body, $this->auth + ['Accept' => 'application/json'])->getStatusCode();
+        } catch (Throwable $e) {
+            $status = 500;
+        }
+        if ($status >= 500) {
+            $failures[] = "{$url} with {$name} -> {$status}";
+        }
+    }
+
+    expect($failures)->toBe([]);
+})->with([
+    'empty' => ['empty.csv', ''],
+    'header only' => ['head.csv', "SKU,Cost\n"],
+    'no line break' => ['one.csv', 'SKU,Cost'],
+    'binary' => ['image.csv', random_bytes(4000)],
+    'not utf-8' => ['latin.csv', "SKU;Co\xFBt\nM\xFCg;4,50\n"],
+    'bom and semicolons' => ['bom.csv', "\xEF\xBB\xBFSKU;Cost\r\nSKU-1;4,50\r\n"],
+    'formulas and markup' => ['evil.csv', "SKU,Cost,Supplier,Ordered\n=cmd|' /C calc'!A0,<script>alert(1)</script>,@SUM(1+1),+1\n\"un\"\"closed,1\n"],
+    'huge cells and numbers' => ['huge.csv', "SKU,Cost\n".str_repeat('x', 200000).",1e999\nSKU-1,-5\nSKU-1,99999999999999999999\nSKU-1,abc\n"],
+    'ragged rows' => ['ragged.csv', "a,b,c\n1\n1,2,3,4,5,6,7,8,9\n,,,\n\n\n"],
+    'many rows' => ['many.csv', "SKU,Cost,Supplier,Ordered,Received\n".str_repeat("SKU-1,4.5,Acme,2026-01-01,2026-01-20\n", 6000)],
+    'wrong type of file' => ['doc.pdf', '%PDF-1.7 not a csv'],
+]);

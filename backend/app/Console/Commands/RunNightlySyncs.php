@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Enums\SyncType;
 use App\Models\Shop;
 use App\Services\Sync\SyncService;
+use App\Support\Monitor;
 use Carbon\CarbonImmutable;
 use Illuminate\Console\Command;
 
@@ -29,14 +30,19 @@ class RunNightlySyncs extends Command
             ->select(['id', 'domain', 'timezone', 'last_synced_at'])
             ->chunkById(200, function ($shops) use ($sync, $hour, &$started) {
                 foreach ($shops as $shop) {
-                    $local = CarbonImmutable::now($shop->timezone);
-                    $syncedToday = $shop->last_synced_at !== null
-                        && CarbonImmutable::parse($shop->last_synced_at)->setTimezone($shop->timezone)->isSameDay($local)
-                        && $local->hour >= $hour;
+                    // One shop that cannot start (its state, Shopify's answer) never stops the others.
+                    try {
+                        $local = CarbonImmutable::now($shop->timezone);
+                        $syncedToday = $shop->last_synced_at !== null
+                            && CarbonImmutable::parse($shop->last_synced_at)->setTimezone($shop->timezone)->isSameDay($local)
+                            && $local->hour >= $hour;
 
-                    if ($local->hour === $hour && ! $syncedToday) {
-                        $sync->start($shop->fresh(), SyncType::Nightly);
-                        $started++;
+                        if ($local->hour === $hour && ! $syncedToday) {
+                            $sync->start($shop->fresh(), SyncType::Nightly);
+                            $started++;
+                        }
+                    } catch (\Throwable $e) {
+                        Monitor::caught($e, 'nightly sync start', ['shop' => $shop->domain]);
                     }
                 }
             });

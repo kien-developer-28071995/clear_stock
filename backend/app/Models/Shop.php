@@ -9,6 +9,7 @@ use App\Observers\ShopObserver;
 use Database\Factories\ShopFactory;
 use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -75,6 +76,19 @@ class Shop extends Model
         'filter_sales_spikes' => true,
         'forecast_profile' => 'balanced',
     ];
+
+    /**
+     * Always a timezone PHP knows: Shopify's zone names are newer than a server's list now and
+     * then, and one unknown name must not stop the hourly work for every shop. UTC until it is known.
+     */
+    protected function timezone(): Attribute
+    {
+        return Attribute::get(function (?string $value): string {
+            static $known = [];
+
+            return $known[$value ?? ''] ??= $value !== null && $value !== '' && @timezone_open($value) !== false ? $value : 'UTC';
+        });
+    }
 
     protected function casts(): array
     {

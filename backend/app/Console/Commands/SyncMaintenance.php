@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Exceptions\SyncFailedException;
 use App\Repositories\Contracts\SyncRunRepositoryInterface;
 use App\Services\Sync\SyncService;
+use App\Support\Monitor;
 use Illuminate\Console\Command;
 
 class SyncMaintenance extends Command
@@ -17,7 +18,11 @@ class SyncMaintenance extends Command
     {
         $stuck = $runs->runningStartedBefore(now()->subHours(config('sync.stuck_after_hours')));
         foreach ($stuck as $run) {
-            $sync->fail($run->id, new SyncFailedException('timeout'));
+            try {
+                $sync->fail($run->id, new SyncFailedException('timeout'));
+            } catch (\Throwable $e) {
+                Monitor::caught($e, 'failing a stuck sync run', ['run' => $run->id]); // the next runs still get their turn
+            }
         }
 
         $pruned = $runs->pruneFinishedBefore(now()->subDays(config('sync.keep_runs_days')));
