@@ -5,7 +5,7 @@ namespace App\Services\Sync;
 use App\Models\Shop;
 use App\Repositories\Contracts\CatalogRepositoryInterface;
 use App\Support\Gid;
-use Illuminate\Support\Carbon;
+use App\Support\Payload;
 
 /** Imports the variants bulk result (BulkQueries::variants) incl. native bundle components. */
 class VariantImporter
@@ -27,34 +27,39 @@ class VariantImporter
             if (isset($line['__parentId'])) {
                 // ProductVariantComponent of a native bundle.
                 $bundle = Gid::id($line['__parentId']);
-                $component = Gid::id($line['productVariant']['id'] ?? null);
+                $component = Gid::id(Payload::get($line, 'productVariant', 'id'));
                 if ($bundle && $component) {
-                    $components[$bundle][] = [$component, max(1, (int) $line['quantity'])];
+                    $components[$bundle][] = [$component, Payload::int($line['quantity'] ?? null, 1, 100_000) ?? 1];
                 }
 
                 continue;
             }
 
-            $variantId = Gid::id($line['id']);
+            // A record we cannot place (no variant or product id) is left out, not guessed at.
+            $variantId = Gid::id($line['id'] ?? null);
+            $productId = Gid::id(Payload::get($line, 'product', 'id'));
+            if ($variantId === null || $productId === null) {
+                continue;
+            }
             if (! empty($line['requiresComponents'])) {
                 $bundles[$variantId] = true;
             }
 
             $rows[] = [
                 'shopify_variant_id' => $variantId,
-                'shopify_product_id' => Gid::id($line['product']['id']),
-                'inventory_item_id' => Gid::id($line['inventoryItem']['id'] ?? null),
-                'product_title' => mb_substr((string) $line['product']['title'], 0, 255),
-                'title' => $line['title'] !== null ? mb_substr((string) $line['title'], 0, 255) : null,
-                'vendor' => trim((string) ($line['product']['vendor'] ?? '')) !== '' ? mb_substr(trim($line['product']['vendor']), 0, 255) : null,
-                'product_type' => trim((string) ($line['product']['productType'] ?? '')) !== '' ? mb_substr(trim($line['product']['productType']), 0, 255) : null,
-                'sku' => ($line['sku'] ?? '') !== '' ? mb_substr((string) $line['sku'], 0, 255) : null,
-                'barcode' => trim((string) ($line['barcode'] ?? '')) !== '' ? mb_substr(trim($line['barcode']), 0, 255) : null,
-                'shopify_unit_cost' => $line['inventoryItem']['unitCost']['amount'] ?? null,
-                'price' => $line['price'] ?? null,
-                'tracked' => (bool) ($line['inventoryItem']['tracked'] ?? false),
-                'is_active' => ($line['product']['status'] ?? 'ACTIVE') === 'ACTIVE',
-                'shopify_created_at' => Carbon::parse($line['createdAt'])->utc()->toDateTimeString(),
+                'shopify_product_id' => $productId,
+                'inventory_item_id' => Gid::id(Payload::get($line, 'inventoryItem', 'id')),
+                'product_title' => Payload::text(Payload::get($line, 'product', 'title')) ?? '',
+                'title' => Payload::text($line['title'] ?? null),
+                'vendor' => Payload::text(Payload::get($line, 'product', 'vendor')),
+                'product_type' => Payload::text(Payload::get($line, 'product', 'productType')),
+                'sku' => Payload::text($line['sku'] ?? null),
+                'barcode' => Payload::text($line['barcode'] ?? null),
+                'shopify_unit_cost' => Payload::money(Payload::get($line, 'inventoryItem', 'unitCost', 'amount')),
+                'price' => Payload::money($line['price'] ?? null),
+                'tracked' => Payload::get($line, 'inventoryItem', 'tracked') === true,
+                'is_active' => (Payload::get($line, 'product', 'status') ?? 'ACTIVE') === 'ACTIVE',
+                'shopify_created_at' => Payload::utc($line['createdAt'] ?? null),
             ];
             $count++;
 

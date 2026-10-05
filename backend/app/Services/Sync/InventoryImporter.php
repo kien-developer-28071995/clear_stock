@@ -5,6 +5,7 @@ namespace App\Services\Sync;
 use App\Models\Shop;
 use App\Repositories\Contracts\CatalogRepositoryInterface;
 use App\Support\Gid;
+use App\Support\Payload;
 use Illuminate\Support\Carbon;
 
 /**
@@ -27,19 +28,27 @@ class InventoryImporter
 
         foreach ($path ? JsonlReader::read($path) : [] as $line) {
             if (isset($line['__parentId'])) {
-                $quantities = collect($line['quantities'] ?? [])->pluck('quantity', 'name');
-                $location = Gid::id($line['location']['id'] ?? null);
-                if ($quantities->has('available') && isset($locationIds[$location])) {
-                    $levelsByItem[Gid::id($line['__parentId'])][] = [$locationIds[$location], (int) $quantities['available'], max(0, (int) ($quantities['incoming'] ?? 0))];
+                // name => quantity of the well-formed entries only.
+                $quantities = [];
+                foreach (is_array($line['quantities'] ?? null) ? $line['quantities'] : [] as $entry) {
+                    if (is_array($entry) && is_string($entry['name'] ?? null) && Payload::int($entry['quantity'] ?? null) !== null) {
+                        $quantities[$entry['name']] = Payload::int($entry['quantity'], -2_000_000_000, 2_000_000_000);
+                    }
+                }
+                $location = Gid::id(Payload::get($line, 'location', 'id'));
+                $item = Gid::id($line['__parentId']);
+                if (isset($quantities['available']) && $item !== null && isset($locationIds[$location])) {
+                    $levelsByItem[$item][] = [$locationIds[$location], $quantities['available'], max(0, $quantities['incoming'] ?? 0)];
                 }
 
                 continue;
             }
 
-            $variant = $variantIds[Gid::id($line['variant']['id'] ?? null)] ?? null;
-            if ($variant !== null) {
-                $itemToVariant[Gid::id($line['id'])] = $variant;
-                $tracked[] = ['variant_id' => $variant, 'tracked' => (bool) $line['tracked']];
+            $variant = $variantIds[Gid::id(Payload::get($line, 'variant', 'id'))] ?? null;
+            $item = Gid::id($line['id'] ?? null);
+            if ($variant !== null && $item !== null) {
+                $itemToVariant[$item] = $variant;
+                $tracked[] = ['variant_id' => $variant, 'tracked' => ($line['tracked'] ?? false) === true];
             }
         }
 

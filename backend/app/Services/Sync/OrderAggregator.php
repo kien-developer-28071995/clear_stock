@@ -47,21 +47,27 @@ class OrderAggregator
         $tags = $excluding ? array_map('mb_strtolower', $shop->excluded_order_tags ?? []) : [];
         $sources = $excluding ? $shop->excluded_order_sources ?? [] : [];
         $excludedOrders = 0;
-        $excluded = fn (array $order): bool => ($tags !== [] && array_intersect($tags, array_map('mb_strtolower', $order['tags'] ?? [])) !== [])
-            || ($sources !== [] && in_array(OrderSource::of($order['sourceName'] ?? null), $sources, true));
+        $excluded = fn (array $order): bool => ($tags !== [] && array_intersect($tags, array_map('mb_strtolower', array_filter(is_array($order['tags'] ?? null) ? $order['tags'] : [], 'is_string'))) !== [])
+            || ($sources !== [] && in_array(OrderSource::of(is_string($order['sourceName'] ?? null) ? $order['sourceName'] : null), $sources, true));
+        // Units of one line as the export gives them: a whole number from 0 up to a sane ceiling.
+        $units = fn (mixed $value): int => is_numeric($value) ? (int) max(0, min(1_000_000, (float) $value)) : 0;
+        $gidOf = fn (mixed $node): mixed => is_array($node) ? ($node['id'] ?? null) : null;
         foreach ($path ? JsonlReader::read($path) : [] as $line) {
             if (! isset($line['__parentId'])) {
+                $orderId = Gid::id($line['id'] ?? null);
+                if ($orderId === null) {
+                    continue; // not an order we can place
+                }
                 if ($excluded($line)) {
-                    $orderDay[Gid::id($line['id'])] = null;
+                    $orderDay[$orderId] = null;
                     $excludedOrders++;
 
                     continue;
                 }
-                $orderDay[Gid::id($line['id'])] = $line['cancelledAt'] === null
-                    ? Carbon::parse($line['processedAt'])->setTimezone($shop->timezone)->toDateString()
-                    : null;
+                $orderDay[$orderId] = ($line['cancelledAt'] ?? null) === null ? $this->localDay($line['processedAt'] ?? null, $shop->timezone) : null;
             } elseif (isset($line['id']) && Gid::type($line['id']) === 'FulfillmentOrder' && ($line['status'] ?? '') !== 'CANCELLED') {
-                $location = $locationIds[Gid::id($line['assignedLocation']['location']['id'] ?? null)] ?? null;
+                $assigned = is_array($line['assignedLocation'] ?? null) ? ($line['assignedLocation']['location'] ?? null) : null;
+                $location = $locationIds[Gid::id($gidOf($assigned))] ?? null;
                 if ($location !== null) {
                     $fulfillmentOrders[Gid::id($line['id'])] = [Gid::id($line['__parentId']), $location];
                 }
@@ -82,10 +88,11 @@ class OrderAggregator
             if (Gid::type($line['__parentId']) === 'FulfillmentOrder') {
                 [$orderId, $location] = $fulfillmentOrders[Gid::id($line['__parentId'])] ?? [null, null];
                 $day = $orderDay[$orderId] ?? null;
-                $variant = $variantIds[Gid::id($line['variant']['id'] ?? null)] ?? null;
-                if ($location !== null && $day !== null && $day >= $windowStart && $variant !== null && (int) $line['totalQuantity'] > 0) {
+                $variant = $variantIds[Gid::id($gidOf($line['variant'] ?? null))] ?? null;
+                $quantity = $units($line['totalQuantity'] ?? 0);
+                if ($location !== null && $day !== null && $day >= $windowStart && $variant !== null && $quantity > 0) {
                     $key = "{$variant}|{$location}|{$day}";
-                    $byLocation[$key] = ($byLocation[$key] ?? 0) + (int) $line['totalQuantity'];
+                    $byLocation[$key] = ($byLocation[$key] ?? 0) + $quantity;
                 }
 
                 continue;
@@ -98,20 +105,20 @@ class OrderAggregator
             }
             $lineItems++;
 
-            $variant = $variantIds[Gid::id($line['variant']['id'] ?? null)] ?? null;
+            $variant = $variantIds[Gid::id($gidOf($line['variant'] ?? null))] ?? null;
             if ($variant !== null) {
-                $qty = (int) $line['quantity'];
-                $current = (int) ($line['currentQuantity'] ?? $qty);
+                $qty = $units($line['quantity'] ?? 0);
+                $current = min($qty, $units($line['currentQuantity'] ?? $qty));
                 $totals[$variant][$day][0] = ($totals[$variant][$day][0] ?? 0) + $qty;
                 $totals[$variant][$day][1] = ($totals[$variant][$day][1] ?? 0) + max(0, $qty - $current);
             }
 
-            $group = $line['lineItemGroup'] ?? null;
+            $group = is_array($line['lineItemGroup'] ?? null) && is_string($line['lineItemGroup']['id'] ?? null) ? $line['lineItemGroup'] : null;
             if ($group !== null && ! isset($groupsSeen[$orderId.'|'.$group['id']])) {
                 $groupsSeen[$orderId.'|'.$group['id']] = true;
                 $bundle = $variantIds[Gid::id($group['variantId'] ?? null)] ?? null;
                 if ($bundle !== null) {
-                    $totals[$bundle][$day][0] = ($totals[$bundle][$day][0] ?? 0) + (int) $group['quantity'];
+                    $totals[$bundle][$day][0] = ($totals[$bundle][$day][0] ?? 0) + $units($group['quantity'] ?? 0);
                     $totals[$bundle][$day][1] ??= 0;
                 }
             }
@@ -140,5 +147,18 @@ class OrderAggregator
         }
 
         return ['orders' => count($orderDay), 'excluded_orders' => $excludedOrders, 'line_items' => $lineItems, 'rows' => count($rows), 'location_rows' => count($byLocation)];
+    }
+
+    /** The shop's calendar day of an order, or null when the export gives no usable time for it. */
+    private function localDay(mixed $processedAt, string $timezone): ?string
+    {
+        if (! is_string($processedAt) || $processedAt === '') {
+            return null;
+        }
+        try {
+            return Carbon::parse($processedAt)->setTimezone($timezone)->toDateString();
+        } catch (\Throwable) {
+            return null;
+        }
     }
 }

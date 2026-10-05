@@ -125,3 +125,34 @@ it('imports stock on the way (Shopify incoming)', function () {
         ->toBe(['location_id' => $main->id, 'available' => 7, 'incoming' => 40])
         ->and(app(CatalogRepositoryInterface::class)->incomingByVariant($this->shop))->toBe([$v1->id => 40]);
 });
+
+it('imports the good products from an export full of nonsense, and never fails on the rest', function () {
+    $nonsense = [
+        variantLine(1),                                                                  // the good one
+        [], ['id' => 12], ['id' => null], ['id' => 'gid://shopify/ProductVariant/abc'],
+        ['id' => gid('ProductVariant', 2)],                                              // nothing else
+        variantLine(3, ['product' => null]),
+        variantLine(4, ['product' => 'a string', 'inventoryItem' => 'x', 'price' => ['x'], 'createdAt' => 'not a date', 'sku' => ['a'], 'title' => 12]),
+        variantLine(5, ['price' => '1e400', 'inventoryItem' => ['unitCost' => ['amount' => '-5'], 'tracked' => 'maybe', 'id' => 'x'], 'createdAt' => '9999-99-99']),
+        variantLine(6, ['price' => 'NaN', 'inventoryItem' => ['unitCost' => 'free'], 'product' => ['title' => str_repeat('x', 3000), 'vendor' => ['v'], 'productType' => 7, 'status' => 5]]),
+        variantLine(7, ['barcode' => ['x'], 'requiresComponents' => 'yes', 'sku' => str_repeat('s', 2000)]),
+        ['__parentId' => gid('ProductVariant', 1), 'id' => gid('InventoryLevel', 1), 'quantities' => 'none', 'location' => 'x'],
+        ['__parentId' => 'x', 'quantity' => 'x', 'productVariant' => 5],
+        ['__parentId' => gid('ProductVariant', 999), 'productVariant' => ['id' => gid('ProductVariant', 1)], 'quantity' => -3],
+    ];
+
+    app(VariantImporter::class)->import($this->shop, jsonlFile($nonsense));
+    $location = Location::factory()->for($this->shop)->create(['shopify_location_id' => 1]);
+    app(InventoryImporter::class)->import($this->shop, jsonlFile(array_merge($nonsense, [
+        ['id' => gid('InventoryLevel', 5), 'item' => 'x', 'location' => ['id' => gid('Location', 1)], 'quantities' => [['name' => 'available', 'quantity' => 'lots']]],
+        ['id' => gid('InventoryLevel', 6), 'item' => ['id' => gid('InventoryItem', 100)], 'location' => null, 'quantities' => 'x'],
+        ['id' => gid('InventoryLevel', 7), 'item' => ['id' => gid('InventoryItem', 100)], 'location' => ['id' => gid('Location', 1)], 'quantities' => [['name' => 'available', 'quantity' => PHP_INT_MAX], ['name' => 'incoming', 'quantity' => -PHP_INT_MAX], 'x', ['name' => 5]]],
+    ])), Carbon::now());
+
+    $good = Variant::forShop($this->shop)->where('shopify_variant_id', 1)->first();
+    expect($good)->not->toBeNull()
+        ->and($good->sku)->toBe('SKU-1')
+        ->and(Variant::forShop($this->shop)->whereNull('shopify_variant_id')->count())->toBe(0)
+        ->and(Variant::forShop($this->shop)->where('unit_cost', '<', 0)->count())->toBe(0)
+        ->and(InventoryLevel::where('shop_id', $this->shop->id)->where('available', '>', 2_000_000_000)->count())->toBe(0);
+});

@@ -19,8 +19,14 @@ final class JsonlReader
         try {
             while (($line = fgets($handle)) !== false) {
                 $line = trim($line);
-                if ($line !== '') {
-                    yield json_decode($line, true, 512, JSON_THROW_ON_ERROR);
+                if ($line === '') {
+                    continue;
+                }
+                // A line that is not JSON at all fails the read: a cut-off download must be fetched
+                // again, not half imported. A JSON value that is not a record is simply not one.
+                $record = json_decode($line, true, 512, JSON_THROW_ON_ERROR);
+                if (is_array($record) && ! array_is_list($record)) {
+                    yield $record;
                 }
             }
         } finally {
