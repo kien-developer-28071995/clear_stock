@@ -6,6 +6,7 @@ use App\Enums\AlertFrequency;
 use App\Enums\RealtimeAlertMode;
 use App\Models\Concerns\BelongsToShop;
 use App\Observers\AlertSettingObserver;
+use App\Support\Features;
 use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -51,6 +52,9 @@ class AlertSetting extends Model
     /** The Slack webhook, or null when unset or unreadable (APP_KEY changed without APP_PREVIOUS_KEYS). */
     public function slackUrl(): ?string
     {
+        if (! Features::on('slack_alerts')) {
+            return null;
+        }
         try {
             return $this->slack_webhook_url ?: null;
         } catch (DecryptException) {

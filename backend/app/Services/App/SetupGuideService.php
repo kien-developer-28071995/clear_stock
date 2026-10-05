@@ -11,6 +11,7 @@ use App\Repositories\Contracts\ForecastQueryRepositoryInterface;
 use App\Repositories\Contracts\ShopRepositoryInterface;
 use App\Repositories\Contracts\SupplierRepositoryInterface;
 use App\Support\Entitlements;
+use App\Support\Features;
 use Carbon\CarbonImmutable;
 use Illuminate\Validation\ValidationException;
 
@@ -53,7 +54,7 @@ class SetupGuideService
             'done' => (bool) $done[$step->value],
             'skipped' => ! $done[$step->value] && in_array($step->value, $skipped, true),
             'skippable' => $step->skippable(),
-        ], SetupStep::cases());
+        ], array_values(array_filter(SetupStep::cases(), fn (SetupStep $step) => $step !== SetupStep::Alerts || Features::enabled(Feature::Alerts))));  // no alerts in this app: no step for them
 
         $completed = count(array_filter($steps, fn ($s) => $s['done'] || $s['skipped']));
 
@@ -69,7 +70,7 @@ class SetupGuideService
                 // The product to open for "see why a product needs reordering".
                 'example_variant' => $this->exampleVariant($shop),
                 // Suppliers can be created from Shopify vendors in one step.
-                'vendor_count' => count($this->catalog->facets($shop)['vendors']),
+                'vendor_count' => Features::on('vendor_suppliers') ? count($this->catalog->facets($shop)['vendors']) : 0,
             ],
         ];
     }

@@ -291,7 +291,7 @@ for (const plan of ['free', 'starter', 'growth'] as PlanKey[]) {
             expect(orders).toHaveLength(1);
             await app.locator('s-table-row', { hasText: String(before.suggested_qty) }).locator('s-button', { hasText: 'Received' }).first().click();
             await expect.poll(async () => (await api<Orders>(app, '/manual-orders')).data.open.some((o) => o.variant_id === variantId)).toBe(false);
-            expect((await api<Detail>(app, `/forecasts/${variantId}`)).data.suggested_qty).toBe(before.suggested_qty);
+            await expect.poll(async () => (await api<Detail>(app, `/forecasts/${variantId}`)).data.suggested_qty).toBe(before.suggested_qty);
 
             // Leave nothing open (other tests read the reorder list).
             for (const o of (await api<Orders>(app, '/manual-orders')).data.open) expect(await call(`/manual-orders/${o.id}`, 'PATCH', { status: 'cancelled' })).toBe(200);

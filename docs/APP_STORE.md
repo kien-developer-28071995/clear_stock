@@ -20,6 +20,12 @@ switched off with `FEATURE_*` (README "Feature switches") and can be released la
 | Forecast accuracy report | **On** (every plan) | Read-only view: past forecasts next to what really sold. |
 | One-off sales spikes ignored, sales lost to stock-outs | **On** (every plan) | Forecast quality and a read-only view; merchants can turn spike filtering off in Settings. |
 | New products from a similar product | **On** (Starter) | A setting on the product page. |
+| Email alerts with the days-left threshold, weekly summary, forecast profiles, trend, unit costs in the app, inventory value history, what to clear, data check, product list CSV | **On** | Settings and read-only views on data the app already has. Each has its own switch since 2026-10-05. |
+| Summary posted to Slack | Off | Not tried with a real Slack workspace yet. |
+| Orders left out by tag / POS / draft | Off | Not checked against real order data yet; a change re-reads the whole order history. |
+| Locations not counted as stock | Off | Belongs with the multi-location features. |
+| Backup suppliers per product, saved views, sizes sold out | Off | Niche extras: a simpler first version to review and to learn. |
+| Shopify's own purchase orders (read-only) | Off | Needs an optional scope and has not run against the real API. |
 | Emailing orders to suppliers | Off | Sends email to third parties on the merchant's behalf: more review questions and needs a verified sending domain first. |
 | Per-location forecasts | Off | Needs 2 extra protected scopes (`read_*_fulfillment_orders`). |
 | Transfers | Off | Needs locations and the optional `write_inventory_transfers` scope (the app's only write). |

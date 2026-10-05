@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { useFeature } from '@/hooks/useEntitlements';
 import { DashboardGate } from '@/features/dashboard/components/DashboardGate';
 import { RunwayChart } from '@/features/dashboard/components/RunwayChart';
 import { Overstock } from '@/features/dashboard/components/Overstock';
@@ -18,6 +19,9 @@ const INSIGHT_TABS = ['stock', 'excess', 'products'] as const;
 /** The overview: days of stock left per product, and money tied up in slow stock. */
 export function InsightsPage() {
     const { t } = useTranslation();
+    const historyExists = useFeature('stock_history');
+    const clearanceExists = useFeature('clearance');
+    const sizeRunsExist = useFeature('size_runs');
     const [tab, setTab] = useTab(INSIGHT_TABS);
 
     return (
@@ -39,12 +43,12 @@ export function InsightsPage() {
                         <Tip id="home_runway">{t('tips.home_runway')}</Tip>
                         <RunwayChart items={data.runway} />
                         <LostSales dashboard={data} />
-                        <StockHistoryChart />
+                        {historyExists && <StockHistoryChart />}
                     </TabPanel>
                     <TabPanel active={tab === 'excess'}>
                         <Overstock dashboard={data} />
                         <SlowMovers dashboard={data} />
-                        <ClearanceList />
+                        {clearanceExists && <ClearanceList />}
                         <DiscontinuedStock dashboard={data} />
                         {data.slow_movers.count === 0 && data.overstock.count === 0 && (
                             <s-section>
@@ -54,7 +58,7 @@ export function InsightsPage() {
                     </TabPanel>
                     <TabPanel active={tab === 'products'}>
                         <AbcSummary dashboard={data} />
-                        <SizeRuns />
+                        {sizeRunsExist && <SizeRuns />}
                         <ForecastAccuracy />
                     </TabPanel>
                     {tab === 'stock' && data.runway.length === 0 && (

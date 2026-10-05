@@ -18,17 +18,20 @@ export function useSectionTabs(group: SectionGroup): { path: string; label: stri
     const budget = useFeature('order_budget');
     const whatIf = useFeature('what_if');
     const events = useFeature('sales_events');
+    const orders = useFeature('manual_orders');
+    const bundles = useFeature('bundles');
+    const costs = useFeature('costs');
 
     const all: Record<SectionGroup, { path: string; label: string; on?: boolean }[]> = {
         reorder: [
             { path: '/reorder', label: t('sections.toOrder') },
-            { path: '/reorder/orders', label: t('nav.orders') },
+            { path: '/reorder/orders', label: t('nav.orders'), on: orders },
             { path: '/reorder/transfers', label: t('nav.transfers'), on: transfers },
         ],
         products: [
             { path: '/products', label: t('sections.allProducts') },
-            { path: '/products/bundles', label: t('nav.bundles') },
-            { path: '/products/costs', label: t('nav.costs') },
+            { path: '/products/bundles', label: t('nav.bundles'), on: bundles },
+            { path: '/products/costs', label: t('nav.costs'), on: costs },
         ],
         planning: [
             { path: '/planning', label: t('nav.purchasePlan'), on: purchasePlan },

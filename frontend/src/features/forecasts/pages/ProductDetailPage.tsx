@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { useFeature } from '@/hooks/useEntitlements';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router';
 import { Tip } from '@/features/setup/components/Tip';
@@ -20,6 +21,8 @@ const PRODUCT_TABS = ['forecast', 'settings', 'suppliers'] as const;
 
 export function ProductDetailPage() {
     const { t } = useTranslation();
+    const ordersExist = useFeature('manual_orders');
+    const alternatesExist = useFeature('alternate_suppliers');
     const variantId = Number(useParams().variantId);
     const { data: f, isPending, error, refetch } = useForecast(variantId);
     const guide = useSetupGuide();
@@ -48,7 +51,7 @@ export function ProductDetailPage() {
     return (
         <s-page heading={f.name}>
             <s-link slot="breadcrumb-actions" href="/products">{t('nav.products')}</s-link>
-            {f.status !== 'discontinued' && (
+            {ordersExist && f.status !== 'discontinued' && (
                 <s-button slot="secondary-actions" onClick={() => markModal.open()}>
                     {t('orders.mark')}
                 </s-button>
@@ -64,10 +67,10 @@ export function ProductDetailPage() {
                 value={tab}
                 onChange={setTab}
                 tabs={[
-                    { id: 'forecast', label: t('tabs.product.forecast') },
-                    { id: 'settings', label: t('tabs.product.settings') },
-                    { id: 'suppliers', label: t('tabs.product.suppliers') },
-                ]}
+                    { id: 'forecast' as const, label: t('tabs.product.forecast') },
+                    { id: 'settings' as const, label: t('tabs.product.settings') },
+                    { id: 'suppliers' as const, label: t('tabs.product.suppliers') },
+                ].filter((x) => x.id !== 'suppliers' || alternatesExist)}
             />
             <TabPanel active={tab === 'forecast'}>
                 <Tip id="product_explanation">{t('tips.product_explanation')}</Tip>
@@ -79,7 +82,7 @@ export function ProductDetailPage() {
                 <ProductSettingsForm f={f} />
             </TabPanel>
             <TabPanel active={tab === 'suppliers'}>
-                <AlternateSuppliers f={f} />
+                {alternatesExist && <AlternateSuppliers f={f} />}
             </TabPanel>
         </s-page>
     );

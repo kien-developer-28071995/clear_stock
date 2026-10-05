@@ -25,8 +25,8 @@ export function useUpdateSettings() {
     });
 }
 
-export function useStockLocations() {
-    return useQuery({ queryKey: ['settings', 'locations'], queryFn: settingsApi.locations });
+export function useStockLocations(enabled = true) {
+    return useQuery({ queryKey: ['settings', 'locations'], queryFn: settingsApi.locations, enabled });
 }
 
 export function useExcludeLocations() {

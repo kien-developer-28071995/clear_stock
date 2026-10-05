@@ -63,7 +63,7 @@ class ExplanationFormatter
             $out[] = $this->line('profile_'.$profile.(($e['profile']['source'] ?? 'shop') === 'variant' ? '_product' : ''));
         }
         $trend = $e['trend'] ?? null;
-        if ($trend !== null && $trend['direction'] !== 'flat') {
+        if ($trend !== null && $trend['direction'] !== 'flat' && Features::on('trend')) {
             $out[] = $this->line('trend_'.$trend['direction'], [
                 'percent' => abs($trend['percent']), 'count' => $trend['recent_days'],
                 'recent' => $this->round($trend['recent_avg']), 'baseline' => $this->round($trend['baseline_avg']), 'days' => $trend['baseline_days'],

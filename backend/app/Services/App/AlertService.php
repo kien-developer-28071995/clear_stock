@@ -14,6 +14,7 @@ use App\Repositories\Contracts\AlertSettingRepositoryInterface;
 use App\Repositories\Contracts\ForecastQueryRepositoryInterface;
 use App\Services\Forecast\ExplanationFormatter;
 use App\Support\Entitlements;
+use App\Support\Features;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
@@ -69,7 +70,7 @@ class AlertService
             ->sortBy([fn ($a, $b) => ($a->current_stock > 0) <=> ($b->current_stock > 0), fn ($a, $b) => $a->reorder_date <=> $b->reorder_date])
             ->values();
         // The merchant's own threshold: also products with only N days of stock left, before their reorder date.
-        if ($setting->cover_days !== null) {
+        if ($setting->cover_days !== null && Features::on('low_cover_alerts')) {
             $items = $items->concat($this->forecasts->lowCover($shop, $local->toDateString(), $setting->cover_days)
                 ->reject(fn (Forecast $f) => $f->variant->alerts_muted || $items->contains('variant_id', $f->variant_id)))->values();
         }
