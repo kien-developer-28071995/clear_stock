@@ -41,18 +41,18 @@ class WebhookService
 
         $job = match ($topicEnum) {
             WebhookTopic::AppUninstalled => new HandleAppUninstalled($shop),
-            WebhookTopic::AppScopesUpdate => new HandleScopesUpdate($shop, $payload['current'] ?? []),
+            WebhookTopic::AppScopesUpdate => new HandleScopesUpdate($shop, array_values(array_filter(is_array($payload['current'] ?? null) ? $payload['current'] : [], 'is_string'))),
             // Only ids are kept: the payload carries customer contact data we must not store.
             WebhookTopic::CustomersDataRequest => new HandleCustomersDataRequest($shop, $this->requestIds($payload)),
             WebhookTopic::CustomersRedact => new HandleCustomersRedact($shop, $this->requestIds($payload)),
             WebhookTopic::ShopRedact => new HandleShopRedact($shop),
             WebhookTopic::AppSubscriptionsUpdate => new HandleAppSubscriptionUpdate($shop),
-            WebhookTopic::BulkOperationsFinish => new HandleBulkOperationFinished($shop, (string) ($payload['admin_graphql_api_id'] ?? '')),
+            WebhookTopic::BulkOperationsFinish => new HandleBulkOperationFinished($shop, is_scalar($payload['admin_graphql_api_id'] ?? null) ? (string) $payload['admin_graphql_api_id'] : ''),
             WebhookTopic::InventoryLevelsUpdate => new HandleInventoryLevelUpdate($shop, [
-                'inventory_item_id' => isset($payload['inventory_item_id']) ? (int) $payload['inventory_item_id'] : null,
-                'location_id' => isset($payload['location_id']) ? (int) $payload['location_id'] : null,
-                'available' => isset($payload['available']) ? (int) $payload['available'] : null,
-                'updated_at' => isset($payload['updated_at']) ? (string) $payload['updated_at'] : null,
+                'inventory_item_id' => $this->int($payload['inventory_item_id'] ?? null),
+                'location_id' => $this->int($payload['location_id'] ?? null),
+                'available' => $this->int($payload['available'] ?? null),
+                'updated_at' => is_string($payload['updated_at'] ?? null) ? $payload['updated_at'] : null,
             ]),
         };
 
@@ -75,9 +75,15 @@ class WebhookService
     private function requestIds(array $payload): array
     {
         return [
-            'customer_id' => isset($payload['customer']['id']) ? (int) $payload['customer']['id'] : null,
-            'orders' => array_map('intval', $payload['orders_requested'] ?? $payload['orders_to_redact'] ?? []),
-            'data_request_id' => isset($payload['data_request']['id']) ? (int) $payload['data_request']['id'] : null,
+            'customer_id' => $this->int(is_array($payload['customer'] ?? null) ? ($payload['customer']['id'] ?? null) : null),
+            'orders' => array_values(array_filter(array_map(fn ($id) => $this->int($id), is_array($orders = $payload['orders_requested'] ?? $payload['orders_to_redact'] ?? null) ? $orders : []), fn ($id) => $id !== null)),
+            'data_request_id' => $this->int(is_array($payload['data_request'] ?? null) ? ($payload['data_request']['id'] ?? null) : null),
         ];
+    }
+
+    /** A whole number from a payload field, or null when it is missing or not a number (Shopify signs the body, not its shape). */
+    private function int(mixed $value): ?int
+    {
+        return is_int($value) || (is_string($value) && preg_match('/^-?\d{1,18}$/', $value)) ? (int) $value : null;
     }
 }

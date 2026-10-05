@@ -62,7 +62,7 @@ function randomShop(int $seed): Shop
             if ($sold === 0 && $shape !== 'returns' && mt_rand(0, 2) > 0) {
                 continue; // days without a row
             }
-            $rows[] = ['shop_id' => $shop->id, 'variant_id' => $v->id, 'date' => CarbonImmutable::parse('2026-09-20')->subDays($ago)->toDateString(),
+            $rows[] = ['shop_id' => $shop->id, 'variant_id' => $v->id, 'date' => CarbonImmutable::now('UTC')->subDays($ago)->toDateString(),
                 'units_sold' => $sold, 'units_returned' => $shape === 'returns' ? mt_rand(0, 6) : 0, 'end_of_day_stock' => null, 'was_in_stock' => mt_rand(0, 6) > 0];
         }
         foreach (array_chunk($rows, 200) as $chunk) {
@@ -74,6 +74,9 @@ function randomShop(int $seed): Shop
 }
 
 it('keeps its promises for any shop', function (int $seed) {
+    // Also at awkward moments: seconds around midnight UTC (another day already in some of the
+    // shops' timezones), New Year's Eve, a leap day.
+    $this->travelTo(['2026-09-20 10:00:00', '2026-09-20 23:59:30', '2026-09-21 00:00:30', '2026-12-31 23:59:59', '2028-02-29 12:00:00'][$seed % 5]);
     $shop = randomShop($seed);
     app(ForecastService::class)->runForShop($shop);
     $auth = ['Authorization' => 'Bearer '.sessionToken($shop->domain)];
