@@ -1,4 +1,4 @@
-import { api, expect, open, setPlan, settled, test, toasts } from './support/app';
+import { api, expect, open, php, setPlan, settled, test, toasts } from './support/app';
 
 /**
  * When the backend fails. Every screen must say so (never an endless spinner, a blank page or a
@@ -168,5 +168,39 @@ test('an impatient double click sends one request', async ({ app }) => {
         await app.evaluate(async (id) => {
             await fetch(`/api/manual-orders/${id}`, { method: 'PATCH', headers: { Authorization: `Bearer ${await window.shopify.idToken()}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ status: 'cancelled' }) });
         }, o.id);
+    }
+});
+
+test('a product with an impossible name breaks no screen, on a desktop or a phone', async ({ app }) => {
+    test.setTimeout(240_000);
+    await open(app, '/');
+    const row = (await api<{ data: { variant_id: number }[] }>(app, '/forecasts?status=reorder_now')).data[0];
+    const original = php<{ product_title: string; title: string; sku: string | null; vendor: string | null }>(
+        `echo json_encode(App\\Models\\Variant::withoutGlobalScopes()->find(${row.variant_id})->only(['product_title', 'title', 'sku', 'vendor']));`,
+    );
+    const evil = `<img src=x onerror="window.__pwned=1"><script>window.__pwned=1</script> שלום 😀 ${'Supercalifragilistic'.repeat(4)} ${'wide '.repeat(60)}`;
+    const set = (v: typeof original) =>
+        php(`$v = App\\Models\\Variant::withoutGlobalScopes()->find(${row.variant_id}); $v->forceFill(json_decode(base64_decode('${Buffer.from(JSON.stringify(v)).toString('base64')}'), true))->save(); App\\Support\\CacheVersion::bumpCatalog($v->shop_id); echo json_encode(true);`);
+    // As long as the sync lets them be (it cuts every name at the column's 255 characters).
+    set({ product_title: evil.slice(0, 255), title: evil.slice(0, 255), sku: 'SKU-' + 'X'.repeat(251), vendor: 'V'.repeat(255) });
+
+    try {
+        for (const width of [1280, 390]) {
+            await app.setViewportSize({ width, height: 844 });
+            for (const path of ['/', '/reorder', '/products', `/products/${row.variant_id}`, `/products/${row.variant_id}?tab=settings`, '/insights', '/planning', '/planning/budget', '/planning/what-if', '/data-health', '/products/costs']) {
+                await app.goto(path);
+                await expect(app.locator('s-page').first(), path).toBeVisible();
+                await settled(app);
+                // Shown as text, never run or built into the page.
+                expect(await app.evaluate(() => (window as unknown as { __pwned?: number }).__pwned), `${path} ran markup from a product name`).toBeUndefined();
+                expect(await app.evaluate(() => document.querySelectorAll('#root img[onerror], #root script').length), path).toBe(0);
+                // And the page still fits its width (3px: the test harness's own menu row).
+                const overflow = await app.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+                expect(overflow, `${path} at ${width}px is wider than the screen by ${overflow}px`).toBeLessThanOrEqual(3);
+            }
+        }
+    } finally {
+        set(original);
+        await app.setViewportSize({ width: 1280, height: 720 });
     }
 });
