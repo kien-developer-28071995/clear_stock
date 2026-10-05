@@ -744,7 +744,8 @@
     "trend_down_one": "Verkauft sich am letzten Tag {{percent}} % langsamer ({{recent}}/Tag) als in den {{days}} Tagen davor ({{baseline}}/Tag).",
     "trend_down_other": "Verkauft sich in den letzten {{count}} Tagen {{percent}} % langsamer ({{recent}}/Tag) als in den {{days}} Tagen davor ({{baseline}}/Tag).",
     "backorder_included_one": "{{count}} Stück ist bereits im Rückstand verkauft (Bestand unter null) und in der Bestellung enthalten.",
-    "backorder_included_other": "{{count}} Stück sind bereits im Rückstand verkauft (Bestand unter null) und in der Bestellung enthalten."
+    "backorder_included_other": "{{count}} Stück sind bereits im Rückstand verkauft (Bestand unter null) und in der Bestellung enthalten.",
+    "lasts_for_years": "{{stock}} auf Lager reichen bei diesem Tempo über 10 Jahre: nichts zu bestellen."
   },
   "import": {
     "fromStocky": "Aus Stocky importieren",

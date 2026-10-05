@@ -803,7 +803,8 @@
     "trend_down_many": "Se vende un {{percent}}% más lento en los últimos {{count}} días ({{recent}}/día) que en los {{days}} días anteriores ({{baseline}}/día).",
     "backorder_included_one": "{{count}} unidad ya está vendida sin stock (stock bajo cero) y se incluye en el pedido.",
     "backorder_included_other": "{{count}} unidades ya están vendidas sin stock (stock bajo cero) y se incluyen en el pedido.",
-    "backorder_included_many": "{{count}} unidades ya están vendidas sin stock (stock bajo cero) y se incluyen en el pedido."
+    "backorder_included_many": "{{count}} unidades ya están vendidas sin stock (stock bajo cero) y se incluyen en el pedido.",
+    "lasts_for_years": "{{stock}} en stock duran más de 10 años a este ritmo: nada que pedir."
   },
   "import": {
     "fromStocky": "Importar desde Stocky",

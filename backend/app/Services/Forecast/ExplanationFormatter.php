@@ -180,6 +180,8 @@ class ExplanationFormatter
             $out[] = match (true) {
                 $stock <= 0 && $suggested > 0 => $this->line('order_today_out_of_stock', ['count' => $suggested]),
                 $stock <= 0 && $incoming > 0 => $this->line('out_of_stock_incoming_covers'),
+                // Selling, but so slowly that the stock lasts beyond any plan: no dates to give.
+                $e['stockout_date'] === null && (float) ($e['avg_daily_sales'] ?? 0) > 0 && $suggested === 0 => $this->line('lasts_for_years', ['stock' => $stock]),
                 // No sales: only the manual minimum decides.
                 $e['stockout_date'] === null => match (true) {
                     $e['reorder']['date'] === null => $this->line('above_min', ['stock' => $e['stock']['position'] ?? $stock]),

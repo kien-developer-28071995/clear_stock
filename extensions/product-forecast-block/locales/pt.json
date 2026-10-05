@@ -227,7 +227,8 @@
             "one": "{{count}} unidade já foi vendida sem estoque (estoque abaixo de zero) e está incluída no pedido.",
             "other": "{{count}} unidades já foram vendidas sem estoque (estoque abaixo de zero) e estão incluídas no pedido.",
             "many": "{{count}} unidades já foram vendidas sem estoque (estoque abaixo de zero) e estão incluídas no pedido."
-        }
+        },
+        "lasts_for_years": "{{stock}} em estoque duram mais de 10 anos neste ritmo: nada a encomendar."
     },
     "ordered": "{{qty}} marcadas como pedidas"
 }

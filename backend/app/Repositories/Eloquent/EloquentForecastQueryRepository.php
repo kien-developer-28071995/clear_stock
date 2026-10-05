@@ -497,7 +497,8 @@ class EloquentForecastQueryRepository implements ForecastQueryRepositoryInterfac
         $slowDays = (int) config('forecast.slow_mover_days');
         $ratio = (float) config('forecast.overstock_ratio');
         $overstock = '(forecasts.avg_daily_sales > 0 AND forecasts.target_stock > 0 AND forecasts.excess_units > forecasts.target_stock * ?)';
-        $upcoming = 'forecasts.reorder_date > ? AND forecasts.days_of_cover <= ?';
+        // No reorder date: its stock lasts beyond the horizon, or nothing triggers a reorder.
+        $upcoming = '(forecasts.reorder_date IS NULL OR forecasts.reorder_date > ?) AND forecasts.days_of_cover <= ?';
 
         // Discontinued products have a status of their own and none of the others.
         [$sql, $bindings] = match ($status) {
@@ -506,8 +507,15 @@ class EloquentForecastQueryRepository implements ForecastQueryRepositoryInterfac
             ForecastStatus::OutOfStock => ['(forecasts.current_stock <= 0 AND forecasts.avg_daily_sales > 0)', []],
             ForecastStatus::Slow => ['(forecasts.current_stock > 0 AND (forecasts.avg_daily_sales = 0 OR forecasts.days_of_cover > ?))', [$slowDays]],
             ForecastStatus::Overstock => ["({$upcoming} AND forecasts.current_stock > 0 AND {$overstock})", [$today, $slowDays, $ratio]],
-            // Not out of stock: with its order on the way such a product has a reorder date ahead, but it is not fine.
-            ForecastStatus::Healthy => ["({$upcoming} AND NOT (forecasts.current_stock <= 0 AND forecasts.avg_daily_sales > 0) AND NOT {$overstock})", [$today, $slowDays, $ratio]],
+            // Everything that is none of the above, exactly as ForecastStatusResolver decides the badge:
+            // every product is found under one filter, and the home counts add up to all of them.
+            ForecastStatus::Healthy => [
+                '(NOT (forecasts.current_stock <= 0 AND forecasts.avg_daily_sales > 0)'
+                .' AND NOT (forecasts.reorder_date IS NOT NULL AND forecasts.reorder_date <= ?)'
+                .' AND NOT (forecasts.current_stock > 0 AND (forecasts.avg_daily_sales = 0 OR forecasts.days_of_cover > ?))'
+                ." AND NOT (forecasts.current_stock > 0 AND {$overstock}))",
+                [$today, $slowDays, $ratio],
+            ],
         };
 
         return $status === ForecastStatus::Discontinued ? [$sql, $bindings] : ["(variants.discontinued = 0 AND {$sql})", $bindings];

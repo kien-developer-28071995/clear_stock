@@ -744,7 +744,8 @@
     "trend_down_one": "Selling {{percent}}% slower in the last {{count}} day ({{recent}}/day) than in the {{days}} days before ({{baseline}}/day).",
     "trend_down_other": "Selling {{percent}}% slower in the last {{count}} days ({{recent}}/day) than in the {{days}} days before ({{baseline}}/day).",
     "backorder_included_one": "{{count}} unit is already sold on backorder (stock below zero) and is included in the order.",
-    "backorder_included_other": "{{count}} units are already sold on backorder (stock below zero) and are included in the order."
+    "backorder_included_other": "{{count}} units are already sold on backorder (stock below zero) and are included in the order.",
+    "lasts_for_years": "{{stock}} in stock lasts more than 10 years at this pace: nothing to order."
   },
   "import": {
     "fromStocky": "Import from Stocky",

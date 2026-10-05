@@ -227,7 +227,8 @@
             "one": "{{count}} unité est déjà vendue en rupture (stock inférieur à zéro) et incluse dans la commande.",
             "other": "{{count}} unités sont déjà vendues en rupture (stock inférieur à zéro) et incluses dans la commande.",
             "many": "{{count}} unités sont déjà vendues en rupture (stock inférieur à zéro) et incluses dans la commande."
-        }
+        },
+        "lasts_for_years": "{{stock}} en stock durent plus de 10 ans à ce rythme : rien à commander."
     },
     "ordered": "{{qty}} marquées comme commandées"
 }

@@ -683,3 +683,25 @@ it('reports no trend with too little to compare', function () {
         ->and(calc(input(history(120, fn ($ago) => $ago % 30 === 0 ? 1 : 0)))->trendPercent)->toBeNull()     // hardly sells
         ->and(calc(input(history(120, fn ($ago) => $ago <= 14 ? ['sold' => 0, 'in_stock' => false] : 4)))->trendPercent)->toBeNull(); // out of stock lately
 });
+
+describe('numbers at the edge', function () {
+    it('gives no dates, and no order, for stock that lasts for years', function () {
+        // One sale every ten days and a warehouse full: about a million days of stock.
+        $r = calc(input(history(90, fn (int $ago) => $ago % 10 === 0 ? 1 : 0), stock: 100000, extra: ['maxStock' => 500000]));
+
+        expect($r->avgDailySales)->toBeGreaterThan(0)
+            ->and($r->stockoutDate)->toBeNull()
+            ->and($r->reorderDate)->toBeNull()
+            ->and($r->daysOfCover)->toBeLessThanOrEqual(99999.0)
+            ->and($r->suggestedQty)->toBe(0)
+            ->and(array_column((new ExplanationFormatter)->lines($r->explanation), 'code'))->toContain('lasts_for_years');
+    });
+
+    it('orders nothing for a product nobody buys, whatever maximum, pack size or negative stock it has', function () {
+        $none = history(120, 0);
+
+        expect(calc(input($none, stock: 12, extra: ['maxStock' => 5000]))->suggestedQty)->toBe(0)
+            ->and(calc(input($none, stock: -5, extra: ['packSize' => 144]))->suggestedQty)->toBe(0)
+            ->and(calc(input($none, stock: 1, extra: ['minOrderQty' => 1000]))->suggestedQty)->toBe(0);
+    });
+});

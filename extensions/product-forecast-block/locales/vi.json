@@ -165,7 +165,8 @@
         },
         "backorder_included": {
             "other": "{{count}} cái đã bán vượt tồn (tồn kho âm) và được cộng vào lượng cần đặt."
-        }
+        },
+        "lasts_for_years": "Tồn {{stock}} cái đủ bán hơn 10 năm với tốc độ này: chưa cần nhập."
     },
     "ordered": "đã đặt {{qty}}"
 }

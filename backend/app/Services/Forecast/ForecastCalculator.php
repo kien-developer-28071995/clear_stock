@@ -266,9 +266,9 @@ class ForecastCalculator
             // Without sales only a manual minimum triggers a reorder.
             $reorderDate = $min !== null && $position <= $min ? $asOf->toDateString() : null;
         } elseif ($curve === null) {
-            $daysOfCover = $stock <= 0 ? 0.0 : round($stock / $avg, 1);
-            $stockoutDate = $asOf->addDays($stock <= 0 ? 0 : (int) floor($stock / $avg))->toDateString();
-            $reorderDate = $asOf->addDays($position <= $reorderPoint ? 0 : (int) floor(($position - $reorderPoint) / $avg))->toDateString();
+            $daysOfCover = $stock <= 0 ? 0.0 : $this->capCover($stock / $avg);
+            $stockoutDate = $this->dateIn($asOf, $stock <= 0 ? 0 : floor($stock / $avg));
+            $reorderDate = $this->dateIn($asOf, $position <= $reorderPoint ? 0 : floor(($position - $reorderPoint) / $avg));
         } else {
             // Same rules walking the event-adjusted demand day by day; past the events it is the plain average again.
             $n = count($curve) - 1;
@@ -280,8 +280,8 @@ class ForecastCalculator
                 $full += (int) floor(max(0.0, $stock - $curve[$n]) / $avg + 1e-9);
             }
             $next = $demand($full + 1) - $demand($full);
-            $daysOfCover = $stock <= 0 ? 0.0 : round($full + ($next > 0 ? max(0.0, $stock - $demand($full)) / $next : 0), 1);
-            $stockoutDate = $asOf->addDays($stock <= 0 ? 0 : $full)->toDateString();
+            $daysOfCover = $stock <= 0 ? 0.0 : $this->capCover($full + ($next > 0 ? max(0.0, $stock - $demand($full)) / $next : 0));
+            $stockoutDate = $this->dateIn($asOf, $stock <= 0 ? 0 : $full);
 
             $k = 0;                                     // last day the position is still above that day's reorder point
             if ($position > $reorderPoint) {
@@ -292,7 +292,16 @@ class ForecastCalculator
                     $k += (int) floor(max(0.0, $position - $demand($n) - $pointAt($n)) / $avg + 1e-9);
                 }
             }
-            $reorderDate = $asOf->addDays($k)->toDateString();
+            $reorderDate = $this->dateIn($asOf, $k);
+        }
+
+        // No day on which to reorder (nobody buys it, or its stock lasts for years) and no minimum
+        // set by the merchant: nothing to order either. A maximum alone, a pack size or negative
+        // stock must not turn such a product into an order. With a minimum the quantity stays: it
+        // is what will be ordered once stock falls to it.
+        if ($reorderDate === null && $min === null) {
+            $needed = 0;
+            $rounding = $this->roundOrder(0, $minOrderQty, $packSize);
         }
 
         // The supplier only takes orders on some weekdays: order on the last of them on or before the due date.
@@ -769,6 +778,25 @@ class ForecastCalculator
      *
      * @return array{needed: int, min_order_qty: ?int, pack_size: ?int, final: int}
      */
+    /** Beyond this the stock is "years away from running out": no date is given. */
+    private const MAX_HORIZON_DAYS = 3650;
+
+    /**
+     * The date some days from now, or null when that is further away than anyone plans for. A
+     * product selling 0.01 a day with a warehouse full of it would otherwise land in the year
+     * 29000, which neither PHP dates nor the database survive.
+     */
+    private function dateIn(CarbonImmutable $asOf, int|float $days): ?string
+    {
+        return $days > self::MAX_HORIZON_DAYS ? null : $asOf->addDays((int) $days)->toDateString();
+    }
+
+    /** Days of stock, kept within what the screens show and the column holds. */
+    private function capCover(float $days): float
+    {
+        return round(min($days, 99999.0), 1);
+    }
+
     private function roundOrder(int $needed, ?int $minOrderQty, ?int $packSize): array
     {
         $minOrderQty = $minOrderQty !== null && $minOrderQty > 1 ? $minOrderQty : null;

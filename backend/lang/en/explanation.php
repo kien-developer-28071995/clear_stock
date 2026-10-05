@@ -30,6 +30,7 @@ return [
     'reorder_point_manual' => 'Reorder point set by you: :count unit.|Reorder point set by you: :count units.',
     'order_up_to_max' => 'Orders fill up to your maximum of :count unit.|Orders fill up to your maximum of :count units.',
     'below_min_order' => ':stock in stock (with stock on the way) is at or below your minimum → order :count unit today.|:stock in stock (with stock on the way) is at or below your minimum → order :count units today.',
+    'lasts_for_years' => ':stock in stock lasts more than 10 years at this pace: nothing to order.',
     'above_min' => ':stock in stock (with stock on the way) is above your minimum; no sales yet, so nothing to order.',
     'no_order_needed' => 'Nothing to order right now.',
     'backorder_included' => ':count unit is already sold on backorder (stock below zero) and is included in the order.|:count units are already sold on backorder (stock below zero) and are included in the order.',
