@@ -1,4 +1,5 @@
 import { useEffect, useState, type RefObject } from 'react';
+import { useSubmitOnce } from '@/hooks/useSubmitOnce';
 import { useTranslation } from 'react-i18next';
 import type { ModalElement } from '@/hooks/useModal';
 import { fieldError } from '@/lib/http';
@@ -18,6 +19,7 @@ interface Props {
 export function SupplierModal({ modalRef, supplier, onDone }: Props) {
     const { t } = useTranslation();
     const create = useCreateSupplier();
+    const once = useSubmitOnce();
     const update = useUpdateSupplier();
     const mutation = supplier ? update : create;
     const [name, setName] = useState('');
@@ -68,9 +70,11 @@ export function SupplierModal({ modalRef, supplier, onDone }: Props) {
             order_weekdays: weekdays.length === 0 ? null : weekdays,
             ...(canAutoEmail ? { auto_email: autoEmail && email.trim() !== '' } : {}),
         };
-        const options = { onSuccess: () => { shopify.toast.show(supplier ? t('suppliers.updated') : t('suppliers.added')); onDone(); } };
-        if (supplier) update.mutate({ id: supplier.id, ...body }, options);
-        else create.mutate(body, options);
+        once((done) => {
+            const options = { onSuccess: () => { shopify.toast.show(supplier ? t('suppliers.updated') : t('suppliers.added')); onDone(); }, onSettled: done };
+            if (supplier) update.mutate({ id: supplier.id, ...body }, options);
+            else create.mutate(body, options);
+        });
     };
 
     return (

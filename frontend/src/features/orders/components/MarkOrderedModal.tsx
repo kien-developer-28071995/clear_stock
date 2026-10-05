@@ -1,4 +1,5 @@
 import { useEffect, useState, type RefObject } from 'react';
+import { useSubmitOnce } from '@/hooks/useSubmitOnce';
 import { useTranslation } from 'react-i18next';
 import type { ModalElement } from '@/hooks/useModal';
 import { fieldError } from '@/lib/http';
@@ -25,6 +26,7 @@ interface Props {
 export function MarkOrderedModal({ id, modalRef, items, onDone }: Props) {
     const { t } = useTranslation();
     const create = useCreateManualOrders();
+    const once = useSubmitOnce();
     // From submit until the dialog has closed, it keeps showing what was submitted: the lists behind
     // it refresh at that moment, and a dialog whose content changes while it closes stays open.
     const [submitted, setSubmitted] = useState<Item[] | null>(null);
@@ -44,7 +46,7 @@ export function MarkOrderedModal({ id, modalRef, items, onDone }: Props) {
     }, [items, submitted]);
 
     const units = single ? Number(qty) : shown.reduce((sum, i) => sum + i.quantity, 0);
-    const submit = () => {
+    const submit = () => once((done) => {
         setSubmitted(items);
         create.mutate(
             {
@@ -68,9 +70,10 @@ export function MarkOrderedModal({ id, modalRef, items, onDone }: Props) {
                     modal?.hideOverlay();
                 },
                 onError: () => setSubmitted(null),
+                onSettled: done,
             },
         );
-    };
+    });
 
     return (
         <s-modal ref={modalRef} id={id} heading={t('orders.markHeading')}>

@@ -25,7 +25,7 @@ class VariantController extends Controller
     /** Search for pickers. */
     public function index(Request $request, ShopContext $context): AnonymousResourceCollection
     {
-        $term = (string) $request->validate(['search' => ['nullable', 'string', 'max:100']])['search'] ?? '';
+        $term = (string) ($request->validate(['search' => ['nullable', 'string', 'max:100']])['search'] ?? '');
 
         return VariantOptionResource::collection($this->variants->search($context->shop(), $term, 20));
     }

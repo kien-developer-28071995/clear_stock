@@ -1,4 +1,5 @@
 import { useEffect, useState, type RefObject } from 'react';
+import { useSubmitOnce } from '@/hooks/useSubmitOnce';
 import { useTranslation } from 'react-i18next';
 import type { ModalElement } from '@/hooks/useModal';
 import { fieldError } from '@/lib/http';
@@ -21,6 +22,7 @@ const toMultiplier = (p: string) => Math.round((1 + Number(p) / 100) * 100) / 10
 export function SalesEventModal({ modalRef, event, onDone }: Props) {
     const { t } = useTranslation();
     const create = useCreateSalesEvent();
+    const once = useSubmitOnce();
     const update = useUpdateSalesEvent();
     const mutation = event ? update : create;
     const suppliers = useSuppliers().data ?? [];
@@ -65,9 +67,11 @@ export function SalesEventModal({ modalRef, event, onDone }: Props) {
             supplier_id: scope === 'supplier' && supplierId ? Number(supplierId) : null,
             variant_ids: scope === 'products' ? (picked ? picked.map((p) => p.gid) : event?.variant_ids ?? []) : null,
         };
-        const options = { onSuccess: () => { shopify.toast.show(event ? t('events.updated') : t('events.added')); onDone(); } };
-        if (event) update.mutate({ id: event.id, ...body }, options);
-        else create.mutate(body, options);
+        once((done) => {
+            const options = { onSuccess: () => { shopify.toast.show(event ? t('events.updated') : t('events.added')); onDone(); }, onSettled: done };
+            if (event) update.mutate({ id: event.id, ...body }, options);
+            else create.mutate(body, options);
+        });
     };
     const pick = async () => {
         const list = await pickVariants({ multiple: true, selected: picked?.map((p) => p.gid) });

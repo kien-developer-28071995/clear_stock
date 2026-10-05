@@ -8,8 +8,10 @@ use App\Models\Shop;
 use App\Repositories\Contracts\ManualOrderRepositoryInterface;
 use App\Repositories\Contracts\VariantRepositoryInterface;
 use App\Services\Forecast\ForecastService;
+use App\Support\CacheKeys;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Validation\ValidationException;
 
 /**
@@ -19,6 +21,9 @@ use Illuminate\Validation\ValidationException;
  */
 class ManualOrderService
 {
+    /** The same order arriving again within this many seconds is the same order. */
+    private const DUPLICATE_WINDOW_SECONDS = 10;
+
     /** Up to this many products the forecasts are recomputed at once, more go to the queue. */
     private const SYNC_RECOMPUTE = 50;
 
@@ -45,11 +50,29 @@ class ManualOrderService
      */
     public function record(Shop $shop, array $items, ?string $expectedOn = null, ?string $reference = null, string $source = ManualOrder::SOURCE_MANUAL): int
     {
+        // One at a time per shop: the duplicate check below must see the order a request sent in
+        // the same moment has just recorded.
+        return Cache::lock(CacheKeys::manualOrderRecordLock($shop->id), 10)
+            ->block(5, fn () => $this->recordLocked($shop, $items, $expectedOn, $reference, $source));
+    }
+
+    private function recordLocked(Shop $shop, array $items, ?string $expectedOn, ?string $reference, string $source): int
+    {
         $variants = $this->variants->findMany($shop, array_column($items, 'variant_id'));
         $items = array_values(array_filter($items, fn ($i) => isset($variants[$i['variant_id']]) && $i['quantity'] > 0));
         if ($items === []) {
             throw ValidationException::withMessages(['items' => 'no_items']);
         }
+        // The very same order again within seconds is a double click or a retried request, not a
+        // second order: counting it twice would hide a real need to reorder. Only while the first
+        // one is still open, so "ordered, cancelled, ordered again" records the second.
+        $justRecorded = $this->orders->openRecordedSince($shop, now()->subSeconds(self::DUPLICATE_WINDOW_SECONDS));
+        $requested = count($items);
+        $items = array_values(array_filter($items, fn ($i) => ! in_array("{$i['variant_id']}|".(int) $i['quantity']."|{$reference}|{$source}", $justRecorded, true)));
+        if ($items === []) {
+            return $requested;
+        }
+
         $today = CarbonImmutable::parse($this->today($shop));
         $leadTimes = $expectedOn === null ? $this->orders->leadTimes($shop, array_column($items, 'variant_id')) : [];
 
@@ -65,7 +88,7 @@ class ManualOrderService
         ], $items));
         $this->recompute($shop, array_column($items, 'variant_id'));
 
-        return count($items);
+        return $requested;
     }
 
     public function find(Shop $shop, int $id): ?ManualOrder

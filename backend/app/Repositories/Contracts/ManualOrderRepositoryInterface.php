@@ -24,6 +24,14 @@ interface ManualOrderRepositoryInterface
     /** @param array<int, array<string, mixed>> $rows */
     public function createMany(Shop $shop, array $rows): void;
 
+    /**
+     * Open orders recorded since a moment, as "variant|quantity|reference|source" keys: lets the
+     * service see the same request arriving twice.
+     *
+     * @return array<int, string>
+     */
+    public function openRecordedSince(Shop $shop, \DateTimeInterface $since): array;
+
     public function update(ManualOrder $order, array $attributes): ManualOrder;
 
     /** @return array<int, int> variant id => lead time days of its current forecast */

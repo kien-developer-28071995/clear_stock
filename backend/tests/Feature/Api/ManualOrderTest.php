@@ -95,3 +95,22 @@ it('ignores other shops products and empty orders', function () {
         ->assertUnprocessable()->assertJsonPath('errors.items.0.code', 'no_items');
     expect(ManualOrder::count())->toBe(0);
 });
+
+it('records the same order once when the request arrives twice, and a later one again', function () {
+    $body = ['items' => [['variant_id' => $this->mug->id, 'quantity' => 40]], 'reference' => 'PO-7'];
+
+    $this->postJson('/api/manual-orders', $body, $this->auth)->assertCreated()->assertJsonPath('data.recorded', 1);
+    $this->postJson('/api/manual-orders', $body, $this->auth)->assertCreated()->assertJsonPath('data.recorded', 1);   // double click / retry
+    expect(ManualOrder::where('variant_id', $this->mug->id)->count())->toBe(1);
+
+    // A different order straight away is a different order; the same one later is a new one.
+    $this->postJson('/api/manual-orders', ['items' => [['variant_id' => $this->mug->id, 'quantity' => 41]], 'reference' => 'PO-7'], $this->auth)->assertCreated();
+    $this->travel(30)->seconds();
+    $this->postJson('/api/manual-orders', $body, $this->auth)->assertCreated();
+    expect(ManualOrder::where('variant_id', $this->mug->id)->count())->toBe(3);
+
+    // Ordered, cancelled at once (a mistake), ordered again: the second one counts.
+    ManualOrder::query()->update(['status' => ManualOrder::CANCELLED]);
+    $this->postJson('/api/manual-orders', $body, $this->auth)->assertCreated();
+    expect(ManualOrder::where('variant_id', $this->mug->id)->where('status', ManualOrder::OPEN)->count())->toBe(1);
+});

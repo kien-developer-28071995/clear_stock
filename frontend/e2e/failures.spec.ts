@@ -105,3 +105,68 @@ test('bad input is refused at the field it was typed in, in words', async ({ app
     expect((await api<{ data: unknown[] }>(app, '/sales-events')).data.filter((e) => (e as { name: string }).name === 'Backwards')).toHaveLength(0);
     await app.keyboard.press('Escape');
 });
+
+test('a mangled address never breaks a screen', async ({ app }) => {
+    test.setTimeout(180_000);
+    await open(app, '/');
+    const variant = (await api<{ data: { variant_id: number }[] }>(app, '/forecasts')).data[0].variant_id;
+    const cases: [string, RegExp | null][] = [
+        // [address, text that must be on the page (null: any page of the app)]
+        ['/products?status=nonsense&sort=upside-down&page=-3&abc=Q&trend=sideways&location_id=x', null],
+        ['/products?page=99999', null],
+        ['/products?search=' + encodeURIComponent('<script>alert(1)</script>%_\\'), null],
+        ['/products/not-a-number', /doesn't exist|couldn't load|not found/i],
+        ['/products/999999999', /doesn't exist|couldn't load|not found/i],
+        [`/products/${variant}?tab=nope`, null],
+        ['/insights?tab=<b>', null],
+        ['/settings?tab=../../etc', null],
+        ['/planning/what-if?growth=abc&horizon=7.5&supplier_id=x&abc=Z', null],
+        ['/planning?weeks=0&supplier_id=-1&vendor=' + 'v'.repeat(3000), null],
+        ['/reorder?vendor=%00%FF', null],
+        ['/no/such/page', /doesn't exist/i],
+        ['/products/costs?missing=perhaps&search=' + 'x'.repeat(500), null],
+    ];
+    for (const [path, text] of cases) {
+        await app.goto(path);
+        await expect(app.locator('s-page').first(), `${path} renders a page`).toBeVisible();
+        await settled(app);
+        if (text) await expect(app.getByText(text).first(), path).toBeVisible();
+        // Nothing typed into the address is ever run or shown as markup.
+        expect(await app.evaluate(() => document.querySelectorAll('#root script, #root img[onerror], #root b').length), path).toBe(0);
+    }
+});
+
+test('an impatient double click sends one request', async ({ app }) => {
+    await open(app, '/reorder');
+    await settled(app);
+    let posts = 0;
+    await app.route((url) => url.pathname === '/api/manual-orders', async (route) => {
+        if (route.request().method() === 'POST') {
+            posts++;
+            await new Promise((r) => setTimeout(r, 600)); // a slow server, so the second click lands while the first is in flight
+        }
+        await route.continue();
+    });
+    await app.locator('s-button', { hasText: 'Mark as ordered' }).first().click();
+    const confirm = app.locator('s-modal#mark-ordered-selected s-button[slot="primary-action"]');
+    await confirm.click();
+    await confirm.evaluate((el: HTMLElement) => el.click());
+    await confirm.evaluate((el: HTMLElement) => el.click());
+    await expect.poll(() => toasts(app)).toContainEqual(expect.stringContaining('marked as ordered'));
+    expect(posts).toBe(1);
+
+    // And if two identical requests do reach the server in the same moment, it records one.
+    const variantId = (await api<{ data: { variant_id: number }[] }>(app, '/forecasts?per_page=50')).data.at(-1)!.variant_id;
+    await app.evaluate(async (variant_id) => {
+        const headers = { Authorization: `Bearer ${await window.shopify.idToken()}`, 'Content-Type': 'application/json', Accept: 'application/json' };
+        const send = () => fetch('/api/manual-orders', { method: 'POST', headers, body: JSON.stringify({ items: [{ variant_id, quantity: 7 }], reference: 'E2E-TWICE' }) });
+        await Promise.all([send(), send(), send()]);
+    }, variantId);
+    const orders = (await api<{ data: { open: { id: number; variant_id: number }[] } }>(app, '/manual-orders')).data.open;
+    expect(new Set(orders.map((o) => o.variant_id)).size, 'one order per product').toBe(orders.length);
+    for (const o of orders) {
+        await app.evaluate(async (id) => {
+            await fetch(`/api/manual-orders/${id}`, { method: 'PATCH', headers: { Authorization: `Bearer ${await window.shopify.idToken()}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ status: 'cancelled' }) });
+        }, o.id);
+    }
+});

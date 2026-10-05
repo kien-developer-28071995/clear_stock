@@ -1,4 +1,5 @@
 import { useState, type RefObject } from 'react';
+import { useSubmitOnce } from '@/hooks/useSubmitOnce';
 import { useTranslation } from 'react-i18next';
 import type { ModalElement } from '@/hooks/useModal';
 import { ApiError, errorMessage, fieldError } from '@/lib/http';
@@ -14,6 +15,7 @@ interface Props {
 export function BundleModal({ modalRef, onDone }: Props) {
     const { t } = useTranslation();
     const save = useSaveBundle();
+    const once = useSubmitOnce();
     const [bundle, setBundle] = useState<PickedVariant | null>(null);
     const [components, setComponents] = useState<(PickedVariant & { quantity: number })[]>([]);
 
@@ -28,16 +30,19 @@ export function BundleModal({ modalRef, onDone }: Props) {
     };
     const submit = () =>
         bundle &&
-        save.mutate(
-            { bundle: bundle.gid, components: components.map((c) => ({ variant: c.gid, quantity: c.quantity })) },
-            {
-                onSuccess: () => {
-                    shopify.toast.show(t('bundles.saved'));
-                    setBundle(null);
-                    setComponents([]);
-                    onDone();
+        once((done) =>
+            save.mutate(
+                { bundle: bundle.gid, components: components.map((c) => ({ variant: c.gid, quantity: c.quantity })) },
+                {
+                    onSuccess: () => {
+                        shopify.toast.show(t('bundles.saved'));
+                        setBundle(null);
+                        setComponents([]);
+                        onDone();
+                    },
+                    onSettled: done,
                 },
-            },
+            ),
         );
 
     const generalError = save.error instanceof ApiError && save.error.status !== 422 ? errorMessage(save.error) : null;
