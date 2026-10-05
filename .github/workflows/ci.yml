@@ -35,6 +35,43 @@ jobs:
       - name: Tests (Pest)
         run: php artisan test
 
+  # The same suite on MySQL, the engine production runs: SQLite forgives what MySQL does not
+  # (values too large for a column, rows tied on a timestamp, JSON key order).
+  backend-mysql:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: clear_stock_test
+        ports: ['3306:3306']
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -proot --silent" --health-interval=5s --health-timeout=5s --health-retries=20
+    steps:
+      - uses: actions/checkout@v5
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: bcmath, intl, gd, zip, pdo_mysql, redis
+          coverage: none
+      - name: Cache Composer
+        uses: actions/cache@v4
+        with:
+          path: ~/.composer/cache
+          key: composer-${{ hashFiles('backend/composer.lock') }}
+      - run: composer install --no-interaction --prefer-dist --no-progress
+      - name: Tests on MySQL
+        run: php artisan test -c phpunit.mysql.xml
+        env:
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_USERNAME: root
+          DB_PASSWORD: root
+
   frontend:
     runs-on: ubuntu-latest
     steps:

@@ -14,7 +14,7 @@ class EloquentAlertLogRepository implements AlertLogRepositoryInterface
     public function recentVariantAlerts(Shop $shop, CarbonInterface $since): array
     {
         return AlertLog::query()->forShop($shop)->whereNotNull('variant_id')->where('sent_at', '>=', $since)
-            ->orderBy('sent_at')->get(['variant_id', 'type'])
+            ->orderBy('sent_at')->orderBy('id')->get(['variant_id', 'type']) // id: two alerts in the same second keep their order
             ->mapWithKeys(fn (AlertLog $l) => [$l->variant_id => $l->type->value])->all();
     }
 

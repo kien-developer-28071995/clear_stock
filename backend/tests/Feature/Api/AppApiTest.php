@@ -301,7 +301,7 @@ describe('order rounding', function () {
             ->assertJsonPath('data.settings.min_order_qty', 200)
             ->assertJsonPath('data.settings.pack_size', 24)
             ->assertJsonPath('data.suggested_qty', 216) // needs 194 -> minimum 200 -> 9 packs of 24
-            ->assertJsonPath('data.explanation.reorder.rounding', ['needed' => 194, 'min_order_qty' => 200, 'pack_size' => 24, 'final' => 216]);
+            ->assertJson(fn ($json) => $json->where('data.explanation.reorder.rounding', fn ($rounding) => $rounding->all() == ['needed' => 194, 'min_order_qty' => 200, 'pack_size' => 24, 'final' => 216])->etc()); // == : MySQL returns JSON keys in its own order
 
         $this->putJson("/api/variants/{$mug->id}/settings", ['pack_size' => 0], $this->auth)
             ->assertUnprocessable()->assertJsonPath('errors.pack_size.0', ['code' => 'min', 'params' => ['value' => 1]]);
@@ -323,7 +323,7 @@ describe('order rounding', function () {
             ->assertJsonFragment(['code' => 'rounding_supplier_default', 'params' => ['supplier' => 'Acme']]);
         // The product's own pack size wins; the minimum still comes from the supplier: 200 -> 20 packs of 10.
         $this->getJson("/api/forecasts/{$cup->id}", $this->auth)
-            ->assertJsonPath('data.explanation.reorder.rounding', ['needed' => 194, 'min_order_qty' => 200, 'pack_size' => 10, 'final' => 200, 'supplier' => 'Acme']);
+            ->assertJson(fn ($json) => $json->where('data.explanation.reorder.rounding', fn ($rounding) => $rounding->all() == ['needed' => 194, 'min_order_qty' => 200, 'pack_size' => 10, 'final' => 200, 'supplier' => 'Acme'])->etc()); // == : MySQL returns JSON keys in its own order
 
         $this->putJson("/api/suppliers/{$acme->id}", ['name' => 'Acme', 'pack_size' => 0], $this->auth)->assertUnprocessable();
     });

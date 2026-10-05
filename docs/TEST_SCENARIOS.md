@@ -99,6 +99,21 @@ Quy tắc: mọi lỗi tìm thấy bằng **M** hoặc **S** phải có thêm m�
 | 6.7 | Shopify trả lỗi / giới hạn tốc độ khi đồng bộ | Job thử lại có giãn cách, ghi log | A |
 | 6.8 | Email gửi lỗi | Thử lại 3 lần, ghi `email_logs` | A |
 
+## 6b. Dữ liệu bất thường
+
+| # | Kịch bản | Mong đợi | Kiểm |
+|---|---|---|---|
+| 6b.1 | Gửi rác tới **mọi** API (sai kiểu, số cực lớn, chuỗi 70.000 ký tự, mã HTML/SQL, id không tồn tại) | Trả 2xx/4xx, không bao giờ 500 | A (`HostileInputTest`) |
+| 6b.2 | Mọi API khi không có token | 401 | A |
+| 6b.3 | Shop A dùng id của shop B ở mọi route | Không lộ, không sửa được dữ liệu shop B | A |
+| 6b.4 | Địa chỉ trình duyệt bị sửa (tham số sai, id sai, mã HTML) | Trang vẫn hiện, không chạy mã lạ | A (`failures.spec`) |
+| 6b.5 | Bấm nhiều lần liên tiếp / hai request trùng cùng lúc | Chỉ ghi một lần | A |
+| 6b.6 | Thêm sự kiện trùng tên và ngày | Từ chối (nếu không tác động bị nhân đôi) | A |
+| 6b.7 | 30 shop ngẫu nhiên (tồn âm, bán thưa, đột biến, mọi quy tắc đặt hàng) | Các bất biến luôn đúng: không gợi ý âm, không ngày trong quá khứ, đủ thùng/MOQ, nhãn = bộ lọc = số đếm, tổng kế hoạch khớp | A (`ForecastInvariantsTest`) |
+| 6b.8 | Bán cực chậm + tồn cực lớn | Không có ngày (quá 10 năm), không gợi ý đặt, không tràn cột | A |
+| 6b.9 | Sản phẩm không ai mua có đặt max / quy cách thùng / tồn âm | Không gợi ý đặt hàng | A |
+| 6b.10 | Toàn bộ test trên MySQL | Qua như trên SQLite | A (`make test-mysql`, CI `backend-mysql`) |
+
 ## 7. Chống làm phiền và an toàn dữ liệu
 
 | # | Kịch bản | Mong đợi | Kiểm |
@@ -122,7 +137,8 @@ Quy tắc: mọi lỗi tìm thấy bằng **M** hoặc **S** phải có thêm m�
 ## Lệnh chạy
 
 ```bash
-make test                 # backend (Pest)
+make test                 # backend (Pest, SQLite)
+make test-mysql           # cùng bộ test trên MySQL (hệ quản trị của production)
 make admin-test           # hệ thống báo cáo
 cd frontend && npx tsc --noEmit && npm run i18n:check
 make e2e                  # mọi màn hình trên 3 gói + extension + sự cố (failures.spec)

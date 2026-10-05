@@ -6,7 +6,7 @@ export UID := $(shell id -u)
 export GID := $(shell id -g)
 
 .DEFAULT_GOAL := help
-.PHONY: help setup up down restart build shell migrate fresh test e2e extensions logs tunnel tunnel-url tunnel-down e2e-features-off e2e-split listing-screenshots feature-screenshots listing-video \
+.PHONY: help setup up down restart build shell migrate fresh test test-mysql e2e extensions logs tunnel tunnel-url tunnel-down e2e-features-off e2e-split listing-screenshots feature-screenshots listing-video \
         app-url webhook artisan composer npm typecheck website website-build admin-setup admin-user admin-test prod-build prod-up prod-down prod-migrate prod-logs
 
 help: ## List available commands
@@ -47,6 +47,10 @@ fresh: ## Drop all tables and re-run migrations
 
 test: ## Run the backend test suite (Pest)
 	$(DC) exec app php artisan test
+
+test-mysql: ## The backend suite on MySQL, the production engine (own database clear_stock_test, never the dev one)
+	@$(DC) exec -T mysql sh -c 'mysql -uroot -p"$$DB_ROOT_PASSWORD" -e "CREATE DATABASE IF NOT EXISTS clear_stock_test; GRANT ALL ON clear_stock_test.* TO \"$$DB_USERNAME\"@\"%\";"' 2>/dev/null
+	$(DC) exec app php artisan test -c phpunit.mysql.xml
 
 e2e: ## End-to-end tests in Chromium on every plan + admin extensions (needs make up + a synced dev store)
 	npm run extensions:locales:check
