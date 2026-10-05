@@ -50,3 +50,25 @@ it('lists and filters products by trend', function () {
         ->and($this->getJson('/api/forecasts?trend=down', $this->auth)->json('data'))->toBe([]);
     expect($this->getJson("/api/forecasts/{$this->mug->id}", $this->auth)->json('data.trend'))->toMatchArray(['direction' => 'up', 'percent' => 100]);
 });
+
+it('forecasts everything with the balanced mix when profiles are switched off app-wide', function () {
+    $this->shop->update(['forecast_profile' => 'recent']);
+    $this->mug->update(['forecast_profile' => 'steady']);
+    config(['features.forecast_profiles' => false]);
+
+    app(ForecastService::class)->runForShop($this->shop->fresh());
+
+    $detail = $this->getJson("/api/forecasts/{$this->mug->id}", $this->auth)->assertOk()->json('data');
+    expect((float) $this->mug->forecast()->first()->avg_daily_sales)->toBe(5.92)
+        ->and($detail['explanation']['profile'])->toBe(['name' => 'balanced', 'source' => 'shop'])
+        ->and(collect($detail['explanation_lines'])->pluck('code')->filter(fn ($c) => str_starts_with($c, 'profile_'))->all())->toBe([]);
+});
+
+it('drops the trend line from the explanation when trend is switched off app-wide', function () {
+    $codes = fn () => array_column($this->getJson("/api/forecasts/{$this->mug->id}", $this->auth)->assertOk()->json('data.explanation_lines'), 'code');
+    expect($codes())->toContain('trend_up');
+
+    config(['features.trend' => false]);
+
+    expect($codes())->not->toContain('trend_up');
+});

@@ -143,7 +143,7 @@ function BudgetView() {
                     )}
                 </s-section>
             )}
-            <MarkOrderedModal id="mark-ordered-budget" modalRef={markModal.ref} items={inBudget.map((i) => ({ variant_id: i.variant_id, name: i.name, quantity: i.quantity }))} />
+            {ordersExist && <MarkOrderedModal id="mark-ordered-budget" modalRef={markModal.ref} items={inBudget.map((i) => ({ variant_id: i.variant_id, name: i.name, quantity: i.quantity }))} />}
         </s-page>
     );
 }

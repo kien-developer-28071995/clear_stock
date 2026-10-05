@@ -103,7 +103,7 @@ export function ActionList({ dashboard }: { dashboard: Dashboard }) {
                     </s-stack>
                 </s-stack>
             </s-box>
-            <MarkOrderedModal id="mark-ordered-selected" modalRef={markModal.ref} items={toMark} onDone={() => setSelected(new Set())} />
+            {ordersExist && <MarkOrderedModal id="mark-ordered-selected" modalRef={markModal.ref} items={toMark} onDone={() => setSelected(new Set())} />}
             {groups.map((g) => {
                 const items = actions[g.key];
                 const shown = expanded[g.key] ? items : items.slice(0, VISIBLE);

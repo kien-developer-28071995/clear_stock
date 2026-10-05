@@ -107,3 +107,34 @@ it('leaves products above the threshold out', function () {
     expect($this->alerts->sendIfDue($this->shop->fresh(), $this->now))->toBe('sent');
     Mail::assertQueued(ReorderDigestMail::class, fn (ReorderDigestMail $mail) => $mail->totalCount === 1 && $mail->envelope()->subject === '1 product needs reordering · Demo Store');
 });
+
+it('sends the email only when Slack is switched off app-wide, and keeps the stored webhook', function () {
+    $this->setting->update(['slack_webhook_url' => ALERT_SLACK_URL]);
+    config(['features.slack_alerts' => false]);
+
+    expect($this->alerts->sendIfDue($this->shop->fresh(), $this->now))->toBe('sent');
+    Mail::assertQueued(ReorderDigestMail::class);
+    Queue::assertNotPushed(PostAlertDigestToSlack::class);
+    expect($this->getJson('/api/settings', $this->auth)->json('data.alerts.slack_webhook_url'))->toBeNull();
+
+    config(['features.slack_alerts' => true]);
+    expect($this->setting->fresh()->slackUrl())->toBe(ALERT_SLACK_URL);
+});
+
+it('ignores the days-of-stock threshold when it is switched off app-wide', function () {
+    $this->setting->update(['cover_days' => 35]);
+    config(['features.low_cover_alerts' => false]);
+
+    expect($this->alerts->sendIfDue($this->shop->fresh(), $this->now))->toBe('sent');
+    Mail::assertQueued(ReorderDigestMail::class, fn (ReorderDigestMail $mail) => $mail->totalCount === 1 && collect($mail->items)->pluck('name')->all() === ['Mug *Blue*']);
+    expect(AlertLog::where('variant_id', $this->cup->id)->exists())->toBeFalse();
+});
+
+it('sends no digest at all when alerts are switched off app-wide', function () {
+    config(['features.alerts' => false]);
+    $this->setting->update(['slack_webhook_url' => ALERT_SLACK_URL, 'cover_days' => 35]);
+
+    expect($this->alerts->sendIfDue($this->shop->fresh(), $this->now))->not->toBe('sent');
+    Mail::assertNothingQueued();
+    Queue::assertNotPushed(PostAlertDigestToSlack::class);
+});

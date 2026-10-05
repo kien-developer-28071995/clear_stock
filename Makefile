@@ -79,10 +79,13 @@ listing-video: ## Draft App Store walkthrough video (WebM) of the v1 app into do
 	$(DC) exec -T app php artisan dev:set-plan starter >/dev/null; \
 	(cd frontend && LISTING_VIDEO=1 npx playwright test e2e/listing-walkthrough.spec.ts)
 
-e2e-features-off: ## E2E check of the app with optional features switched off (restores backend/.env afterwards)
+# Every switch of backend/config/features.php, off (a test fails when a new switch is missing here).
+ALL_OFF = \nFEATURE_WHAT_IF=false\nFEATURE_REFERENCE_PRODUCTS=false\nFEATURE_ABC=false\nFEATURE_PURCHASE_PLAN=false\nFEATURE_ORDER_BUDGET=false\nFEATURE_SPIKE_FILTER=false\nFEATURE_LOST_SALES=false\nFEATURE_ACCURACY=false\nFEATURE_SALES_EVENTS=false\nFEATURE_WEEKLY_SUMMARY=false\nFEATURE_PURCHASE_ORDERS=false\nFEATURE_SHOPIFY_PURCHASE_ORDERS=false\nFEATURE_SUPPLIER_EMAILS=false\nFEATURE_LOCATIONS=false\nFEATURE_TRANSFERS=false\nFEATURE_REALTIME_ALERTS=false\nFEATURE_FLOW_TRIGGERS=false\nFEATURE_BUNDLES=false\nFEATURE_ALERTS=false\nFEATURE_SLACK_ALERTS=false\nFEATURE_LOW_COVER_ALERTS=false\nFEATURE_FORECAST_PROFILES=false\nFEATURE_TREND=false\nFEATURE_ORDER_EXCLUSIONS=false\nFEATURE_LOCATION_EXCLUSIONS=false\nFEATURE_MANUAL_ORDERS=false\nFEATURE_ALTERNATE_SUPPLIERS=false\nFEATURE_SUPPLIER_IMPORT=false\nFEATURE_VENDOR_SUPPLIERS=false\nFEATURE_COSTS=false\nFEATURE_SAVED_VIEWS=false\nFEATURE_PRODUCT_EXPORT=false\nFEATURE_STOCK_HISTORY=false\nFEATURE_CLEARANCE=false\nFEATURE_SIZE_RUNS=false\nFEATURE_DATA_HEALTH=false\n
+
+e2e-features-off: ## E2E check of the app with every optional feature switched off (restores backend/.env afterwards)
 	@env='$(CURDIR)/backend/.env'; cp "$$env" "$$env.e2e-backup"; \
 	trap 'mv "$$env.e2e-backup" "$$env"' EXIT; \
-	printf '\nFEATURE_WHAT_IF=false\nFEATURE_TRANSFERS=false\nFEATURE_FLOW_TRIGGERS=false\nFEATURE_ABC=false\n' >> "$$env"; \
+	printf '$(ALL_OFF)' >> "$$env"; \
 	(cd frontend && E2E_FEATURES_OFF=1 npx playwright test e2e/features-off.spec.ts)
 
 extensions: ## Install admin extension deps, copy the app's forecast translations into them, type-check
