@@ -506,7 +506,8 @@ class EloquentForecastQueryRepository implements ForecastQueryRepositoryInterfac
             ForecastStatus::OutOfStock => ['(forecasts.current_stock <= 0 AND forecasts.avg_daily_sales > 0)', []],
             ForecastStatus::Slow => ['(forecasts.current_stock > 0 AND (forecasts.avg_daily_sales = 0 OR forecasts.days_of_cover > ?))', [$slowDays]],
             ForecastStatus::Overstock => ["({$upcoming} AND forecasts.current_stock > 0 AND {$overstock})", [$today, $slowDays, $ratio]],
-            ForecastStatus::Healthy => ["({$upcoming} AND NOT {$overstock})", [$today, $slowDays, $ratio]],
+            // Not out of stock: with its order on the way such a product has a reorder date ahead, but it is not fine.
+            ForecastStatus::Healthy => ["({$upcoming} AND NOT (forecasts.current_stock <= 0 AND forecasts.avg_daily_sales > 0) AND NOT {$overstock})", [$today, $slowDays, $ratio]],
         };
 
         return $status === ForecastStatus::Discontinued ? [$sql, $bindings] : ["(variants.discontinued = 0 AND {$sql})", $bindings];

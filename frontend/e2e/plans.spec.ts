@@ -303,8 +303,14 @@ for (const plan of ['free', 'starter', 'growth'] as PlanKey[]) {
             const dialogOpen = (id: string) => app.locator(`s-modal#${id}`).evaluate((el) => !!el.shadowRoot?.querySelector('dialog[open]'));
             const openOrders = async () => (await api<Orders>(app, '/manual-orders')).data.open;
 
+            // Earlier tests placed and closed orders: wait until the forecasts suggest ordering again.
+            const due = async () => (await api<{ data: { suggested_qty: number }[] }>(app, '/forecasts?status=reorder_now')).data.filter((r) => r.suggested_qty > 0).length;
+            await open(app, '/');
+            await expect.poll(due, { timeout: 30_000 }).toBeGreaterThan(0);
+
             // Reorder list: what is due starts selected; marking it as ordered closes the dialog.
             await open(app, '/reorder');
+            await expect(app.locator('s-button', { hasText: 'Mark as ordered' }).first()).not.toHaveAttribute('disabled');
             await app.locator('s-button', { hasText: 'Mark as ordered' }).first().click();
             await expect.poll(() => dialogOpen('mark-ordered-selected')).toBe(true);
             await app.locator('s-modal#mark-ordered-selected s-button[slot="primary-action"]').click();
@@ -317,15 +323,23 @@ for (const plan of ['free', 'starter', 'growth'] as PlanKey[]) {
 
             // Orders placed: "Cancel order" asks first; backing out keeps the order.
             await open(app, '/reorder/orders');
-            await app.locator('s-button', { hasText: 'Cancel order' }).first().click();
+            const cancelFirst = async () => {
+                await app.locator('s-table-row').getByRole('button', { name: /More actions/ }).first().click();
+                await app.getByRole('menuitem', { name: 'Cancel order' }).click();
+            };
+            await cancelFirst();
             await expect(app.getByText('Cancel this order?')).toBeVisible();
             await app.locator('s-button', { hasText: 'Keep order' }).click();
             expect(await openOrders()).toHaveLength(placed.length);
             for (let left = placed.length; left > 0; left--) {
-                await app.locator('s-table-row s-button', { hasText: 'Cancel order' }).first().click();
+                await cancelFirst();
                 await app.locator('s-modal s-button[slot="primary-action"]', { hasText: 'Cancel order' }).click();
                 await expect.poll(async () => (await openOrders()).length).toBe(left - 1);
+                // The list on screen has caught up (the next click must not land on the row that just left).
+                await expect(app.locator('s-table-row').getByRole('button', { name: /More actions/ })).toHaveCount(left - 1);
             }
+
+            await expect.poll(due, { timeout: 30_000 }).toBeGreaterThan(0); // back to where the test started
 
             // A product's supplier shows in its settings (the list of suppliers loads after the product).
             const withSupplier = (await api<{ data: { variant_id: number; supplier: string | null }[] }>(app, '/forecasts?per_page=50')).data.find((r) => r.supplier);
@@ -598,7 +612,8 @@ for (const plan of ['free', 'starter', 'growth'] as PlanKey[]) {
 
             await open(app, '/orders');
             const row = app.locator('s-table-row', { hasText: 'E2E-PART' }).first();
-            await row.locator('s-button', { hasText: 'Part received' }).click();
+            await row.getByRole('button', { name: /More actions/ }).click();
+            await app.getByRole('menuitem', { name: 'Part received' }).click();
             await row.getByRole('spinbutton', { name: 'Received so far' }).fill('15');
             await row.locator('s-button', { hasText: 'Save' }).click();
             await expect.poll(async () => (await api<Orders>(app, '/manual-orders')).data.open.find((o) => o.id === order.id)?.received_quantity).toBe(15);

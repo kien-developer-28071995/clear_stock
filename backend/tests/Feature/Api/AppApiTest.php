@@ -426,3 +426,20 @@ it('counts, filters and badges agree on every status', function () {
     }
     expect($counts)->toMatchArray(['out_of_stock' => 1, 'reorder_now' => 2, 'overstock' => 1, 'healthy' => 1, 'slow' => 2]);
 });
+
+it('keeps an out-of-stock product out of "OK" while its order is on the way', function () {
+    $out = product($this->shop, $this->location, 'Out', stock: 0, perDay: 4);
+    product($this->shop, $this->location, 'Fine', stock: 250, perDay: 4);
+    forecastAll($this->shop);
+    $qty = $out->forecast()->first()->suggested_qty;
+
+    // Ordered outside Shopify: nothing left to order, the reorder date moves ahead, still nothing to sell.
+    $this->postJson('/api/manual-orders', ['items' => [['variant_id' => $out->id, 'quantity' => $qty]]], $this->auth)->assertCreated();
+    forecastAll($this->shop);
+    expect($out->forecast()->first()->suggested_qty)->toBe(0);
+
+    $counts = $this->getJson('/api/dashboard', $this->auth)->json('data.counts');
+    expect($counts)->toMatchArray(['out_of_stock' => 1, 'healthy' => 1, 'reorder_now' => 0]);
+    $this->getJson('/api/forecasts?status=healthy', $this->auth)->assertJsonPath('data.*.name', ['Fine']);
+    $this->getJson('/api/forecasts?status=out_of_stock', $this->auth)->assertJsonPath('data.*.name', ['Out'])->assertJsonPath('data.0.status', 'out_of_stock');
+});

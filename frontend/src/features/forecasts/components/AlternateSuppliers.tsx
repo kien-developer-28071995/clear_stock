@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { isValidationError } from '@/lib/queryClient';
 import { useTranslation } from 'react-i18next';
 import { errorMessage } from '@/lib/http';
 import type { ForecastDetail } from '@/features/forecasts/types';
@@ -29,7 +30,8 @@ export function AlternateSuppliers({ f }: { f: ForecastDetail }) {
     const taken = new Set([f.settings.supplier_id, ...list.map((a) => a.supplier_id)]);
     const options = suppliers.data?.filter((s) => !taken.has(s.id)) ?? [];
 
-    const toast = { onError: (e: unknown) => shopify.toast.show(errorMessage(e), { isError: true }) };
+    // Other failures are announced for every save (lib/queryClient); these fields have no place for a validation error.
+    const toast = { onError: (e: unknown) => { if (isValidationError(e)) shopify.toast.show(errorMessage(e), { isError: true }); } };
     const stripName = list.map(({ name: _name, ...rest }) => rest);
     const add = () =>
         save.mutate([...stripName, { supplier_id: Number(supplierId), unit_cost: numberOrNull(cost), lead_time_days: numberOrNull(lead), supplier_sku: sku.trim() || null }], {

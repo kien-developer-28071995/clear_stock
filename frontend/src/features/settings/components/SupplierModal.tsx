@@ -86,6 +86,9 @@ export function SupplierModal({ modalRef, supplier, onDone }: Props) {
                     error={fieldError(mutation.error, 'lead_time_days')}
                     onInput={(e) => setLead(e.currentTarget.value)}
                 />
+                {/* More than a handful of fields: grouped under headings, like the product's settings. */}
+                <s-divider />
+                <s-heading>{t('productSettings.groups.orderRules')}</s-heading>
                 <s-grid gridTemplateColumns="1fr 1fr" gap="base">
                     <s-number-field
                         label={t('productSettings.minOrder')}
@@ -116,6 +119,8 @@ export function SupplierModal({ modalRef, supplier, onDone }: Props) {
                     error={fieldError(mutation.error, 'order_cycle_days')}
                     onInput={(e) => setCycle(e.currentTarget.value)}
                 />
+                <s-divider />
+                <s-heading>{t('productSettings.groups.cost')}</s-heading>
                 <s-grid gridTemplateColumns="1fr 1fr" gap="base">
                     <s-number-field
                         label={t('suppliers.minOrderValue')}

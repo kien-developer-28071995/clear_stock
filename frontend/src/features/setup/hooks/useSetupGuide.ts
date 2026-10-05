@@ -11,7 +11,7 @@ export function useSetupGuide() {
 /** All guide mutations return the new state; write it straight into the cache. */
 function useGuideMutation<T>(fn: (arg: T) => Promise<SetupGuideState>) {
     const qc = useQueryClient();
-    return useMutation({ mutationFn: fn, onSuccess: (data) => qc.setQueryData(KEY, data) });
+    return useMutation({ mutationFn: fn, onSuccess: (data) => qc.setQueryData(KEY, data), meta: { silent: true } }); // progress notes: never worth an error message
 }
 
 export const useRecordSetupEvent = () => useGuideMutation(setupApi.event);
@@ -26,5 +26,6 @@ export function useDismissTip() {
         onMutate: (tip: TipKey) =>
             qc.setQueryData<SetupGuideState>(KEY, (s) => (s ? { ...s, tips_dismissed: [...s.tips_dismissed, tip] } : s)),
         onSuccess: (data) => qc.setQueryData(KEY, data),
+        meta: { silent: true },
     });
 }
