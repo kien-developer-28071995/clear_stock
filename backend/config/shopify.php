@@ -26,4 +26,7 @@ return [
     // Marketing website (website/ in the repo): home, /privacy, /support. The app's own
     // /privacy and /support redirect there. Dev: the website's `npm run dev`.
     'website_url' => rtrim((string) env('WEBSITE_URL', 'http://localhost:4321'), '/'),
+    // The embedded app's own address (frontend/, a static site): what application_url in
+    // shopify.app.toml names. This backend is the API it calls and serves no page of the app.
+    'frontend_url' => rtrim((string) env('FRONTEND_URL', ''), '/') ?: null,
 ];

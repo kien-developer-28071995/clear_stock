@@ -1,7 +1,7 @@
 <?php
 
-use App\Http\Controllers\EmbeddedAppController;
 use App\Http\Controllers\FlowLifecycleController;
+use App\Http\Controllers\FrontendRedirectController;
 use App\Http\Controllers\PublicPageController;
 use App\Http\Controllers\WebhookController;
 use Illuminate\Support\Facades\Route;
@@ -15,12 +15,8 @@ Route::post('/webhooks', WebhookController::class)->middleware('shopify.webhook'
 // Shopify Flow lifecycle callback (extensions/flow-lifecycle), same HMAC as webhooks.
 Route::post('/flow/lifecycle', FlowLifecycleController::class)->middleware('shopify.webhook')->name('flow.lifecycle');
 
-// Listed in shopify.app.toml [auth] redirect_urls; with Shopify-managed install it is
-// only hit by legacy links, so send the merchant into the embedded app.
-Route::get('/auth/callback', EmbeddedAppController::class);
-
-// Embedded SPA: every other GET path renders the React shell (client-side routing).
-Route::get('/{path?}', EmbeddedAppController::class)
-    ->where('path', '^(?!api/|horizon|up$|build/).*')
-    ->middleware('embedded.headers')
+// The app's pages live on the frontend's own domain (frontend/). Anything else that reaches the
+// backend in a browser (an old application_url, /auth/callback from a legacy link) is sent there.
+Route::get('/{path?}', FrontendRedirectController::class)
+    ->where('path', '^(?!api/|horizon|up$).*')
     ->name('app');

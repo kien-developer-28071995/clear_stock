@@ -12,7 +12,8 @@ return [
     'allowed_origins' => ['*'],
     'allowed_origins_patterns' => [],
     'allowed_headers' => ['*'],
-    'exposed_headers' => [],
+    // Read by the app when it runs on its own domain: the file name of a download, rows an export left out.
+    'exposed_headers' => ['Content-Disposition', 'X-Skipped-Rows'],
     'max_age' => 7200, // cache preflight requests
     'supports_credentials' => false,
 ];

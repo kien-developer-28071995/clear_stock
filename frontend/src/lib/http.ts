@@ -47,6 +47,13 @@ export function fieldError(error: unknown, field: string): string | undefined {
     return coded ? translateCode('validation', coded, 'invalid') : undefined;
 }
 
+/**
+ * The backend's API. The frontend is a site of its own and only ever talks to the backend here.
+ * VITE_API_URL is the backend's origin (required for a build); empty in dev, where one tunnel
+ * hostname fronts both and the dev proxy routes /api to the backend.
+ */
+const API = `${(import.meta.env.VITE_API_URL ?? '').replace(/\/+$/, '')}/api`;
+
 type Method = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
 async function headers(): Promise<Record<string, string>> {
@@ -55,7 +62,7 @@ async function headers(): Promise<Record<string, string>> {
 }
 
 async function request<T>(method: Method, path: string, body?: unknown): Promise<T> {
-    const response = await fetch(`/api${path}`, {
+    const response = await fetch(`${API}${path}`, {
         method,
         headers: {
             Accept: 'application/json',
@@ -73,7 +80,7 @@ async function request<T>(method: Method, path: string, body?: unknown): Promise
 
 /** POST multipart form data (file uploads). The browser sets the multipart boundary. */
 async function postForm<T>(path: string, form: FormData): Promise<T> {
-    const response = await fetch(`/api${path}`, { method: 'POST', headers: { Accept: 'application/json', ...(await headers()) }, body: form });
+    const response = await fetch(`${API}${path}`, { method: 'POST', headers: { Accept: 'application/json', ...(await headers()) }, body: form });
     const data: unknown = await response.json().catch(() => null);
     if (!response.ok) throw ApiError.fromResponse(response.status, data);
 
@@ -83,7 +90,7 @@ async function postForm<T>(path: string, form: FormData): Promise<T> {
 /** Download a file from the API (auth header included) and hand it to the browser. */
 /** Saves the file the API returns; resolves with the response headers (e.g. counts the file comes with). */
 async function download(path: string): Promise<Headers> {
-    const response = await fetch(`/api${path}`, { headers: { Accept: 'application/json', ...(await headers()) } });
+    const response = await fetch(`${API}${path}`, { headers: { Accept: 'application/json', ...(await headers()) } });
     if (!response.ok) {
         throw ApiError.fromResponse(response.status, await response.json().catch(() => null));
     }

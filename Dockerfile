@@ -3,15 +3,14 @@
 # Multi-stage build for clear_stock.
 #   target "dev"   -> PHP-FPM with dev tooling, repo mounted from host
 #   target "app"   -> production PHP-FPM runtime with backend/ (also horizon + scheduler)
-#   target "web"   -> production nginx serving backend/public + frontend build
+#   target "web"   -> production nginx in front of the backend (API, webhooks)
 #
-# Layout: backend/ = Laravel API + embedded page shell, frontend/ = React SPA (Vite).
-# The frontend build is written into backend/public/build.
+# These are the backend's images only. The frontend (frontend/) is a separate static site with
+# its own domain: the Deploy workflow builds and publishes it, no image involved.
 #
 # Build prod:  docker compose -f docker-compose.prod.yml build
 
 ARG PHP_VERSION=8.4
-ARG NODE_VERSION=22
 
 ############################
 # Base PHP image (shared)
@@ -64,17 +63,6 @@ COPY backend/ .
 RUN composer dump-autoload --no-dev --optimize --classmap-authoritative --no-scripts
 
 ############################
-# Frontend build
-############################
-FROM node:${NODE_VERSION}-alpine AS frontend
-WORKDIR /app/frontend
-COPY frontend/package.json frontend/package-lock.json frontend/.npmrc ./
-RUN --mount=type=cache,target=/root/.npm npm ci
-COPY frontend/ .
-# Outputs to /app/backend/public/build. The API key is injected at runtime by Blade, not Vite.
-RUN npm run build
-
-############################
 # Production PHP runtime
 ############################
 FROM php-base AS app
@@ -83,7 +71,6 @@ COPY docker/php/opcache.prod.ini /usr/local/etc/php/conf.d/zz-opcache.ini
 
 COPY --chown=www-data:www-data backend/ .
 COPY --chown=www-data:www-data --from=vendor /app/vendor ./vendor
-COPY --chown=www-data:www-data --from=frontend /app/backend/public/build ./public/build
 COPY docker/php/entrypoint.prod.sh /usr/local/bin/entrypoint
 RUN chmod +x /usr/local/bin/entrypoint \
     && rm -rf tests \
@@ -100,4 +87,3 @@ CMD ["php-fpm"]
 FROM nginx:1.27-alpine AS web
 COPY docker/nginx/prod.conf /etc/nginx/conf.d/default.conf
 COPY backend/public /var/www/html/public
-COPY --from=frontend /app/backend/public/build /var/www/html/public/build

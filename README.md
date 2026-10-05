@@ -354,7 +354,7 @@ Backend and frontend are separate projects; the repo root only holds infra.
 /                         docker-compose.yml, docker-compose.prod.yml, Dockerfile, Makefile,
 │                         shopify.app.toml, docker/ (nginx, php, scripts)
 ├── extensions/           Shopify admin UI extensions (product page block, product list action) + shared/ helpers
-├── backend/              Laravel 13 — API, webhooks, embedded page shell (composer.json, artisan, tests/, .env)
+├── backend/              Laravel 13 — the API, webhooks, queue and scheduler; serves no page of the app (composer.json, artisan, tests/, .env)
 │   ├── app/
 │   │   ├── Http/Controllers/Api, Http/Middleware, Http/Resources
 │   │   ├── Models/                 Shop, …
@@ -362,7 +362,6 @@ Backend and frontend are separate projects; the repo root only holds infra.
 │   │   ├── Services/               ShopAuthService, ShopService, Shopify/* (OAuth, tokens, Admin API)
 │   │   ├── Observers/              cache invalidation
 │   │   └── Support/CacheKeys.php   every cache key lives here
-│   └── resources/views/app.blade.php   loads App Bridge, Polaris and the Vite bundle
 ├── frontend/             React 19 + TypeScript + Vite (package.json, vite.config.ts, .env)
 │   └── src/
 │       ├── app/                    App, providers, router
@@ -377,7 +376,7 @@ Backend and frontend are separate projects; the repo root only holds infra.
   - `frontend/.env`: Vite only (`APP_URL` for the dev server/HMR origin). Only `VITE_*` variables reach browser code; never put secrets here.
   - `website/.env`: build settings of the static website (all of it ends up in public HTML; never put secrets here).
   - Host ports use compose defaults (`8080`, `33060`, `8025`); override per run, e.g. `APP_PORT=8090 make up`.
-- The frontend builds into `backend/public/build`; in dev, Vite writes `backend/public/hot` so Laravel serves HMR assets.
+- **Frontend and backend are separate apps.** The frontend (`frontend/`) is a static site with its own domain (`FRONTEND_URL`, the `application_url` in `shopify.app.toml`): `npm run build` writes `frontend/dist`, and it reaches the backend only through the API at `VITE_API_URL` with the App Bridge session token (no cookies, so different domains are fine). The backend (`APP_URL`) answers the API, webhooks and Horizon; any other browser request is redirected to the frontend. In dev one tunnel hostname fronts both and `docker/nginx/dev.conf` tells them apart by path. `make e2e-split` runs the built frontend on one origin against the API on another.
 - Request flow in the backend: Controller → Service → Repository (Cache → Eloquent) → Model.
 - Running tools outside Docker: `cd backend && composer install && php artisan test`, `cd frontend && npm install && npm run dev`.
 

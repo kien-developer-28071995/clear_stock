@@ -16,6 +16,11 @@ function lastLine(output: string): string {
     return output.split('\n').filter(Boolean).at(-1) ?? '';
 }
 
+/** A session token for the dev shop, as App Bridge would hand out. */
+export function sessionToken(): string {
+    return lastLine(artisan('dev:session-token', '--ttl=3600'));
+}
+
 export function setPlan(plan: PlanKey): void {
     artisan('dev:set-plan', plan);
 }
@@ -37,7 +42,7 @@ export async function api<T>(page: Page, url: string, init: { method?: string; b
     );
 }
 
-/** The embedded shell (resources/views/app.blade.php) without App Bridge's CDN script. */
+/** The app's page (frontend/index.html) without App Bridge's CDN script. */
 const SHELL = `<!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Clear Stock</title>
@@ -60,7 +65,7 @@ declare global {
 }
 
 /** Stub of the App Bridge APIs the app uses (`shopify.*`). */
-function stubAppBridge({ token, locale }: { token: string; locale: string }) {
+export function stubAppBridge({ token, locale }: { token: string; locale: string }) {
     window.__e2e = { toasts: [], saveBar: {}, pickerSelection: [], scopes: [], grantScopes: true, scopeRequests: [] };
     (window as unknown as { shopify: unknown }).shopify = {
         config: { locale },
@@ -86,7 +91,7 @@ function stubAppBridge({ token, locale }: { token: string; locale: string }) {
 
 export const test = base.extend<{ app: Page }>({
     app: async ({ page, baseURL }, use) => {
-        const token = lastLine(artisan('dev:session-token', '--ttl=3600'));
+        const token = sessionToken();
         await page.addInitScript(stubAppBridge, { token, locale: 'en' });
         // Every page navigation gets the shell; API, Vite and CDN requests go through.
         await page.route(

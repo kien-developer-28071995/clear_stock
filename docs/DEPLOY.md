@@ -155,6 +155,28 @@ Nếu **mất hẳn key cũ**: token không giải mã được nữa; shop vẫ
 - Image cũ không còn dùng và cũ hơn 7 ngày được xóa sau mỗi lần deploy thành công, nên ổ đĩa không đầy dần; image 7 ngày gần nhất vẫn còn để quay lại nhanh.
 - Deploy có thể lâu hơn bình thường (tối đa khoảng 10 phút) nếu đúng lúc đó đang có job đồng bộ lớn: Horizon chờ job xong rồi mới dừng.
 
+## 4a. Frontend và backend là hai phần riêng
+
+| Phần | Domain (ví dụ) | Biến | Chạy bằng |
+|---|---|---|---|
+| Backend: API, webhook, Horizon | `api.example.com` | `APP_URL` | container `web` + `app` + `horizon` + `scheduler` |
+| Frontend: giao diện app nhúng | `app.example.com` | `FRONTEND_URL` | file tĩnh trong `<thư mục deploy>/frontend`, Caddy phục vụ |
+| Website giới thiệu | `www.example.com` | `WEBSITE_URL` | file tĩnh trong `<thư mục deploy>/website` |
+
+Frontend chỉ gọi backend qua `https://<APP_URL>/api/...` kèm session token của Shopify. Backend không trả trang nào của app; request khác vào backend bằng trình duyệt được chuyển sang `FRONTEND_URL`.
+
+**Cài lần đầu (hoặc khi chuyển từ bản một domain):**
+
+1. Tạo bản ghi DNS cho domain frontend và domain backend, trỏ về server.
+2. Thêm khối `app.example.com` và `api.example.com` vào `/etc/caddy/Caddyfile` theo `deploy/Caddyfile`, rồi `sudo caddy validate --config /etc/caddy/Caddyfile && sudo systemctl reload caddy`. Khối frontend gửi header `frame-ancestors` theo từng shop: Shopify bắt buộc.
+3. GitHub → Variables (environment `production`): `APP_URL` = domain backend, `FRONTEND_URL` = domain frontend. Deploy dừng nếu thiếu `FRONTEND_URL`.
+4. `shopify.app.production.toml`: `application_url` = domain frontend; `redirect_urls`, URL webhook và `extensions/flow-lifecycle` = domain backend. Chạy `shopify app deploy --config production`.
+5. Push `main`, duyệt Deploy. Workflow build frontend với `VITE_API_URL` = `APP_URL` và upload sau khi backend đã lên.
+
+Giữ domain cũ trỏ về backend thêm một thời gian: link cũ vào đó sẽ tự chuyển sang frontend.
+
+**Sau này tách frontend sang server riêng:** cài Caddy ở server mới với riêng khối `app.example.com`, thêm Secrets `FRONTEND_DEPLOY_HOST`, `FRONTEND_DEPLOY_USER`, `FRONTEND_DEPLOY_PATH`, `FRONTEND_DEPLOY_KNOWN_HOSTS` (và `FRONTEND_DEPLOY_SSH_KEY`, `FRONTEND_DEPLOY_PORT` nếu khác), đổi DNS. Không phải sửa code hay workflow.
+
 ## 4b. Báo cáo cho chủ app (`admin/`)
 
 Container `admin` chạy cạnh app, chỉ mở `127.0.0.1:8090` trên server. Cài một lần trong thư mục deploy: `bash admin-setup.sh` (tạo `admin/.env` và user MySQL `report` chỉ đọc); lần deploy sau tự bật. Tạo tài khoản: `docker compose -f docker-compose.prod.yml exec admin php artisan admin:user you@example.com`. Mở từ máy cá nhân: `ssh -N -L 8090:127.0.0.1:8090 <user>@<server>` rồi vào http://localhost:8090. Chi tiết và cách gắn domain riêng: `admin/README.md`.

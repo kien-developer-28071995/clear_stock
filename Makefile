@@ -6,7 +6,7 @@ export UID := $(shell id -u)
 export GID := $(shell id -g)
 
 .DEFAULT_GOAL := help
-.PHONY: help setup up down restart build shell migrate fresh test e2e extensions logs tunnel tunnel-url tunnel-down e2e-features-off listing-screenshots feature-screenshots listing-video \
+.PHONY: help setup up down restart build shell migrate fresh test e2e extensions logs tunnel tunnel-url tunnel-down e2e-features-off e2e-split listing-screenshots feature-screenshots listing-video \
         app-url webhook artisan composer npm typecheck website website-build admin-setup admin-user admin-test prod-build prod-up prod-down prod-migrate prod-logs
 
 help: ## List available commands
@@ -51,6 +51,12 @@ test: ## Run the backend test suite (Pest)
 e2e: ## End-to-end tests in Chromium on every plan + admin extensions (needs make up + a synced dev store)
 	npm run extensions:locales:check
 	cd frontend && npx playwright test
+
+e2e-split: ## E2E of the built frontend on its own origin (:4173) calling the API on another (:8080)
+	@cd frontend && VITE_API_URL=http://localhost:$${APP_PORT:-8080} npm run build >/dev/null \
+	&& (npx vite preview --port 4173 --strictPort >/dev/null 2>&1 & echo $$! > .preview.pid) && sleep 2; \
+	E2E_SPLIT_URL=http://localhost:4173 E2E_SPLIT_API=http://localhost:$${APP_PORT:-8080} npx playwright test e2e/split-domain.spec.ts; status=$$?; \
+	kill $$(cat .preview.pid) 2>/dev/null; rm -f .preview.pid; exit $$status
 
 # What the App Store version (v1) switches off: keep in step with backend/.env.production.example.
 V1_OFF = \nFEATURE_SHOPIFY_PURCHASE_ORDERS=false\nFEATURE_SUPPLIER_EMAILS=false\nFEATURE_LOCATIONS=false\nFEATURE_TRANSFERS=false\nFEATURE_REALTIME_ALERTS=false\nFEATURE_FLOW_TRIGGERS=false\nFEATURE_SLACK_ALERTS=false\nFEATURE_ORDER_EXCLUSIONS=false\nFEATURE_LOCATION_EXCLUSIONS=false\nFEATURE_ALTERNATE_SUPPLIERS=false\nFEATURE_SAVED_VIEWS=false\nFEATURE_SIZE_RUNS=false\nBILLING_GROWTH_OFFERED=false\n

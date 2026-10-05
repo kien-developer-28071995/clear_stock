@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<!--
+  The embedded app's page. Shopify opens it in the admin iframe as /?shop=...&host=...&embedded=1.
+  %VITE_*% values come from the build environment (frontend/.env.example). The web server in
+  front must send the iframe protection header per shop (deploy/Caddyfile, docker/nginx/dev.conf).
+-->
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>%VITE_APP_NAME%</title>
+    <!-- App Bridge + Polaris web components from Shopify's CDN (must load before app code). -->
+    <meta name="shopify-api-key" content="%VITE_SHOPIFY_API_KEY%">
+    <script src="https://cdn.shopify.com/shopifycloud/app-bridge.js"></script>
+    <!-- App Bridge renders the save bar in the admin chrome; its source element never shows in the iframe. -->
+    <style>ui-save-bar { display: none; }</style>
+    <script src="https://cdn.shopify.com/shopifycloud/polaris-1.js"></script>
+    <script>window.__APP_CONFIG__ = { appName: "%VITE_APP_NAME%" };</script>
+    <script type="module" src="/src/main.tsx"></script>
+</head>
+<body>
+    <div id="root"></div>
+</body>
+</html>

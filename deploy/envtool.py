@@ -35,7 +35,7 @@ LINE = re.compile(r'^([A-Z][A-Z0-9_]*)=(.*)$')
 REQUIRED = [
     'APP_KEY', 'APP_URL', 'SHOPIFY_API_KEY', 'SHOPIFY_API_SECRET',
     'DB_PASSWORD', 'DB_ROOT_PASSWORD', 'HORIZON_BASIC_AUTH_USER', 'HORIZON_BASIC_AUTH_PASSWORD',
-    'MAIL_HOST', 'MAIL_FROM_ADDRESS', 'SUPPORT_EMAIL', 'WEBSITE_URL',
+    'MAIL_HOST', 'MAIL_FROM_ADDRESS', 'SUPPORT_EMAIL', 'WEBSITE_URL', 'FRONTEND_URL',
 ]
 # Template defaults that are only placeholders for these keys.
 WEAK = {'DB_PASSWORD': {'secret'}, 'DB_ROOT_PASSWORD': {'root'}}

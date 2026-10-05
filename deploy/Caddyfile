@@ -1,11 +1,37 @@
-# HTTPS in front of the "web" container and the static website (Let's Encrypt certificates,
-# automatic renewal). Install Caddy on the server, copy this to /etc/caddy/Caddyfile, replace
-# both domains, then:
+# HTTPS in front of three separate things (Let's Encrypt certificates, automatic renewal):
+#   api.example.com  the backend: API, webhooks, Horizon (the "web" container)   = APP_URL
+#   app.example.com  the app's frontend: a static site (frontend/)               = FRONTEND_URL
+#   www.example.com  the marketing website (website/)                            = WEBSITE_URL
+# Install Caddy on the server, copy this to /etc/caddy/Caddyfile, replace the domains, then:
 #   sudo systemctl reload caddy
 # The web container listens on 127.0.0.1:8080 (APP_PORT in the deploy dir's .env).
-app.example.com {
+api.example.com {
     encode zstd gzip
     reverse_proxy 127.0.0.1:8080
+}
+
+# The app's frontend (frontend/): static files the Deploy workflow uploads to <deploy dir>/frontend.
+# Shopify opens it in the admin iframe as /?shop=...&host=...; it calls the API at api.example.com.
+# When the frontend moves to its own server, this block (and only this block) moves with it.
+app.example.com {
+    encode zstd gzip
+    root * /opt/clear_stock/frontend
+
+    # Iframe protection, required for embedded apps: only the shop's own admin may frame the app,
+    # and a request without a valid shop may not be framed at all.
+    @shop expression `{query.shop}.matches('^[a-zA-Z0-9][a-zA-Z0-9-]*[.]myshopify[.]com$')`
+    @noShop not expression `{query.shop}.matches('^[a-zA-Z0-9][a-zA-Z0-9-]*[.]myshopify[.]com$')`
+    header @shop Content-Security-Policy "frame-ancestors https://{query.shop} https://admin.shopify.com;"
+    header @noShop Content-Security-Policy "frame-ancestors 'none';"
+
+    # Hashed assets never change; the page itself is always re-checked so a deploy shows at once.
+    header /assets/* Cache-Control "public, max-age=31536000, immutable"
+    @page not path /assets/*
+    header @page Cache-Control "no-cache"
+
+    # Client-side routes (/products/12, /settings...) are all the same page.
+    try_files {path} /index.html
+    file_server
 }
 
 # Owner reports (admin/), only if you want them on a domain instead of an SSH tunnel

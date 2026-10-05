@@ -4,7 +4,6 @@ use App\Exceptions\ApiErrorResponse;
 use App\Exceptions\ApiException;
 use App\Exceptions\InvalidSessionTokenException;
 use App\Exceptions\PlanRequiredException;
-use App\Http\Middleware\EmbeddedAppHeaders;
 use App\Http\Middleware\RequireFeatureSwitch;
 use App\Http\Middleware\VerifyShopifySessionToken;
 use App\Http\Middleware\VerifyShopifyWebhook;
@@ -35,7 +34,6 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             'shopify.session' => VerifyShopifySessionToken::class,
-            'embedded.headers' => EmbeddedAppHeaders::class,
             'shopify.webhook' => VerifyShopifyWebhook::class,
             'feature' => RequireFeatureSwitch::class,
         ]);

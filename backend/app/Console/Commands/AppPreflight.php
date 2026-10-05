@@ -51,6 +51,12 @@ class AppPreflight extends Command
             'WEBSITE_URL must be the https address of the website (its /privacy and /support are the App Store listing URLs).',
         );
         $this->check(parse_url($website, PHP_URL_HOST) !== parse_url((string) config('app.url'), PHP_URL_HOST), 'WEBSITE_URL must not be APP_URL: the app redirects /privacy and /support to the website.');
+        $frontend = (string) config('shopify.frontend_url');
+        $this->check(str_starts_with($frontend, 'https://') && ! preg_match('/REPLACE|example\.com|localhost/', $frontend), 'FRONTEND_URL must be the https address of the app frontend (application_url in shopify.app.toml).');
+        $this->check(
+            ! in_array(parse_url($frontend, PHP_URL_HOST), [parse_url((string) config('app.url'), PHP_URL_HOST), parse_url($website, PHP_URL_HOST)], true),
+            'FRONTEND_URL must be its own host: not APP_URL (the API) and not WEBSITE_URL.',
+        );
         $this->check(config('queue.default') === 'redis', 'QUEUE_CONNECTION should be redis (Horizon).');
         $this->check(config('cache.default') === 'redis', 'CACHE_STORE should be redis.');
 

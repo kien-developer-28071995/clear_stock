@@ -54,9 +54,12 @@ jobs:
         working-directory: frontend
       - name: Admin extension locales copied from the app
         run: node extensions/scripts/sync-locales.mjs --check
-      - name: Build
-        run: npm run build
+      - name: Build (static site, as the Deploy workflow publishes it)
+        run: npm run build && test -f dist/index.html
         working-directory: frontend
+        env:
+          VITE_API_URL: https://api.example.test
+          VITE_SHOPIFY_API_KEY: ci-build
 
   # Marketing website (website/): translations, types and the static build.
   website:
@@ -139,5 +142,5 @@ jobs:
       - name: Render with placeholder values
         env:
           SECRETS_JSON: '{"APP_KEY":"base64:ci","SHOPIFY_API_KEY":"k","SHOPIFY_API_SECRET":"s","DB_PASSWORD":"p","DB_ROOT_PASSWORD":"r","HORIZON_BASIC_AUTH_USER":"u","HORIZON_BASIC_AUTH_PASSWORD":"p"}'
-          VARS_JSON: '{"APP_URL":"https://ci.example.test","MAIL_HOST":"smtp.ci.test","MAIL_FROM_ADDRESS":"a@ci.test","SUPPORT_EMAIL":"s@ci.test","WEBSITE_URL":"https://www.ci.example.test"}'
+          VARS_JSON: '{"APP_URL":"https://ci.example.test","MAIL_HOST":"smtp.ci.test","MAIL_FROM_ADDRESS":"a@ci.test","SUPPORT_EMAIL":"s@ci.test","WEBSITE_URL":"https://www.ci.example.test","FRONTEND_URL":"https://app.ci.example.test"}'
         run: python3 deploy/envtool.py render --out "$RUNNER_TEMP/backend.env"
