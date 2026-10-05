@@ -73,11 +73,11 @@ export function AppRouter() {
             <Routes>
                 <Route path="/" element={<HomeRoute />} />
                 <Route path="/reorder" element={<ReorderPage />} />
-                <Route path="/reorder/orders" element={<ManualOrdersPage />} />
+                <Route path="/reorder/orders" element={<FeatureRoute feature="manual_orders"><ManualOrdersPage /></FeatureRoute>} />
                 <Route path="/reorder/transfers" element={<FeatureRoute feature="transfers"><TransfersPage /></FeatureRoute>} />
                 <Route path="/products" element={<ProductsPage />} />
-                <Route path="/products/bundles" element={<BundlesPage />} />
-                <Route path="/products/costs" element={<CostsPage />} />
+                <Route path="/products/bundles" element={<FeatureRoute feature="bundles"><BundlesPage /></FeatureRoute>} />
+                <Route path="/products/costs" element={<FeatureRoute feature="costs"><CostsPage /></FeatureRoute>} />
                 <Route path="/products/:variantId" element={<ProductDetailPage />} />
                 <Route path="/insights" element={<InsightsPage />} />
                 <Route path="/planning" element={<PlanningIndex />} />
@@ -85,10 +85,10 @@ export function AppRouter() {
                 <Route path="/planning/what-if" element={<FeatureRoute feature="what_if"><WhatIfPage /></FeatureRoute>} />
                 <Route path="/planning/events" element={<FeatureRoute feature="sales_events"><SalesEventsPage /></FeatureRoute>} />
                 <Route path="/suppliers" element={<SuppliersPage />} />
-                <Route path="/suppliers/import" element={<PurchaseOrderImportPage />} />
-                <Route path="/suppliers/from-vendors" element={<VendorSuppliersPage />} />
+                <Route path="/suppliers/import" element={<FeatureRoute feature="supplier_import"><PurchaseOrderImportPage /></FeatureRoute>} />
+                <Route path="/suppliers/from-vendors" element={<FeatureRoute feature="vendor_suppliers"><VendorSuppliersPage /></FeatureRoute>} />
                 <Route path="/settings" element={<SettingsPage />} />
-                <Route path="/data-health" element={<DataHealthPage />} />
+                <Route path="/data-health" element={<FeatureRoute feature="data_health"><DataHealthPage /></FeatureRoute>} />
                 <Route path="/plans" element={<PlansPage />} />
                 {/* Paths from before the pages were grouped (links in emails, bookmarks). */}
                 {Object.entries(MOVED).map(([from, to]) => (

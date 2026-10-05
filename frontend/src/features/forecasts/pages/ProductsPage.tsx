@@ -48,7 +48,10 @@ export function ProductsPage() {
     const abc = useFeature('abc');
     const sortOptions = SORT_OPTIONS.filter((o) => abc || o !== 'revenue');
     const narrow = useIsNarrow();
-    const views = useSavedViews();
+    const viewsExist = useFeature('saved_views');
+    const trendExists = useFeature('trend');
+    const exportExists = useFeature('product_export');
+    const views = useSavedViews(viewsExist);
     // Search, status and sort are always there; the other filters open on demand (or when one is in use).
     const extraActive = [filters.location_id, filters.vendor, filters.product_type, filters.abc, filters.trend].some((v) => v !== '' && v !== undefined);
     const [moreOpen, setMoreOpen] = useState(false);
@@ -87,7 +90,7 @@ export function ProductsPage() {
         <s-page heading={t('nav.products')} inlineSize="large"><SectionTabs group="products" />
             <s-stack slot="secondary-actions">
                 <ExportPurchaseOrderButton locationId={filters.location_id || undefined} />
-                <s-button icon="export" loading={exporting || undefined} onClick={exportList}>{t('products.exportCsv')}</s-button>
+                {exportExists && <s-button icon="export" loading={exporting || undefined} onClick={exportList}>{t('products.exportCsv')}</s-button>}
             </s-stack>
             {error && <ErrorBanner error={error} onRetry={() => refetch()} />}
             {/* Free plan: the list is capped at the plan's best sellers. */}
@@ -138,7 +141,7 @@ export function ProductsPage() {
                         <s-press-button pressed={showMore || undefined} disabled={extraActive || undefined} onClick={() => setMoreOpen(!moreOpen)}>
                             {t('products.moreFilters')}
                         </s-press-button>
-                        {(showMore || (views.data?.length ?? 0) > 0) && (
+                        {viewsExist && (showMore || (views.data?.length ?? 0) > 0) && (
                             <s-grid-item gridColumn="span 4">
                                 <SavedViews current={Object.fromEntries(params.entries())} onApply={(view) => setParams(view)} canSave={showMore} />
                             </s-grid-item>
@@ -196,7 +199,7 @@ export function ProductsPage() {
                                         <s-option key={value} value={value}>{t(`abc.option${value}`)}</s-option>
                                     ))}
                                 </s-select>)}
-                                <s-select
+                                {trendExists && (<s-select
                                     label={t('trend.filter')}
                                     labelAccessibilityVisibility="exclusive"
                                     value={optionValue(filters.trend)}
@@ -205,7 +208,7 @@ export function ProductsPage() {
                                     <s-option value={NO_VALUE}>{t('trend.all')}</s-option>
                                     <s-option value="up">{t('trend.up')}</s-option>
                                     <s-option value="down">{t('trend.down')}</s-option>
-                                </s-select>
+                                </s-select>)}
                                 </s-stack>
                             </s-grid-item>
                         )}
@@ -252,7 +255,7 @@ export function ProductsPage() {
                                 <s-table-cell>
                                     <s-stack gap="small-100" alignItems="end">
                                         <s-text>{formatNumber(row.avg_daily_sales, 2)}</s-text>
-                                        {row.trend_percent !== null && Math.abs(row.trend_percent) >= TREND_THRESHOLD && (
+                                        {trendExists && row.trend_percent !== null && Math.abs(row.trend_percent) >= TREND_THRESHOLD && (
                                             <s-text color="subdued">
                                                 <span title={t(row.trend_percent > 0 ? 'trend.badgeUp' : 'trend.badgeDown', { percent: Math.abs(row.trend_percent) })}>
                                                     {row.trend_percent > 0 ? '↑' : '↓'} {Math.abs(row.trend_percent)}%

@@ -38,6 +38,8 @@ export function ProductSettingsForm({ f }: { f: ForecastDetail }) {
     const [referencePercent, setReferencePercent] = useState('');
     const canReference = useEntitlements().reference_products;
     const referenceExists = useFeature('reference_products');
+    const profilesExist = useFeature('forecast_profiles');
+    const costsExist = useFeature('costs');
 
     const saved = {
         supplierId: f.settings.supplier_id ? String(f.settings.supplier_id) : '',
@@ -196,6 +198,7 @@ export function ProductSettingsForm({ f }: { f: ForecastDetail }) {
                         onInput={(e) => setMaxStock(e.currentTarget.value)}
                     />
                 </s-grid></s-query-container>
+                {costsExist && (<>
                 <s-divider />
                 <s-heading>{t('productSettings.groups.cost')}</s-heading>
                 <s-box maxInlineSize="240px">
@@ -210,9 +213,12 @@ export function ProductSettingsForm({ f }: { f: ForecastDetail }) {
                         onInput={(e) => setCost(e.currentTarget.value)}
                     />
                 </s-box>
+                </>)}
+                {(profilesExist || referenceExists) && (<>
                 <s-divider />
                 <s-heading>{t('productSettings.groups.forecast')}</s-heading>
-                <s-select
+                </>)}
+                {profilesExist && (<s-select
                     label={t('forecastProfile.productLabel')}
                     details={t('forecastProfile.productHelp')}
                     value={optionValue(profile)}
@@ -223,7 +229,7 @@ export function ProductSettingsForm({ f }: { f: ForecastDetail }) {
                     {FORECAST_PROFILES.map((p) => (
                         <s-option key={p} value={p}>{t(`forecastProfile.${p}`)}</s-option>
                     ))}
-                </s-select>
+                </s-select>)}
                 {referenceExists && (<s-stack gap="small-200">
                     <s-text type="strong">{t('productSettings.reference')}</s-text>
                     {!canReference && <UpgradePrompt id="reference-products" plan="starter">{t('productSettings.referenceLocked')}</UpgradePrompt>}

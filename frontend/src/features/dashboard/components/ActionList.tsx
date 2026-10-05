@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { useFeature } from '@/hooks/useEntitlements';
 import { useTranslation } from 'react-i18next';
 import type { ActionGroup, ActionItem, Dashboard } from '@/features/dashboard/types';
 import { ExportPurchaseOrderButton } from '@/features/forecasts/components/ExportPurchaseOrderButton';
@@ -56,6 +57,7 @@ function Row({ item, today, checked, onToggle }: { item: ActionItem; today: stri
  */
 export function ActionList({ dashboard }: { dashboard: Dashboard }) {
     const { t } = useTranslation();
+    const ordersExist = useFeature('manual_orders');
     const { actions, today } = dashboard;
     const initial = useMemo(
         () => new Set([...actions.out_of_stock, ...actions.order_today].map((i) => i.variant_id)),
@@ -92,9 +94,11 @@ export function ActionList({ dashboard }: { dashboard: Dashboard }) {
                 <s-stack direction="inline" gap="base" alignItems="center" justifyContent="space-between">
                     <s-text color="subdued">{t('actions.selected', { count: selected.size })}</s-text>
                     <s-stack direction="inline" gap="small-200">
-                        <s-button disabled={toMark.length === 0 || undefined} onClick={() => markModal.open()}>
-                            {t('orders.markSelected')}
-                        </s-button>
+                        {ordersExist && (
+                            <s-button disabled={toMark.length === 0 || undefined} onClick={() => markModal.open()}>
+                                {t('orders.markSelected')}
+                            </s-button>
+                        )}
                         <ExportPurchaseOrderButton variantIds={[...selected]} variant="primary" />
                     </s-stack>
                 </s-stack>

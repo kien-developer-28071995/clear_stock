@@ -8,7 +8,7 @@ import { SaveBar } from '@/components/ui/SaveBar';
 import { UpgradePrompt } from '@/components/ui/UpgradePrompt';
 import { fieldError } from '@/lib/http';
 import { useModal } from '@/hooks/useModal';
-import { useEntitlements } from '@/hooks/useEntitlements';
+import { useEntitlements, useFeature } from '@/hooks/useEntitlements';
 import { ExportPurchaseOrderButton } from '@/features/forecasts/components/ExportPurchaseOrderButton';
 import { MarkOrderedModal } from '@/features/orders/components/MarkOrderedModal';
 import { useBudget, useSetBudget } from '@/features/budget/hooks/useBudget';
@@ -38,6 +38,7 @@ export function BudgetPage() {
 
 function BudgetView() {
     const { t } = useTranslation();
+    const ordersExist = useFeature('manual_orders');
     const { data, error, refetch, isFetching } = useBudget();
     const save = useSetBudget();
     const [value, setValue] = useState('');
@@ -95,7 +96,7 @@ function BudgetView() {
                             </s-text>
                             <MissingCostNote count={data.totals.missing_cost} />
                             <s-stack direction="inline" gap="small-200">
-                                <s-button disabled={inBudget.length === 0 || undefined} onClick={() => markModal.open()}>{t('orders.markSelected')}</s-button>
+                                {ordersExist && <s-button disabled={inBudget.length === 0 || undefined} onClick={() => markModal.open()}>{t('orders.markSelected')}</s-button>}
                                 <ExportPurchaseOrderButton variantIds={inBudget.map((i) => i.variant_id)} label={t('budget.export')} />
                             </s-stack>
                         </s-stack>

@@ -7,7 +7,11 @@
  * and merchant settings are kept, so switching it back on restores everything.
  *
  * Plans still decide who gets a feature that is switched on (config/billing.php).
- * The core promise is not switchable: forecasts, explanations, bundles, alerts, suppliers.
+ * Not switchable (the app is nothing without them): forecasts and their explanations, the
+ * product list and product settings, suppliers, sync, onboarding, billing.
+ *
+ * Switches marked "surface" only hide the screens and close the API: what a merchant already
+ * saved there keeps applying (entered costs, orders marked as placed, locations left out).
  *
  * Change with FEATURE_* env vars; production caches config, so restart the containers
  * (`php artisan config:cache` runs on start). Check the result: `php artisan features:status`.
@@ -43,4 +47,31 @@ return [
     // Automation (Growth)
     'realtime_alerts' => (bool) env('FEATURE_REALTIME_ALERTS', true),
     'flow_triggers' => (bool) env('FEATURE_FLOW_TRIGGERS', true),
+
+    // Bundles and alerts (Starter+)
+    'bundles' => (bool) env('FEATURE_BUNDLES', true),                   // bundle sales counted toward components
+    'alerts' => (bool) env('FEATURE_ALERTS', true),                     // reorder summary emails (daily/weekly)
+    'slack_alerts' => (bool) env('FEATURE_SLACK_ALERTS', true),         // the same summary posted to Slack (needs alerts)
+    'low_cover_alerts' => (bool) env('FEATURE_LOW_COVER_ALERTS', true), // "also alert under N days of stock" (needs alerts)
+
+    // Forecast options (every plan)
+    'forecast_profiles' => (bool) env('FEATURE_FORECAST_PROFILES', true),   // window mix per shop/product; off = balanced
+    'trend' => (bool) env('FEATURE_TREND', true),                           // selling faster/slower badge, filter, explanation line
+    'order_exclusions' => (bool) env('FEATURE_ORDER_EXCLUSIONS', true),     // leave out orders by tag / POS / draft
+    'location_exclusions' => (bool) env('FEATURE_LOCATION_EXCLUSIONS', true), // surface: locations not counted as stock
+
+    // Ordering helpers (every plan)
+    'manual_orders' => (bool) env('FEATURE_MANUAL_ORDERS', true),             // surface: "mark as ordered" + orders placed
+    'alternate_suppliers' => (bool) env('FEATURE_ALTERNATE_SUPPLIERS', true), // backup suppliers per product
+    'supplier_import' => (bool) env('FEATURE_SUPPLIER_IMPORT', true),         // suppliers from purchase order CSVs (Stocky)
+    'vendor_suppliers' => (bool) env('FEATURE_VENDOR_SUPPLIERS', true),       // suppliers from Shopify vendors
+    'costs' => (bool) env('FEATURE_COSTS', true),                             // surface: unit costs entered in the app
+
+    // Lists and reports (every plan)
+    'saved_views' => (bool) env('FEATURE_SAVED_VIEWS', true),       // saved filters of the product list
+    'product_export' => (bool) env('FEATURE_PRODUCT_EXPORT', true), // product list as CSV
+    'stock_history' => (bool) env('FEATURE_STOCK_HISTORY', true),   // inventory units and value over time
+    'clearance' => (bool) env('FEATURE_CLEARANCE', true),           // what to clear (slow + excess stock list)
+    'size_runs' => (bool) env('FEATURE_SIZE_RUNS', true),           // products with sizes sold out
+    'data_health' => (bool) env('FEATURE_DATA_HEALTH', true),       // product data check
 ];

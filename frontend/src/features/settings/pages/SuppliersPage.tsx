@@ -28,6 +28,8 @@ export function SuppliersPage() {
     const [emailing, setEmailing] = useState<Supplier | null>(null);
     const { supplier_emails: canEmail, supplier_auto_email: canAutoEmail } = useEntitlements();
     const emailsExist = useFeature('supplier_emails');
+    const fromVendors = useFeature('vendor_suppliers');
+    const canImport = useFeature('supplier_import');
     const openEmail = (s: Supplier) => {
         setEmailing(s);
         emailModal.open();
@@ -60,21 +62,31 @@ export function SuppliersPage() {
             <s-button slot="primary-action" variant="primary" onClick={openNew}>
                 {t('suppliers.add')}
             </s-button>
-            <s-button slot="secondary-actions" href="/suppliers/from-vendors">
-                {t('vendors.button')}
-            </s-button>
-            <s-button slot="secondary-actions" href="/suppliers/import">
-                {t('import.fromStocky')}
-            </s-button>
+            {fromVendors && (
+                <s-button slot="secondary-actions" href="/suppliers/from-vendors">
+                    {t('vendors.button')}
+                </s-button>
+            )}
+            {canImport && (
+                <s-button slot="secondary-actions" href="/suppliers/import">
+                    {t('import.fromStocky')}
+                </s-button>
+            )}
             {error && <ErrorBanner error={error} onRetry={() => refetch()} />}
 
             {data && data.length === 0 ? (
                 <s-section>
                     <s-empty-state heading={t('suppliers.emptyHeading')}>
                         <s-paragraph slot="subheading">{t('suppliers.emptyBody')}</s-paragraph>
-                        <s-button slot="primary-action" href="/suppliers/from-vendors">{t('vendors.button')}</s-button>
-                        <s-button slot="secondary-actions" onClick={openNew}>{t('suppliers.add')}</s-button>
-                        <s-button slot="secondary-actions" href="/suppliers/import">{t('import.fromStocky')}</s-button>
+                        {fromVendors ? (
+                            <>
+                                <s-button slot="primary-action" href="/suppliers/from-vendors">{t('vendors.button')}</s-button>
+                                <s-button slot="secondary-actions" onClick={openNew}>{t('suppliers.add')}</s-button>
+                            </>
+                        ) : (
+                            <s-button slot="primary-action" onClick={openNew}>{t('suppliers.add')}</s-button>
+                        )}
+                        {canImport && <s-button slot="secondary-actions" href="/suppliers/import">{t('import.fromStocky')}</s-button>}
                     </s-empty-state>
                 </s-section>
             ) : (

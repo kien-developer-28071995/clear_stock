@@ -57,7 +57,26 @@ export type FeatureSwitch =
     | 'locations'
     | 'transfers'
     | 'realtime_alerts'
-    | 'flow_triggers';
+    | 'flow_triggers'
+    | 'bundles'
+    | 'alerts'
+    | 'slack_alerts'
+    | 'low_cover_alerts'
+    | 'forecast_profiles'
+    | 'trend'
+    | 'order_exclusions'
+    | 'location_exclusions'
+    | 'manual_orders'
+    | 'alternate_suppliers'
+    | 'supplier_import'
+    | 'vendor_suppliers'
+    | 'costs'
+    | 'saved_views'
+    | 'product_export'
+    | 'stock_history'
+    | 'clearance'
+    | 'size_runs'
+    | 'data_health';
 
 export type FeatureSwitches = Record<FeatureSwitch, boolean>;
 

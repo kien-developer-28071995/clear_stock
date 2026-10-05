@@ -7,7 +7,7 @@ use App\Enums\Feature;
 /**
  * App-wide feature switches (config/features.php). Entitlements asks this first, so a
  * switched-off feature is off for every shop whatever its plan. Features without a
- * switch (forecasts, explanations, bundles, alerts) are always on.
+ * switch (forecasts, explanations) are always on.
  */
 final class Features
 {
@@ -31,11 +31,15 @@ final class Features
         Feature::Transfers->value => 'transfers',
         Feature::RealtimeAlerts->value => 'realtime_alerts',
         Feature::FlowTriggers->value => 'flow_triggers',
+        Feature::Bundles->value => 'bundles',
+        Feature::Alerts->value => 'alerts',
     ];
 
     /** A switch that only works with another one on. */
     private const REQUIRES = [
         'transfers' => 'locations',
+        'slack_alerts' => 'alerts',
+        'low_cover_alerts' => 'alerts',
     ];
 
     public static function enabled(Feature $feature): bool
@@ -43,6 +47,12 @@ final class Features
         $switch = self::SWITCH[$feature->value] ?? null;
 
         return $switch === null || self::switchOn($switch);
+    }
+
+    /** A switch by its config key, for features every plan has (no Feature case). */
+    public static function on(string $switch): bool
+    {
+        return self::switchOn($switch);
     }
 
     /** @return array<string, bool> every switch and its effective state (dependencies applied) */

@@ -271,13 +271,34 @@ Three [admin UI extensions](https://shopify.dev/docs/api/admin-extensions) in `e
 | `FEATURE_TRANSFERS` | Transfer suggestions | needs locations; uses the optional `write_inventory_transfers` scope |
 | `FEATURE_REALTIME_ALERTS` | Real-time stock alerts | the per-shop inventory webhook is removed by the nightly `alerts:realtime-sync` |
 | `FEATURE_FLOW_TRIGGERS` | Shopify Flow triggers | also leave the `flow-*` extensions out of the deploy |
+| `FEATURE_BUNDLES` | Bundles (bundle sales counted toward components) |  |
+| `FEATURE_ALERTS` | Reorder summary emails | off also switches off the two below |
+| `FEATURE_SLACK_ALERTS` | The summary posted to Slack | needs alerts |
+| `FEATURE_LOW_COVER_ALERTS` | "Also alert under N days of stock" | needs alerts |
+| `FEATURE_FORECAST_PROFILES` | Sales-rate averaging per shop and product | off = balanced for everyone |
+| `FEATURE_TREND` | Selling faster/slower badge, filter and explanation line |  |
+| `FEATURE_ORDER_EXCLUSIONS` | Orders left out by tag / POS / draft | off = every order counts at the next sync |
+| `FEATURE_LOCATION_EXCLUSIONS` | Locations not counted as stock | surface only: locations already left out stay out |
+| `FEATURE_MANUAL_ORDERS` | "Mark as ordered" and orders placed | surface only: open orders keep counting until they lapse |
+| `FEATURE_ALTERNATE_SUPPLIERS` | Backup suppliers per product |  |
+| `FEATURE_SUPPLIER_IMPORT` | Suppliers from purchase order CSVs (Stocky) |  |
+| `FEATURE_VENDOR_SUPPLIERS` | Suppliers from Shopify vendors |  |
+| `FEATURE_COSTS` | Unit costs entered in the app | surface only: costs already entered keep applying |
+| `FEATURE_SAVED_VIEWS` | Saved filters of the product list |  |
+| `FEATURE_PRODUCT_EXPORT` | Product list as CSV |  |
+| `FEATURE_STOCK_HISTORY` | Inventory value over time (Insights) | the daily snapshot keeps being recorded |
+| `FEATURE_CLEARANCE` | What to clear (Insights) |  |
+| `FEATURE_SIZE_RUNS` | Products with sizes sold out (Insights) |  |
+| `FEATURE_DATA_HEALTH` | Product data check |  |
 | `BILLING_GROWTH_OFFERED` | Growth on the pricing page | off = no new Growth subscriptions; existing ones keep working |
 
 How it is safe:
 - **One gate.** `Entitlements::has()` = plan **and** switch, so every API, job, webhook, listener and scheduled command that already checked the plan also respects the switch. Locked APIs answer `404 feature_disabled` (not the `402` upgrade answer).
 - **Hidden, not upsold.** `/api/shop` returns `entitlements.features`; the app drops the menu entry, page (404), buttons, settings, upgrade prompts and pricing rows of a switched-off feature (`useFeature()`).
 - **Nothing is deleted.** Settings and data stay; switching back on restores the feature.
-- **Core features have no switch:** forecasts, explanations, bundles, alerts, suppliers.
+- **Core features have no switch:** forecasts and explanations, the product list and product settings, suppliers, sync, onboarding, billing.
+- **Features every plan has** (no plan limit to hang the switch on) are closed by the route middleware `feature:<switch>` and asked with `Features::on()`.
+- **v1 values** live in `backend/.env.production.example` and in `V1_OFF` in the Makefile (keep both in step); `make feature-screenshots` shoots every feature that is on into `docs/screen-feature/`.
 - Production caches config: restart after changing a switch. Check with `php artisan features:status` (fails on combinations that can't work: a missing scope for a switched-on feature, or Growth offered with nothing Growth-only left). `make e2e-features-off` runs an E2E check with switches off.
 
 ## Shopify Flow triggers (Growth)

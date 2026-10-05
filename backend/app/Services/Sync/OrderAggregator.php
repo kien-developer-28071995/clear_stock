@@ -6,6 +6,7 @@ use App\Models\Shop;
 use App\Repositories\Contracts\CatalogRepositoryInterface;
 use App\Repositories\Contracts\DailySalesRepositoryInterface;
 use App\Repositories\Contracts\LocationSalesRepositoryInterface;
+use App\Support\Features;
 use App\Support\Gid;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -42,8 +43,9 @@ class OrderAggregator
         $orderDay = [];
         $fulfillmentOrders = [];
         // Orders the merchant keeps out of the forecast (Settings): by tag or by source.
-        $tags = array_map('mb_strtolower', $shop->excluded_order_tags ?? []);
-        $sources = $shop->excluded_order_sources ?? [];
+        $excluding = Features::on('order_exclusions');
+        $tags = $excluding ? array_map('mb_strtolower', $shop->excluded_order_tags ?? []) : [];
+        $sources = $excluding ? $shop->excluded_order_sources ?? [] : [];
         $excludedOrders = 0;
         $excluded = fn (array $order): bool => ($tags !== [] && array_intersect($tags, array_map('mb_strtolower', $order['tags'] ?? [])) !== [])
             || ($sources !== [] && in_array(OrderSource::of($order['sourceName'] ?? null), $sources, true));

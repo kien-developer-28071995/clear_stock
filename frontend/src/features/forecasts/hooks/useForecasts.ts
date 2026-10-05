@@ -72,8 +72,8 @@ export const useSetAlternates = (variantId: number) =>
     useProductMutation((suppliers: Parameters<typeof forecastApi.setAlternates>[1]) => forecastApi.setAlternates(variantId, suppliers));
 export const useMakeMainSupplier = (variantId: number) => useProductMutation((supplierId: number) => forecastApi.makeMainSupplier(variantId, supplierId));
 
-export function useSavedViews() {
-    return useQuery({ queryKey: ['views'], queryFn: forecastApi.views, staleTime: 5 * 60_000 });
+export function useSavedViews(enabled = true) {
+    return useQuery({ queryKey: ['views'], queryFn: forecastApi.views, staleTime: 5 * 60_000, enabled });
 }
 
 function useViewMutation<T>(fn: (arg: T) => Promise<unknown>) {

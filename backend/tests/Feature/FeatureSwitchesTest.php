@@ -126,3 +126,32 @@ it('reports the switches and warns about combinations that cannot work', functio
     config(['features.locations' => true, 'shopify.scopes' => 'read_products,read_orders']);
     $this->artisan('features:status')->expectsOutputToContain('SHOPIFY_SCOPES lacks')->assertFailed();
 });
+
+it('has a switch for every optional feature and closes the API of one that is off', function (string $switch, string $method, string $url) {
+    expect(config('features'))->toHaveKey($switch);
+    switchOff($switch);
+
+    $this->json($method, $url, [], $this->auth)->assertNotFound()->assertJsonPath('code', 'feature_disabled');
+    expect($this->getJson('/api/shop', $this->auth)->json("data.entitlements.features.{$switch}"))->toBeFalse();
+})->with([
+    ['product_export', 'GET', '/api/forecasts/export'],
+    ['saved_views', 'GET', '/api/views'],
+    ['clearance', 'GET', '/api/clearance'],
+    ['size_runs', 'GET', '/api/size-runs'],
+    ['location_exclusions', 'GET', '/api/settings/locations'],
+    ['vendor_suppliers', 'GET', '/api/suppliers/from-vendors'],
+    ['costs', 'GET', '/api/costs'],
+    ['manual_orders', 'GET', '/api/manual-orders'],
+    ['stock_history', 'GET', '/api/stock-history'],
+    ['data_health', 'GET', '/api/data-health'],
+    ['alternate_suppliers', 'GET', '/api/variants/1/suppliers'],
+    ['supplier_import', 'POST', '/api/imports/purchase-orders/preview'],
+    ['bundles', 'GET', '/api/bundles'],
+]);
+
+it('switches alerts off together with the Slack and days-left options that need them', function () {
+    config(['features.alerts' => false]);
+
+    expect(Features::all())->toMatchArray(['alerts' => false, 'slack_alerts' => false, 'low_cover_alerts' => false])
+        ->and(Features::enabled(Feature::Alerts))->toBeFalse();
+});

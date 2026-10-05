@@ -12,6 +12,7 @@ use App\Repositories\Contracts\LocationSalesRepositoryInterface;
 use App\Repositories\Contracts\ManualOrderRepositoryInterface;
 use App\Services\App\SalesEventService;
 use App\Support\Entitlements;
+use App\Support\Features;
 use Carbon\CarbonImmutable;
 
 /** Loads everything the calculator needs for a batch of variants (a few queries per batch, not per variant). */
@@ -125,6 +126,7 @@ class ForecastInputBuilder
         $bundleIds = array_values(array_unique(array_merge([], ...array_map('array_keys', $bundles))));
         $rows = $this->sales->rowsBetween($shop, array_values(array_unique([...$variantIds, ...$bundleIds])), $historyStart, $yesterday);
         $filterSpikes = $shop->filter_sales_spikes && Entitlements::for($shop)->has(Feature::SpikeFilter);
+        $profiles = Features::on('forecast_profiles');
         $events = $this->salesEvents->matcher($shop, $asOf);
         // Orders placed outside Shopify count as on the way, on top of Shopify's incoming.
         $ordered = $this->manualOrders->onTheWay($shop, ManualOrder::countedFrom($asOf->toDateString()), $variantIds);
@@ -182,8 +184,8 @@ class ForecastInputBuilder
                 orderWeekdays: $variant->supplier?->order_weekdays,
                 events: $events->for($id, $variant->supplier_id),
                 ordered: $ordered[$id] ?? null,
-                profile: $variant->forecast_profile ?? $shop->forecast_profile ?? 'balanced',
-                profileSource: $variant->forecast_profile !== null ? 'variant' : 'shop',
+                profile: $profiles ? ($variant->forecast_profile ?? $shop->forecast_profile ?? 'balanced') : 'balanced',
+                profileSource: $profiles && $variant->forecast_profile !== null ? 'variant' : 'shop',
             );
         }
 

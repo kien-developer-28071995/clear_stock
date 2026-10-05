@@ -6,7 +6,7 @@ export UID := $(shell id -u)
 export GID := $(shell id -g)
 
 .DEFAULT_GOAL := help
-.PHONY: help setup up down restart build shell migrate fresh test e2e extensions logs tunnel tunnel-url tunnel-down e2e-features-off listing-screenshots listing-video \
+.PHONY: help setup up down restart build shell migrate fresh test e2e extensions logs tunnel tunnel-url tunnel-down e2e-features-off listing-screenshots feature-screenshots listing-video \
         app-url webhook artisan composer npm typecheck website website-build admin-setup admin-user admin-test prod-build prod-up prod-down prod-migrate prod-logs
 
 help: ## List available commands
@@ -52,19 +52,30 @@ e2e: ## End-to-end tests in Chromium on every plan + admin extensions (needs mak
 	npm run extensions:locales:check
 	cd frontend && npx playwright test
 
+# What the App Store version (v1) switches off: keep in step with backend/.env.production.example.
+V1_OFF = \nFEATURE_SHOPIFY_PURCHASE_ORDERS=false\nFEATURE_SUPPLIER_EMAILS=false\nFEATURE_LOCATIONS=false\nFEATURE_TRANSFERS=false\nFEATURE_REALTIME_ALERTS=false\nFEATURE_FLOW_TRIGGERS=false\nFEATURE_SLACK_ALERTS=false\nFEATURE_ORDER_EXCLUSIONS=false\nFEATURE_LOCATION_EXCLUSIONS=false\nFEATURE_ALTERNATE_SUPPLIERS=false\nFEATURE_SAVED_VIEWS=false\nFEATURE_SIZE_RUNS=false\nBILLING_GROWTH_OFFERED=false\n
+
 listing-screenshots: ## App Store screenshots (1600x900) of the v1 app into docs/listing/screenshots (restores backend/.env and the plan)
 	@env='$(CURDIR)/backend/.env'; cp "$$env" "$$env.listing-backup"; \
 	plan=$$($(DC) exec -T app php artisan tinker --execute='echo App\Models\Shop::first()->plan->value;' | tail -1); \
 	trap 'mv "$$env.listing-backup" "$$env"; $(DC) exec -T app php artisan dev:set-plan "$$plan" >/dev/null' EXIT; \
-	printf '\nFEATURE_SUPPLIER_EMAILS=false\nFEATURE_LOCATIONS=false\nFEATURE_TRANSFERS=false\nFEATURE_REALTIME_ALERTS=false\nFEATURE_FLOW_TRIGGERS=false\nBILLING_GROWTH_OFFERED=false\n' >> "$$env"; \
+	printf '$(V1_OFF)' >> "$$env"; \
 	$(DC) exec -T app php artisan dev:set-plan starter >/dev/null; \
 	(cd frontend && LISTING_SCREENSHOTS=1 npx playwright test e2e/listing-screenshots.spec.ts)
+
+feature-screenshots: ## Screenshot of every feature that is on in v1 (Starter) into docs/screen-feature (restores backend/.env and the plan)
+	@env='$(CURDIR)/backend/.env'; cp "$$env" "$$env.features-backup"; \
+	plan=$$($(DC) exec -T app php artisan tinker --execute='echo App\Models\Shop::first()->plan->value;' | tail -1); \
+	trap 'mv "$$env.features-backup" "$$env"; $(DC) exec -T app php artisan dev:set-plan "$$plan" >/dev/null' EXIT; \
+	printf '$(V1_OFF)' >> "$$env"; \
+	$(DC) exec -T app php artisan dev:set-plan starter >/dev/null; \
+	(cd frontend && FEATURE_SCREENSHOTS=1 npx playwright test e2e/feature-screenshots.spec.ts)
 
 listing-video: ## Draft App Store walkthrough video (WebM) of the v1 app into docs/listing (restores backend/.env and the plan)
 	@env='$(CURDIR)/backend/.env'; cp "$$env" "$$env.video-backup"; \
 	plan=$$($(DC) exec -T app php artisan tinker --execute='echo App\Models\Shop::first()->plan->value;' | tail -1); \
 	trap 'mv "$$env.video-backup" "$$env"; $(DC) exec -T app php artisan dev:set-plan "$$plan" >/dev/null' EXIT; \
-	printf '\nFEATURE_SUPPLIER_EMAILS=false\nFEATURE_LOCATIONS=false\nFEATURE_TRANSFERS=false\nFEATURE_REALTIME_ALERTS=false\nFEATURE_FLOW_TRIGGERS=false\nBILLING_GROWTH_OFFERED=false\n' >> "$$env"; \
+	printf '$(V1_OFF)' >> "$$env"; \
 	$(DC) exec -T app php artisan dev:set-plan starter >/dev/null; \
 	(cd frontend && LISTING_VIDEO=1 npx playwright test e2e/listing-walkthrough.spec.ts)
 

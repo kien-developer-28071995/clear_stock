@@ -3,8 +3,8 @@ import { manualOrderApi } from '@/features/orders/api/manualOrderApi';
 
 const key = ['manual-orders'] as const;
 
-export function useManualOrders() {
-    return useQuery({ queryKey: key, queryFn: manualOrderApi.list });
+export function useManualOrders(enabled = true) {
+    return useQuery({ queryKey: key, queryFn: manualOrderApi.list, enabled });
 }
 
 /** Orders change what is on the way: refresh forecasts and the home screen too. */

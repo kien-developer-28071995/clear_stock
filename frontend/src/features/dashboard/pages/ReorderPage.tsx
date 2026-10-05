@@ -29,7 +29,7 @@ export function ReorderPage() {
     const transfers = useTransfers(useEntitlements().transfers).data;
     const transferUnits = transfers?.routes.reduce((sum, r) => sum + r.total_units, 0) ?? 0;
     // Orders marked as placed outside Shopify.
-    const orders = useManualOrders().data;
+    const orders = useManualOrders(useFeature('manual_orders')).data;
     const overdue = orders?.open.filter((o) => o.state === 'overdue').length ?? 0;
 
     return (
