@@ -155,3 +155,40 @@ it('switches alerts off together with the Slack and days-left options that need 
     expect(Features::all())->toMatchArray(['alerts' => false, 'slack_alerts' => false, 'low_cover_alerts' => false])
         ->and(Features::enabled(Feature::Alerts))->toBeFalse();
 });
+
+it('leaves the alerts step and the vendor shortcut out of the setup guide when they are switched off', function () {
+    $keys = fn () => array_column($this->getJson('/api/setup-guide', $this->auth)->assertOk()->json('data.steps'), 'key');
+    expect($keys())->toContain('alerts');
+
+    switchOff('alerts', 'vendor_suppliers');
+
+    $guide = $this->getJson('/api/setup-guide', $this->auth)->assertOk()->json('data');
+    expect(array_column($guide['steps'], 'key'))->not->toContain('alerts')
+        ->and($guide['total'])->toBe(count($guide['steps']))
+        ->and($guide['context']['vendor_count'])->toBe(0);
+});
+
+it('hides bundles and alerts on every plan when switched off', function () {
+    switchOff('bundles', 'alerts');
+
+    $entitlements = $this->getJson('/api/shop', $this->auth)->json('data.entitlements');
+    expect($entitlements['bundles'])->toBeFalse()->and($entitlements['alerts'])->toBeFalse()
+        ->and(Entitlements::for($this->shop)->has(Feature::Bundles))->toBeFalse();
+    $this->putJson('/api/settings', ['alerts' => ['enabled' => true]], $this->auth);
+    expect($this->getJson('/api/settings', $this->auth)->json('data.alerts.available'))->toBeFalse();
+});
+
+it('lists every switch in the Makefile lists the E2E runs and the v1 screenshots use', function () {
+    $makefile = file_get_contents(base_path('../Makefile'));
+    preg_match('/^ALL_OFF = (.*)$/m', $makefile, $all);
+    preg_match('/^V1_OFF = (.*)$/m', $makefile, $v1);
+    $example = file_get_contents(base_path('.env.production.example'));
+
+    foreach (array_keys(config('features')) as $switch) {
+        $env = 'FEATURE_'.strtoupper($switch);
+        expect($all[1])->toContain("{$env}=false")
+            ->and($example)->toMatch("/^{$env}=(true|false)$/m");
+        // v1: the Makefile and the production template switch off the same features.
+        expect(str_contains($v1[1], "{$env}=false"))->toBe((bool) preg_match("/^{$env}=false$/m", $example), $env);
+    }
+})->skip(fn () => ! is_file(base_path('../Makefile')), 'the Makefile is outside the backend image');

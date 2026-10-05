@@ -148,3 +148,19 @@ it('leaves out orders the merchant excluded by tag or source', function () {
     expect(sales($this->a))->toBe(['2026-09-10' => [3, 0]])
         ->and($stats)->toMatchArray(['orders' => 4, 'excluded_orders' => 2]);
 });
+
+it('counts every order when order exclusions are switched off app-wide', function () {
+    $this->shop->update(['excluded_order_tags' => ['Wholesale'], 'excluded_order_sources' => ['pos']]);
+    config(['features.order_exclusions' => false]);
+    $file = jsonlFile([
+        order(1, '2026-09-10T15:00:00Z') + ['tags' => ['wholesale']],
+        lineItem(1, 101, 50),
+        order(2, '2026-09-10T15:00:00Z') + ['tags' => [], 'sourceName' => 'pos'],
+        lineItem(2, 101, 7),
+    ]);
+
+    $stats = app(OrderAggregator::class)->import($this->shop->fresh(), $file, '2026-09-01');
+
+    expect(sales($this->a))->toBe(['2026-09-10' => [57, 0]])
+        ->and($stats)->toMatchArray(['orders' => 2, 'excluded_orders' => 0]);
+});

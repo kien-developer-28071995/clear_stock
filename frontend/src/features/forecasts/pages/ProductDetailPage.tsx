@@ -56,11 +56,11 @@ export function ProductDetailPage() {
                     {t('orders.mark')}
                 </s-button>
             )}
-            <MarkOrderedModal
+            {ordersExist && <MarkOrderedModal
                 id="mark-ordered-product"
                 modalRef={markModal.ref}
                 items={[{ variant_id: f.variant_id, name: f.name, quantity: Math.max(1, f.suggested_qty) }]}
-            />
+            />}
             <ForecastSummary f={f} />
             <Tabs
                 label={t('product.heading')}
