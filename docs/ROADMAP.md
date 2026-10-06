@@ -203,6 +203,19 @@ Nguồn: Shopify Editions Spring '26, listing Stockcast và Forthcast (cập nh�
 
 Nguồn lần 6: https://www.shopify.com/editions/spring2026 · https://www.forthcast.io/blog/shopify-sidekick-inventory-what-it-can-and-cant-do · https://apps.shopify.com/stockcast-inventory-forecast · https://apps.shopify.com/forthcast · https://community.shopify.dev/t/bfs-enforcement-update-reviewing-lcp-readings/21956
 
+## Nghiên cứu bổ sung (2026-10-06, lần 7): 20 app tương tự
+
+Danh sách, bảng so tính năng và phân tích nằm ở `docs/COMPETITORS.md`. Đề xuất (chưa làm), theo thứ tự giá trị:
+
+67. PO thành chứng từ: gom dòng đã đặt cùng NCC thành PO có số, PDF, nhận hết một bấm (không cần quyền ghi).
+68. Dữ liệu mẫu để thử app trước khi đồng bộ xong.
+69. Tạm ẩn sản phẩm khỏi danh sách cần nhập trong N ngày.
+70. Dự phóng nhu cầu 30/60/90 ngày trên trang sản phẩm.
+71. Sửa hàng loạt và chọn cột trong danh sách sản phẩm.
+72. KPI tồn kho (vòng quay, tỷ lệ ngày hết hàng); xuất XLSX; báo cáo hẹn giờ; kế hoạch nhập 26/52 tuần; thêm ngôn ngữ.
+
+Không làm: chatbot AI, kiểm kê/mã vạch/ghi tồn, backorder, BOM, đa kênh.
+
 ## Phase tiếp theo: tối ưu UI/UX và hiệu năng (kế hoạch, 2026-10-05)
 
 > **Trạng thái 2026-10-05:** đã làm nhóm trang + tab, sửa lệch chuẩn qua 2 vòng rà ảnh chụp (máy tính + điện thoại), web vitals, tăng tốc và cache kế hoạch nhập, tổng đến hạn theo NCC bằng SQL. Chưa làm: A4/A5 (chunk dùng chung 72 KB, nạp ngôn ngữ dự phòng), A6 prefetch, usage events (#57), lọc field webhook (#58), đọc bulk song song (#59).
