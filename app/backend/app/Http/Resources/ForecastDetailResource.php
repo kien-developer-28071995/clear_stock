@@ -5,6 +5,7 @@ namespace App\Http\Resources;
 use App\Enums\OverrideField;
 use App\Models\Forecast;
 use App\Services\Forecast\ExplanationFormatter;
+use App\Support\Features;
 use Illuminate\Http\Request;
 
 /** @mixin Forecast */
@@ -63,6 +64,11 @@ class ForecastDetailResource extends ForecastResource
             'accuracy' => $request->attributes->get('accuracy'),
             // The rate forecast in an earlier week ({week_start, avg}), to show how it moved.
             'previous' => $request->attributes->get('previous'),
+            // Expected sales over the next 30/60/90 days vs the stock there is (null = not shown).
+            'projection' => $request->attributes->get('projection'),
+            // Out of the reorder list and alert emails until this day (null = not snoozed).
+            'snoozed_until' => Features::on('snooze') && $v->snoozed_until !== null && $v->snoozed_until->toDateString() > $request->attributes->get('today', now()->toDateString())
+                ? $v->snoozed_until->toDateString() : null,
         ];
     }
 

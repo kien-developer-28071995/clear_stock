@@ -103,3 +103,25 @@ it('queues a check for every shop with alerts on', function () {
     Queue::assertPushed(SendAlertDigest::class, 1);
     Queue::assertPushed(SendAlertDigest::class, fn ($job) => $job->shopId === $this->shop->id);
 });
+
+it('leaves a snoozed product out of the summary until the day it is back', function () {
+    $this->mug->update(['snoozed_until' => '2026-09-25']);
+
+    expect($this->alerts->sendIfDue($this->shop->fresh(), ($this->at)('2026-09-20 08:05')))->not->toBe('sent');
+    Mail::assertNothingQueued();
+
+    $this->travelTo('2026-09-25 06:00:00');
+    app(ForecastService::class)->runForShop($this->shop->fresh());
+
+    expect($this->alerts->sendIfDue($this->shop->fresh(), ($this->at)('2026-09-25 08:05')))->toBe('sent');
+    Mail::assertQueued(ReorderDigestMail::class, fn (ReorderDigestMail $mail) => str_contains($mail->render(), 'Mug'));
+});
+
+it('leaves a snoozed product out of the days-of-stock alert too', function () {
+    $this->setting->update(['cover_days' => 9000]);
+    $this->plate->update(['snoozed_until' => '2026-09-25']);
+    $this->mug->update(['snoozed_until' => '2026-09-25']);
+
+    expect($this->alerts->sendIfDue($this->shop->fresh(), ($this->at)('2026-09-20 08:05')))->not->toBe('sent');
+    Mail::assertNothingQueued();
+});

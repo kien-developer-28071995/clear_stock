@@ -6,6 +6,8 @@ interface Request {
     heading: string;
     body: ReactNode;
     confirmLabel: string;
+    /** Label of the button that backs out (default: Cancel). */
+    cancelLabel?: string;
     destructive?: boolean;
     resolve: (ok: boolean) => void;
 }
@@ -23,6 +25,7 @@ export function useConfirm() {
     const id = `confirm-${useId().replace(/:/g, '')}`;
     const ref = useRef<ModalElement>(null);
     const [request, setRequest] = useState<Request | null>(null);
+    const answered = useRef<Request | null>(null);
 
     const confirm = (options: Omit<Request, 'resolve'>) =>
         new Promise<boolean>((resolve) => {
@@ -30,10 +33,23 @@ export function useConfirm() {
             requestAnimationFrame(() => ref.current?.showOverlay());
         });
 
+    // The content stays until the dialog has closed: a dialog whose content changes while it
+    // closes can stay open.
     const finish = (ok: boolean) => {
-        request?.resolve(ok);
-        setRequest(null);
-        ref.current?.hideOverlay();
+        // Answered already (hiding fires onHide once more): nothing to do.
+        if (!request || answered.current === request) return;
+        answered.current = request;
+        request.resolve(ok);
+        const modal = ref.current;
+        let cleared = false;
+        const clear = () => {
+            if (cleared) return;
+            cleared = true;
+            setRequest((current) => (current === request ? null : current));
+        };
+        modal?.addEventListener('afterhide', clear, { once: true });
+        setTimeout(clear, 2000); // in case the event never comes
+        modal?.hideOverlay();
     };
 
     const modal = (
@@ -43,7 +59,7 @@ export function useConfirm() {
                 {request?.confirmLabel}
             </s-button>
             <s-button slot="secondary-actions" onClick={() => finish(false)}>
-                {t('common.cancel')}
+                {request?.cancelLabel ?? t('common.cancel')}
             </s-button>
         </s-modal>
     );

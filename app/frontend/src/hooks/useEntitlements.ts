@@ -63,6 +63,11 @@ const NONE: Entitlements = {
         clearance: true,
         size_runs: true,
         data_health: true,
+        snooze: true,
+        demand_projection: true,
+        change_log: true,
+        review_prompt: true,
+        feedback: true,
     },
 };
 

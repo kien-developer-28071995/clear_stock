@@ -1,9 +1,11 @@
 import { useEffect, useState, type RefObject } from 'react';
+import { useSubmitOnce } from '@/hooks/useSubmitOnce';
 import { useTranslation } from 'react-i18next';
 import type { ModalElement } from '@/hooks/useModal';
 import { fieldError } from '@/lib/http';
 import { useCreateManualOrders } from '@/features/orders/hooks/useManualOrders';
 import { formatNumber } from '@/utils/format';
+import { useReviewPrompt } from '@/hooks/useReviewPrompt';
 
 interface Item {
     variant_id: number;
@@ -25,21 +27,29 @@ interface Props {
 export function MarkOrderedModal({ id, modalRef, items, onDone }: Props) {
     const { t } = useTranslation();
     const create = useCreateManualOrders();
-    const single = items.length === 1;
+    const once = useSubmitOnce();
+    const askForReview = useReviewPrompt();
+    // From submit until the dialog has closed, it keeps showing what was submitted: the lists behind
+    // it refresh at that moment, and a dialog whose content changes while it closes stays open.
+    const [submitted, setSubmitted] = useState<Item[] | null>(null);
+    const shown = submitted ?? items;
+    const single = shown.length === 1;
     const [qty, setQty] = useState('');
     const [expected, setExpected] = useState('');
     const [reference, setReference] = useState('');
 
     useEffect(() => {
-        setQty(single ? String(items[0].quantity) : '');
+        if (submitted) return;
+        setQty(items.length === 1 ? String(items[0].quantity) : '');
         setExpected('');
         setReference('');
         create.reset();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [items]);
+    }, [items, submitted]);
 
-    const units = single ? Number(qty) : items.reduce((sum, i) => sum + i.quantity, 0);
-    const submit = () =>
+    const units = single ? Number(qty) : shown.reduce((sum, i) => sum + i.quantity, 0);
+    const submit = () => once((done) => {
+        setSubmitted(items);
         create.mutate(
             {
                 items: single ? [{ variant_id: items[0].variant_id, quantity: Number(qty) }] : items.map((i) => ({ variant_id: i.variant_id, quantity: i.quantity })),
@@ -49,16 +59,29 @@ export function MarkOrderedModal({ id, modalRef, items, onDone }: Props) {
             {
                 onSuccess: (r) => {
                     shopify.toast.show(t('orders.recorded', { count: r.recorded }));
-                    modalRef.current?.hideOverlay();
-                    onDone?.();
+                    const modal = modalRef.current;
+                    let finished = false;
+                    const finish = () => {
+                        if (finished) return;
+                        finished = true;
+                        setSubmitted(null);
+                        onDone?.();
+                        askForReview(); // a finished task: the moment Shopify recommends
+                    };
+                    modal?.addEventListener('afterhide', finish, { once: true });
+                    setTimeout(finish, 2000); // in case the event never comes
+                    modal?.hideOverlay();
                 },
+                onError: () => setSubmitted(null),
+                onSettled: done,
             },
         );
+    });
 
     return (
         <s-modal ref={modalRef} id={id} heading={t('orders.markHeading')}>
             <s-stack gap="base">
-                <s-paragraph>{single ? t('orders.markIntroOne', { name: items[0]?.name ?? '' }) : t('orders.markIntro', { count: items.length, units: formatNumber(units, 0) })}</s-paragraph>
+                <s-paragraph>{single ? t('orders.markIntroOne', { name: shown[0]?.name ?? '' }) : t('orders.markIntro', { count: shown.length, units: formatNumber(units, 0) })}</s-paragraph>
                 {single && (
                     <s-number-field label={t('orders.quantity')} min={1} value={qty} error={fieldError(create.error, 'items.0.quantity')} onInput={(e) => setQty(e.currentTarget.value)} />
                 )}
@@ -76,7 +99,7 @@ export function MarkOrderedModal({ id, modalRef, items, onDone }: Props) {
                 <s-text color="subdued">{t('orders.markHelp')}</s-text>
                 {fieldError(create.error, 'items') && <s-text tone="critical">{fieldError(create.error, 'items')}</s-text>}
             </s-stack>
-            <s-button slot="primary-action" variant="primary" onClick={submit} loading={create.isPending || undefined} disabled={items.length === 0 || !(units > 0) || undefined}>
+            <s-button slot="primary-action" variant="primary" onClick={submit} loading={create.isPending || submitted !== null || undefined} disabled={shown.length === 0 || !(units > 0) || undefined}>
                 {t('orders.mark')}
             </s-button>
             <s-button slot="secondary-actions" commandFor={id} command="--hide">

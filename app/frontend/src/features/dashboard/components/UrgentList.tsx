@@ -19,7 +19,11 @@ function Row({ item }: { item: ActionItem }) {
                 </s-stack>
                 <s-stack direction="inline" gap="small-200" alignItems="center">
                     {item.current_stock <= 0 && <s-badge tone="critical">{t('status.out_of_stock')}</s-badge>}
-                    <s-text type="strong">{t('actions.order', { qty: formatNumber(item.suggested_qty, 0) })}</s-text>
+                    {item.suggested_qty > 0 ? (
+                        <s-text type="strong">{t('actions.order', { qty: formatNumber(item.suggested_qty, 0) })}</s-text>
+                    ) : (
+                        <s-text color="subdued">{t('actions.nothingMore')}</s-text>
+                    )}
                 </s-stack>
             </s-grid></s-query-container>
         </s-box>

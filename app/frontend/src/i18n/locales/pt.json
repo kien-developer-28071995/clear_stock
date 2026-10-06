@@ -165,7 +165,9 @@
     "seeAll_other": "Ver todos os {{count}}",
     "seeAll_many": "Ver todos os {{count}}",
     "dataSynced": "Dados sincronizados {{when}}",
-    "notSyncedYet": "Aguardando a primeira sincronização"
+    "notSyncedYet": "Aguardando a primeira sincronização",
+    "failedHeading": "Não foi possível importar os dados da sua loja",
+    "failedBody": "A importação da Shopify não terminou, então ainda não há nada para prever. Veja o motivo e tente de novo em \"Dados da loja\", abaixo."
   },
   "actions": {
     "noneLeft": "0 restante",
@@ -197,7 +199,8 @@
         "title": "Pedir esta semana",
         "hint": "Data de pedido nos próximos 7 dias"
       }
-    }
+    },
+    "nothingMore": "Nada mais a encomendar"
   },
   "runway": {
     "heading": "Cobertura do estoque",
@@ -802,7 +805,8 @@
     "trend_down_many": "Vende {{percent}}% mais devagar nos últimos {{count}} dias ({{recent}}/dia) do que nos {{days}} dias anteriores ({{baseline}}/dia).",
     "backorder_included_one": "{{count}} unidade já foi vendida sem estoque (estoque abaixo de zero) e está incluída no pedido.",
     "backorder_included_other": "{{count}} unidades já foram vendidas sem estoque (estoque abaixo de zero) e estão incluídas no pedido.",
-    "backorder_included_many": "{{count}} unidades já foram vendidas sem estoque (estoque abaixo de zero) e estão incluídas no pedido."
+    "backorder_included_many": "{{count}} unidades já foram vendidas sem estoque (estoque abaixo de zero) e estão incluídas no pedido.",
+    "lasts_for_years": "{{stock}} em estoque duram mais de 10 anos neste ritmo: nada a encomendar."
   },
   "import": {
     "fromStocky": "Importar do Stocky",
@@ -1279,7 +1283,10 @@
     "link_many": "Pedidos feitos ({{count}})",
     "receivePart": "Recebido em parte",
     "receivedSoFar": "Recebido até agora",
-    "partReceived": "{{received}} recebidas, o restante está a caminho"
+    "partReceived": "{{received}} recebidas, o restante está a caminho",
+    "confirmCancelHeading": "Cancelar esta encomenda?",
+    "confirmCancel": "\"{{name}}\" ({{qty}} unidades) deixa de contar como a caminho e pode voltar a ser sugerido.",
+    "keep": "Manter encomenda"
   },
   "costs": {
     "intro": "O valor do estoque, o dinheiro parado e os totais de pedidos de compra e do plano precisam do custo unitário de cada produto. Informe aqui os custos dos produtos que não têm custo na Shopify, ou para usar seu custo real com frete. Eles têm prioridade sobre o custo da Shopify no app; a Shopify não é alterada.",
@@ -1515,7 +1522,8 @@
     "product": {
       "forecast": "Previsão",
       "settings": "Configurações",
-      "suppliers": "Fornecedores"
+      "suppliers": "Fornecedores",
+      "history": "Histórico"
     },
     "insights": {
       "stock": "Estoque",
@@ -1532,5 +1540,86 @@
   "sections": {
     "toOrder": "A pedir",
     "allProducts": "Todos os produtos"
+  },
+  "snooze": {
+    "action": "Adiar",
+    "heading": "Adiar sugestões de pedido",
+    "introOne": "{{name}} sai da lista de reposição e dos e-mails de alerta e volta sozinho.",
+    "intro_one": "{{count}} produto sai da lista de reposição e dos e-mails de alerta e volta sozinho.",
+    "intro_many": "{{count}} produtos saem da lista de reposição e dos e-mails de alerta e voltam sozinhos.",
+    "intro_other": "{{count}} produtos saem da lista de reposição e dos e-mails de alerta e voltam sozinhos.",
+    "for": "Adiar por",
+    "help": "A previsão não muda. Você pode trazer um produto de volta a qualquer momento pela lista Adiados.",
+    "confirm": "Adiar",
+    "done_one": "{{count}} produto adiado até {{date}}",
+    "done_many": "{{count}} produtos adiados até {{date}}",
+    "done_other": "{{count}} produtos adiados até {{date}}",
+    "listHeading_one": "Adiados · {{count}}",
+    "listHeading_many": "Adiados · {{count}}",
+    "listHeading_other": "Adiados · {{count}}",
+    "until": "Volta em {{date}}",
+    "bringBack": "Trazer de volta",
+    "bringBackNamed": "Trazer {{name}} de volta",
+    "back": "{{name}} voltou para a lista de reposição",
+    "productNote": "Adiado: fora da lista de reposição e dos e-mails de alerta até {{date}}."
+  },
+  "projection": {
+    "heading": "Vendas esperadas",
+    "period_one": "Próximo {{count}} dia (até {{date}})",
+    "period_many": "Próximos {{count}} dias (até {{date}})",
+    "period_other": "Próximos {{count}} dias (até {{date}})",
+    "short_one": "{{qty}} unidade a mais do que seu estoque cobre",
+    "short_many": "{{qty}} unidades a mais do que seu estoque cobre",
+    "short_other": "{{qty}} unidades a mais do que seu estoque cobre",
+    "covered": "Coberto pelo seu estoque",
+    "basis": "A {{rate}}/dia. O estoque conta o disponível mais o que está a caminho.",
+    "basisEvents": "A {{rate}}/dia, com seus eventos de venda contados nos dias deles. O estoque conta o disponível mais o que está a caminho."
+  },
+  "history": {
+    "heading": "Alterações neste produto",
+    "none": "Nenhuma alteração ainda. As configurações e os ajustes de previsão que você mudar aparecem aqui.",
+    "what": "Alteração",
+    "from": "De",
+    "to": "Para",
+    "when": "Quando",
+    "empty": "Não definido",
+    "on": "Sim",
+    "off": "Não",
+    "kept": "As alterações ficam guardadas por 180 dias.",
+    "sources": {
+      "bulk": "Edição em massa",
+      "import": "Importação",
+      "extension": "Página de produto da Shopify"
+    },
+    "fields": {
+      "supplier": "Fornecedor",
+      "lead_time_override": "Prazo de entrega (dias)",
+      "safety_days": "Estoque de segurança (dias)",
+      "min_order_qty": "Pedido mínimo",
+      "pack_size": "Unidades por caixa",
+      "min_stock": "Mín (repor em)",
+      "max_stock": "Máx (pedir até)",
+      "alerts_muted": "Alertas silenciados",
+      "discontinued": "Descontinuado",
+      "forecast_profile": "Média do ritmo de vendas",
+      "supplier_sku": "Código do fornecedor",
+      "reference": "Produto semelhante",
+      "reference_percent": "Parte do ritmo do produto semelhante (%)",
+      "cost_override": "Custo unitário",
+      "snoozed_until": "Adiado até",
+      "override_avg_daily_sales": "Vendas por dia (seu ajuste)",
+      "override_lead_time_days": "Prazo de entrega (seu ajuste)",
+      "override_safety_days": "Dias de segurança (seu ajuste)"
+    }
+  },
+  "feedback": {
+    "heading": "Feedback",
+    "body": "Falta algo, algo está errado ou confuso? Conte para nós. Vai direto para quem desenvolve o app.",
+    "open": "Enviar feedback",
+    "message": "Sua mensagem",
+    "email": "Seu e-mail (opcional)",
+    "emailHelp": "Só se você quiser uma resposta.",
+    "send": "Enviar",
+    "sent": "Feedback enviado. Obrigado!"
   }
 }

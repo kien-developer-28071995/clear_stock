@@ -143,7 +143,7 @@ it('submits three bulk operations and starts polling', function () {
 
     $run->refresh();
     expect($run->stage)->toBe(SyncStage::Fetching)
-        ->and(array_keys($run->operations))->toBe(['variants', 'inventory', 'orders'])
+        ->and(array_keys($run->operations))->toEqualCanonicalizing(['variants', 'inventory', 'orders']) // MySQL stores JSON keys in its own order
         ->and($run->stats['estimated_objects'])->toBe(10 * 3 + 2 * 3)
         ->and(Location::forShop($this->shop)->count())->toBe(1);
     Queue::assertPushed(CheckSyncRun::class);

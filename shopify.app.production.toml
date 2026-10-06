@@ -11,7 +11,9 @@
 
 client_id = "585d48be540225310586b5df5dc1348e"
 name = "Clear Stock"
-application_url = "https://clear-stock.techfoxify.com"
+# The frontend (a static site, FRONTEND_URL). The backend (APP_URL) is https://app-api.clear-stock.techfoxify.com:
+# redirect_urls and the webhook addresses below point there.
+application_url = "https://app.clear-stock.techfoxify.com"
 embedded = true
 extension_directories = [ "extensions/product-forecast-block", "extensions/product-settings-action", "extensions/product-order-action" ]
 
@@ -24,15 +26,15 @@ scopes = "read_products,read_inventory,read_locations,read_orders,read_all_order
 use_legacy_install_flow = false
 
 [auth]
-redirect_urls = [ "https://clear-stock.techfoxify.com/auth/callback" ]
+redirect_urls = [ "https://app-api.clear-stock.techfoxify.com/auth/callback" ]
 
 [webhooks]
 api_version = "2026-07"
 
   [[webhooks.subscriptions]]
   topics = [ "app/uninstalled", "app/scopes_update", "app_subscriptions/update", "bulk_operations/finish" ]
-  uri = "/webhooks"
+  uri = "https://app-api.clear-stock.techfoxify.com/webhooks"
 
   [[webhooks.subscriptions]]
   compliance_topics = [ "customers/data_request", "customers/redact", "shop/redact" ]
-  uri = "/webhooks"
+  uri = "https://app-api.clear-stock.techfoxify.com/webhooks"

@@ -3,6 +3,8 @@ api_version = "2026-07"
 # "More actions" on the Shopify product and variant pages: mark the product as ordered outside
 # Shopify (email, phone, supplier portal) with the suggested quantities, so Clear Stock counts it
 # as on the way and stops suggesting it. POST /api/extension/manual-orders.
+#
+# One target per extension (Shopify refuses more): the same module, registered once per page.
 [[extensions]]
 type = "ui_extension"
 name = "t:name"
@@ -12,6 +14,12 @@ uid = "6f2c1e9a-3b7d-4c55-9a1e-2d8f4b7c0e13"
   [[extensions.targeting]]
   target = "admin.product-details.action.render"
   module = "./src/ProductOrderAction.tsx"
+
+[[extensions]]
+type = "ui_extension"
+name = "t:name"
+handle = "variant-order-action"
+uid = "9b109113-5e3a-4c8d-9692-82bb299aad4a"
 
   [[extensions.targeting]]
   target = "admin.product-variant-details.action.render"

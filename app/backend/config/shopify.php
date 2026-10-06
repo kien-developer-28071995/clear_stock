@@ -23,7 +23,13 @@ return [
 
     'support_email' => env('SUPPORT_EMAIL', 'support@example.com'),
 
+    // Days after install before the app may ask for an App Store review (once per shop).
+    'review_prompt_after_days' => (int) env('REVIEW_PROMPT_AFTER_DAYS', 7),
+
     // Marketing website (website/ in the repo): home, /privacy, /support. The app's own
     // /privacy and /support redirect there. Dev: the website's `npm run dev`.
     'website_url' => rtrim((string) env('WEBSITE_URL', 'http://localhost:4321'), '/'),
+    // The embedded app's own address (app/frontend/, a static site): what application_url in
+    // shopify.app.toml names. This backend is the API it calls and serves no page of the app.
+    'frontend_url' => rtrim((string) env('FRONTEND_URL', ''), '/') ?: null,
 ];

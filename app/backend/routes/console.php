@@ -1,6 +1,8 @@
 <?php
 
+use App\Models\ChangeLog;
 use App\Models\EmailLog;
+use App\Models\FeatureEvent;
 use App\Models\WebVital;
 use Illuminate\Support\Facades\Schedule;
 
@@ -17,4 +19,4 @@ Schedule::command('sync:maintenance')->everyThirtyMinutes()->withoutOverlapping(
 // Missed app_subscriptions/update webhooks: the plan is re-read from Shopify once a day.
 Schedule::command('billing:reconcile')->dailyAt('04:20')->withoutOverlapping(120)->onOneServer();
 Schedule::command('horizon:snapshot')->everyFiveMinutes();
-Schedule::command('model:prune', ['--model' => [EmailLog::class, WebVital::class]])->dailyAt('03:10')->onOneServer();
+Schedule::command('model:prune', ['--model' => [EmailLog::class, WebVital::class, FeatureEvent::class, ChangeLog::class]])->dailyAt('03:10')->onOneServer();

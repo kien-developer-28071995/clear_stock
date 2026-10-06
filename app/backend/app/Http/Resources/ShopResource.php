@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use App\Models\Shop;
+use App\Services\App\ReviewPromptService;
 use App\Support\Entitlements;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -29,6 +30,8 @@ class ShopResource extends JsonResource
             'default_lead_time_days' => $this->default_lead_time_days,
             'default_safety_days' => $this->default_safety_days,
             'forecasted_at' => $this->forecasted_at?->toIso8601String(),
+            // The app may ask for an App Store review now (once, after a finished task).
+            'review_prompt' => app(ReviewPromptService::class)->eligible($this->resource),
         ];
     }
 }

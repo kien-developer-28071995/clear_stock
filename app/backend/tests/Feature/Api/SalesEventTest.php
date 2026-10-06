@@ -97,3 +97,11 @@ it('expands a season into the occurrences inside a window', function () {
         ->and(array_column($season->occurrences('2026-01-01', '2026-01-03'), 'to'))->toBe(['2026-01-05'])      // spans New Year
         ->and($season->fill(['repeats_yearly' => false])->occurrences('2026-01-01', '2026-12-31'))->toHaveCount(1);
 });
+
+it('refuses the same event twice (it would apply its change twice), but not an edit of itself or other dates', function () {
+    $id = $this->postJson('/api/sales-events', eventBody(), $this->auth)->assertCreated()->json('data.id');
+
+    $this->postJson('/api/sales-events', eventBody(), $this->auth)->assertUnprocessable()->assertJsonPath('errors.name.0.code', 'unique');
+    $this->putJson("/api/sales-events/{$id}", eventBody(['multiplier' => 3]), $this->auth)->assertOk();                 // saving itself
+    $this->postJson('/api/sales-events', eventBody(['starts_on' => '2026-12-01', 'ends_on' => '2026-12-05']), $this->auth)->assertCreated(); // same name, other dates
+});

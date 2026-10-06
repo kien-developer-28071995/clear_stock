@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Jobs\Forecast\RecomputeForecasts;
 use App\Models\Shop;
+use App\Support\Monitor;
 use Carbon\CarbonImmutable;
 use Illuminate\Console\Command;
 
@@ -27,10 +28,15 @@ class RunNightlyForecasts extends Command
             ->select(['id', 'timezone', 'forecasted_at'])
             ->chunkById(200, function ($shops) use ($hour, &$queued) {
                 foreach ($shops as $shop) {
-                    $stale = $shop->forecasted_at === null || $shop->forecasted_at->lt(now()->subHours(20));
-                    if (CarbonImmutable::now($shop->timezone)->hour === $hour && $stale) {
-                        RecomputeForecasts::dispatch($shop->id);
-                        $queued++;
+                    // One shop in a bad state never stops the others.
+                    try {
+                        $stale = $shop->forecasted_at === null || $shop->forecasted_at->lt(now()->subHours(20));
+                        if (CarbonImmutable::now($shop->timezone)->hour === $hour && $stale) {
+                            RecomputeForecasts::dispatch($shop->id);
+                            $queued++;
+                        }
+                    } catch (\Throwable $e) {
+                        Monitor::caught($e, 'nightly forecast', ['shop_id' => $shop->id]);
                     }
                 }
             });

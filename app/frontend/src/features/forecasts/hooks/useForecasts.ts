@@ -72,6 +72,14 @@ export const useSetAlternates = (variantId: number) =>
     useProductMutation((suppliers: Parameters<typeof forecastApi.setAlternates>[1]) => forecastApi.setAlternates(variantId, suppliers));
 export const useMakeMainSupplier = (variantId: number) => useProductMutation((supplierId: number) => forecastApi.makeMainSupplier(variantId, supplierId));
 
+/** What was changed on a product; loaded when its History tab is opened. */
+export function useChanges(variantId: number, enabled: boolean) {
+    return useQuery({ queryKey: [...forecastKeys.detail(variantId), 'changes'], queryFn: () => forecastApi.changes(variantId), enabled });
+}
+
+/** "Not now" for reorder suggestions (days = null brings them back). */
+export const useSnooze = () => useProductMutation(forecastApi.snooze);
+
 export function useSavedViews(enabled = true) {
     return useQuery({ queryKey: ['views'], queryFn: forecastApi.views, staleTime: 5 * 60_000, enabled });
 }

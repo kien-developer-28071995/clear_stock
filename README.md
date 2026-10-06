@@ -290,6 +290,11 @@ Three [admin UI extensions](https://shopify.dev/docs/api/admin-extensions) in `e
 | `FEATURE_CLEARANCE` | What to clear (Insights) |  |
 | `FEATURE_SIZE_RUNS` | Products with sizes sold out (Insights) |  |
 | `FEATURE_DATA_HEALTH` | Product data check |  |
+| `FEATURE_SNOOZE` | "Snooze" on the reorder list: hide a suggestion until a later day | off = nothing is snoozed (stored days are kept, not applied) |
+| `FEATURE_DEMAND_PROJECTION` | Expected sales over the next 30/60/90 days on the product page |  |
+| `FEATURE_REVIEW_PROMPT` | Shopify's review dialog, once per shop, after a finished task (7+ days after install, `REVIEW_PROMPT_AFTER_DAYS`) |  |
+| `FEATURE_FEEDBACK` | Feedback box in Settings, emailed to `SUPPORT_EMAIL` |  |
+| `FEATURE_CHANGE_LOG` | History tab of a product (what was changed, when) | off = nothing is logged either |
 | `BILLING_GROWTH_OFFERED` | Growth on the pricing page | off = no new Growth subscriptions; existing ones keep working |
 
 How it is safe:
@@ -354,7 +359,7 @@ Backend and frontend are separate projects; the repo root only holds infra.
 /                         docker-compose.yml, docker-compose.prod.yml, Dockerfile, Makefile,
 │                         shopify.app.toml, docker/ (nginx, php, scripts)
 ├── extensions/           Shopify admin UI extensions (product page block, product list action) + shared/ helpers
-├── app/backend/              Laravel 13 — API, webhooks, embedded page shell (composer.json, artisan, tests/, .env)
+├── app/backend/              Laravel 13 — the API, webhooks, queue and scheduler; serves no page of the app (composer.json, artisan, tests/, .env)
 │   ├── app/
 │   │   ├── Http/Controllers/Api, Http/Middleware, Http/Resources
 │   │   ├── Models/                 Shop, …
@@ -362,7 +367,6 @@ Backend and frontend are separate projects; the repo root only holds infra.
 │   │   ├── Services/               ShopAuthService, ShopService, Shopify/* (OAuth, tokens, Admin API)
 │   │   ├── Observers/              cache invalidation
 │   │   └── Support/CacheKeys.php   every cache key lives here
-│   └── resources/views/app.blade.php   loads App Bridge, Polaris and the Vite bundle
 ├── app/frontend/             React 19 + TypeScript + Vite (package.json, vite.config.ts, .env)
 │   └── src/
 │       ├── app/                    App, providers, router
@@ -377,7 +381,7 @@ Backend and frontend are separate projects; the repo root only holds infra.
   - `app/frontend/.env`: Vite only (`APP_URL` for the dev server/HMR origin). Only `VITE_*` variables reach browser code; never put secrets here.
   - `website/.env`: build settings of the static website (all of it ends up in public HTML; never put secrets here).
   - Host ports use compose defaults (`8080`, `33060`, `8025`); override per run, e.g. `APP_PORT=8090 make up`.
-- The frontend builds into `app/backend/public/build`; in dev, Vite writes `app/backend/public/hot` so Laravel serves HMR assets.
+- **Frontend and backend are separate apps.** The frontend (`app/frontend/`) is a static site with its own domain (`FRONTEND_URL`, the `application_url` in `shopify.app.toml`): `npm run build` writes `app/frontend/dist`, and it reaches the backend only through the API at `VITE_API_URL` with the App Bridge session token (no cookies, so different domains are fine). The backend (`APP_URL`) answers the API, webhooks and Horizon; any other browser request is redirected to the frontend. In dev one tunnel hostname fronts both and `docker/nginx/dev.conf` tells them apart by path. `make e2e-split` runs the built frontend on one origin against the API on another.
 - Request flow in the backend: Controller → Service → Repository (Cache → Eloquent) → Model.
 - Running tools outside Docker: `cd backend && composer install && php artisan test`, `cd frontend && npm install && npm run dev`.
 

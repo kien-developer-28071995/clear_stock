@@ -82,6 +82,40 @@ test.beforeAll(() => {
     execFileSync('npm', ['run', 'extensions:bundle', '--silent'], { cwd: ROOT });
 });
 
+/**
+ * Recomputes the forecasts of the shop under test only: with another shop in the dev database
+ * (a large one seeded to measure performance) a run for everyone takes most of a test's timeout.
+ */
+function recompute(): void {
+    const domain = php<{ domain: string }>('echo json_encode(["domain" => App\\Models\\Shop::query()->whereNull("uninstalled_at")->first()->domain]);').domain;
+    artisan('forecast:run', `--shop=${domain}`);
+}
+
+/**
+ * The tests below need a product that is in stock and due today. Whether the dev store has one
+ * depends on the day (its sales history ages, so reorder dates drift): when it has none, the
+ * best-selling product in stock gets a manual minimum just above its stock, which makes it due,
+ * and loses it again after the tests.
+ */
+let madeDue: number | null = null;
+
+test.beforeAll(() => {
+    const due = php<{ id: number | null }>(
+        'echo json_encode(["id" => App\\Models\\Forecast::whereNull("location_id")->where("reorder_date", "<=", now()->toDateString())->where("avg_daily_sales", ">", 0)->where("current_stock", ">", 0)->value("variant_id")]);',
+    ).id;
+    if (due !== null) return;
+    madeDue = php<{ id: number }>(
+        '$f = App\\Models\\Forecast::whereNull("location_id")->where("avg_daily_sales", ">", 0)->where("current_stock", ">", 0)->whereHas("variant", fn ($q) => $q->where("is_active", true)->where("discontinued", false)->whereNull("min_stock"))->orderByDesc("avg_daily_sales")->firstOrFail(); App\\Models\\Variant::whereKey($f->variant_id)->update(["min_stock" => $f->current_stock + $f->incoming_stock + 1]); echo json_encode(["id" => $f->variant_id]);',
+    ).id;
+    recompute();
+});
+
+test.afterAll(() => {
+    if (madeDue === null) return;
+    php(`App\\Models\\Variant::whereKey(${madeDue})->update(["min_stock" => null]); echo json_encode(true);`);
+    recompute();
+});
+
 /** A synced product whose (first) variant has to be reordered now. */
 function productToReorder(): { productId: number; variantId: number } {
     return php(
@@ -144,7 +178,7 @@ test.describe('product list bulk action', () => {
             await expect.poll(() => page.evaluate(() => (window as unknown as { __closed: boolean }).__closed)).toBe(true);
         } finally {
             php(`App\\Models\\Variant::where("shopify_product_id", ${productId})->update(["lead_time_override" => ${before ?? 'null'}]); echo json_encode(true);`);
-            artisan('forecast:run');
+            recompute();
         }
         void errors;
     });
@@ -182,7 +216,7 @@ test.describe('product page: mark as ordered', () => {
             await expect(page.locator('s-link[href="app:orders"]')).toBeVisible();
         } finally {
             php(`App\\Models\\ManualOrder::where("variant_id", ${variantId})->where("status", "open")->update(["status" => "cancelled", "closed_at" => now()]); echo json_encode(true);`);
-            artisan('forecast:run');
+            recompute();
         }
         void errors;
     });
@@ -208,7 +242,7 @@ test.describe('product page: reorder settings', () => {
             expect(v).toEqual({ pack: 12, discontinued: true });
         } finally {
             php(`App\\Models\\Variant::where("shopify_product_id", ${productId})->update(["pack_size" => null, "discontinued" => false]); echo json_encode(true);`);
-            artisan('forecast:run');
+            recompute();
         }
         void errors;
     });

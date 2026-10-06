@@ -116,4 +116,10 @@ final class CacheKeys
     {
         return 'webhook:delivery:'.$webhookId;
     }
+
+    /** One "mark as ordered" at a time per shop, so two identical requests in the same moment are seen as one. */
+    public static function manualOrderRecordLock(int $shopId): string
+    {
+        return 'lock:manual-orders:record:'.$shopId;
+    }
 }

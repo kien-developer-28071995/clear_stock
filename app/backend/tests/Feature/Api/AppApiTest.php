@@ -301,7 +301,7 @@ describe('order rounding', function () {
             ->assertJsonPath('data.settings.min_order_qty', 200)
             ->assertJsonPath('data.settings.pack_size', 24)
             ->assertJsonPath('data.suggested_qty', 216) // needs 194 -> minimum 200 -> 9 packs of 24
-            ->assertJsonPath('data.explanation.reorder.rounding', ['needed' => 194, 'min_order_qty' => 200, 'pack_size' => 24, 'final' => 216]);
+            ->assertJson(fn ($json) => $json->where('data.explanation.reorder.rounding', fn ($rounding) => $rounding->all() == ['needed' => 194, 'min_order_qty' => 200, 'pack_size' => 24, 'final' => 216])->etc()); // == : MySQL returns JSON keys in its own order
 
         $this->putJson("/api/variants/{$mug->id}/settings", ['pack_size' => 0], $this->auth)
             ->assertUnprocessable()->assertJsonPath('errors.pack_size.0', ['code' => 'min', 'params' => ['value' => 1]]);
@@ -323,7 +323,7 @@ describe('order rounding', function () {
             ->assertJsonFragment(['code' => 'rounding_supplier_default', 'params' => ['supplier' => 'Acme']]);
         // The product's own pack size wins; the minimum still comes from the supplier: 200 -> 20 packs of 10.
         $this->getJson("/api/forecasts/{$cup->id}", $this->auth)
-            ->assertJsonPath('data.explanation.reorder.rounding', ['needed' => 194, 'min_order_qty' => 200, 'pack_size' => 10, 'final' => 200, 'supplier' => 'Acme']);
+            ->assertJson(fn ($json) => $json->where('data.explanation.reorder.rounding', fn ($rounding) => $rounding->all() == ['needed' => 194, 'min_order_qty' => 200, 'pack_size' => 10, 'final' => 200, 'supplier' => 'Acme'])->etc()); // == : MySQL returns JSON keys in its own order
 
         $this->putJson("/api/suppliers/{$acme->id}", ['name' => 'Acme', 'pack_size' => 0], $this->auth)->assertUnprocessable();
     });
@@ -425,4 +425,21 @@ it('counts, filters and badges agree on every status', function () {
         expect(array_values($status === 'reorder_now' ? array_diff($badges, ['out_of_stock']) : $badges))->toBe($rows['data'] === [] ? [] : [$status]);
     }
     expect($counts)->toMatchArray(['out_of_stock' => 1, 'reorder_now' => 2, 'overstock' => 1, 'healthy' => 1, 'slow' => 2]);
+});
+
+it('keeps an out-of-stock product out of "OK" while its order is on the way', function () {
+    $out = product($this->shop, $this->location, 'Out', stock: 0, perDay: 4);
+    product($this->shop, $this->location, 'Fine', stock: 250, perDay: 4);
+    forecastAll($this->shop);
+    $qty = $out->forecast()->first()->suggested_qty;
+
+    // Ordered outside Shopify: nothing left to order, the reorder date moves ahead, still nothing to sell.
+    $this->postJson('/api/manual-orders', ['items' => [['variant_id' => $out->id, 'quantity' => $qty]]], $this->auth)->assertCreated();
+    forecastAll($this->shop);
+    expect($out->forecast()->first()->suggested_qty)->toBe(0);
+
+    $counts = $this->getJson('/api/dashboard', $this->auth)->json('data.counts');
+    expect($counts)->toMatchArray(['out_of_stock' => 1, 'healthy' => 1, 'reorder_now' => 0]);
+    $this->getJson('/api/forecasts?status=healthy', $this->auth)->assertJsonPath('data.*.name', ['Fine']);
+    $this->getJson('/api/forecasts?status=out_of_stock', $this->auth)->assertJsonPath('data.*.name', ['Out'])->assertJsonPath('data.0.status', 'out_of_stock');
 });

@@ -1,4 +1,5 @@
 import { SectionTabs } from '@/components/layout/SectionTabs';
+import { useConfirm } from '@/components/ui/ConfirmModal';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ErrorBanner } from '@/components/ui/ErrorBanner';
@@ -24,6 +25,7 @@ export function ManualOrdersPage() {
     const { data, error, refetch } = useManualOrders();
     const update = useUpdateManualOrder();
     const [showClosed, setShowClosed] = useState(false);
+    const { confirm, modal: confirmModal } = useConfirm();
     // Partial delivery: the row being edited and the units received so far.
     const [part, setPart] = useState<{ id: number; value: string } | null>(null);
 
@@ -31,6 +33,17 @@ export function ManualOrdersPage() {
 
     const act = (o: ManualOrder, status: 'received' | 'cancelled' | 'open') =>
         update.mutate({ id: o.id, status }, { onSuccess: () => shopify.toast.show(t(`orders.done.${status}`)) });
+    // Cancelling changes what gets suggested, and the button sits where others just were: ask first.
+    const cancel = async (o: ManualOrder) => {
+        const ok = await confirm({
+            heading: t('orders.confirmCancelHeading'),
+            body: t('orders.confirmCancel', { name: o.name ?? '', qty: formatNumber(o.quantity, 0) }),
+            confirmLabel: t('orders.cancel'),
+            cancelLabel: t('orders.keep'),
+            destructive: true,
+        });
+        if (ok) act(o, 'cancelled');
+    };
     const savePart = (o: ManualOrder) => {
         const received = Number(part?.value);
         if (!Number.isFinite(received) || received < 0) return;
@@ -88,11 +101,19 @@ export function ManualOrdersPage() {
                                         <s-button variant="tertiary" onClick={() => setPart(null)}>{t('common.cancel')}</s-button>
                                     </s-stack>
                                 ) : (
-                                <s-button-group>
-                                    <s-button slot="secondary-actions" onClick={() => act(o, 'received')}>{t('orders.receive')}</s-button>
-                                    <s-button slot="secondary-actions" onClick={() => setPart({ id: o.id, value: String(o.received_quantity || '') })}>{t('orders.receivePart')}</s-button>
-                                    <s-button slot="secondary-actions" tone="critical" onClick={() => act(o, 'cancelled')}>{t('orders.cancel')}</s-button>
-                                </s-button-group>
+                                <>
+                                    {/* One action in sight, the rest under "More": three buttons a row is a wall on a phone. */}
+                                    <s-stack direction="inline" gap="small-200" alignItems="center">
+                                        <s-button onClick={() => act(o, 'received')}>{t('orders.receive')}</s-button>
+                                        <s-button accessibilityLabel={t('suppliers.moreActions', { name: o.name ?? '' })} commandFor={`order-menu-${o.id}`} command="--toggle">
+                                            {t('common.more')}
+                                        </s-button>
+                                    </s-stack>
+                                    <s-menu id={`order-menu-${o.id}`} accessibilityLabel={t('suppliers.moreActions', { name: o.name ?? '' })}>
+                                        <s-button onClick={() => setPart({ id: o.id, value: String(o.received_quantity || '') })}>{t('orders.receivePart')}</s-button>
+                                        <s-button tone="critical" onClick={() => void cancel(o)}>{t('orders.cancel')}</s-button>
+                                    </s-menu>
+                                </>
                                 )}
                             </s-table-cell>
                         )}
@@ -133,6 +154,7 @@ export function ManualOrdersPage() {
                     )}
                 </s-section>
             )}
+            {confirmModal}
         </s-page>
     );
 }

@@ -108,6 +108,29 @@ export interface Explanation {
     confidence: { level: Confidence; reasons: { code: string }[] };
 }
 
+export interface ProjectionRow {
+    days: number;
+    /** Last day of the period (Y-m-d). */
+    until: string;
+    /** Expected sales in the period, sales events counted on their days. */
+    units: number;
+    /** What stock on hand plus stock on the way does not cover. */
+    shortfall: number;
+    /** A sales event falls inside the period. */
+    events: boolean;
+}
+
+/** One change a merchant made to a product (GET /forecasts/:id/changes). */
+export interface ChangeEntry {
+    id: number;
+    /** A product setting, `supplier`, `reference`, or `override.<field>`. */
+    field: string;
+    old: string | null;
+    new: string | null;
+    source: 'app' | 'bulk' | 'import' | 'extension';
+    at: string;
+}
+
 export interface ForecastDetail extends ForecastRow {
     /** null on plans without explanations */
     explanation: Explanation | null;
@@ -148,6 +171,10 @@ export interface ForecastDetail extends ForecastRow {
     };
     /** Other suppliers this product can be bought from. */
     alternate_suppliers: AlternateSupplier[];
+    /** Expected sales over the next 30/60/90 days; null when not shown (no sales, discontinued, switched off). */
+    projection: ProjectionRow[] | null;
+    /** Out of the reorder list and alert emails until this day; null = not snoozed. */
+    snoozed_until: string | null;
     defaults: { lead_time_days: number; safety_days: number; forecast_profile: ForecastProfile };
     /** Recent sales rate vs the weeks before (null = too little to compare). */
     trend: { direction: 'up' | 'down' | 'flat'; percent: number; recent_avg: number; baseline_avg: number } | null;

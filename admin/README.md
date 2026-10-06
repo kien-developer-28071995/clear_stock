@@ -100,7 +100,7 @@ Chạy trên máy cá nhân với dữ liệu production cũng được (tunnel 
 
 Việc tiếp theo, xếp theo giá trị:
 
-1. **Usage events trong app.** Thêm bảng `feature_events` (shop_id, feature, ngày, số lần) ở backend, ghi mỗi lần mở trang what-if, kế hoạch nhập, Phân tích, xuất file. Đây là cách duy nhất biết các tính năng không lưu dữ liệu có ai dùng. Cần sửa app chính nên chưa làm ở đây.
+1. ~~**Usage events trong app.**~~ Xong (2026-10-06): app ghi bảng `feature_events` (shop, tính năng, ngày UTC, số lần) qua middleware `usage:<tính năng>`; trang Feature usage có nhóm "Used in the last 28 days" (what-if, kế hoạch nhập, ngân sách, xuất PO, xuất danh sách, độ chính xác, lịch sử tồn, xả hàng, lệch size, kiểm tra dữ liệu, lịch sử thay đổi, chuyển kho). Thêm tính năng: thêm tên vào `App\Support\FeatureUsage::FEATURES` ở backend, gắn middleware vào route, thêm một dòng `$used(...)` trong `FeatureUsage::definitions()`.
 2. **Cohort giữ chân.** Shop cài tuần N còn lại bao nhiêu sau 1, 2, 4, 8 tuần. Sổ sự kiện đã đủ dữ liệu.
 3. **Phễu chuyển đổi.** Cài → onboarding → đồng bộ xong → thêm NCC → dùng thử → trả tiền, kèm thời gian giữa các bước.
 4. **Doanh thu thật từ Shopify Partner API** (payouts, app charges) thay cho MRR ước tính. Cần token Partner API.

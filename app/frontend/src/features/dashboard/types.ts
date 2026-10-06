@@ -13,6 +13,13 @@ export interface ActionItem {
     reason: Coded | null;
 }
 
+export interface SnoozedItem {
+    variant_id: number;
+    name: string;
+    /** The day it comes back (Y-m-d, shop time). */
+    until: string;
+}
+
 export type ActionGroup = 'out_of_stock' | 'order_today' | 'this_week';
 
 export interface RunwayItem {
@@ -72,6 +79,8 @@ export interface Dashboard {
     explanations_locked: boolean;
     actions: Record<ActionGroup, ActionItem[]>;
     actions_truncated: boolean;
+    /** Products put off until a later day ("not now"): out of the action list until then. */
+    snoozed: SnoozedItem[];
     runway: RunwayItem[];
     slow_movers: { value: number; count: number; missing_cost: number; days: number; top: SlowMover[] };
     /** Still selling, but holding clearly more than the order-up-to level. */

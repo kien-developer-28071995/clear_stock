@@ -9,6 +9,7 @@ use App\Observers\ShopObserver;
 use Database\Factories\ShopFactory;
 use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -47,6 +48,7 @@ use Illuminate\Support\Carbon;
  * @property ?Carbon $last_synced_at
  * @property ?Carbon $forecasted_at
  * @property ?string $realtime_webhook_id shop-specific inventory_levels/update subscription (real-time alerts)
+ * @property ?Carbon $review_prompted_at Shopify's review dialog was shown (or never will be): not asked again
  * @property ?Carbon $installed_at
  * @property ?Carbon $uninstalled_at
  */
@@ -61,7 +63,7 @@ class Shop extends Model
         'access_token', 'access_token_expires_at', 'refresh_token', 'refresh_token_expires_at', 'scopes',
         'plan', 'plan_interval', 'subscription_id', 'subscription_status', 'plan_renews_at', 'trial_started_at', 'currency', 'timezone', 'locale', 'default_lead_time_days', 'default_safety_days', 'filter_sales_spikes', 'forecast_profile', 'excluded_order_tags', 'excluded_order_sources', 'order_budget', 'onboarded_at', 'setup_guide',
         'sync_status', 'sync_error', 'sync_failure_notified_at', 'last_synced_at', 'forecasted_at', 'realtime_webhook_id',
-        'installed_at', 'uninstalled_at',
+        'installed_at', 'uninstalled_at', 'review_prompted_at', 'review_prompt_result',
     ];
 
     protected $hidden = ['access_token', 'refresh_token'];
@@ -75,6 +77,19 @@ class Shop extends Model
         'filter_sales_spikes' => true,
         'forecast_profile' => 'balanced',
     ];
+
+    /**
+     * Always a timezone PHP knows: Shopify's zone names are newer than a server's list now and
+     * then, and one unknown name must not stop the hourly work for every shop. UTC until it is known.
+     */
+    protected function timezone(): Attribute
+    {
+        return Attribute::get(function (?string $value): string {
+            static $known = [];
+
+            return $known[$value ?? ''] ??= $value !== null && $value !== '' && @timezone_open($value) !== false ? $value : 'UTC';
+        });
+    }
 
     protected function casts(): array
     {
@@ -93,6 +108,7 @@ class Shop extends Model
             'last_synced_at' => 'datetime',
             'forecasted_at' => 'datetime',
             'installed_at' => 'datetime',
+            'review_prompted_at' => 'datetime',
             'uninstalled_at' => 'datetime',
             'onboarded_at' => 'datetime',
             'setup_guide' => 'array',

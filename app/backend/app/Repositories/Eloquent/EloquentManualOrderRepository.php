@@ -44,6 +44,13 @@ class EloquentManualOrderRepository implements ManualOrderRepositoryInterface
         DB::table('manual_orders')->insert(array_map(fn ($r) => $r + ['shop_id' => $shop->id, 'created_at' => $now, 'updated_at' => $now], $rows));
     }
 
+    public function openRecordedSince(Shop $shop, \DateTimeInterface $since): array
+    {
+        return DB::table('manual_orders')->where('shop_id', $shop->id)->where('status', ManualOrder::OPEN)->where('created_at', '>=', $since)
+            ->get(['variant_id', 'quantity', 'reference', 'source'])
+            ->map(fn ($r) => "{$r->variant_id}|{$r->quantity}|{$r->reference}|{$r->source}")->all();
+    }
+
     public function update(ManualOrder $order, array $attributes): ManualOrder
     {
         $order->fill($attributes)->save();

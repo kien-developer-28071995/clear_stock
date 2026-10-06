@@ -7,6 +7,7 @@ use App\Models\Forecast;
 use App\Models\Shop;
 use App\Models\Variant;
 use App\Repositories\Contracts\ForecastQueryRepositoryInterface;
+use App\Support\Features;
 use Carbon\CarbonImmutable;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
@@ -103,6 +104,7 @@ class EloquentForecastQueryRepository implements ForecastQueryRepositoryInterfac
             $query->whereIn('forecasts.variant_id', $variantIds);
         } else {
             $this->whereStatus($query, ForecastStatus::ReorderNow, $today);
+            $this->notSnoozed($query, $today);
         }
         if ($supplierId !== null) {
             $query->where('variants.supplier_id', $supplierId);
@@ -119,6 +121,7 @@ class EloquentForecastQueryRepository implements ForecastQueryRepositoryInterfac
         return $this->statusQuery($shop, ForecastStatus::ReorderNow, $today)
             ->where('forecasts.suggested_qty', '>', 0)
             ->whereNotNull('variants.supplier_id')->where('variants.discontinued', false)
+            ->tap(fn ($q) => $this->notSnoozed($q, $today))
             ->groupBy('variants.supplier_id')
             ->selectRaw("variants.supplier_id as supplier_id, COUNT(*) as products, SUM(forecasts.suggested_qty) as units, COALESCE(SUM(forecasts.suggested_qty * ({$cost})), 0) as cost")
             ->toBase()->get()
@@ -131,6 +134,7 @@ class EloquentForecastQueryRepository implements ForecastQueryRepositoryInterfac
         return $this->base($shop)->with('variant')
             ->where('forecasts.avg_daily_sales', '>', 0)->where('variants.discontinued', false)
             ->where('forecasts.current_stock', '>', 0)->where('forecasts.days_of_cover', '<=', $days)
+            ->tap(fn ($q) => $this->notSnoozed($q, $today))
             ->where(fn ($q) => $q->whereNull('forecasts.reorder_date')->orWhere('forecasts.reorder_date', '>', $today))
             ->orderBy('forecasts.days_of_cover')->orderBy('forecasts.id')->get(['forecasts.*']);
     }
@@ -163,11 +167,19 @@ class EloquentForecastQueryRepository implements ForecastQueryRepositoryInterfac
         return $this->base($shop)->with('variant')
             ->where('forecasts.avg_daily_sales', '>', 0)->where('variants.discontinued', false)
             ->where(fn ($q) => $q->where('forecasts.current_stock', '<=', 0)->orWhere('forecasts.reorder_date', '<=', $until))
+            ->tap(fn ($q) => $this->notSnoozed($q, CarbonImmutable::now($shop->timezone)->toDateString()))
             ->orderByRaw('forecasts.current_stock > 0')
             ->orderBy('forecasts.reorder_date')
             ->orderBy('forecasts.stockout_date')
             ->orderByDesc('forecasts.avg_daily_sales')
             ->limit($limit)->get(['forecasts.*']);
+    }
+
+    public function snoozed(Shop $shop, string $today, int $limit): array
+    {
+        return Variant::query()->forShop($shop)->where('is_active', true)->whereDate('snoozed_until', '>', $today)
+            ->orderBy('snoozed_until')->orderBy('id')->limit($limit)->get()
+            ->map(fn (Variant $v) => ['variant_id' => $v->id, 'name' => $v->displayName(), 'until' => $v->snoozed_until->toDateString()])->all();
     }
 
     public function runway(Shop $shop, int $limit): Collection
@@ -474,6 +486,15 @@ class EloquentForecastQueryRepository implements ForecastQueryRepositoryInterfac
             ->where('variants.is_active', true);
     }
 
+    /** Leaves out products the merchant put off ("not now") until a later day; a switched-off feature snoozes nothing. */
+    private function notSnoozed(Builder $query, string $today): void
+    {
+        if (Features::on('snooze')) {
+            // By calendar day whatever the column holds (SQLite keeps a time next to a date saved through the model).
+            $query->where(fn ($q) => $q->whereNull('variants.snoozed_until')->orWhereDate('variants.snoozed_until', '<=', $today));
+        }
+    }
+
     private function whereStatus(Builder $query, ForecastStatus $status, string $today): void
     {
         [$sql, $bindings] = $this->statusSql($status, $today);
@@ -497,7 +518,8 @@ class EloquentForecastQueryRepository implements ForecastQueryRepositoryInterfac
         $slowDays = (int) config('forecast.slow_mover_days');
         $ratio = (float) config('forecast.overstock_ratio');
         $overstock = '(forecasts.avg_daily_sales > 0 AND forecasts.target_stock > 0 AND forecasts.excess_units > forecasts.target_stock * ?)';
-        $upcoming = 'forecasts.reorder_date > ? AND forecasts.days_of_cover <= ?';
+        // No reorder date: its stock lasts beyond the horizon, or nothing triggers a reorder.
+        $upcoming = '(forecasts.reorder_date IS NULL OR forecasts.reorder_date > ?) AND forecasts.days_of_cover <= ?';
 
         // Discontinued products have a status of their own and none of the others.
         [$sql, $bindings] = match ($status) {
@@ -506,7 +528,15 @@ class EloquentForecastQueryRepository implements ForecastQueryRepositoryInterfac
             ForecastStatus::OutOfStock => ['(forecasts.current_stock <= 0 AND forecasts.avg_daily_sales > 0)', []],
             ForecastStatus::Slow => ['(forecasts.current_stock > 0 AND (forecasts.avg_daily_sales = 0 OR forecasts.days_of_cover > ?))', [$slowDays]],
             ForecastStatus::Overstock => ["({$upcoming} AND forecasts.current_stock > 0 AND {$overstock})", [$today, $slowDays, $ratio]],
-            ForecastStatus::Healthy => ["({$upcoming} AND NOT {$overstock})", [$today, $slowDays, $ratio]],
+            // Everything that is none of the above, exactly as ForecastStatusResolver decides the badge:
+            // every product is found under one filter, and the home counts add up to all of them.
+            ForecastStatus::Healthy => [
+                '(NOT (forecasts.current_stock <= 0 AND forecasts.avg_daily_sales > 0)'
+                .' AND NOT (forecasts.reorder_date IS NOT NULL AND forecasts.reorder_date <= ?)'
+                .' AND NOT (forecasts.current_stock > 0 AND (forecasts.avg_daily_sales = 0 OR forecasts.days_of_cover > ?))'
+                ." AND NOT (forecasts.current_stock > 0 AND {$overstock}))",
+                [$today, $slowDays, $ratio],
+            ],
         };
 
         return $status === ForecastStatus::Discontinued ? [$sql, $bindings] : ["(variants.discontinued = 0 AND {$sql})", $bindings];

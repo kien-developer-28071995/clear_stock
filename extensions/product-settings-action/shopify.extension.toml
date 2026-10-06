@@ -3,6 +3,8 @@ api_version = "2026-07"
 # Reorder settings (supplier, lead time, safety days, minimum order, pack size, discontinued) for
 # every variant of the products: "More actions" on the product list (selected products) and on a
 # product page. POST /api/extension/product-settings.
+#
+# One target per extension (Shopify refuses more): the same module, registered once per page.
 [[extensions]]
 type = "ui_extension"
 name = "t:name"
@@ -12,6 +14,12 @@ uid = "15e4bae7-69c2-4981-874e-0df929f1e2f5"
   [[extensions.targeting]]
   target = "admin.product-index.selection-action.render"
   module = "./src/ProductSettingsAction.tsx"
+
+[[extensions]]
+type = "ui_extension"
+name = "t:name"
+handle = "product-page-settings-action"
+uid = "6b549a3c-5791-4fc0-be54-8189ea1851a5"
 
   [[extensions.targeting]]
   target = "admin.product-details.action.render"

@@ -87,6 +87,11 @@ class CachedForecastQueryRepository implements ForecastQueryRepositoryInterface
         return $this->remember($shop, $until, "actions{$limit}", fn () => $this->inner->actionItems($shop, $until, $limit));
     }
 
+    public function snoozed(Shop $shop, string $today, int $limit): array
+    {
+        return $this->remember($shop, $today, "snoozed{$limit}", fn () => $this->inner->snoozed($shop, $today, $limit));
+    }
+
     public function runway(Shop $shop, int $limit): Collection
     {
         return $this->remember($shop, 'any', "runway{$limit}", fn () => $this->inner->runway($shop, $limit));

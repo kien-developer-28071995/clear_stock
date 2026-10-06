@@ -44,7 +44,7 @@ APP_PORT=127.0.0.1:8080
 sudo apt install -y caddy
 ```
 
-Chép `deploy/Caddyfile` vào `/etc/caddy/Caddyfile`, đổi `app.example.com` thành domain của app và `www.example.com` thành domain của website (DNS bản ghi A của cả hai đã trỏ về IP server), rồi chạy `sudo systemctl reload caddy`. Caddy tự lấy và gia hạn chứng chỉ Let's Encrypt.
+Chép `deploy/Caddyfile` vào `/etc/caddy/Caddyfile`, đổi `app.clear-stock.techfoxify.com` thành domain của app và `www.example.com` thành domain của website (DNS bản ghi A của cả hai đã trỏ về IP server), rồi chạy `sudo systemctl reload caddy`. Caddy tự lấy và gia hạn chứng chỉ Let's Encrypt.
 
 **Website** (`website/`, trang giới thiệu + `/privacy` + `/support`): là file HTML tĩnh, Caddy phục vụ thẳng từ `/opt/clear_stock/website` (không qua Docker). Workflow Deploy build website bằng chính các Variable của app rồi upload và đổi thư mục một lần (không có lúc nửa cũ nửa mới). Website phải là domain **khác** `APP_URL`: app chuyển `/privacy`, `/support` của nó sang `WEBSITE_URL`.
 
@@ -154,6 +154,28 @@ Nếu **mất hẳn key cũ**: token không giải mã được nữa; shop vẫ
 
 - Image cũ không còn dùng và cũ hơn 7 ngày được xóa sau mỗi lần deploy thành công, nên ổ đĩa không đầy dần; image 7 ngày gần nhất vẫn còn để quay lại nhanh.
 - Deploy có thể lâu hơn bình thường (tối đa khoảng 10 phút) nếu đúng lúc đó đang có job đồng bộ lớn: Horizon chờ job xong rồi mới dừng.
+
+## 4a. Frontend và backend là hai phần riêng
+
+| Phần | Domain | Biến | Chạy bằng |
+|---|---|---|---|
+| Backend: API, webhook, Horizon | `app-api.clear-stock.techfoxify.com` | `APP_URL` | container `web` + `app` + `horizon` + `scheduler` |
+| Frontend: giao diện app nhúng | `app.clear-stock.techfoxify.com` | `FRONTEND_URL` | file tĩnh trong `<thư mục deploy>/frontend`, Caddy phục vụ |
+| Website giới thiệu | `www.example.com` | `WEBSITE_URL` | file tĩnh trong `<thư mục deploy>/website` |
+
+Frontend chỉ gọi backend qua `https://<APP_URL>/api/...` kèm session token của Shopify. Backend không trả trang nào của app; request khác vào backend bằng trình duyệt được chuyển sang `FRONTEND_URL`.
+
+**Cài lần đầu (hoặc khi chuyển từ bản một domain):**
+
+1. Tạo bản ghi DNS cho domain frontend và domain backend, trỏ về server.
+2. Thêm khối `app.clear-stock.techfoxify.com` và `app-api.clear-stock.techfoxify.com` vào `/etc/caddy/Caddyfile` theo `deploy/Caddyfile`, rồi `sudo caddy validate --config /etc/caddy/Caddyfile && sudo systemctl reload caddy`. Khối frontend gửi header `frame-ancestors` theo từng shop: Shopify bắt buộc.
+3. GitHub → Variables (environment `production`): `APP_URL` = domain backend, `FRONTEND_URL` = domain frontend. Deploy dừng nếu thiếu `FRONTEND_URL`.
+4. `shopify.app.production.toml`: `application_url` = domain frontend; `redirect_urls`, URL webhook và `extensions/flow-lifecycle` = domain backend. Chạy `shopify app deploy --config production`.
+5. Push `main`, duyệt Deploy. Workflow build frontend với `VITE_API_URL` = `APP_URL` và upload sau khi backend đã lên.
+
+Giữ domain cũ trỏ về backend thêm một thời gian: link cũ vào đó sẽ tự chuyển sang frontend.
+
+**Sau này tách frontend sang server riêng:** cài Caddy ở server mới với riêng khối `app.clear-stock.techfoxify.com`, thêm Secrets `FRONTEND_DEPLOY_HOST`, `FRONTEND_DEPLOY_USER`, `FRONTEND_DEPLOY_PATH`, `FRONTEND_DEPLOY_KNOWN_HOSTS` (và `FRONTEND_DEPLOY_SSH_KEY`, `FRONTEND_DEPLOY_PORT` nếu khác), đổi DNS. Không phải sửa code hay workflow.
 
 ## 4b. Báo cáo cho chủ app (`admin/`)
 

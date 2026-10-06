@@ -12,17 +12,20 @@ import { WhyThisNumber } from '@/features/forecasts/components/WhyThisNumber';
 import { AdjustForecastForm } from '@/features/forecasts/components/AdjustForecastForm';
 import { ProductSettingsForm } from '@/features/forecasts/components/ProductSettingsForm';
 import { AlternateSuppliers } from '@/features/forecasts/components/AlternateSuppliers';
+import { DemandProjection } from '@/features/forecasts/components/DemandProjection';
+import { ChangeHistory } from '@/features/forecasts/components/ChangeHistory';
 import { LocationForecasts } from '@/features/forecasts/components/LocationForecasts';
 import { MarkOrderedModal } from '@/features/orders/components/MarkOrderedModal';
 import { useModal } from '@/hooks/useModal';
 import { TabPanel, Tabs, useTab } from '@/components/ui/Tabs';
 
-const PRODUCT_TABS = ['forecast', 'settings', 'suppliers'] as const;
+const PRODUCT_TABS = ['forecast', 'settings', 'suppliers', 'history'] as const;
 
 export function ProductDetailPage() {
     const { t } = useTranslation();
     const ordersExist = useFeature('manual_orders');
     const alternatesExist = useFeature('alternate_suppliers');
+    const historyExists = useFeature('change_log');
     const variantId = Number(useParams().variantId);
     const { data: f, isPending, error, refetch } = useForecast(variantId);
     const guide = useSetupGuide();
@@ -70,11 +73,13 @@ export function ProductDetailPage() {
                     { id: 'forecast' as const, label: t('tabs.product.forecast') },
                     { id: 'settings' as const, label: t('tabs.product.settings') },
                     { id: 'suppliers' as const, label: t('tabs.product.suppliers') },
-                ].filter((x) => x.id !== 'suppliers' || alternatesExist)}
+                    { id: 'history' as const, label: t('tabs.product.history') },
+                ].filter((x) => (x.id !== 'suppliers' || alternatesExist) && (x.id !== 'history' || historyExists))}
             />
             <TabPanel active={tab === 'forecast'}>
                 <Tip id="product_explanation">{t('tips.product_explanation')}</Tip>
                 <WhyThisNumber f={f} />
+                <DemandProjection f={f} />
                 <AdjustForecastForm f={f} />
                 <LocationForecasts f={f} />
             </TabPanel>
@@ -83,6 +88,9 @@ export function ProductDetailPage() {
             </TabPanel>
             <TabPanel active={tab === 'suppliers'}>
                 {alternatesExist && <AlternateSuppliers f={f} />}
+            </TabPanel>
+            <TabPanel active={tab === 'history'}>
+                {historyExists && <ChangeHistory variantId={f.variant_id} />}
             </TabPanel>
         </s-page>
     );

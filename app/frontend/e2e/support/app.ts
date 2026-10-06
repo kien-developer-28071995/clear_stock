@@ -16,6 +16,11 @@ function lastLine(output: string): string {
     return output.split('\n').filter(Boolean).at(-1) ?? '';
 }
 
+/** A session token for the dev shop, as App Bridge would hand out. */
+export function sessionToken(shop: string | null = null): string {
+    return lastLine(artisan('dev:session-token', '--ttl=3600', ...(shop ? [`--shop=${shop}`] : [])));
+}
+
 export function setPlan(plan: PlanKey): void {
     artisan('dev:set-plan', plan);
 }
@@ -37,7 +42,7 @@ export async function api<T>(page: Page, url: string, init: { method?: string; b
     );
 }
 
-/** The embedded shell (resources/views/app.blade.php) without App Bridge's CDN script. */
+/** The app's page (app/frontend/index.html) without App Bridge's CDN script. */
 const SHELL = `<!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Clear Stock</title>
@@ -55,13 +60,14 @@ const SHELL = `<!DOCTYPE html>
 
 declare global {
     interface Window {
-        __e2e: { toasts: string[]; saveBar: Record<string, boolean>; pickerSelection: unknown[]; scopes: string[]; grantScopes: boolean; scopeRequests: string[][] };
+        __e2e: { toasts: string[]; saveBar: Record<string, boolean>; pickerSelection: unknown[]; scopes: string[]; grantScopes: boolean; scopeRequests: string[][]; reviewRequests: number; reviewCode: string };
     }
 }
 
 /** Stub of the App Bridge APIs the app uses (`shopify.*`). */
-function stubAppBridge({ token, locale }: { token: string; locale: string }) {
-    window.__e2e = { toasts: [], saveBar: {}, pickerSelection: [], scopes: [], grantScopes: true, scopeRequests: [] };
+export function stubAppBridge({ token, locale }: { token: string; locale: string }) {
+    // reviewCode: what Shopify's review dialog answers. "cooldown-period" (not shown this time) leaves the shop as it was.
+    window.__e2e = { toasts: [], saveBar: {}, pickerSelection: [], scopes: [], grantScopes: true, scopeRequests: [], reviewRequests: 0, reviewCode: 'cooldown-period' };
     (window as unknown as { shopify: unknown }).shopify = {
         config: { locale },
         idToken: async () => token,
@@ -72,6 +78,13 @@ function stubAppBridge({ token, locale }: { token: string; locale: string }) {
             leaveConfirmation: async () => undefined,
         },
         resourcePicker: async () => window.__e2e.pickerSelection,
+        reviews: {
+            request: async () => {
+                window.__e2e.reviewRequests++;
+                const code = window.__e2e.reviewCode;
+                return { success: code === 'success', code, message: '' };
+            },
+        },
         // Optional scopes: the merchant approves (grantScopes) or declines the dialog.
         scopes: {
             query: async () => ({ granted: window.__e2e.scopes, required: [], optional: [] }),
@@ -84,9 +97,11 @@ function stubAppBridge({ token, locale }: { token: string; locale: string }) {
     };
 }
 
-export const test = base.extend<{ app: Page }>({
-    app: async ({ page, baseURL }, use) => {
-        const token = lastLine(artisan('dev:session-token', '--ttl=3600'));
+export const test = base.extend<{ app: Page; shopDomain: string | null }>({
+    // Another shop than the dev store (`test.use({ shopDomain })`): a store in a state the dev store is not in.
+    shopDomain: [null, { option: true }],
+    app: async ({ page, baseURL, shopDomain }, use) => {
+        const token = sessionToken(shopDomain);
         await page.addInitScript(stubAppBridge, { token, locale: 'en' });
         // Every page navigation gets the shell; API, Vite and CDN requests go through.
         await page.route(

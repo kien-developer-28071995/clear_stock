@@ -24,7 +24,7 @@ class RealtimeStockAlertMail extends QueuedMailable
             $subject = count($this->items).' products need attention'.($out > 0 ? " ({$out} sold out)" : '');
         }
 
-        return new Envelope(subject: "{$subject} · {$store}");
+        return new Envelope(subject: self::subjectLine("{$subject} · {$store}"));
     }
 
     public function content(): Content

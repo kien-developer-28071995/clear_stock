@@ -164,3 +164,39 @@ it('counts every order when order exclusions are switched off app-wide', functio
     expect(sales($this->a))->toBe(['2026-09-10' => [57, 0]])
         ->and($stats)->toMatchArray(['orders' => 2, 'excluded_orders' => 0]);
 });
+
+// (A line that is not JSON at all still fails the sync: that is a cut-off download, to be fetched again, not skipped.)
+it('imports what it can from an export full of nonsense, without failing and without counting the nonsense', function () {
+    $path = tempnam(sys_get_temp_dir(), 'jsonl');
+    file_put_contents($path, implode("\n", [
+        json_encode(order(1, '2026-09-10T15:00:00Z')),
+        json_encode(lineItem(1, 101, 2)),                                              // the one good line
+        '',
+        '[]',
+        '"a string"',
+        '12',
+        'null',
+        json_encode(['id' => gid('Order', 2)]),                                         // order without dates
+        json_encode(['id' => gid('Order', 3), 'processedAt' => 'not a date', 'cancelledAt' => 'nope']),
+        json_encode(['id' => 12345, 'processedAt' => ['x'], 'tags' => 'vip']),          // wrong types everywhere
+        json_encode(lineItem(2, 101, 5)),                                               // its order has no date
+        json_encode(lineItem(999, 101, 5)),                                             // its order never came
+        json_encode(['quantity' => 'many', 'currentQuantity' => null, 'variant' => 'x', '__parentId' => gid('Order', 1)]),
+        json_encode(['quantity' => -4, 'currentQuantity' => -9, 'variant' => ['id' => gid('ProductVariant', 101)], '__parentId' => gid('Order', 1)]),
+        json_encode(['quantity' => PHP_INT_MAX, 'currentQuantity' => PHP_INT_MAX, 'variant' => ['id' => gid('ProductVariant', 102)], '__parentId' => gid('Order', 1)]),
+        json_encode(['quantity' => 1, 'variant' => ['id' => 'gid://shopify/ProductVariant/abc'], '__parentId' => gid('Order', 1)]),
+        json_encode(['quantity' => 1, 'variant' => null, '__parentId' => ['x']]),
+        json_encode(['__parentId' => gid('Order', 1), 'lineItemGroup' => 'x', 'quantity' => 1, 'variant' => ['id' => gid('ProductVariant', 101)]]),
+    ]));
+
+    $stats = app(OrderAggregator::class)->import($this->shop, $path, '2026-09-01');
+
+    $a = sales($this->a);
+    expect($a)->toHaveKey('2026-09-10')
+        ->and($a['2026-09-10'][0])->toBeGreaterThanOrEqual(2)->toBeLessThanOrEqual(3)   // the good line (and at most the grouped one)
+        ->and($a['2026-09-10'][1])->toBe(0)
+        ->and(array_keys($a))->toBe(['2026-09-10'])
+        ->and(DailySale::forShop($this->shop->id)->where('units_sold', '<', 0)->count())->toBe(0)
+        ->and(DailySale::forShop($this->shop->id)->where('units_sold', '>', 1_000_000_000)->count())->toBe(0)
+        ->and($stats['orders'])->toBeGreaterThanOrEqual(1);
+});

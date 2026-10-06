@@ -1,6 +1,7 @@
 import { http } from '@/lib/http';
 import type {
     AlternateSupplier,
+    ChangeEntry,
     ForecastDetail,
     SavedView,
     ForecastFilters,
@@ -27,6 +28,10 @@ export const forecastApi = {
     setAlternates: async (variantId: number, suppliers: Omit<AlternateSupplier, 'name'>[]) =>
         (await http.put<{ data: AlternateSupplier[] }>(`/variants/${variantId}/suppliers`, { suppliers })).data,
     makeMainSupplier: (variantId: number, supplierId: number) => http.post(`/variants/${variantId}/suppliers/${supplierId}/main`),
+    changes: async (variantId: number) => (await http.get<{ data: ChangeEntry[] }>(`/forecasts/${variantId}/changes`)).data,
+    /** days = null brings the products back now. */
+    snooze: async (body: { variant_ids: number[]; days: number | null }) =>
+        (await http.post<{ data: { updated: number; until: string | null } }>('/snooze', body)).data,
     views: async () => (await http.get<{ data: SavedView[] }>('/views')).data,
     saveView: async (body: { name: string; filters: Record<string, string> }) => (await http.post<{ data: SavedView[] }>('/views', body)).data,
     deleteView: async (id: number) => (await http.delete<{ data: SavedView[] }>(`/views/${id}`)).data,

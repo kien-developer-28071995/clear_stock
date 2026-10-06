@@ -153,20 +153,25 @@ class ForecastService
 
     private function row(ForecastResult $r, \DateTimeInterface $computedAt): array
     {
+        // Kept within what each column holds: one absurd product (a typo of a million in stock, a
+        // sales rate of next to nothing) must never fail the forecast run of the whole shop.
+        $int = fn (int|float $v, int $min, int $max): int => (int) max($min, min($max, $v));
+        $unsigned = fn (int|float $v): int => $int($v, 0, 4_294_967_295);
+
         return [
             'variant_id' => $r->variantId,
-            'current_stock' => $r->currentStock,
-            'incoming_stock' => $r->incomingStock,
-            'avg_daily_sales' => $r->avgDailySales,
-            'days_of_cover' => $r->daysOfCover,
+            'current_stock' => $int($r->currentStock, -2_147_483_648, 2_147_483_647),
+            'incoming_stock' => $int($r->incomingStock, -2_147_483_648, 2_147_483_647),
+            'avg_daily_sales' => min($r->avgDailySales, 9_999_999.999),
+            'days_of_cover' => $r->daysOfCover === null ? null : min($r->daysOfCover, 9_999_999.9),
             'stockout_date' => $r->stockoutDate,
             'reorder_date' => $r->reorderDate,
-            'reorder_point' => $r->reorderPoint,
-            'suggested_qty' => $r->suggestedQty,
-            'target_stock' => $r->targetStock,
-            'excess_units' => $r->excessUnits,
-            'lost_units_30d' => $r->lostUnits30d,
-            'trend_percent' => $r->trendPercent,
+            'reorder_point' => $unsigned($r->reorderPoint),
+            'suggested_qty' => $unsigned($r->suggestedQty),
+            'target_stock' => $unsigned($r->targetStock),
+            'excess_units' => $unsigned($r->excessUnits),
+            'lost_units_30d' => min($r->lostUnits30d, 99_999_999.99),
+            'trend_percent' => $r->trendPercent === null ? null : $int($r->trendPercent, -32_768, 32_767),
             'confidence' => $r->confidence->value,
             'explanation' => json_encode($r->explanation, JSON_THROW_ON_ERROR),
             'computed_at' => $computedAt,

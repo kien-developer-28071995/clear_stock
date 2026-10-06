@@ -3,11 +3,12 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DashboardGate } from '@/features/dashboard/components/DashboardGate';
 import { ActionList } from '@/features/dashboard/components/ActionList';
+import { SnoozedList } from '@/features/dashboard/components/SnoozedList';
 import type { ActionGroup, Dashboard } from '@/features/dashboard/types';
 import { Tip } from '@/features/setup/components/Tip';
 import { useTransfers } from '@/features/transfers/hooks/useTransfers';
 import { useEntitlements, useFeature } from '@/hooks/useEntitlements';
-import { NO_VALUE, fromOption, optionValue } from '@/utils/select';
+import { NO_VALUE, fromOption, optionValue, optionsKey } from '@/utils/select';
 import { useManualOrders } from '@/features/orders/hooks/useManualOrders';
 
 /** Only the products of one vendor, to order everything from the same maker at once. */
@@ -57,7 +58,8 @@ export function ReorderPage() {
                         )}
                         {vendors.length > 1 && (
                             <s-box maxInlineSize="320px" paddingBlockEnd="base">
-                                <s-select label={t('products.vendor')} value={optionValue(vendor)} onChange={(e) => setVendor(fromOption(e.currentTarget.value))}>
+                                <s-select
+                                    key={optionsKey(vendors.length)} label={t('products.vendor')} value={optionValue(vendor)} onChange={(e) => setVendor(fromOption(e.currentTarget.value))}>
                                     <s-option value={NO_VALUE}>{t('products.allVendors')}</s-option>
                                     {vendors.map((v) => (
                                         <s-option key={v} value={v}>{v}</s-option>
@@ -67,6 +69,7 @@ export function ReorderPage() {
                         )}
                         {/* key: a new vendor starts a fresh selection */}
                         <ActionList key={vendor} dashboard={forVendor(data, vendor)} />
+                        <SnoozedList items={data.snoozed ?? []} />
                     </s-page>
                 );
             }}

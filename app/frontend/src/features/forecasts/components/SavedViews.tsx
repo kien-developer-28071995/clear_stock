@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { isValidationError } from '@/lib/queryClient';
 import { useTranslation } from 'react-i18next';
 import { errorMessage, fieldError } from '@/lib/http';
 import { useDeleteView, useSaveView, useSavedViews } from '@/features/forecasts/hooks/useForecasts';
@@ -27,7 +28,7 @@ export function SavedViews({ current, onApply, canSave }: Props) {
     const submit = () =>
         save.mutate(
             { name: name.trim(), filters },
-            { onSuccess: () => { setName(''); shopify.toast.show(t('views.saved')); }, onError: (e) => shopify.toast.show(errorMessage(e), { isError: true }) },
+            { onSuccess: () => { setName(''); shopify.toast.show(t('views.saved')); }, onError: (e) => { if (isValidationError(e)) shopify.toast.show(errorMessage(e), { isError: true }); } },
         );
 
     return (

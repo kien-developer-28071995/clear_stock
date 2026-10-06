@@ -46,7 +46,7 @@ test('with every switch off the core still works and nothing switched off is sho
     app.on('pageerror', (e) => failed.push(`page error: ${e.message}`));
 
     await open(app, '/');
-    const shop = await api<{ data: { entitlements: { features: Record<string, boolean> } } }>(app, '/shop');
+    const shop = await api<{ data: { review_prompt: boolean; entitlements: { features: Record<string, boolean> } } }>(app, '/shop');
     expect(Object.entries(shop.data.entitlements.features).filter(([, on]) => on).map(([k]) => k)).toEqual([]);
     const variant = (await api<{ data: { variant_id: number }[] }>(app, '/forecasts')).data[0].variant_id;
     const gone = async (text: string | RegExp) => expect(app.getByText(text, { exact: typeof text === 'string' })).toHaveCount(0);
@@ -56,6 +56,8 @@ test('with every switch off the core still works and nothing switched off is sho
     await open(app, '/reorder');
     await settled(app);
     await expect(app.locator('s-button', { hasText: 'Mark as ordered' })).toHaveCount(0);
+    await expect(app.locator('s-button', { hasText: /^Snooze$/ })).toHaveCount(0);
+    expect(shop.data.review_prompt).toBe(false);
     await expect(app.locator('s-button', { hasText: 'Export purchase order' })).toHaveCount(0);
     await expect(app.locator('s-press-button', { hasText: 'Orders placed' })).toHaveCount(0);
 
@@ -76,6 +78,8 @@ test('with every switch off the core still works and nothing switched off is sho
     await settled(app);
     await expect(app.locator('s-section[heading="Why these numbers?"]')).toBeVisible();
     await expect(app.locator('s-press-button', { hasText: 'Suppliers' })).toHaveCount(0);
+    await expect(app.locator('s-press-button', { hasText: 'History' })).toHaveCount(0);
+    await expect(app.locator('s-section[heading="Expected sales"]')).toHaveCount(0);
     await expect(app.locator('s-button', { hasText: 'Mark as ordered' })).toHaveCount(0);
     await open(app, `/products/${variant}?tab=settings`);
     await settled(app);
@@ -103,6 +107,7 @@ test('with every switch off the core still works and nothing switched off is sho
 
     // Settings: defaults and language stay; no alerts tab, no optional sections.
     await open(app, '/settings');
+    await expect(app.locator('s-button', { hasText: 'Send feedback' })).toHaveCount(0);
     await settled(app);
     await expect(app.getByLabel('Default lead time')).toBeVisible();
     await expect(app.locator('s-press-button', { hasText: 'Alerts and emails' })).toHaveCount(0);

@@ -6,7 +6,7 @@ export UID := $(shell id -u)
 export GID := $(shell id -g)
 
 .DEFAULT_GOAL := help
-.PHONY: help setup up down restart build shell migrate fresh test e2e extensions logs tunnel tunnel-url tunnel-down e2e-features-off listing-screenshots feature-screenshots listing-video \
+.PHONY: help setup up down restart build shell migrate fresh test test-mysql e2e extensions logs tunnel tunnel-url tunnel-down e2e-features-off e2e-split e2e-sweep listing-screenshots feature-screenshots listing-video \
         app-url webhook artisan composer npm typecheck website website-build admin-setup admin-user admin-test prod-build prod-up prod-down prod-migrate prod-logs
 
 help: ## List available commands
@@ -48,9 +48,22 @@ fresh: ## Drop all tables and re-run migrations
 test: ## Run the backend test suite (Pest)
 	$(DC) exec app php artisan test
 
+test-mysql: ## The backend suite on MySQL, the production engine (own database clear_stock_test, never the dev one)
+	@$(DC) exec -T mysql sh -c 'mysql -uroot -p"$$DB_ROOT_PASSWORD" -e "CREATE DATABASE IF NOT EXISTS clear_stock_test; GRANT ALL ON clear_stock_test.* TO \"$$DB_USERNAME\"@\"%\";"' 2>/dev/null
+	$(DC) exec app php artisan test -c phpunit.mysql.xml
+
 e2e: ## End-to-end tests in Chromium on every plan + admin extensions (needs make up + a synced dev store)
 	npm run extensions:locales:check
 	cd app/frontend && npx playwright test
+
+e2e-sweep: ## Sweep of every screen on every plan, in every language and at phone width: console errors, failed API calls, raw keys, overflow (needs make up)
+	cd app/frontend && E2E_SWEEP=1 npx playwright test e2e/sweep.spec.ts
+
+e2e-split: ## E2E of the built frontend on its own origin (:4173) calling the API on another (:8080)
+	@cd app/frontend && VITE_API_URL=http://localhost:$${APP_PORT:-8080} npm run build >/dev/null \
+	&& (npx vite preview --port 4173 --strictPort >/dev/null 2>&1 & echo $$! > .preview.pid) && sleep 2; \
+	E2E_SPLIT_URL=http://localhost:4173 E2E_SPLIT_API=http://localhost:$${APP_PORT:-8080} npx playwright test e2e/split-domain.spec.ts; status=$$?; \
+	kill $$(cat .preview.pid) 2>/dev/null; rm -f .preview.pid; exit $$status
 
 # What the App Store version (v1) switches off: keep in step with app/backend/.env.production.example.
 V1_OFF = \nFEATURE_SHOPIFY_PURCHASE_ORDERS=false\nFEATURE_SUPPLIER_EMAILS=false\nFEATURE_LOCATIONS=false\nFEATURE_TRANSFERS=false\nFEATURE_REALTIME_ALERTS=false\nFEATURE_FLOW_TRIGGERS=false\nFEATURE_SLACK_ALERTS=false\nFEATURE_ORDER_EXCLUSIONS=false\nFEATURE_LOCATION_EXCLUSIONS=false\nFEATURE_ALTERNATE_SUPPLIERS=false\nFEATURE_SAVED_VIEWS=false\nFEATURE_SIZE_RUNS=false\nBILLING_GROWTH_OFFERED=false\n
@@ -80,7 +93,7 @@ listing-video: ## Draft App Store walkthrough video (WebM) of the v1 app into do
 	(cd app/frontend && LISTING_VIDEO=1 npx playwright test e2e/listing-walkthrough.spec.ts)
 
 # Every switch of app/backend/config/features.php, off (a test fails when a new switch is missing here).
-ALL_OFF = \nFEATURE_WHAT_IF=false\nFEATURE_REFERENCE_PRODUCTS=false\nFEATURE_ABC=false\nFEATURE_PURCHASE_PLAN=false\nFEATURE_ORDER_BUDGET=false\nFEATURE_SPIKE_FILTER=false\nFEATURE_LOST_SALES=false\nFEATURE_ACCURACY=false\nFEATURE_SALES_EVENTS=false\nFEATURE_WEEKLY_SUMMARY=false\nFEATURE_PURCHASE_ORDERS=false\nFEATURE_SHOPIFY_PURCHASE_ORDERS=false\nFEATURE_SUPPLIER_EMAILS=false\nFEATURE_LOCATIONS=false\nFEATURE_TRANSFERS=false\nFEATURE_REALTIME_ALERTS=false\nFEATURE_FLOW_TRIGGERS=false\nFEATURE_BUNDLES=false\nFEATURE_ALERTS=false\nFEATURE_SLACK_ALERTS=false\nFEATURE_LOW_COVER_ALERTS=false\nFEATURE_FORECAST_PROFILES=false\nFEATURE_TREND=false\nFEATURE_ORDER_EXCLUSIONS=false\nFEATURE_LOCATION_EXCLUSIONS=false\nFEATURE_MANUAL_ORDERS=false\nFEATURE_ALTERNATE_SUPPLIERS=false\nFEATURE_SUPPLIER_IMPORT=false\nFEATURE_VENDOR_SUPPLIERS=false\nFEATURE_COSTS=false\nFEATURE_SAVED_VIEWS=false\nFEATURE_PRODUCT_EXPORT=false\nFEATURE_STOCK_HISTORY=false\nFEATURE_CLEARANCE=false\nFEATURE_SIZE_RUNS=false\nFEATURE_DATA_HEALTH=false\n
+ALL_OFF = \nFEATURE_WHAT_IF=false\nFEATURE_REFERENCE_PRODUCTS=false\nFEATURE_ABC=false\nFEATURE_PURCHASE_PLAN=false\nFEATURE_ORDER_BUDGET=false\nFEATURE_SPIKE_FILTER=false\nFEATURE_LOST_SALES=false\nFEATURE_ACCURACY=false\nFEATURE_SALES_EVENTS=false\nFEATURE_WEEKLY_SUMMARY=false\nFEATURE_PURCHASE_ORDERS=false\nFEATURE_SHOPIFY_PURCHASE_ORDERS=false\nFEATURE_SUPPLIER_EMAILS=false\nFEATURE_LOCATIONS=false\nFEATURE_TRANSFERS=false\nFEATURE_REALTIME_ALERTS=false\nFEATURE_FLOW_TRIGGERS=false\nFEATURE_BUNDLES=false\nFEATURE_ALERTS=false\nFEATURE_SLACK_ALERTS=false\nFEATURE_LOW_COVER_ALERTS=false\nFEATURE_FORECAST_PROFILES=false\nFEATURE_TREND=false\nFEATURE_ORDER_EXCLUSIONS=false\nFEATURE_LOCATION_EXCLUSIONS=false\nFEATURE_MANUAL_ORDERS=false\nFEATURE_ALTERNATE_SUPPLIERS=false\nFEATURE_SUPPLIER_IMPORT=false\nFEATURE_VENDOR_SUPPLIERS=false\nFEATURE_COSTS=false\nFEATURE_SAVED_VIEWS=false\nFEATURE_PRODUCT_EXPORT=false\nFEATURE_STOCK_HISTORY=false\nFEATURE_CLEARANCE=false\nFEATURE_SIZE_RUNS=false\nFEATURE_DATA_HEALTH=false\nFEATURE_SNOOZE=false\nFEATURE_DEMAND_PROJECTION=false\nFEATURE_CHANGE_LOG=false\nFEATURE_REVIEW_PROMPT=false\nFEATURE_FEEDBACK=false\n
 
 e2e-features-off: ## E2E check of the app with every optional feature switched off (restores app/backend/.env afterwards)
 	@env='$(CURDIR)/app/backend/.env'; cp "$$env" "$$env.e2e-backup"; \
@@ -138,9 +151,12 @@ tunnel: ## Start the HTTPS tunnel, print its URL and write it into app/backend/.
 		$(MAKE) --no-print-directory app-url; \
 	fi
 
+# Only the log of the current run counts: a restarted container still holds the URL of its previous
+# run, which would then be written everywhere (happened 2026-10-06 after Docker was restarted).
 tunnel-url: ## Print the current quick-tunnel URL
 	@for i in $$(seq 1 30); do \
-		url=$$($(DC) --profile tunnel logs tunnel 2>/dev/null | grep -oE 'https://[a-z0-9-]+\.trycloudflare\.com' | tail -1); \
+		started=$$(docker inspect -f '{{.State.StartedAt}}' $$($(DC) --profile tunnel ps -q tunnel 2>/dev/null) 2>/dev/null); \
+		url=$$($(DC) --profile tunnel logs --since "$${started:-1m}" tunnel 2>/dev/null | grep -oE 'https://[a-z0-9-]+\.trycloudflare\.com' | tail -1); \
 		if [ -n "$$url" ]; then echo $$url; exit 0; fi; sleep 1; \
 	done; echo "Tunnel URL not found (check: make logs s=tunnel)" >&2; exit 1
 

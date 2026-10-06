@@ -1,4 +1,5 @@
 import { useEffect, useState, type RefObject } from 'react';
+import { useSubmitOnce } from '@/hooks/useSubmitOnce';
 import { useTranslation } from 'react-i18next';
 import type { ModalElement } from '@/hooks/useModal';
 import { fieldError } from '@/lib/http';
@@ -18,6 +19,7 @@ interface Props {
 export function SupplierModal({ modalRef, supplier, onDone }: Props) {
     const { t } = useTranslation();
     const create = useCreateSupplier();
+    const once = useSubmitOnce();
     const update = useUpdateSupplier();
     const mutation = supplier ? update : create;
     const [name, setName] = useState('');
@@ -34,7 +36,9 @@ export function SupplierModal({ modalRef, supplier, onDone }: Props) {
     const canAutoEmail = useEntitlements().supplier_auto_email;
     const emailsExist = useFeature('supplier_emails');
 
-    useEffect(() => {
+    // Back to what is saved (or empty for a new one): when another one is opened, and each time the
+    // dialog opens, so reopening the same one never shows what was typed and abandoned before.
+    const reset = () => {
         setName(supplier?.name ?? '');
         setEmail(supplier?.email ?? '');
         setLead(supplier?.lead_time_days?.toString() ?? '');
@@ -47,6 +51,9 @@ export function SupplierModal({ modalRef, supplier, onDone }: Props) {
         setAutoEmail(supplier?.auto_email ?? false);
         create.reset();
         update.reset();
+    };
+    useEffect(() => {
+        reset();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [supplier]);
 
@@ -63,13 +70,15 @@ export function SupplierModal({ modalRef, supplier, onDone }: Props) {
             order_weekdays: weekdays.length === 0 ? null : weekdays,
             ...(canAutoEmail ? { auto_email: autoEmail && email.trim() !== '' } : {}),
         };
-        const options = { onSuccess: () => { shopify.toast.show(supplier ? t('suppliers.updated') : t('suppliers.added')); onDone(); } };
-        if (supplier) update.mutate({ id: supplier.id, ...body }, options);
-        else create.mutate(body, options);
+        once((done) => {
+            const options = { onSuccess: () => { shopify.toast.show(supplier ? t('suppliers.updated') : t('suppliers.added')); onDone(); }, onSettled: done };
+            if (supplier) update.mutate({ id: supplier.id, ...body }, options);
+            else create.mutate(body, options);
+        });
     };
 
     return (
-        <s-modal ref={modalRef} id="supplier-modal" heading={supplier ? t('suppliers.edit') : t('suppliers.add')}>
+        <s-modal ref={modalRef} id="supplier-modal" onShow={reset} heading={supplier ? t('suppliers.edit') : t('suppliers.add')}>
             <s-stack gap="base">
                 <s-text-field label={t('suppliers.name')} value={name} error={fieldError(mutation.error, 'name')} onInput={(e) => setName(e.currentTarget.value)} />
                 <s-number-field
@@ -81,6 +90,9 @@ export function SupplierModal({ modalRef, supplier, onDone }: Props) {
                     error={fieldError(mutation.error, 'lead_time_days')}
                     onInput={(e) => setLead(e.currentTarget.value)}
                 />
+                {/* More than a handful of fields: grouped under headings, like the product's settings. */}
+                <s-divider />
+                <s-heading>{t('productSettings.groups.orderRules')}</s-heading>
                 <s-grid gridTemplateColumns="1fr 1fr" gap="base">
                     <s-number-field
                         label={t('productSettings.minOrder')}
@@ -111,6 +123,8 @@ export function SupplierModal({ modalRef, supplier, onDone }: Props) {
                     error={fieldError(mutation.error, 'order_cycle_days')}
                     onInput={(e) => setCycle(e.currentTarget.value)}
                 />
+                <s-divider />
+                <s-heading>{t('productSettings.groups.cost')}</s-heading>
                 <s-grid gridTemplateColumns="1fr 1fr" gap="base">
                     <s-number-field
                         label={t('suppliers.minOrderValue')}

@@ -47,6 +47,7 @@ use Illuminate\Support\Carbon;
  * @property ?int $reference_percent share of the reference's rate (null = 100%)
  * @property bool $is_bundle
  * @property ?Carbon $shopify_created_at
+ * @property ?Carbon $snoozed_until out of the reorder list and alert emails until this day (shop's calendar)
  */
 class Variant extends Model
 {
@@ -55,7 +56,7 @@ class Variant extends Model
     protected $fillable = [
         'shop_id', 'shopify_variant_id', 'shopify_product_id', 'inventory_item_id',
         'product_title', 'vendor', 'product_type', 'title', 'sku', 'barcode', 'supplier_sku', 'unit_cost', 'shopify_unit_cost', 'cost_override', 'price', 'tracked', 'is_active',
-        'supplier_id', 'lead_time_override', 'safety_days', 'min_order_qty', 'pack_size', 'min_stock', 'max_stock', 'alerts_muted', 'discontinued', 'forecast_profile', 'reference_variant_id', 'reference_percent', 'is_bundle', 'shopify_created_at',
+        'supplier_id', 'lead_time_override', 'safety_days', 'min_order_qty', 'pack_size', 'min_stock', 'max_stock', 'alerts_muted', 'discontinued', 'forecast_profile', 'reference_variant_id', 'reference_percent', 'is_bundle', 'shopify_created_at', 'snoozed_until',
     ];
 
     protected function casts(): array
@@ -85,6 +86,7 @@ class Variant extends Model
             'reference_percent' => 'integer',
             'is_bundle' => 'boolean',
             'shopify_created_at' => 'datetime',
+            'snoozed_until' => 'date',
         ];
     }
 

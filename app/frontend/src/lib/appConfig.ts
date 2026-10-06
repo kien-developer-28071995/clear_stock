@@ -1,4 +1,4 @@
-/** Server-provided config, injected by resources/views/app.blade.php. */
+/** Build-time config, written into index.html (%VITE_*%). */
 export interface AppConfig {
     appName: string;
 }

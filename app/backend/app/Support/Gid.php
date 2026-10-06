@@ -5,17 +5,18 @@ namespace App\Support;
 /** Shopify global ids: gid://shopify/ProductVariant/123 <-> 123 */
 final class Gid
 {
-    public static function id(?string $gid): ?int
+    /** Anything that is not a gid (a missing field, another type) is null: exports are read as they come. */
+    public static function id(mixed $gid): ?int
     {
-        if ($gid === null || ! preg_match('#/(\d+)$#', $gid, $m)) {
+        if (! is_string($gid) || ! preg_match('#/(\d{1,18})$#', $gid, $m)) {
             return null;
         }
 
         return (int) $m[1];
     }
 
-    public static function type(string $gid): ?string
+    public static function type(mixed $gid): ?string
     {
-        return preg_match('#^gid://shopify/([A-Za-z]+)/#', $gid, $m) ? $m[1] : null;
+        return is_string($gid) && preg_match('#^gid://shopify/([A-Za-z]+)/#', $gid, $m) ? $m[1] : null;
     }
 }

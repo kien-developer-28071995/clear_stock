@@ -14,7 +14,7 @@ class SyncFailingMail extends QueuedMailable
 
     public function envelope(): Envelope
     {
-        return new Envelope(subject: 'Action needed: '.config('shopify.app_name').' cannot sync '.($this->shop->name ?? $this->shop->domain));
+        return new Envelope(subject: self::subjectLine('Action needed: '.config('shopify.app_name').' cannot sync '.($this->shop->name ?? $this->shop->domain)));
     }
 
     public function content(): Content

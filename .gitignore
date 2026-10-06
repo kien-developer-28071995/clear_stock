@@ -16,3 +16,6 @@ Thumbs.db
 # Screenshots for review (make feature-screenshots, UI audits): regenerated, not kept in the repo
 /docs/screens/
 /docs/screen-feature/
+/app/frontend/dist/
+/app/frontend/.preview.pid
+/app/frontend/preview.html

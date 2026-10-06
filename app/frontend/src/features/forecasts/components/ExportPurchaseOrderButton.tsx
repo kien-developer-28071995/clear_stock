@@ -2,6 +2,7 @@ import { useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { http, ApiError, errorMessage } from '@/lib/http';
 import { useEntitlements, useFeature } from '@/hooks/useEntitlements';
+import { useReviewPrompt } from '@/hooks/useReviewPrompt';
 
 /**
  * Growth plan: download a purchase order of everything to reorder now (optionally one
@@ -28,6 +29,7 @@ export function ExportPurchaseOrderButton({ supplierId, locationId, variantIds, 
     const { purchase_orders: allowed } = useEntitlements();
     const exists = useFeature('purchase_orders');
     const [busy, setBusy] = useState(false);
+    const askForReview = useReviewPrompt();
 
     const exportCsv = async (format: Format) => {
         setBusy(true);
@@ -42,6 +44,7 @@ export function ExportPurchaseOrderButton({ supplierId, locationId, variantIds, 
                 const skipped = Number(headers.get('X-Skipped-Rows') ?? 0);
                 shopify.toast.show(skipped > 0 ? `${t('po.shopifyDone')} ${t('po.shopifySkipped', { count: skipped })}` : t('po.shopifyDone'));
             }
+            askForReview(); // the order is in the merchant's hands: a finished task
         } catch (e) {
             shopify.toast.show(e instanceof ApiError ? errorMessage(e) : t('errors.exportFailed'), { isError: true });
         } finally {

@@ -196,7 +196,8 @@
         "backorder_included": {
             "one": "{{count}} Stück ist bereits im Rückstand verkauft (Bestand unter null) und in der Bestellung enthalten.",
             "other": "{{count}} Stück sind bereits im Rückstand verkauft (Bestand unter null) und in der Bestellung enthalten."
-        }
+        },
+        "lasts_for_years": "{{stock}} auf Lager reichen bei diesem Tempo über 10 Jahre: nichts zu bestellen."
     },
     "ordered": "{{qty}} als bestellt markiert"
 }

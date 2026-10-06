@@ -14,7 +14,20 @@ class SalesEventRequest extends FormRequest
         $shopId = app(ShopContext::class)->shop()->id;
 
         return [
-            'name' => ['required', 'string', 'max:100'],
+            // The same event twice (same name and dates) would apply its change twice: x2 becomes x4.
+            'name' => ['required', 'string', 'max:100', function (string $attr, mixed $value, \Closure $fail) use ($shopId) {
+                $from = $this->input('starts_on');
+                $to = $this->input('ends_on');
+                if (! is_string($value) || ! is_string($from) || ! is_string($to) || strtotime($from) === false || strtotime($to) === false) {
+                    return; // the date rules report those
+                }
+                $twin = SalesEvent::query()->withoutGlobalScopes()->where('shop_id', $shopId)->where('name', trim($value))
+                    ->whereDate('starts_on', $from)->whereDate('ends_on', $to)
+                    ->when($this->route('event'), fn ($q, $id) => $q->where('id', '!=', (int) $id))->exists();
+                if ($twin) {
+                    $fail('unique');
+                }
+            }],
             'starts_on' => ['required', 'date_format:Y-m-d'],
             // At most ~3 months: longer changes are a new normal (adjust the sales rate instead).
             'ends_on' => ['required', 'date_format:Y-m-d', 'after_or_equal:starts_on', function (string $attr, mixed $value, \Closure $fail) {

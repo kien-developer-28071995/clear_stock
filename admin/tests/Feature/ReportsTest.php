@@ -181,6 +181,28 @@ class ReportsTest extends TestCase
         $fresh = (new FeatureUsage(new AppData))->all();
         $this->assertTrue($fresh['weekly_summary']['available']);
         $this->assertSame(1, count($fresh['weekly_summary']['shop_ids']));
+
+        // Features that store nothing: counted from the app's feature_events, last 28 days only.
+        $this->assertFalse($fresh['used_what_if']['available']);
+        [$first, $second] = $fresh['onboarded']['shop_ids'];
+        Schema::connection('app')->create('feature_events', function (Blueprint $t) {
+            $t->id();
+            $t->unsignedBigInteger('shop_id');
+            $t->string('feature');
+            $t->date('day');
+            $t->unsignedInteger('count');
+        });
+        DB::connection('app')->table('feature_events')->insert([
+            ['shop_id' => $first, 'feature' => 'what_if', 'day' => now('UTC')->toDateString(), 'count' => 3],
+            ['shop_id' => $first, 'feature' => 'what_if_export', 'day' => now('UTC')->subDay()->toDateString(), 'count' => 1],
+            ['shop_id' => $second, 'feature' => 'what_if', 'day' => now('UTC')->subDays(40)->toDateString(), 'count' => 9],
+            ['shop_id' => 999, 'feature' => 'purchase_plan', 'day' => now('UTC')->toDateString(), 'count' => 1],   // not installed
+        ]);
+        app(FeatureUsage::class)->forget();
+        $counted = (new FeatureUsage(new AppData))->all();
+        $this->assertSame([$first], $counted['used_what_if']['shop_ids']);
+        $this->assertTrue($counted['used_purchase_plan']['available']);
+        $this->assertSame([], $counted['used_purchase_plan']['shop_ids']);
     }
 
     public function test_feature_usage_compares_with_a_month_ago(): void

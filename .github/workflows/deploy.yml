@@ -128,6 +128,56 @@ jobs:
         run: |
           ssh -i ~/.ssh/id_deploy -p "${{ secrets.DEPLOY_PORT || 22 }}" "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}" \
             "cd '${{ secrets.DEPLOY_PATH }}' && IMAGE_PREFIX='${{ env.IMAGE_PREFIX }}' bash deploy.sh '${{ inputs.tag || needs.build.outputs.tag }}' ${{ inputs.migrate && '--migrate' || (vars.AUTO_MIGRATE != 'false' && '--migrate=auto' || '') }}"
+      # The app's frontend: a static site on its own domain (FRONTEND_URL), published apart from the
+      # backend containers. It goes to FRONTEND_DEPLOY_* when those secrets exist (its own server),
+      # else next to the backend. After the backend, so a new page never calls an older API.
+      - uses: actions/setup-node@v5
+        if: inputs.tag == ''
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: app/frontend/package-lock.json
+      - name: Build the app frontend
+        if: inputs.tag == ''
+        working-directory: app/frontend
+        env:
+          VITE_API_URL: ${{ vars.APP_URL }}
+          VITE_SHOPIFY_API_KEY: ${{ vars.SHOPIFY_API_KEY || secrets.SHOPIFY_API_KEY }}
+          VITE_APP_NAME: ${{ vars.SHOPIFY_APP_NAME || 'Clear Stock' }}
+          VITE_WEBSITE_URL: ${{ vars.WEBSITE_URL }}
+        run: npm ci && npm run build && npm run build:check
+      - name: Publish the app frontend (swapped in whole)
+        if: inputs.tag == ''
+        env:
+          HOST: ${{ secrets.FRONTEND_DEPLOY_HOST || secrets.DEPLOY_HOST }}
+          SSH_USER: ${{ secrets.FRONTEND_DEPLOY_USER || secrets.DEPLOY_USER }}
+          PORT: ${{ secrets.FRONTEND_DEPLOY_PORT || secrets.DEPLOY_PORT || 22 }}
+          TARGET: ${{ secrets.FRONTEND_DEPLOY_PATH || secrets.DEPLOY_PATH }}
+          KNOWN_HOSTS: ${{ secrets.FRONTEND_DEPLOY_KNOWN_HOSTS }}
+          SSH_KEY: ${{ secrets.FRONTEND_DEPLOY_SSH_KEY }}
+        run: |
+          key=~/.ssh/id_deploy
+          if [ -n "$SSH_KEY" ]; then key=~/.ssh/id_frontend; echo "$SSH_KEY" > "$key"; chmod 600 "$key"; fi
+          if [ -n "$KNOWN_HOSTS" ]; then echo "$KNOWN_HOSTS" >> ~/.ssh/known_hosts; fi
+          tar -C app/frontend/dist -czf "$RUNNER_TEMP/frontend.tgz" .
+          scp -i "$key" -P "$PORT" "$RUNNER_TEMP/frontend.tgz" "$SSH_USER@$HOST:$TARGET/frontend.tgz"
+          ssh -i "$key" -p "$PORT" "$SSH_USER@$HOST" \
+            "cd '$TARGET' && rm -rf frontend.new frontend.old && mkdir frontend.new && tar -xzf frontend.tgz -C frontend.new && rm frontend.tgz && chmod -R a+rX frontend.new && { [ ! -d frontend ] || mv frontend frontend.old; } && mv frontend.new frontend && rm -rf frontend.old"
+      # The live split, as a browser meets it: the frontend's page with the iframe protection
+      # header for a shop, and the API on the backend's domain answering a cross-origin preflight.
+      - name: Check the live frontend and API
+        if: inputs.tag == ''
+        env:
+          FRONTEND_URL: ${{ vars.FRONTEND_URL }}
+          API_URL: ${{ vars.APP_URL }}
+        run: |
+          page=$(curl -fsS -D "$RUNNER_TEMP/h" "$FRONTEND_URL/?shop=check.myshopify.com&embedded=1")
+          echo "$page" | grep -q 'name="shopify-api-key"' || { echo "::error::$FRONTEND_URL does not serve the app's page"; exit 1; }
+          tr -d '\r' < "$RUNNER_TEMP/h" | grep -qi '^content-security-policy: frame-ancestors https://check.myshopify.com https://admin.shopify.com' \
+            || { echo "::error::$FRONTEND_URL does not send the frame-ancestors header for the shop (deploy/Caddyfile)"; exit 1; }
+          curl -fsS -o /dev/null -X OPTIONS -H "Origin: $FRONTEND_URL" -H 'Access-Control-Request-Method: GET' -H 'Access-Control-Request-Headers: authorization' -D "$RUNNER_TEMP/c" "$API_URL/api/shop"
+          tr -d '\r' < "$RUNNER_TEMP/c" | grep -qi '^access-control-allow-origin:' || { echo "::error::$API_URL/api does not answer cross-origin requests"; exit 1; }
+          [ "$(curl -s -o /dev/null -w '%{http_code}' "$API_URL/api/shop")" = 401 ] || { echo "::error::$API_URL/api/shop should refuse a call without a session token (401)"; exit 1; }
       - uses: actions/setup-node@v5
         if: inputs.tag == '' && vars.WEBSITE_URL != ''
         with:

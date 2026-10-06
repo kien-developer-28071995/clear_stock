@@ -63,13 +63,15 @@ class ShopController extends Controller
     /** @return array{status: string, plan: string, feature: string, q: string, sort: string} */
     private function filters(Request $request): array
     {
-        $sort = (string) $request->query('sort', 'installed_at');
+        // A text value or nothing: an address can also carry arrays (?q[]=x), which are not filters.
+        $text = fn (string $key, string $default = ''): string => is_string($value = $request->query($key, $default)) ? $value : $default;
+        $sort = $text('sort', 'installed_at');
 
         return [
-            'status' => in_array($request->query('status'), ['installed', 'uninstalled', 'deleted'], true) ? $request->query('status') : '',
-            'plan' => in_array($request->query('plan'), ['free', 'starter', 'growth'], true) ? $request->query('plan') : '',
-            'feature' => (string) $request->query('feature', ''),
-            'q' => trim((string) $request->query('q', '')),
+            'status' => in_array($text('status'), ['installed', 'uninstalled', 'deleted'], true) ? $text('status') : '',
+            'plan' => in_array($text('plan'), ['free', 'starter', 'growth'], true) ? $text('plan') : '',
+            'feature' => $text('feature'),
+            'q' => trim($text('q')),
             'sort' => in_array($sort, self::SORTS, true) ? $sort : 'installed_at',
         ];
     }

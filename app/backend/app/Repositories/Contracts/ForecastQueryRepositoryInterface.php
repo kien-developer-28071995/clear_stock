@@ -55,6 +55,13 @@ interface ForecastQueryRepositoryInterface
     public function actionItems(Shop $shop, string $until, int $limit): Collection;
 
     /**
+     * Products put off until a later day ("not now"), soonest back first.
+     *
+     * @return array<int, array{variant_id: int, name: string, until: string}>
+     */
+    public function snoozed(Shop $shop, string $today, int $limit): array;
+
+    /**
      * Selling products with the fewest days of stock left (for the runway chart).
      *
      * @return Collection<int, Forecast>

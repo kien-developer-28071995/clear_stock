@@ -1,5 +1,5 @@
 import fs from 'node:fs';
-import { api, expect, open, pickNext, saveBar, setPlan, settled, test, toasts, variants, type PlanKey } from './support/app';
+import { api, expect, open, php, pickNext, saveBar, setPlan, settled, test, toasts, variants, type PlanKey } from './support/app';
 
 /**
  * Every screen and every feature, once per plan. Each plan block switches the dev shop
@@ -297,6 +297,73 @@ for (const plan of ['free', 'starter', 'growth'] as PlanKey[]) {
             for (const o of (await api<Orders>(app, '/manual-orders')).data.open) expect(await call(`/manual-orders/${o.id}`, 'PATCH', { status: 'cancelled' })).toBe(200);
         });
 
+        // Found by using the app by hand (2026-10-05); each was invisible to the tests above.
+        test('dialogs close after saving, cancelling an order asks first, and forms forget what was abandoned', async ({ app }) => {
+            type Orders = { data: { open: { id: number; variant_id: number }[] } };
+            const dialogOpen = (id: string) => app.locator(`s-modal#${id}`).evaluate((el) => !!el.shadowRoot?.querySelector('dialog[open]'));
+            const openOrders = async () => (await api<Orders>(app, '/manual-orders')).data.open;
+
+            // Earlier tests placed and closed orders: wait until the forecasts suggest ordering again.
+            const due = async () => (await api<{ data: { suggested_qty: number }[] }>(app, '/forecasts?status=reorder_now')).data.filter((r) => r.suggested_qty > 0).length;
+            await open(app, '/');
+            await expect.poll(due, { timeout: 30_000 }).toBeGreaterThan(0);
+
+            // Reorder list: what is due starts selected; marking it as ordered closes the dialog.
+            await open(app, '/reorder');
+            await expect(app.locator('s-button', { hasText: 'Mark as ordered' }).first()).not.toHaveAttribute('disabled');
+            await app.locator('s-button', { hasText: 'Mark as ordered' }).first().click();
+            await expect.poll(() => dialogOpen('mark-ordered-selected')).toBe(true);
+            await app.locator('s-modal#mark-ordered-selected s-button[slot="primary-action"]').click();
+            await expect.poll(() => toasts(app)).toContainEqual(expect.stringContaining('marked as ordered'));
+            await expect.poll(() => dialogOpen('mark-ordered-selected')).toBe(false);
+            const placed = await openOrders();
+            expect(placed.length).toBeGreaterThan(0);
+            // An out-of-stock product stays listed, but with nothing left to order or to tick.
+            await expect(app.getByText('Order 0', { exact: true })).toHaveCount(0);
+
+            // Orders placed: "Cancel order" asks first; backing out keeps the order.
+            await open(app, '/reorder/orders');
+            const cancelFirst = async () => {
+                await app.locator('s-table-row').getByRole('button', { name: /More actions/ }).first().click();
+                await app.getByRole('menuitem', { name: 'Cancel order' }).click();
+            };
+            await cancelFirst();
+            await expect(app.getByText('Cancel this order?')).toBeVisible();
+            await app.locator('s-button', { hasText: 'Keep order' }).click();
+            expect(await openOrders()).toHaveLength(placed.length);
+            for (let left = placed.length; left > 0; left--) {
+                await cancelFirst();
+                await app.locator('s-modal s-button[slot="primary-action"]', { hasText: 'Cancel order' }).click();
+                await expect.poll(async () => (await openOrders()).length).toBe(left - 1);
+                // The list on screen has caught up (the next click must not land on the row that just left).
+                await expect(app.locator('s-table-row').getByRole('button', { name: /More actions/ })).toHaveCount(left - 1);
+            }
+
+            await expect.poll(due, { timeout: 30_000 }).toBeGreaterThan(0); // back to where the test started
+
+            // A product's supplier shows in its settings (the list of suppliers loads after the product).
+            const withSupplier = (await api<{ data: { variant_id: number; supplier: string | null }[] }>(app, '/forecasts?per_page=50')).data.find((r) => r.supplier);
+            if (withSupplier) {
+                await open(app, `/products/${withSupplier.variant_id}?tab=settings`);
+                const shown = () => app.locator('s-section[heading="Product settings"] s-select[label="Supplier"]').evaluate((el) => el.shadowRoot?.querySelector('select')?.selectedOptions[0]?.textContent?.trim());
+                await expect.poll(shown).toBe(withSupplier.supplier);
+            }
+
+            // A form dismissed half-filled starts empty the next time.
+            if (await app.evaluate(async () => (await (await fetch('/api/shop', { headers: { Authorization: `Bearer ${await window.shopify.idToken()}` } })).json()).data.entitlements.features.sales_events)) {
+                await open(app, '/planning/events');
+                const add = app.locator('s-button', { hasText: 'Add event' }).first();
+                await add.evaluate((el: HTMLElement) => el.click());
+                const name = app.locator('s-modal#sales-event-modal').getByRole('textbox', { name: 'Name' });
+                await name.fill('Abandoned');
+                await app.keyboard.press('Escape');
+                await expect.poll(() => dialogOpen('sales-event-modal')).toBe(false);
+                await add.evaluate((el: HTMLElement) => el.click());
+                await expect(name).toHaveValue('');
+                await app.keyboard.press('Escape');
+            }
+        });
+
         test('unit costs can be entered in the app and feed the money figures', async ({ app }) => {
             type Costs = { data: { counts: { missing: number }; items: { variant_id: number; name: string; app_cost: number | null; cost: number | null }[] } };
             await open(app, '/costs');
@@ -545,7 +612,8 @@ for (const plan of ['free', 'starter', 'growth'] as PlanKey[]) {
 
             await open(app, '/orders');
             const row = app.locator('s-table-row', { hasText: 'E2E-PART' }).first();
-            await row.locator('s-button', { hasText: 'Part received' }).click();
+            await row.getByRole('button', { name: /More actions/ }).click();
+            await app.getByRole('menuitem', { name: 'Part received' }).click();
             await row.getByRole('spinbutton', { name: 'Received so far' }).fill('15');
             await row.locator('s-button', { hasText: 'Save' }).click();
             await expect.poll(async () => (await api<Orders>(app, '/manual-orders')).data.open.find((o) => o.id === order.id)?.received_quantity).toBe(15);
@@ -737,7 +805,8 @@ for (const plan of ['free', 'starter', 'growth'] as PlanKey[]) {
             const row = app.locator('s-table-row', { hasText: name });
             await expect(row).toContainText('9 days');
 
-            await row.locator('s-button', { hasText: 'Edit' }).click();
+            // The supplier's name opens it (Edit is also under More).
+            await row.locator('s-link', { hasText: name }).click();
             await modal.getByRole('spinbutton', { name: /lead time/i }).fill('11');
             // Order days: Monday and Thursday.
             await modal.getByRole('checkbox', { name: 'Mon' }).check();
@@ -886,6 +955,68 @@ for (const plan of ['free', 'starter', 'growth'] as PlanKey[]) {
             await expect.poll(() => toasts(app)).toContainEqual(expect.stringContaining('Draft transfer #T0001 created (30 units)'));
         });
 
+        test('snoozing takes a suggestion off the reorder list until it is brought back; the product page shows expected sales and what was changed', async ({ app }) => {
+            type Dash = { data: { actions: Record<string, { variant_id: number; suggested_qty: number }[]>; snoozed: { variant_id: number; name: string }[] } };
+            const dash = async () => (await api<Dash>(app, '/dashboard')).data;
+            const listed = async () => Object.values((await dash()).actions).flat().map((i) => i.variant_id).sort();
+            const dialogOpen = (id: string) => app.locator(`s-modal#${id}`).evaluate((el) => !!el.shadowRoot?.querySelector('dialog[open]'));
+
+            await open(app, '/reorder');
+            // What is due starts selected (earlier tests placed and cancelled orders: wait for the forecasts).
+            await expect.poll(async () => Object.values((await dash()).actions).slice(0, 2).flat().filter((i) => i.suggested_qty > 0).length, { timeout: 30_000 }).toBeGreaterThan(0);
+            await open(app, '/reorder');
+            const before = await listed();
+            expect((await dash()).snoozed).toEqual([]);
+            let snoozed: number[] = [];
+
+            try {
+                const button = app.locator('s-button', { hasText: /^Snooze$/ }).first();
+                await expect(button).not.toHaveAttribute('disabled');
+                await button.click();
+                await expect.poll(() => dialogOpen('snooze-selected')).toBe(true);
+                await expect(app.locator('s-modal#snooze-selected')).toContainText('then come');
+                await app.locator('s-modal#snooze-selected s-button[slot="primary-action"]').click();
+                await expect.poll(() => toasts(app)).toContainEqual(expect.stringMatching(/snoozed until/));
+                await expect.poll(() => dialogOpen('snooze-selected')).toBe(false);
+
+                snoozed = (await dash()).snoozed.map((s) => s.variant_id);
+                expect(snoozed.length).toBeGreaterThan(0);
+                expect(await listed()).toEqual(before.filter((id) => !snoozed.includes(id)));
+                // The list of what is snoozed, each with the day it comes back.
+                await expect(app.getByText(`Snoozed · ${snoozed.length}`)).toBeVisible();
+                await expect(app.getByText(/^Back on /).first()).toBeVisible();
+
+                // The product itself says so, its forecast unchanged, and the change is in its history.
+                await open(app, `/products/${snoozed[0]}`);
+                await expect(app.getByText(/Snoozed: out of the reorder list and alert emails until/)).toBeVisible();
+                await expect(app.getByText('Expected sales')).toBeVisible();
+                await expect(app.getByText(/^Next 30 days \(to /)).toBeVisible();
+                await app.locator('s-press-button', { hasText: 'History' }).click();
+                await expect(app).toHaveURL(/tab=history/);
+                await expect(app.locator('s-table-row', { hasText: 'Snoozed until' }).first()).toBeVisible();
+
+                // Bringing it back from the product page puts it on the list again.
+                await app.locator('s-button', { hasText: 'Bring back' }).first().click();
+                await expect.poll(() => toasts(app)).toContainEqual(expect.stringMatching(/is back in the reorder list/));
+                await expect(app.getByText(/Snoozed: out of the reorder list/)).toHaveCount(0);
+                expect((await dash()).snoozed.map((s) => s.variant_id)).toEqual(snoozed.slice(1));
+
+                // The rest from the reorder page, one by one.
+                await open(app, '/reorder');
+                for (let left = snoozed.length - 1; left > 0; left--) {
+                    await app.locator('s-button', { hasText: 'Bring back' }).first().click();
+                    await expect.poll(async () => (await dash()).snoozed.length).toBe(left - 1);
+                    await expect(app.locator('s-button', { hasText: 'Bring back' })).toHaveCount(left - 1);
+                }
+                await expect(app.getByText(/^Snoozed · /)).toHaveCount(0);
+                expect(await listed()).toEqual(before);
+            } finally {
+                // Whatever happened above, nothing stays snoozed in the dev shop.
+                const still = (await dash()).snoozed.map((s) => s.variant_id);
+                if (still.length > 0) await api(app, '/snooze', { method: 'POST', body: { variant_ids: still, days: null } });
+            }
+        });
+
         test('plans page marks the current plan and upgrades go through Shopify billing', async ({ app }) => {
             // Billing itself is Shopify's: answer the API call with a fake approval URL.
             let requested: unknown = null;
@@ -920,5 +1051,63 @@ for (const plan of ['free', 'starter', 'growth'] as PlanKey[]) {
         });
     });
 }
+
+test('asks for a review once, after a finished task, and the feedback box sends a message', async ({ app }) => {
+    const mayAsk = async () => (await api<{ data: { review_prompt: boolean } }>(app, '/shop')).data.review_prompt;
+    const asked = () => app.evaluate(() => window.__e2e.reviewRequests);
+    const reset = () => php('App\\Models\\Shop::first()->update(["review_prompted_at" => null, "review_prompt_result" => null]); echo json_encode(true);');
+    const exportOrder = async () => {
+        const download = app.waitForEvent('download');
+        await app.getByRole('button', { name: 'Export purchase order' }).first().click();
+        await app.getByRole('menuitem', { name: 'Spreadsheet (CSV)' }).click();
+        await download;
+    };
+    setPlan('starter');
+    reset();
+
+    try {
+        // Opening the app asks for nothing.
+        await open(app, '/reorder');
+        expect(await mayAsk()).toBe(true);
+        await app.waitForTimeout(3000);
+        expect(await asked()).toBe(0);
+
+        // Shopify did not show its dialog this time (cooldown): the shop may be asked another day.
+        await exportOrder();
+        await expect.poll(asked, { timeout: 10_000 }).toBe(1);
+        await exportOrder(); // once per visit
+        await app.waitForTimeout(3500);
+        expect(await asked()).toBe(1);
+        expect(await mayAsk()).toBe(true);
+
+        // Next visit the dialog is shown: never asked again.
+        await open(app, '/reorder');
+        await app.evaluate(() => (window.__e2e.reviewCode = 'success'));
+        await exportOrder();
+        await expect.poll(asked, { timeout: 10_000 }).toBe(1);
+        await expect.poll(mayAsk).toBe(false);
+        await open(app, '/reorder');
+        await exportOrder();
+        await app.waitForTimeout(3500);
+        expect(await asked()).toBe(0);
+
+        // Feedback box in Settings: nothing to send until something is written; the form starts clean each time.
+        await open(app, '/settings?tab=general');
+        const modal = app.locator('s-modal#feedback-modal');
+        const sendButton = modal.locator('s-button[slot="primary-action"]');
+        await app.locator('s-button', { hasText: 'Send feedback' }).click();
+        await expect(sendButton).toHaveAttribute('disabled');
+        await modal.getByRole('textbox', { name: 'Your message' }).fill('Abandoned draft');
+        await app.keyboard.press('Escape');
+        await app.locator('s-button', { hasText: 'Send feedback' }).click();
+        await expect(modal.getByRole('textbox', { name: 'Your message' })).toHaveValue('');
+        await modal.getByRole('textbox', { name: 'Your message' }).fill('E2E: the explanations are clear.');
+        await expect(sendButton).not.toHaveAttribute('disabled');
+        await sendButton.click();
+        await expect.poll(() => toasts(app)).toContainEqual('Feedback sent. Thank you!');
+    } finally {
+        reset();
+    }
+});
 
 test.afterAll(() => setPlan('free'));

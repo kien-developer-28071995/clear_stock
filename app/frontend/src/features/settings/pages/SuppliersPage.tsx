@@ -103,7 +103,8 @@ export function SuppliersPage() {
                                 <s-table-row key={s.id}>
                                     <s-table-cell>
                                         <s-stack gap="small-100">
-                                            <s-text type="strong">{s.name}</s-text>
+                                            {/* The name opens the supplier: two buttons per row are enough, also on a phone. */}
+                                            <s-link onClick={() => openEdit(s)}>{s.name}</s-link>
                                             {s.email && <s-text color="subdued">{s.email}</s-text>}
                                             {s.last_emailed_at && <s-text color="subdued">{t('supplierEmail.lastSent', { when: timeAgo(s.last_emailed_at) })}</s-text>}
                                             {emailsExist && s.auto_email && (canAutoEmail ? <s-badge>{t('supplierEmail.autoBadge')}</s-badge> : <s-badge tone="warning">{t('supplierEmail.autoPaused')}</s-badge>)}
@@ -134,13 +135,13 @@ export function SuppliersPage() {
                                     </s-table-cell>
                                     <s-table-cell>
                                         <s-stack direction="inline" gap="small-200" alignItems="center">
-                                            <s-button onClick={() => openEdit(s)}>{t('common.edit')}</s-button>
                                             <ExportPurchaseOrderButton supplierId={s.id} label={t('po.short')} />
                                             <s-button accessibilityLabel={t('suppliers.moreActions', { name: s.name })} commandFor={`supplier-menu-${s.id}`} command="--toggle">
                                                 {t('common.more')}
                                             </s-button>
                                         </s-stack>
                                         <s-menu id={`supplier-menu-${s.id}`} accessibilityLabel={t('suppliers.moreActions', { name: s.name })}>
+                                            <s-button onClick={() => openEdit(s)}>{t('common.edit')}</s-button>
                                             <s-button onClick={() => assignProducts(s)}>{t('suppliers.assign')}</s-button>
                                             {emailsExist && (
                                                 <s-button icon={canEmail ? 'email' : 'lock'} disabled={!canEmail || !s.email || undefined} onClick={() => openEmail(s)}>

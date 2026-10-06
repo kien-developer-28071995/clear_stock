@@ -25,6 +25,7 @@ class ForecastAdjustmentService
         private readonly ForecastRepositoryInterface $forecasts,
         private readonly VariantRepositoryInterface $variants,
         private readonly ForecastService $engine,
+        private readonly ChangeLogService $changes,
     ) {}
 
     /**
@@ -32,17 +33,21 @@ class ForecastAdjustmentService
      */
     public function setOverrides(Shop $shop, Variant $variant, array $overrides): void
     {
+        $before = $variant->overrides()->active()->get()->mapWithKeys(fn ($o) => ['override.'.$o->field->value => (float) $o->value])->all();
+        $after = [];
         foreach (OverrideField::cases() as $field) {
             if (! array_key_exists($field->value, $overrides)) {
                 continue;
             }
             $o = $overrides[$field->value];
+            $after['override.'.$field->value] = $o === null || $o['value'] === null ? null : (float) $o['value'];
             if ($o === null || $o['value'] === null) {
                 $this->forecasts->removeOverride($shop, $variant->id, $field->value);
             } else {
                 $this->forecasts->setOverride($shop, $variant->id, $field->value, (float) $o['value'], $o['note'] ?? null, $o['expires_at'] ?? null);
             }
         }
+        $this->changes->record($shop, $variant->id, $before, $after);
 
         $this->engine->runForShop($shop, [$variant->id]);
     }
@@ -53,7 +58,9 @@ class ForecastAdjustmentService
         $this->assertMinBelowMax($settings + $variant->only(['min_stock', 'max_stock']));
         $settings += $this->referenceSettings($shop, $variant, $reference);
         $wasDiscontinued = $variant->discontinued;
+        $before = $variant->only(array_keys($settings));
         $variant = $this->variants->updateSettings($variant, $settings);
+        $this->changes->record($shop, $variant->id, $before, $settings);
         $this->engine->runForShop($shop, [$variant->id]);
         if ($variant->discontinued !== $wasDiscontinued) {
             $this->refreshLimitedPlan($shop);
@@ -91,7 +98,9 @@ class ForecastAdjustmentService
         )));
 
         $this->assertMinBelowMax($settings);
+        $before = $settings === [] ? [] : $this->variants->findMany($shop, $variantIds)->mapWithKeys(fn (Variant $v) => [$v->id => $v->only(array_keys($settings))])->all();
         $updated = $this->variants->bulkUpdateSettings($shop, $variantIds, $settings);
+        $this->changes->recordMany($shop, $before, $settings);
         RecomputeForecasts::dispatch($shop->id, $variantIds);
         if (array_key_exists('discontinued', $settings)) {
             $this->refreshLimitedPlan($shop);

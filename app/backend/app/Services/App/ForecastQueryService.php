@@ -5,6 +5,8 @@ namespace App\Services\App;
 use App\Models\Forecast;
 use App\Models\Shop;
 use App\Repositories\Contracts\ForecastQueryRepositoryInterface;
+use App\Services\Forecast\DemandProjection;
+use App\Support\Features;
 use App\Support\ForecastStatusResolver;
 use Carbon\CarbonImmutable;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -15,7 +17,31 @@ class ForecastQueryService
 
     private const EXPORT_CHUNK = 500;
 
-    public function __construct(private readonly ForecastQueryRepositoryInterface $forecasts) {}
+    public function __construct(
+        private readonly ForecastQueryRepositoryInterface $forecasts,
+        private readonly SalesEventService $salesEvents,
+        private readonly DemandProjection $projection,
+    ) {}
+
+    /**
+     * Expected sales over the next 30/60/90 days next to the stock there is. Null when switched
+     * off, for a product that does not sell, and for one no longer reordered.
+     *
+     * @return ?array<int, array{days: int, until: string, units: int, shortfall: int, events: bool}>
+     */
+    public function projection(Shop $shop, Forecast $forecast): ?array
+    {
+        $variant = $forecast->variant;
+        if (! Features::on('demand_projection') || (float) $forecast->avg_daily_sales <= 0 || $variant->discontinued) {
+            return null;
+        }
+
+        return $this->projection->project(
+            $this->today($shop), (float) $forecast->avg_daily_sales,
+            $this->salesEvents->matcher($shop)->for($variant->id, $variant->supplier_id),
+            (int) $forecast->current_stock, (int) $forecast->incoming_stock,
+        );
+    }
 
     /**
      * Every product matching the list filters, as CSV rows (header first). Read page by page:

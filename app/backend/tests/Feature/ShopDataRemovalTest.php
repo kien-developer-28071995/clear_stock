@@ -21,6 +21,8 @@ it('leaves no row of the shop in any table after shop/redact, including the newe
     DB::table('inventory_snapshots')->insert(['shop_id' => $shop->id, 'date' => '2026-09-01', 'units' => 1, 'value' => 1, 'products_in_stock' => 1, 'products_missing_cost' => 0, 'created_at' => $now, 'updated_at' => $now]);
     DB::table('location_minimums')->insert(['shop_id' => $shop->id, 'variant_id' => $variant->id, 'location_id' => $location->id, 'min_stock' => 5, 'created_at' => $now, 'updated_at' => $now]);
     DB::table('variant_suppliers')->insert(['shop_id' => $shop->id, 'variant_id' => $variant->id, 'supplier_id' => $supplier->id, 'created_at' => $now, 'updated_at' => $now]);
+    DB::table('change_logs')->insert(['shop_id' => $shop->id, 'variant_id' => $variant->id, 'field' => 'min_stock', 'new_value' => '5', 'source' => 'app', 'created_at' => $now]);
+    DB::table('feature_events')->insert(['shop_id' => $shop->id, 'feature' => 'what_if', 'day' => '2026-09-01', 'count' => 2]);
     DB::table('saved_views')->insert(['shop_id' => $keep->id, 'name' => 'Theirs', 'filters' => '{}', 'created_at' => $now, 'updated_at' => $now]);
 
     app(ShopLifecycleService::class)->redactShop('gone.myshopify.com');

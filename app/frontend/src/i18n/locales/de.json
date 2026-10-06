@@ -160,7 +160,9 @@
     "seeAll_one": "{{count}} ansehen",
     "seeAll_other": "Alle {{count}} ansehen",
     "dataSynced": "Daten synchronisiert {{when}}",
-    "notSyncedYet": "Warten auf die erste Synchronisierung"
+    "notSyncedYet": "Warten auf die erste Synchronisierung",
+    "failedHeading": "Deine Shop-Daten konnten nicht importiert werden",
+    "failedBody": "Der Import aus Shopify wurde nicht abgeschlossen, daher gibt es noch nichts zu prognostizieren. Den Grund und einen neuen Versuch findest du unten unter „Shopdaten“."
   },
   "actions": {
     "noneLeft": "0 übrig",
@@ -190,7 +192,8 @@
         "title": "Diese Woche bestellen",
         "hint": "Bestelldatum in den nächsten 7 Tagen"
       }
-    }
+    },
+    "nothingMore": "Nichts weiter zu bestellen"
   },
   "runway": {
     "heading": "Bestandsreichweite",
@@ -743,7 +746,8 @@
     "trend_down_one": "Verkauft sich am letzten Tag {{percent}} % langsamer ({{recent}}/Tag) als in den {{days}} Tagen davor ({{baseline}}/Tag).",
     "trend_down_other": "Verkauft sich in den letzten {{count}} Tagen {{percent}} % langsamer ({{recent}}/Tag) als in den {{days}} Tagen davor ({{baseline}}/Tag).",
     "backorder_included_one": "{{count}} Stück ist bereits im Rückstand verkauft (Bestand unter null) und in der Bestellung enthalten.",
-    "backorder_included_other": "{{count}} Stück sind bereits im Rückstand verkauft (Bestand unter null) und in der Bestellung enthalten."
+    "backorder_included_other": "{{count}} Stück sind bereits im Rückstand verkauft (Bestand unter null) und in der Bestellung enthalten.",
+    "lasts_for_years": "{{stock}} auf Lager reichen bei diesem Tempo über 10 Jahre: nichts zu bestellen."
   },
   "import": {
     "fromStocky": "Aus Stocky importieren",
@@ -1168,7 +1172,10 @@
     "link_other": "Aufgegebene Bestellungen ({{count}})",
     "receivePart": "Teilweise erhalten",
     "receivedSoFar": "Bisher erhalten",
-    "partReceived": "{{received}} erhalten, der Rest ist unterwegs"
+    "partReceived": "{{received}} erhalten, der Rest ist unterwegs",
+    "confirmCancelHeading": "Diese Bestellung stornieren?",
+    "confirmCancel": "„{{name}}“ ({{qty}} Stück) zählt nicht mehr als unterwegs und kann wieder vorgeschlagen werden.",
+    "keep": "Bestellung behalten"
   },
   "costs": {
     "intro": "Lagerwert, gebundenes Kapital sowie Bestell- und Plansummen brauchen die Stückkosten jedes Produkts. Gib hier Kosten für Produkte ein, die in Shopify keine haben, oder um deine echten Einstandskosten zu verwenden. Sie haben in der App Vorrang vor den Shopify-Kosten; Shopify selbst wird nicht geändert.",
@@ -1377,7 +1384,8 @@
     "product": {
       "forecast": "Prognose",
       "settings": "Einstellungen",
-      "suppliers": "Lieferanten"
+      "suppliers": "Lieferanten",
+      "history": "Verlauf"
     },
     "insights": {
       "stock": "Bestand",
@@ -1394,5 +1402,81 @@
   "sections": {
     "toOrder": "Zu bestellen",
     "allProducts": "Alle Produkte"
+  },
+  "snooze": {
+    "action": "Zurückstellen",
+    "heading": "Bestellvorschläge zurückstellen",
+    "introOne": "{{name}} verschwindet aus der Nachbestellliste und den Warn-E-Mails und kommt von selbst zurück.",
+    "intro_one": "{{count}} Produkt verschwindet aus der Nachbestellliste und den Warn-E-Mails und kommt von selbst zurück.",
+    "intro_other": "{{count}} Produkte verschwinden aus der Nachbestellliste und den Warn-E-Mails und kommen von selbst zurück.",
+    "for": "Zurückstellen für",
+    "help": "Die Prognose ändert sich nicht. Du kannst ein Produkt jederzeit über die Liste „Zurückgestellt“ zurückholen.",
+    "confirm": "Zurückstellen",
+    "done_one": "{{count}} Produkt bis {{date}} zurückgestellt",
+    "done_other": "{{count}} Produkte bis {{date}} zurückgestellt",
+    "listHeading_one": "Zurückgestellt · {{count}}",
+    "listHeading_other": "Zurückgestellt · {{count}}",
+    "until": "Zurück am {{date}}",
+    "bringBack": "Zurückholen",
+    "bringBackNamed": "{{name}} zurückholen",
+    "back": "{{name}} ist wieder in der Nachbestellliste",
+    "productNote": "Zurückgestellt: bis {{date}} nicht in der Nachbestellliste und den Warn-E-Mails."
+  },
+  "projection": {
+    "heading": "Erwarteter Absatz",
+    "period_one": "Nächster {{count}} Tag (bis {{date}})",
+    "period_other": "Nächste {{count}} Tage (bis {{date}})",
+    "short_one": "{{qty}} Stück mehr, als dein Bestand deckt",
+    "short_other": "{{qty}} Stück mehr, als dein Bestand deckt",
+    "covered": "Durch deinen Bestand gedeckt",
+    "basis": "Bei {{rate}}/Tag. Der Bestand zählt Lagerbestand plus Ware im Zulauf.",
+    "basisEvents": "Bei {{rate}}/Tag, deine Verkaufsaktionen an ihren Tagen eingerechnet. Der Bestand zählt Lagerbestand plus Ware im Zulauf."
+  },
+  "history": {
+    "heading": "Änderungen an diesem Produkt",
+    "none": "Noch keine Änderungen. Einstellungen und Prognoseanpassungen, die du änderst, erscheinen hier.",
+    "what": "Änderung",
+    "from": "Von",
+    "to": "Auf",
+    "when": "Wann",
+    "empty": "Nicht gesetzt",
+    "on": "An",
+    "off": "Aus",
+    "kept": "Änderungen werden 180 Tage aufbewahrt.",
+    "sources": {
+      "bulk": "Sammelbearbeitung",
+      "import": "Import",
+      "extension": "Shopify-Produktseite"
+    },
+    "fields": {
+      "supplier": "Lieferant",
+      "lead_time_override": "Lieferzeit (Tage)",
+      "safety_days": "Sicherheitsbestand (Tage)",
+      "min_order_qty": "Mindestbestellmenge",
+      "pack_size": "Packungsgröße",
+      "min_stock": "Min (nachbestellen bei)",
+      "max_stock": "Max (auffüllen bis)",
+      "alerts_muted": "Warnungen stumm",
+      "discontinued": "Ausgelaufen",
+      "forecast_profile": "Mittelung der Verkaufsrate",
+      "supplier_sku": "Artikelnummer des Lieferanten",
+      "reference": "Ähnliches Produkt",
+      "reference_percent": "Anteil an der Rate des ähnlichen Produkts (%)",
+      "cost_override": "Stückkosten",
+      "snoozed_until": "Zurückgestellt bis",
+      "override_avg_daily_sales": "Verkäufe pro Tag (deine Anpassung)",
+      "override_lead_time_days": "Lieferzeit (deine Anpassung)",
+      "override_safety_days": "Sicherheitstage (deine Anpassung)"
+    }
+  },
+  "feedback": {
+    "heading": "Feedback",
+    "body": "Fehlt etwas, ist etwas falsch oder unklar? Sag es uns. Es geht direkt an die Menschen, die die App bauen.",
+    "open": "Feedback senden",
+    "message": "Deine Nachricht",
+    "email": "Deine E-Mail (optional)",
+    "emailHelp": "Nur wenn du eine Antwort möchtest.",
+    "send": "Senden",
+    "sent": "Feedback gesendet. Danke!"
   }
 }

@@ -13,7 +13,7 @@ import { whatIfApi } from '@/features/whatif/api/whatIfApi';
 import { ApiError, errorMessage } from '@/lib/http';
 import type { Horizon, WhatIfItem, WhatIfParams, WhatIfSide, WhatIfTotals } from '@/features/whatif/types';
 import { formatDate, formatMoney, formatNumber } from '@/utils/format';
-import { NO_VALUE, fromOption, optionValue } from '@/utils/select';
+import { NO_VALUE, fromOption, optionValue, optionsKey } from '@/utils/select';
 
 const PRESETS = [-20, 10, 20, 50, 100];
 const HORIZONS: Horizon[] = [0, 14, 30];
@@ -150,6 +150,7 @@ function WhatIfView() {
                         </s-select>
                         {suppliers.length > 0 && (
                             <s-select
+                                key={optionsKey(suppliers.length)}
                                 label={t('table.supplier')}
                                 value={optionValue(params.supplier_id)}
                                 onChange={(e) => update({ supplier_id: fromOption(e.currentTarget.value) ? Number(e.currentTarget.value) : '' })}
@@ -161,7 +162,8 @@ function WhatIfView() {
                             </s-select>
                         )}
                         {vendors.length > 1 && (
-                            <s-select label={t('products.vendor')} value={optionValue(params.vendor)} onChange={(e) => update({ vendor: fromOption(e.currentTarget.value) })}>
+                            <s-select
+                                key={optionsKey(vendors.length)} label={t('products.vendor')} value={optionValue(params.vendor)} onChange={(e) => update({ vendor: fromOption(e.currentTarget.value) })}>
                                 <s-option value={NO_VALUE}>{t('products.allVendors')}</s-option>
                                 {vendors.map((v) => (
                                     <s-option key={v} value={v}>{v}</s-option>

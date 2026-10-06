@@ -6,7 +6,7 @@ import { FORECAST_PROFILES, type ForecastDetail, type ForecastProfile } from '@/
 import { formatNumber } from '@/utils/format';
 import { SaveBar } from '@/components/ui/SaveBar';
 import { useSuppliers } from '@/features/settings/hooks/useSettings';
-import { NO_VALUE, fromOption, optionValue } from '@/utils/select';
+import { NO_VALUE, fromOption, optionValue, optionsKey } from '@/utils/select';
 import { pickVariants } from '@/lib/resourcePicker';
 import { UpgradePrompt } from '@/components/ui/UpgradePrompt';
 import { useEntitlements, useFeature } from '@/hooks/useEntitlements';
@@ -113,6 +113,7 @@ export function ProductSettingsForm({ f }: { f: ForecastDetail }) {
             <s-stack gap="base">
                 <s-heading>{t('productSettings.groups.supplier')}</s-heading>
                 <s-select
+                    key={optionsKey(suppliers.data?.length ?? 0)}
                     label={t('table.supplier')}
                     value={optionValue(supplierId)}
                     error={fieldError(update.error, 'supplier_id')}

@@ -13,9 +13,11 @@ use App\Models\Shop;
 use App\Repositories\Contracts\CatalogRepositoryInterface;
 use App\Repositories\Contracts\VariantRepositoryInterface;
 use App\Services\App\AlternateSupplierService;
+use App\Services\App\ChangeLogService;
 use App\Services\App\ForecastAccuracyService;
 use App\Services\App\ForecastAdjustmentService;
 use App\Services\App\ForecastQueryService;
+use App\Services\App\SnoozeService;
 use App\Support\Csv;
 use App\Support\Entitlements;
 use App\Support\Features;
@@ -107,6 +109,27 @@ class ForecastController extends Controller
         return $this->detail($request, $context->shop(), $variant);
     }
 
+    /** What was changed on this product (settings, forecast adjustments), newest first. */
+    public function changes(ShopContext $context, ChangeLogService $changes, int $variant): JsonResponse
+    {
+        $shop = $context->shop();
+        $this->variants->find($shop, $variant) ?? throw ApiException::notFound('product');
+
+        return response()->json(['data' => $changes->list($shop, $variant)]);
+    }
+
+    /** "Not now": keep products out of the reorder list and alert emails for some days (null = bring back). */
+    public function snooze(Request $request, ShopContext $context, SnoozeService $snooze): JsonResponse
+    {
+        $data = $request->validate([
+            'variant_ids' => ['required', 'array', 'min:1', 'max:500'],
+            'variant_ids.*' => ['required', 'integer', 'distinct'],
+            'days' => ['present', 'nullable', 'integer', 'min:1', 'max:'.SnoozeService::MAX_DAYS],
+        ]);
+
+        return response()->json(['data' => $snooze->snooze($context->shop(), $data['variant_ids'], $data['days'])]);
+    }
+
     public function updateOverrides(OverrideRequest $request, ShopContext $context, int $variant): JsonResponse
     {
         $shop = $context->shop();
@@ -147,6 +170,7 @@ class ForecastController extends Controller
         $request->attributes->set('accuracy', $this->accuracy->forVariant($shop, $variantId));
         $request->attributes->set('alternate_suppliers', $this->alternates->list($shop, $variantId));
         $request->attributes->set('previous', $this->accuracy->previousWeek($shop, $variantId));
+        $request->attributes->set('projection', $this->query->projection($shop, $forecast));
         $request->attributes->set('by_location', $entitlements->has(Feature::Locations)
             ? $this->query->byLocation($shop, $variantId)
             : null);

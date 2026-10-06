@@ -89,8 +89,6 @@ services:
     command: ["sh", "-c", "npm install --no-audit --no-fund && npm run dev"]
     volumes:
       - ./app/frontend:/app/frontend
-      - ./app/backend/public:/app/backend/public
-      - ./app/backend/resources/views:/app/backend/resources/views:ro
     environment:
       npm_config_cache: /app/frontend/.npm-cache
 

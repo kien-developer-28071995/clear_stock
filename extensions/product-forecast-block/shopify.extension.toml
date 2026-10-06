@@ -3,6 +3,9 @@ api_version = "2026-07"
 # Forecast of the product (each variant) on the Shopify product page, and of one variant on
 # the variant page, with the plain-language "why" and a link into the app.
 # Data: GET /api/extension/products/{id} or /api/extension/variants/{id}.
+#
+# Shopify accepts one target per extension ("Extension targeting config should have just one of
+# the following targets"), so the same module is registered once per page it appears on.
 [[extensions]]
 type = "ui_extension"
 name = "t:name"
@@ -12,6 +15,12 @@ uid = "1b921fad-089f-4edb-ba09-d3c6280a2a82"
   [[extensions.targeting]]
   target = "admin.product-details.block.render"
   module = "./src/ProductForecastBlock.tsx"
+
+[[extensions]]
+type = "ui_extension"
+name = "t:name"
+handle = "variant-forecast-block"
+uid = "18229aab-6883-4380-b268-dbf5b1918817"
 
   [[extensions.targeting]]
   target = "admin.product-variant-details.block.render"

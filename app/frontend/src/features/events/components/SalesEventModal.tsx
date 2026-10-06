@@ -1,4 +1,5 @@
 import { useEffect, useState, type RefObject } from 'react';
+import { useSubmitOnce } from '@/hooks/useSubmitOnce';
 import { useTranslation } from 'react-i18next';
 import type { ModalElement } from '@/hooks/useModal';
 import { fieldError } from '@/lib/http';
@@ -6,7 +7,7 @@ import { pickVariants, type PickedVariant } from '@/lib/resourcePicker';
 import { useSuppliers } from '@/features/settings/hooks/useSettings';
 import { useCreateSalesEvent, useUpdateSalesEvent } from '@/features/events/hooks/useSalesEvents';
 import type { EventScope, SalesEvent } from '@/features/events/types';
-import { NO_VALUE, fromOption, optionValue } from '@/utils/select';
+import { NO_VALUE, fromOption, optionValue, optionsKey } from '@/utils/select';
 
 interface Props {
     modalRef: RefObject<ModalElement | null>;
@@ -21,6 +22,7 @@ const toMultiplier = (p: string) => Math.round((1 + Number(p) / 100) * 100) / 10
 export function SalesEventModal({ modalRef, event, onDone }: Props) {
     const { t } = useTranslation();
     const create = useCreateSalesEvent();
+    const once = useSubmitOnce();
     const update = useUpdateSalesEvent();
     const mutation = event ? update : create;
     const suppliers = useSuppliers().data ?? [];
@@ -34,7 +36,9 @@ export function SalesEventModal({ modalRef, event, onDone }: Props) {
     // Picked in this dialog (gids + names), or the saved products (local ids, count only).
     const [picked, setPicked] = useState<PickedVariant[] | null>(null);
 
-    useEffect(() => {
+    // Back to what is saved (or empty for a new one): when another one is opened, and each time the
+    // dialog opens, so reopening the same one never shows what was typed and abandoned before.
+    const reset = () => {
         setName(event?.name ?? '');
         setFrom(event?.starts_on ?? '');
         setTo(event?.ends_on ?? '');
@@ -45,6 +49,9 @@ export function SalesEventModal({ modalRef, event, onDone }: Props) {
         setPicked(null);
         create.reset();
         update.reset();
+    };
+    useEffect(() => {
+        reset();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [event]);
 
@@ -60,9 +67,11 @@ export function SalesEventModal({ modalRef, event, onDone }: Props) {
             supplier_id: scope === 'supplier' && supplierId ? Number(supplierId) : null,
             variant_ids: scope === 'products' ? (picked ? picked.map((p) => p.gid) : event?.variant_ids ?? []) : null,
         };
-        const options = { onSuccess: () => { shopify.toast.show(event ? t('events.updated') : t('events.added')); onDone(); } };
-        if (event) update.mutate({ id: event.id, ...body }, options);
-        else create.mutate(body, options);
+        once((done) => {
+            const options = { onSuccess: () => { shopify.toast.show(event ? t('events.updated') : t('events.added')); onDone(); }, onSettled: done };
+            if (event) update.mutate({ id: event.id, ...body }, options);
+            else create.mutate(body, options);
+        });
     };
     const pick = async () => {
         const list = await pickVariants({ multiple: true, selected: picked?.map((p) => p.gid) });
@@ -70,7 +79,7 @@ export function SalesEventModal({ modalRef, event, onDone }: Props) {
     };
 
     return (
-        <s-modal ref={modalRef} id="sales-event-modal" heading={event ? t('events.edit') : t('events.add')}>
+        <s-modal ref={modalRef} id="sales-event-modal" onShow={reset} heading={event ? t('events.edit') : t('events.add')}>
             <s-stack gap="base">
                 <s-text-field label={t('events.name')} placeholder={t('events.namePlaceholder')} value={name} error={fieldError(mutation.error, 'name')} onInput={(e) => setName(e.currentTarget.value)} />
                 <s-grid gridTemplateColumns="1fr 1fr" gap="base">
@@ -100,7 +109,8 @@ export function SalesEventModal({ modalRef, event, onDone }: Props) {
                     <s-option value="products">{t('events.scope.products')}</s-option>
                 </s-select>
                 {scope === 'supplier' && (
-                    <s-select label={t('table.supplier')} value={optionValue(supplierId)} error={fieldError(mutation.error, 'supplier_id')} onChange={(e) => setSupplierId(fromOption(e.currentTarget.value))}>
+                    <s-select
+                        key={optionsKey(suppliers.length)} label={t('table.supplier')} value={optionValue(supplierId)} error={fieldError(mutation.error, 'supplier_id')} onChange={(e) => setSupplierId(fromOption(e.currentTarget.value))}>
                         <s-option value={NO_VALUE}>{t('events.pickSupplier')}</s-option>
                         {suppliers.map((s) => (
                             <s-option key={s.id} value={String(s.id)}>{s.name}</s-option>

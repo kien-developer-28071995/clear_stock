@@ -227,7 +227,8 @@
             "one": "{{count}} unidad ya está vendida sin stock (stock bajo cero) y se incluye en el pedido.",
             "other": "{{count}} unidades ya están vendidas sin stock (stock bajo cero) y se incluyen en el pedido.",
             "many": "{{count}} unidades ya están vendidas sin stock (stock bajo cero) y se incluyen en el pedido."
-        }
+        },
+        "lasts_for_years": "{{stock}} en stock duran más de 10 años a este ritmo: nada que pedir."
     },
     "ordered": "{{qty}} marcadas como pedidas"
 }

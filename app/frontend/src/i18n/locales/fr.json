@@ -165,7 +165,9 @@
     "seeAll_other": "Voir les {{count}}",
     "seeAll_many": "Voir les {{count}}",
     "dataSynced": "Données synchronisées {{when}}",
-    "notSyncedYet": "En attente de la première synchronisation"
+    "notSyncedYet": "En attente de la première synchronisation",
+    "failedHeading": "Impossible d'importer les données de votre boutique",
+    "failedBody": "L'import depuis Shopify ne s'est pas terminé : il n'y a encore rien à prévoir. Consultez la raison et réessayez dans « Données de la boutique » ci-dessous."
   },
   "actions": {
     "noneLeft": "0 restant",
@@ -197,7 +199,8 @@
         "title": "À commander cette semaine",
         "hint": "Date de commande dans les 7 prochains jours"
       }
-    }
+    },
+    "nothingMore": "Rien de plus à commander"
   },
   "runway": {
     "heading": "Autonomie du stock",
@@ -802,7 +805,8 @@
     "trend_down_many": "Se vend {{percent}} % moins vite sur les {{count}} derniers jours ({{recent}}/jour) que sur les {{days}} jours précédents ({{baseline}}/jour).",
     "backorder_included_one": "{{count}} unité est déjà vendue en rupture (stock inférieur à zéro) et incluse dans la commande.",
     "backorder_included_other": "{{count}} unités sont déjà vendues en rupture (stock inférieur à zéro) et incluses dans la commande.",
-    "backorder_included_many": "{{count}} unités sont déjà vendues en rupture (stock inférieur à zéro) et incluses dans la commande."
+    "backorder_included_many": "{{count}} unités sont déjà vendues en rupture (stock inférieur à zéro) et incluses dans la commande.",
+    "lasts_for_years": "{{stock}} en stock durent plus de 10 ans à ce rythme : rien à commander."
   },
   "import": {
     "fromStocky": "Importer depuis Stocky",
@@ -1279,7 +1283,10 @@
     "link_many": "Commandes passées ({{count}})",
     "receivePart": "Reçu en partie",
     "receivedSoFar": "Reçu à ce jour",
-    "partReceived": "{{received}} reçues, le reste est en route"
+    "partReceived": "{{received}} reçues, le reste est en route",
+    "confirmCancelHeading": "Annuler cette commande ?",
+    "confirmCancel": "« {{name}} » ({{qty}} unités) ne comptera plus comme en route et pourra être suggéré à nouveau.",
+    "keep": "Garder la commande"
   },
   "costs": {
     "intro": "La valeur du stock, la trésorerie immobilisée et les totaux des bons de commande et du plan nécessitent le coût unitaire de chaque produit. Saisissez ici les coûts des produits qui n'en ont pas dans Shopify, ou pour utiliser votre coût de revient réel. Ils priment sur le coût Shopify dans l'application ; Shopify n'est pas modifié.",
@@ -1515,7 +1522,8 @@
     "product": {
       "forecast": "Prévision",
       "settings": "Réglages",
-      "suppliers": "Fournisseurs"
+      "suppliers": "Fournisseurs",
+      "history": "Historique"
     },
     "insights": {
       "stock": "Stock",
@@ -1532,5 +1540,86 @@
   "sections": {
     "toOrder": "À commander",
     "allProducts": "Tous les produits"
+  },
+  "snooze": {
+    "action": "Reporter",
+    "heading": "Reporter des suggestions de commande",
+    "introOne": "{{name}} quitte la liste de réapprovisionnement et les e-mails d'alerte, puis revient tout seul.",
+    "intro_one": "{{count}} produit quitte la liste de réapprovisionnement et les e-mails d'alerte, puis revient tout seul.",
+    "intro_many": "{{count}} produits quittent la liste de réapprovisionnement et les e-mails d'alerte, puis reviennent tout seuls.",
+    "intro_other": "{{count}} produits quittent la liste de réapprovisionnement et les e-mails d'alerte, puis reviennent tout seuls.",
+    "for": "Reporter pendant",
+    "help": "La prévision ne change pas. Vous pouvez faire revenir un produit à tout moment depuis la liste Reportés.",
+    "confirm": "Reporter",
+    "done_one": "{{count}} produit reporté jusqu'au {{date}}",
+    "done_many": "{{count}} produits reportés jusqu'au {{date}}",
+    "done_other": "{{count}} produits reportés jusqu'au {{date}}",
+    "listHeading_one": "Reportés · {{count}}",
+    "listHeading_many": "Reportés · {{count}}",
+    "listHeading_other": "Reportés · {{count}}",
+    "until": "De retour le {{date}}",
+    "bringBack": "Faire revenir",
+    "bringBackNamed": "Faire revenir {{name}}",
+    "back": "{{name}} est de retour dans la liste de réapprovisionnement",
+    "productNote": "Reporté : hors de la liste de réapprovisionnement et des e-mails d'alerte jusqu'au {{date}}."
+  },
+  "projection": {
+    "heading": "Ventes attendues",
+    "period_one": "Prochain {{count}} jour (jusqu'au {{date}})",
+    "period_many": "{{count}} prochains jours (jusqu'au {{date}})",
+    "period_other": "{{count}} prochains jours (jusqu'au {{date}})",
+    "short_one": "{{qty}} unité de plus que ce que couvre votre stock",
+    "short_many": "{{qty}} unités de plus que ce que couvre votre stock",
+    "short_other": "{{qty}} unités de plus que ce que couvre votre stock",
+    "covered": "Couvert par votre stock",
+    "basis": "À {{rate}}/jour. Le stock compte ce qui est disponible plus ce qui est en route.",
+    "basisEvents": "À {{rate}}/jour, vos événements de vente comptés à leurs dates. Le stock compte ce qui est disponible plus ce qui est en route."
+  },
+  "history": {
+    "heading": "Modifications de ce produit",
+    "none": "Aucune modification pour l'instant. Les réglages et ajustements de prévision que vous modifiez apparaissent ici.",
+    "what": "Modification",
+    "from": "De",
+    "to": "À",
+    "when": "Quand",
+    "empty": "Non défini",
+    "on": "Oui",
+    "off": "Non",
+    "kept": "Les modifications sont conservées 180 jours.",
+    "sources": {
+      "bulk": "Modification groupée",
+      "import": "Import",
+      "extension": "Page produit Shopify"
+    },
+    "fields": {
+      "supplier": "Fournisseur",
+      "lead_time_override": "Délai de livraison (jours)",
+      "safety_days": "Stock de sécurité (jours)",
+      "min_order_qty": "Commande minimum",
+      "pack_size": "Taille du lot",
+      "min_stock": "Min (commander à)",
+      "max_stock": "Max (commander jusqu'à)",
+      "alerts_muted": "Alertes désactivées",
+      "discontinued": "Arrêté",
+      "forecast_profile": "Moyenne du rythme de vente",
+      "supplier_sku": "Référence fournisseur",
+      "reference": "Produit similaire",
+      "reference_percent": "Part du rythme du produit similaire (%)",
+      "cost_override": "Coût unitaire",
+      "snoozed_until": "Reporté jusqu'au",
+      "override_avg_daily_sales": "Ventes par jour (votre ajustement)",
+      "override_lead_time_days": "Délai de livraison (votre ajustement)",
+      "override_safety_days": "Jours de sécurité (votre ajustement)"
+    }
+  },
+  "feedback": {
+    "heading": "Vos retours",
+    "body": "Il manque quelque chose, quelque chose est faux ou peu clair ? Dites-le-nous. Votre message arrive directement à l'équipe qui développe l'application.",
+    "open": "Envoyer un retour",
+    "message": "Votre message",
+    "email": "Votre e-mail (facultatif)",
+    "emailHelp": "Seulement si vous souhaitez une réponse.",
+    "send": "Envoyer",
+    "sent": "Retour envoyé. Merci !"
   }
 }
