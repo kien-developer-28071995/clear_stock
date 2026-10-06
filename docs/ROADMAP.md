@@ -190,10 +190,10 @@ Nguồn: Shopify Editions Spring '26, listing Stockcast và Forthcast (cập nh�
 - Built for Shopify: điểm ≥ 4.0 với đủ số review, phản hồi hỗ trợ trung vị < 24 giờ; yêu cầu LCP đang tạm dừng áp dụng.
 
 ### Đề xuất (chưa làm), xếp theo giá trị
-57. **Ghi sự kiện dùng tính năng** (S): bảng `feature_events` (shop, tính năng, ngày, số lần) cho what-if, kế hoạch nhập, Phân tích, xuất file. Là điều kiện để `admin/` biết tính năng không lưu dữ liệu có ai dùng, và để quyết định bỏ hay đẩy tính năng.
+57. ✅ **Ghi sự kiện dùng tính năng** (S, xong 2026-10-06: bảng `feature_events`, middleware route `usage:<tính năng>`, nhóm "Used in the last 28 days" ở `admin/`): bảng `feature_events` (shop, tính năng, ngày, số lần) cho what-if, kế hoạch nhập, Phân tích, xuất file. Là điều kiện để `admin/` biết tính năng không lưu dữ liệu có ai dùng, và để quyết định bỏ hay đẩy tính năng.
 58. **Webhook tồn kho chỉ khi `available` đổi** (S): cảnh báo tức thời đang nhận mọi thay đổi của `inventory_levels/update`. Đọc docs bộ lọc webhook trước.
 59. **Bulk operation đọc song song** (S–M): đồng bộ đầu nhanh hơn, onboarding "5 phút" chắc hơn với shop lớn. Đọc docs trước.
-60. **Nhật ký thay đổi** (M): ai đổi lead time, min/max, điều chỉnh dự báo, khi nào; hiện trên trang sản phẩm. Hợp với lời hứa minh bạch; Stockcast đã có.
+60. ✅ **Nhật ký thay đổi** (M, xong 2026-10-06: bảng `change_logs`, tab History trên trang sản phẩm, giữ 180 ngày; chưa ghi *ai* đổi vì app không lưu thông tin nhân viên): ai đổi lead time, min/max, điều chỉnh dự báo, khi nào; hiện trên trang sản phẩm. Hợp với lời hứa minh bạch; Stockcast đã có.
 61. **Nhờ đánh giá đúng lúc + hộp góp ý trong app** (S): hỏi review sau khi merchant xuất PO đầu tiên hoặc sau 14 ngày dùng, tối đa một lần; góp ý gửi về email hỗ trợ. Built for Shopify cần điểm và số review.
 62. **Tích hợp Sidekick** (chưa rõ công): tìm hiểu cách app khai báo dữ liệu/hành động cho Sidekick; nếu mở cho mọi app thì để Sidekick trả lời "cần nhập gì" bằng số của Clear Stock.
 63. **Việc còn dở của lần 5**: PO dạng PDF (#34), nhiều ngày giao cho một đơn (#35), tiền tệ NCC và bậc giá (#37), báo cáo CSV gửi định kỳ (#52), lọc theo tag/collection và cột tuỳ chọn (#53), chia lượng đặt theo tỷ lệ size (#44), ngưỡng ngày tồn tuỳ chọn cho Flow (#49).
@@ -209,8 +209,8 @@ Danh sách, bảng so tính năng và phân tích nằm ở `docs/COMPETITORS.md
 
 67. PO thành chứng từ: gom dòng đã đặt cùng NCC thành PO có số, PDF, nhận hết một bấm (không cần quyền ghi).
 68. Dữ liệu mẫu để thử app trước khi đồng bộ xong.
-69. Tạm ẩn sản phẩm khỏi danh sách cần nhập trong N ngày.
-70. Dự phóng nhu cầu 30/60/90 ngày trên trang sản phẩm.
+69. ✅ Tạm ẩn sản phẩm khỏi danh sách cần nhập trong N ngày (xong 2026-10-06: `variants.snoozed_until`, nút Snooze ở Cần nhập hàng).
+70. ✅ Dự phóng nhu cầu 30/60/90 ngày trên trang sản phẩm (xong 2026-10-06: `DemandProjection`, mục "Expected sales").
 71. Sửa hàng loạt và chọn cột trong danh sách sản phẩm.
 72. KPI tồn kho (vòng quay, tỷ lệ ngày hết hàng); xuất XLSX; báo cáo hẹn giờ; kế hoạch nhập 26/52 tuần; thêm ngôn ngữ.
 

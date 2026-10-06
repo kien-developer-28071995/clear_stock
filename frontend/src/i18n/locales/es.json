@@ -1520,7 +1520,8 @@
     "product": {
       "forecast": "Previsión",
       "settings": "Ajustes",
-      "suppliers": "Proveedores"
+      "suppliers": "Proveedores",
+      "history": "Historial"
     },
     "insights": {
       "stock": "Stock",
@@ -1537,5 +1538,76 @@
   "sections": {
     "toOrder": "Por pedir",
     "allProducts": "Todos los productos"
+  },
+  "snooze": {
+    "action": "Posponer",
+    "heading": "Posponer sugerencias de pedido",
+    "introOne": "{{name}} sale de la lista de reposición y de los correos de alerta, y vuelve solo.",
+    "intro_one": "{{count}} producto sale de la lista de reposición y de los correos de alerta, y vuelve solo.",
+    "intro_many": "{{count}} productos salen de la lista de reposición y de los correos de alerta, y vuelven solos.",
+    "intro_other": "{{count}} productos salen de la lista de reposición y de los correos de alerta, y vuelven solos.",
+    "for": "Posponer durante",
+    "help": "El pronóstico no cambia. Puedes recuperar un producto cuando quieras desde la lista Pospuestos.",
+    "confirm": "Posponer",
+    "done_one": "{{count}} producto pospuesto hasta el {{date}}",
+    "done_many": "{{count}} productos pospuestos hasta el {{date}}",
+    "done_other": "{{count}} productos pospuestos hasta el {{date}}",
+    "listHeading_one": "Pospuestos · {{count}}",
+    "listHeading_many": "Pospuestos · {{count}}",
+    "listHeading_other": "Pospuestos · {{count}}",
+    "until": "Vuelve el {{date}}",
+    "bringBack": "Recuperar",
+    "bringBackNamed": "Recuperar {{name}}",
+    "back": "{{name}} vuelve a la lista de reposición",
+    "productNote": "Pospuesto: fuera de la lista de reposición y de los correos de alerta hasta el {{date}}."
+  },
+  "projection": {
+    "heading": "Ventas previstas",
+    "period_one": "Próximo {{count}} día (hasta el {{date}})",
+    "period_many": "Próximos {{count}} días (hasta el {{date}})",
+    "period_other": "Próximos {{count}} días (hasta el {{date}})",
+    "short_one": "{{qty}} unidad más de lo que cubre tu stock",
+    "short_many": "{{qty}} unidades más de lo que cubre tu stock",
+    "short_other": "{{qty}} unidades más de lo que cubre tu stock",
+    "covered": "Cubierto por tu stock",
+    "basis": "A {{rate}}/día. El stock cuenta lo disponible más lo que está en camino.",
+    "basisEvents": "A {{rate}}/día, con tus eventos de venta contados en sus días. El stock cuenta lo disponible más lo que está en camino."
+  },
+  "history": {
+    "heading": "Cambios en este producto",
+    "none": "Aún no hay cambios. Los ajustes y las correcciones del pronóstico que cambies aparecen aquí.",
+    "what": "Cambio",
+    "from": "De",
+    "to": "A",
+    "when": "Cuándo",
+    "empty": "Sin definir",
+    "on": "Sí",
+    "off": "No",
+    "kept": "Los cambios se guardan 180 días.",
+    "sources": {
+      "bulk": "Edición masiva",
+      "import": "Importación",
+      "extension": "Página de producto de Shopify"
+    },
+    "fields": {
+      "supplier": "Proveedor",
+      "lead_time_override": "Plazo de entrega (días)",
+      "safety_days": "Stock de seguridad (días)",
+      "min_order_qty": "Pedido mínimo",
+      "pack_size": "Unidades por caja",
+      "min_stock": "Mín (reponer en)",
+      "max_stock": "Máx (pedir hasta)",
+      "alerts_muted": "Alertas silenciadas",
+      "discontinued": "Descatalogado",
+      "forecast_profile": "Promedio del ritmo de ventas",
+      "supplier_sku": "Código del proveedor",
+      "reference": "Producto similar",
+      "reference_percent": "Parte del ritmo del producto similar (%)",
+      "cost_override": "Coste unitario",
+      "snoozed_until": "Pospuesto hasta",
+      "override_avg_daily_sales": "Ventas por día (tu ajuste)",
+      "override_lead_time_days": "Plazo de entrega (tu ajuste)",
+      "override_safety_days": "Días de seguridad (tu ajuste)"
+    }
   }
 }

@@ -1382,7 +1382,8 @@
     "product": {
       "forecast": "Forecast",
       "settings": "Settings",
-      "suppliers": "Suppliers"
+      "suppliers": "Suppliers",
+      "history": "History"
     },
     "insights": {
       "stock": "Stock",
@@ -1399,5 +1400,71 @@
   "sections": {
     "toOrder": "To order",
     "allProducts": "All products"
+  },
+  "snooze": {
+    "action": "Snooze",
+    "heading": "Snooze reorder suggestions",
+    "introOne": "{{name}} leaves the reorder list and alert emails, then comes back by itself.",
+    "intro_one": "{{count}} product leaves the reorder list and alert emails, then comes back by itself.",
+    "intro_other": "{{count}} products leave the reorder list and alert emails, then come back by themselves.",
+    "for": "Snooze for",
+    "help": "The forecast does not change. You can bring a product back any time from the Snoozed list.",
+    "confirm": "Snooze",
+    "done_one": "{{count}} product snoozed until {{date}}",
+    "done_other": "{{count}} products snoozed until {{date}}",
+    "listHeading_one": "Snoozed · {{count}}",
+    "listHeading_other": "Snoozed · {{count}}",
+    "until": "Back on {{date}}",
+    "bringBack": "Bring back",
+    "bringBackNamed": "Bring back {{name}}",
+    "back": "{{name}} is back in the reorder list",
+    "productNote": "Snoozed: out of the reorder list and alert emails until {{date}}."
+  },
+  "projection": {
+    "heading": "Expected sales",
+    "period_one": "Next {{count}} day (to {{date}})",
+    "period_other": "Next {{count}} days (to {{date}})",
+    "short_one": "{{qty}} unit more than your stock covers",
+    "short_other": "{{qty}} units more than your stock covers",
+    "covered": "Covered by your stock",
+    "basis": "At {{rate}}/day. Stock counts what is on hand plus what is on the way.",
+    "basisEvents": "At {{rate}}/day, with your sales events counted on their days. Stock counts what is on hand plus what is on the way."
+  },
+  "history": {
+    "heading": "Changes to this product",
+    "none": "No changes yet. Settings and forecast adjustments you change are listed here.",
+    "what": "Change",
+    "from": "From",
+    "to": "To",
+    "when": "When",
+    "empty": "Not set",
+    "on": "On",
+    "off": "Off",
+    "kept": "Changes are kept for 180 days.",
+    "sources": {
+      "bulk": "Bulk edit",
+      "import": "Import",
+      "extension": "Shopify product page"
+    },
+    "fields": {
+      "supplier": "Supplier",
+      "lead_time_override": "Lead time (days)",
+      "safety_days": "Safety stock (days)",
+      "min_order_qty": "Minimum order",
+      "pack_size": "Pack size",
+      "min_stock": "Min (reorder at)",
+      "max_stock": "Max (order up to)",
+      "alerts_muted": "Alerts muted",
+      "discontinued": "Discontinued",
+      "forecast_profile": "Sales rate averaging",
+      "supplier_sku": "Supplier product code",
+      "reference": "Similar product",
+      "reference_percent": "Share of the similar product's rate (%)",
+      "cost_override": "Unit cost",
+      "snoozed_until": "Snoozed until",
+      "override_avg_daily_sales": "Sales per day (your adjustment)",
+      "override_lead_time_days": "Lead time (your adjustment)",
+      "override_safety_days": "Safety days (your adjustment)"
+    }
   }
 }

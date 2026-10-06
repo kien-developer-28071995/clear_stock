@@ -954,6 +954,68 @@ for (const plan of ['free', 'starter', 'growth'] as PlanKey[]) {
             await expect.poll(() => toasts(app)).toContainEqual(expect.stringContaining('Draft transfer #T0001 created (30 units)'));
         });
 
+        test('snoozing takes a suggestion off the reorder list until it is brought back; the product page shows expected sales and what was changed', async ({ app }) => {
+            type Dash = { data: { actions: Record<string, { variant_id: number; suggested_qty: number }[]>; snoozed: { variant_id: number; name: string }[] } };
+            const dash = async () => (await api<Dash>(app, '/dashboard')).data;
+            const listed = async () => Object.values((await dash()).actions).flat().map((i) => i.variant_id).sort();
+            const dialogOpen = (id: string) => app.locator(`s-modal#${id}`).evaluate((el) => !!el.shadowRoot?.querySelector('dialog[open]'));
+
+            await open(app, '/reorder');
+            // What is due starts selected (earlier tests placed and cancelled orders: wait for the forecasts).
+            await expect.poll(async () => Object.values((await dash()).actions).slice(0, 2).flat().filter((i) => i.suggested_qty > 0).length, { timeout: 30_000 }).toBeGreaterThan(0);
+            await open(app, '/reorder');
+            const before = await listed();
+            expect((await dash()).snoozed).toEqual([]);
+            let snoozed: number[] = [];
+
+            try {
+                const button = app.locator('s-button', { hasText: /^Snooze$/ }).first();
+                await expect(button).not.toHaveAttribute('disabled');
+                await button.click();
+                await expect.poll(() => dialogOpen('snooze-selected')).toBe(true);
+                await expect(app.locator('s-modal#snooze-selected')).toContainText('then come');
+                await app.locator('s-modal#snooze-selected s-button[slot="primary-action"]').click();
+                await expect.poll(() => toasts(app)).toContainEqual(expect.stringMatching(/snoozed until/));
+                await expect.poll(() => dialogOpen('snooze-selected')).toBe(false);
+
+                snoozed = (await dash()).snoozed.map((s) => s.variant_id);
+                expect(snoozed.length).toBeGreaterThan(0);
+                expect(await listed()).toEqual(before.filter((id) => !snoozed.includes(id)));
+                // The list of what is snoozed, each with the day it comes back.
+                await expect(app.getByText(`Snoozed · ${snoozed.length}`)).toBeVisible();
+                await expect(app.getByText(/^Back on /).first()).toBeVisible();
+
+                // The product itself says so, its forecast unchanged, and the change is in its history.
+                await open(app, `/products/${snoozed[0]}`);
+                await expect(app.getByText(/Snoozed: out of the reorder list and alert emails until/)).toBeVisible();
+                await expect(app.getByText('Expected sales')).toBeVisible();
+                await expect(app.getByText(/^Next 30 days \(to /)).toBeVisible();
+                await app.locator('s-press-button', { hasText: 'History' }).click();
+                await expect(app).toHaveURL(/tab=history/);
+                await expect(app.locator('s-table-row', { hasText: 'Snoozed until' }).first()).toBeVisible();
+
+                // Bringing it back from the product page puts it on the list again.
+                await app.locator('s-button', { hasText: 'Bring back' }).first().click();
+                await expect.poll(() => toasts(app)).toContainEqual(expect.stringMatching(/is back in the reorder list/));
+                await expect(app.getByText(/Snoozed: out of the reorder list/)).toHaveCount(0);
+                expect((await dash()).snoozed.map((s) => s.variant_id)).toEqual(snoozed.slice(1));
+
+                // The rest from the reorder page, one by one.
+                await open(app, '/reorder');
+                for (let left = snoozed.length - 1; left > 0; left--) {
+                    await app.locator('s-button', { hasText: 'Bring back' }).first().click();
+                    await expect.poll(async () => (await dash()).snoozed.length).toBe(left - 1);
+                    await expect(app.locator('s-button', { hasText: 'Bring back' })).toHaveCount(left - 1);
+                }
+                await expect(app.getByText(/^Snoozed · /)).toHaveCount(0);
+                expect(await listed()).toEqual(before);
+            } finally {
+                // Whatever happened above, nothing stays snoozed in the dev shop.
+                const still = (await dash()).snoozed.map((s) => s.variant_id);
+                if (still.length > 0) await api(app, '/snooze', { method: 'POST', body: { variant_ids: still, days: null } });
+            }
+        });
+
         test('plans page marks the current plan and upgrades go through Shopify billing', async ({ app }) => {
             // Billing itself is Shopify's: answer the API call with a fake approval URL.
             let requested: unknown = null;

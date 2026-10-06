@@ -290,6 +290,9 @@ Three [admin UI extensions](https://shopify.dev/docs/api/admin-extensions) in `e
 | `FEATURE_CLEARANCE` | What to clear (Insights) |  |
 | `FEATURE_SIZE_RUNS` | Products with sizes sold out (Insights) |  |
 | `FEATURE_DATA_HEALTH` | Product data check |  |
+| `FEATURE_SNOOZE` | "Snooze" on the reorder list: hide a suggestion until a later day | off = nothing is snoozed (stored days are kept, not applied) |
+| `FEATURE_DEMAND_PROJECTION` | Expected sales over the next 30/60/90 days on the product page |  |
+| `FEATURE_CHANGE_LOG` | History tab of a product (what was changed, when) | off = nothing is logged either |
 | `BILLING_GROWTH_OFFERED` | Growth on the pricing page | off = no new Growth subscriptions; existing ones keep working |
 
 How it is safe:

@@ -76,7 +76,10 @@ export type FeatureSwitch =
     | 'stock_history'
     | 'clearance'
     | 'size_runs'
-    | 'data_health';
+    | 'data_health'
+    | 'snooze'
+    | 'demand_projection'
+    | 'change_log';
 
 export type FeatureSwitches = Record<FeatureSwitch, boolean>;
 

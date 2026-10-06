@@ -20,6 +20,7 @@ use App\Services\Forecast\ExplanationFormatter;
 use App\Services\Forecast\ForecastService;
 use App\Services\Shopify\WebhookSubscriptionClient;
 use App\Support\Entitlements;
+use App\Support\Features;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
@@ -178,9 +179,14 @@ class RealtimeAlertService
         }
 
         $recent = $this->logs->recentVariantAlerts($shop, $now->subDays((int) config('alerts.realert_days')));
-        $due = $pending->filter(function ($state) use ($mode, $recent) {
+        $today = $local->toDateString();
+        $due = $pending->filter(function ($state) use ($mode, $recent, $today) {
             $type = $state->level->alertType();
             if ($type === null || $state->variant === null || $state->variant->alerts_muted || $state->variant->discontinued) {
+                return false;
+            }
+            // "Not now" until a later day also silences the alert.
+            if (Features::on('snooze') && $state->variant->snoozed_until !== null && $state->variant->snoozed_until->toDateString() > $today) {
                 return false;
             }
             if ($mode === RealtimeAlertMode::OutOfStock && $type !== AlertType::OutOfStock) {

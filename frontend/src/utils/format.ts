@@ -38,6 +38,11 @@ export function formatDate(ymd: string | null): string {
     );
 }
 
+/** Day, month and time of a moment, in the viewer's time zone: "Oct 15, 2:30 PM". */
+export function formatDateTime(iso: string): string {
+    return new Intl.DateTimeFormat(currentLocale(), { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }).format(new Date(iso));
+}
+
 /** Days between today (Y-m-d, shop time) and a date; negative = past. */
 export function daysUntil(ymd: string | null, today: string): number | null {
     if (!ymd) return null;

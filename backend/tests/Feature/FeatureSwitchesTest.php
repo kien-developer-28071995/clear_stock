@@ -144,6 +144,8 @@ it('has a switch for every optional feature and closes the API of one that is of
     ['manual_orders', 'GET', '/api/manual-orders'],
     ['stock_history', 'GET', '/api/stock-history'],
     ['data_health', 'GET', '/api/data-health'],
+    ['snooze', 'POST', '/api/snooze'],
+    ['change_log', 'GET', '/api/forecasts/1/changes'],
     ['alternate_suppliers', 'GET', '/api/variants/1/suppliers'],
     ['supplier_import', 'POST', '/api/imports/purchase-orders/preview'],
     ['bundles', 'GET', '/api/bundles'],

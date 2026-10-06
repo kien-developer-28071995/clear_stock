@@ -4,6 +4,7 @@ import { ConfidenceBadge, StatusBadge } from '@/components/ui/StatusBadge';
 import { AbcBadge } from '@/features/forecasts/components/AbcBadge';
 import { useShop } from '@/features/shop/hooks/useShop';
 import { formatDate, formatMoney, formatNumber } from '@/utils/format';
+import { useSnooze } from '@/features/forecasts/hooks/useForecasts';
 
 function Metric({ label, value }: { label: string; value: string }) {
     return (
@@ -20,6 +21,7 @@ export function ForecastSummary({ f }: { f: ForecastDetail }) {
     const currency = useShop().data?.currency ?? null;
     const abc = f.abc;
     const discontinued = f.status === 'discontinued';
+    const snooze = useSnooze();
 
     return (
         <s-section>
@@ -73,6 +75,18 @@ export function ForecastSummary({ f }: { f: ForecastDetail }) {
                 </s-grid>
                 </s-query-container>
                 {discontinued && <s-text color="subdued">{t('discontinued.summary')}</s-text>}
+                {/* Put off with "Not now": out of the reorder list and alert emails until that day. */}
+                {f.snoozed_until && (
+                    <s-stack direction="inline" gap="base" alignItems="center">
+                        <s-text color="subdued">{t('snooze.productNote', { date: formatDate(f.snoozed_until) })}</s-text>
+                        <s-button
+                            disabled={snooze.isPending || undefined}
+                            onClick={() => snooze.mutate({ variant_ids: [f.variant_id], days: null }, { onSuccess: () => shopify.toast.show(t('snooze.back', { name: f.name })) })}
+                        >
+                            {t('snooze.bringBack')}
+                        </s-button>
+                    </s-stack>
+                )}
                 {/* How the rate moved since the forecast of an earlier week. */}
                 {f.previous && !f.overrides.avg_daily_sales && Math.abs(f.avg_daily_sales - f.previous.avg) >= 0.05 && (
                     <s-text color="subdued">

@@ -1244,7 +1244,8 @@
     "product": {
       "forecast": "Dự báo",
       "settings": "Cài đặt",
-      "suppliers": "Nhà cung cấp"
+      "suppliers": "Nhà cung cấp",
+      "history": "Lịch sử"
     },
     "insights": {
       "stock": "Tồn kho",
@@ -1261,5 +1262,66 @@
   "sections": {
     "toOrder": "Cần đặt",
     "allProducts": "Tất cả sản phẩm"
+  },
+  "snooze": {
+    "action": "Tạm ẩn",
+    "heading": "Tạm ẩn gợi ý nhập hàng",
+    "introOne": "{{name}} sẽ rời danh sách cần nhập và email cảnh báo, rồi tự quay lại.",
+    "intro_other": "{{count}} sản phẩm sẽ rời danh sách cần nhập và email cảnh báo, rồi tự quay lại.",
+    "for": "Tạm ẩn trong",
+    "help": "Dự báo không thay đổi. Bạn có thể đưa sản phẩm trở lại bất cứ lúc nào từ danh sách Đang tạm ẩn.",
+    "confirm": "Tạm ẩn",
+    "done_other": "Đã tạm ẩn {{count}} sản phẩm đến {{date}}",
+    "listHeading_other": "Đang tạm ẩn · {{count}}",
+    "until": "Quay lại ngày {{date}}",
+    "bringBack": "Đưa trở lại",
+    "bringBackNamed": "Đưa {{name}} trở lại",
+    "back": "{{name}} đã trở lại danh sách cần nhập",
+    "productNote": "Đang tạm ẩn: không nằm trong danh sách cần nhập và email cảnh báo đến {{date}}."
+  },
+  "projection": {
+    "heading": "Dự kiến bán",
+    "period_other": "{{count}} ngày tới (đến {{date}})",
+    "short_other": "Thiếu {{qty}} cái so với tồn kho",
+    "covered": "Tồn kho đủ đáp ứng",
+    "basis": "Theo mức {{rate}}/ngày. Tồn kho gồm hàng đang có và hàng đang về.",
+    "basisEvents": "Theo mức {{rate}}/ngày, có tính các sự kiện bán hàng vào đúng ngày. Tồn kho gồm hàng đang có và hàng đang về."
+  },
+  "history": {
+    "heading": "Thay đổi của sản phẩm này",
+    "none": "Chưa có thay đổi nào. Cài đặt và điều chỉnh dự báo bạn thay đổi sẽ hiện ở đây.",
+    "what": "Thay đổi",
+    "from": "Từ",
+    "to": "Thành",
+    "when": "Lúc",
+    "empty": "Chưa đặt",
+    "on": "Bật",
+    "off": "Tắt",
+    "kept": "Thay đổi được lưu 180 ngày.",
+    "sources": {
+      "bulk": "Sửa hàng loạt",
+      "import": "Nhập file",
+      "extension": "Trang sản phẩm Shopify"
+    },
+    "fields": {
+      "supplier": "Nhà cung cấp",
+      "lead_time_override": "Lead time (ngày)",
+      "safety_days": "Tồn an toàn (ngày)",
+      "min_order_qty": "Đặt tối thiểu",
+      "pack_size": "Quy cách thùng",
+      "min_stock": "Min (đặt lại khi)",
+      "max_stock": "Max (nhập tới)",
+      "alerts_muted": "Tắt cảnh báo",
+      "discontinued": "Ngừng nhập",
+      "forecast_profile": "Cách tính tốc độ bán",
+      "supplier_sku": "Mã hàng của NCC",
+      "reference": "Sản phẩm tương tự",
+      "reference_percent": "Tỷ lệ so với sản phẩm tương tự (%)",
+      "cost_override": "Giá vốn",
+      "snoozed_until": "Tạm ẩn đến",
+      "override_avg_daily_sales": "Bán mỗi ngày (bạn điều chỉnh)",
+      "override_lead_time_days": "Lead time (bạn điều chỉnh)",
+      "override_safety_days": "Ngày an toàn (bạn điều chỉnh)"
+    }
   }
 }

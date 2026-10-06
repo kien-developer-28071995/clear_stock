@@ -33,6 +33,7 @@ use App\Http\Controllers\Api\VendorSupplierController;
 use App\Http\Controllers\Api\WebVitalController;
 use Illuminate\Support\Facades\Route;
 
+// `usage:<feature>` counts uses of features that store nothing (App\Support\FeatureUsage).
 // All API routes are called by the embedded app with an App Bridge session token.
 // Ids in URLs are resolved through repositories scoped to the authenticated shop
 // (no implicit route-model binding: it would run before the shop is known).
@@ -59,20 +60,23 @@ Route::middleware('shopify.session')->group(function () {
     Route::post('/setup-guide/tips', [SetupGuideController::class, 'dismissTip']);
 
     Route::get('/forecasts', [ForecastController::class, 'index']);
-    Route::get('/forecasts/export', [ForecastController::class, 'export'])->middleware('feature:product_export');
+    Route::get('/forecasts/export', [ForecastController::class, 'export'])->middleware('feature:product_export')->middleware('usage:product_export');
     Route::get('/locations', [ForecastController::class, 'locations']);
     Route::get('/facets', [ForecastController::class, 'facets']);
     Route::get('/forecasts/{variant}', [ForecastController::class, 'show'])->whereNumber('variant');
     Route::put('/forecasts/{variant}/overrides', [ForecastController::class, 'updateOverrides'])->whereNumber('variant');
     Route::put('/forecasts/{variant}/location-minimums', [ForecastController::class, 'updateLocationMinimums'])->whereNumber('variant');
+    // What was changed on a product; "not now" for reorder suggestions.
+    Route::get('/forecasts/{variant}/changes', [ForecastController::class, 'changes'])->whereNumber('variant')->middleware(['feature:change_log', 'usage:change_log']);
+    Route::post('/snooze', [ForecastController::class, 'snooze'])->middleware('throttle:30,1')->middleware('feature:snooze');
 
     // Saved product list views; clearance list and broken size runs (Insights).
     Route::get('/views', [SavedViewController::class, 'index'])->middleware('feature:saved_views');
     Route::post('/views', [SavedViewController::class, 'store'])->middleware('throttle:30,1')->middleware('feature:saved_views');
     Route::delete('/views/{view}', [SavedViewController::class, 'destroy'])->whereNumber('view')->middleware('feature:saved_views');
-    Route::get('/clearance', [StockInsightController::class, 'clearance'])->middleware('feature:clearance');
-    Route::get('/clearance/export', [StockInsightController::class, 'clearanceExport'])->middleware('feature:clearance');
-    Route::get('/size-runs', [StockInsightController::class, 'sizeRuns'])->middleware('feature:size_runs');
+    Route::get('/clearance', [StockInsightController::class, 'clearance'])->middleware('feature:clearance')->middleware('usage:clearance');
+    Route::get('/clearance/export', [StockInsightController::class, 'clearanceExport'])->middleware('feature:clearance')->middleware('usage:clearance_export');
+    Route::get('/size-runs', [StockInsightController::class, 'sizeRuns'])->middleware('feature:size_runs')->middleware('usage:size_runs');
 
     Route::get('/variants', [VariantController::class, 'index']);
     Route::put('/variants/settings', [VariantController::class, 'bulkUpdateSettings']);
@@ -98,15 +102,15 @@ Route::middleware('shopify.session')->group(function () {
     Route::post('/billing', [BillingController::class, 'store'])->middleware('throttle:10,1');
 
     // What-if: sales +/- X% -> what to order (nothing saved).
-    Route::get('/what-if', [GrowthScenarioController::class, 'show']);
-    Route::get('/what-if/export', [GrowthScenarioController::class, 'export']);
+    Route::get('/what-if', [GrowthScenarioController::class, 'show'])->middleware('usage:what_if');
+    Route::get('/what-if/export', [GrowthScenarioController::class, 'export'])->middleware('usage:what_if_export');
 
     // Purchase plan: orders and spend week by week at the current sales rates (nothing saved).
-    Route::get('/purchase-plan', [PurchasePlanController::class, 'show']);
-    Route::get('/purchase-plan/export', [PurchasePlanController::class, 'export']);
+    Route::get('/purchase-plan', [PurchasePlanController::class, 'show'])->middleware('usage:purchase_plan');
+    Route::get('/purchase-plan/export', [PurchasePlanController::class, 'export'])->middleware('usage:purchase_plan_export');
 
     // Monthly purchasing budget: what to reorder first when cash is short (Starter).
-    Route::get('/budget', [BudgetController::class, 'show']);
+    Route::get('/budget', [BudgetController::class, 'show'])->middleware('usage:budget');
     Route::put('/budget', [BudgetController::class, 'update']);
 
     // Unit costs entered in the app (win over Shopify's cost in money figures).
@@ -126,13 +130,13 @@ Route::middleware('shopify.session')->group(function () {
     Route::delete('/sales-events/{event}', [SalesEventController::class, 'destroy'])->whereNumber('event');
 
     // Forecast accuracy: past forecasts next to what really sold.
-    Route::get('/accuracy', ForecastAccuracyController::class);
+    Route::get('/accuracy', ForecastAccuracyController::class)->middleware('usage:accuracy');
 
     // Inventory units and value at cost, day by day; product data problems.
-    Route::get('/stock-history', StockHistoryController::class)->middleware('feature:stock_history');
-    Route::get('/data-health', DataHealthController::class)->middleware('feature:data_health');
+    Route::get('/stock-history', StockHistoryController::class)->middleware('feature:stock_history')->middleware('usage:stock_history');
+    Route::get('/data-health', DataHealthController::class)->middleware('feature:data_health')->middleware('usage:data_health');
 
-    Route::get('/purchase-orders/export', [PurchaseOrderController::class, 'export']);
+    Route::get('/purchase-orders/export', [PurchaseOrderController::class, 'export'])->middleware('usage:purchase_order_export');
     // Shopify's own open purchase orders (optional scope), and a product's other suppliers.
     Route::get('/shopify-purchase-orders', [OrderingController::class, 'shopifyPurchaseOrders'])->middleware('throttle:30,1');
     Route::get('/variants/{variant}/suppliers', [OrderingController::class, 'suppliers'])->whereNumber('variant')->middleware('feature:alternate_suppliers');
@@ -150,7 +154,7 @@ Route::middleware('shopify.session')->group(function () {
     Route::post('/extension/manual-orders', [ProductExtensionController::class, 'markOrdered'])->middleware('throttle:30,1')->middleware('feature:manual_orders');
 
     // Growth: move stock between locations before ordering (draft transfers in Shopify).
-    Route::get('/transfers', [TransferController::class, 'index']);
+    Route::get('/transfers', [TransferController::class, 'index'])->middleware('usage:transfers');
     Route::post('/transfers', [TransferController::class, 'store'])->middleware('throttle:20,1');
 
     Route::get('/bundles', [BundleController::class, 'index'])->middleware('feature:bundles');

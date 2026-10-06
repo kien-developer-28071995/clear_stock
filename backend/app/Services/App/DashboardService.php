@@ -22,6 +22,8 @@ class DashboardService
 
     private const RUNWAY_LIMIT = 12;
 
+    private const SNOOZED_LIMIT = 50;
+
     public function __construct(
         private readonly ForecastQueryRepositoryInterface $forecasts,
         private readonly ExplanationFormatter $formatter,
@@ -70,6 +72,8 @@ class DashboardService
                 'days' => (int) config('forecast.abc.days'),
                 'thresholds' => ['a' => (float) config('forecast.abc.a'), 'b' => (float) config('forecast.abc.b')],
             ],
+            // Products put off until a later day ("not now"): out of the lists above until then.
+            'snoozed' => Features::on(SnoozeService::SWITCH) ? $this->forecasts->snoozed($shop, $todayYmd, self::SNOOZED_LIMIT) : [],
             'explanations_locked' => ! $explain,
         ];
     }

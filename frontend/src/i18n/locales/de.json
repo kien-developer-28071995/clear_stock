@@ -1382,7 +1382,8 @@
     "product": {
       "forecast": "Prognose",
       "settings": "Einstellungen",
-      "suppliers": "Lieferanten"
+      "suppliers": "Lieferanten",
+      "history": "Verlauf"
     },
     "insights": {
       "stock": "Bestand",
@@ -1399,5 +1400,71 @@
   "sections": {
     "toOrder": "Zu bestellen",
     "allProducts": "Alle Produkte"
+  },
+  "snooze": {
+    "action": "Zurückstellen",
+    "heading": "Bestellvorschläge zurückstellen",
+    "introOne": "{{name}} verschwindet aus der Nachbestellliste und den Warn-E-Mails und kommt von selbst zurück.",
+    "intro_one": "{{count}} Produkt verschwindet aus der Nachbestellliste und den Warn-E-Mails und kommt von selbst zurück.",
+    "intro_other": "{{count}} Produkte verschwinden aus der Nachbestellliste und den Warn-E-Mails und kommen von selbst zurück.",
+    "for": "Zurückstellen für",
+    "help": "Die Prognose ändert sich nicht. Du kannst ein Produkt jederzeit über die Liste „Zurückgestellt“ zurückholen.",
+    "confirm": "Zurückstellen",
+    "done_one": "{{count}} Produkt bis {{date}} zurückgestellt",
+    "done_other": "{{count}} Produkte bis {{date}} zurückgestellt",
+    "listHeading_one": "Zurückgestellt · {{count}}",
+    "listHeading_other": "Zurückgestellt · {{count}}",
+    "until": "Zurück am {{date}}",
+    "bringBack": "Zurückholen",
+    "bringBackNamed": "{{name}} zurückholen",
+    "back": "{{name}} ist wieder in der Nachbestellliste",
+    "productNote": "Zurückgestellt: bis {{date}} nicht in der Nachbestellliste und den Warn-E-Mails."
+  },
+  "projection": {
+    "heading": "Erwarteter Absatz",
+    "period_one": "Nächster {{count}} Tag (bis {{date}})",
+    "period_other": "Nächste {{count}} Tage (bis {{date}})",
+    "short_one": "{{qty}} Stück mehr, als dein Bestand deckt",
+    "short_other": "{{qty}} Stück mehr, als dein Bestand deckt",
+    "covered": "Durch deinen Bestand gedeckt",
+    "basis": "Bei {{rate}}/Tag. Der Bestand zählt Lagerbestand plus Ware im Zulauf.",
+    "basisEvents": "Bei {{rate}}/Tag, deine Verkaufsaktionen an ihren Tagen eingerechnet. Der Bestand zählt Lagerbestand plus Ware im Zulauf."
+  },
+  "history": {
+    "heading": "Änderungen an diesem Produkt",
+    "none": "Noch keine Änderungen. Einstellungen und Prognoseanpassungen, die du änderst, erscheinen hier.",
+    "what": "Änderung",
+    "from": "Von",
+    "to": "Auf",
+    "when": "Wann",
+    "empty": "Nicht gesetzt",
+    "on": "An",
+    "off": "Aus",
+    "kept": "Änderungen werden 180 Tage aufbewahrt.",
+    "sources": {
+      "bulk": "Sammelbearbeitung",
+      "import": "Import",
+      "extension": "Shopify-Produktseite"
+    },
+    "fields": {
+      "supplier": "Lieferant",
+      "lead_time_override": "Lieferzeit (Tage)",
+      "safety_days": "Sicherheitsbestand (Tage)",
+      "min_order_qty": "Mindestbestellmenge",
+      "pack_size": "Packungsgröße",
+      "min_stock": "Min (nachbestellen bei)",
+      "max_stock": "Max (auffüllen bis)",
+      "alerts_muted": "Warnungen stumm",
+      "discontinued": "Ausgelaufen",
+      "forecast_profile": "Mittelung der Verkaufsrate",
+      "supplier_sku": "Artikelnummer des Lieferanten",
+      "reference": "Ähnliches Produkt",
+      "reference_percent": "Anteil an der Rate des ähnlichen Produkts (%)",
+      "cost_override": "Stückkosten",
+      "snoozed_until": "Zurückgestellt bis",
+      "override_avg_daily_sales": "Verkäufe pro Tag (deine Anpassung)",
+      "override_lead_time_days": "Lieferzeit (deine Anpassung)",
+      "override_safety_days": "Sicherheitstage (deine Anpassung)"
+    }
   }
 }

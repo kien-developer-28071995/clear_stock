@@ -1520,7 +1520,8 @@
     "product": {
       "forecast": "Prévision",
       "settings": "Réglages",
-      "suppliers": "Fournisseurs"
+      "suppliers": "Fournisseurs",
+      "history": "Historique"
     },
     "insights": {
       "stock": "Stock",
@@ -1537,5 +1538,76 @@
   "sections": {
     "toOrder": "À commander",
     "allProducts": "Tous les produits"
+  },
+  "snooze": {
+    "action": "Reporter",
+    "heading": "Reporter des suggestions de commande",
+    "introOne": "{{name}} quitte la liste de réapprovisionnement et les e-mails d'alerte, puis revient tout seul.",
+    "intro_one": "{{count}} produit quitte la liste de réapprovisionnement et les e-mails d'alerte, puis revient tout seul.",
+    "intro_many": "{{count}} produits quittent la liste de réapprovisionnement et les e-mails d'alerte, puis reviennent tout seuls.",
+    "intro_other": "{{count}} produits quittent la liste de réapprovisionnement et les e-mails d'alerte, puis reviennent tout seuls.",
+    "for": "Reporter pendant",
+    "help": "La prévision ne change pas. Vous pouvez faire revenir un produit à tout moment depuis la liste Reportés.",
+    "confirm": "Reporter",
+    "done_one": "{{count}} produit reporté jusqu'au {{date}}",
+    "done_many": "{{count}} produits reportés jusqu'au {{date}}",
+    "done_other": "{{count}} produits reportés jusqu'au {{date}}",
+    "listHeading_one": "Reportés · {{count}}",
+    "listHeading_many": "Reportés · {{count}}",
+    "listHeading_other": "Reportés · {{count}}",
+    "until": "De retour le {{date}}",
+    "bringBack": "Faire revenir",
+    "bringBackNamed": "Faire revenir {{name}}",
+    "back": "{{name}} est de retour dans la liste de réapprovisionnement",
+    "productNote": "Reporté : hors de la liste de réapprovisionnement et des e-mails d'alerte jusqu'au {{date}}."
+  },
+  "projection": {
+    "heading": "Ventes attendues",
+    "period_one": "Prochain {{count}} jour (jusqu'au {{date}})",
+    "period_many": "{{count}} prochains jours (jusqu'au {{date}})",
+    "period_other": "{{count}} prochains jours (jusqu'au {{date}})",
+    "short_one": "{{qty}} unité de plus que ce que couvre votre stock",
+    "short_many": "{{qty}} unités de plus que ce que couvre votre stock",
+    "short_other": "{{qty}} unités de plus que ce que couvre votre stock",
+    "covered": "Couvert par votre stock",
+    "basis": "À {{rate}}/jour. Le stock compte ce qui est disponible plus ce qui est en route.",
+    "basisEvents": "À {{rate}}/jour, vos événements de vente comptés à leurs dates. Le stock compte ce qui est disponible plus ce qui est en route."
+  },
+  "history": {
+    "heading": "Modifications de ce produit",
+    "none": "Aucune modification pour l'instant. Les réglages et ajustements de prévision que vous modifiez apparaissent ici.",
+    "what": "Modification",
+    "from": "De",
+    "to": "À",
+    "when": "Quand",
+    "empty": "Non défini",
+    "on": "Oui",
+    "off": "Non",
+    "kept": "Les modifications sont conservées 180 jours.",
+    "sources": {
+      "bulk": "Modification groupée",
+      "import": "Import",
+      "extension": "Page produit Shopify"
+    },
+    "fields": {
+      "supplier": "Fournisseur",
+      "lead_time_override": "Délai de livraison (jours)",
+      "safety_days": "Stock de sécurité (jours)",
+      "min_order_qty": "Commande minimum",
+      "pack_size": "Taille du lot",
+      "min_stock": "Min (commander à)",
+      "max_stock": "Max (commander jusqu'à)",
+      "alerts_muted": "Alertes désactivées",
+      "discontinued": "Arrêté",
+      "forecast_profile": "Moyenne du rythme de vente",
+      "supplier_sku": "Référence fournisseur",
+      "reference": "Produit similaire",
+      "reference_percent": "Part du rythme du produit similaire (%)",
+      "cost_override": "Coût unitaire",
+      "snoozed_until": "Reporté jusqu'au",
+      "override_avg_daily_sales": "Ventes par jour (votre ajustement)",
+      "override_lead_time_days": "Délai de livraison (votre ajustement)",
+      "override_safety_days": "Jours de sécurité (votre ajustement)"
+    }
   }
 }

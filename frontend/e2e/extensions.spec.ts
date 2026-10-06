@@ -91,6 +91,31 @@ function recompute(): void {
     artisan('forecast:run', `--shop=${domain}`);
 }
 
+/**
+ * The tests below need a product that is in stock and due today. Whether the dev store has one
+ * depends on the day (its sales history ages, so reorder dates drift): when it has none, the
+ * best-selling product in stock gets a manual minimum just above its stock, which makes it due,
+ * and loses it again after the tests.
+ */
+let madeDue: number | null = null;
+
+test.beforeAll(() => {
+    const due = php<{ id: number | null }>(
+        'echo json_encode(["id" => App\\Models\\Forecast::whereNull("location_id")->where("reorder_date", "<=", now()->toDateString())->where("avg_daily_sales", ">", 0)->where("current_stock", ">", 0)->value("variant_id")]);',
+    ).id;
+    if (due !== null) return;
+    madeDue = php<{ id: number }>(
+        '$f = App\\Models\\Forecast::whereNull("location_id")->where("avg_daily_sales", ">", 0)->where("current_stock", ">", 0)->whereHas("variant", fn ($q) => $q->where("is_active", true)->where("discontinued", false)->whereNull("min_stock"))->orderByDesc("avg_daily_sales")->firstOrFail(); App\\Models\\Variant::whereKey($f->variant_id)->update(["min_stock" => $f->current_stock + $f->incoming_stock + 1]); echo json_encode(["id" => $f->variant_id]);',
+    ).id;
+    recompute();
+});
+
+test.afterAll(() => {
+    if (madeDue === null) return;
+    php(`App\\Models\\Variant::whereKey(${madeDue})->update(["min_stock" => null]); echo json_encode(true);`);
+    recompute();
+});
+
 /** A synced product whose (first) variant has to be reordered now. */
 function productToReorder(): { productId: number; variantId: number } {
     return php(

@@ -56,6 +56,7 @@ test('with every switch off the core still works and nothing switched off is sho
     await open(app, '/reorder');
     await settled(app);
     await expect(app.locator('s-button', { hasText: 'Mark as ordered' })).toHaveCount(0);
+    await expect(app.locator('s-button', { hasText: /^Snooze$/ })).toHaveCount(0);
     await expect(app.locator('s-button', { hasText: 'Export purchase order' })).toHaveCount(0);
     await expect(app.locator('s-press-button', { hasText: 'Orders placed' })).toHaveCount(0);
 
@@ -76,6 +77,8 @@ test('with every switch off the core still works and nothing switched off is sho
     await settled(app);
     await expect(app.locator('s-section[heading="Why these numbers?"]')).toBeVisible();
     await expect(app.locator('s-press-button', { hasText: 'Suppliers' })).toHaveCount(0);
+    await expect(app.locator('s-press-button', { hasText: 'History' })).toHaveCount(0);
+    await expect(app.locator('s-section[heading="Expected sales"]')).toHaveCount(0);
     await expect(app.locator('s-button', { hasText: 'Mark as ordered' })).toHaveCount(0);
     await open(app, `/products/${variant}?tab=settings`);
     await settled(app);

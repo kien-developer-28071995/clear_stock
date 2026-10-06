@@ -6,6 +6,7 @@ use App\Models\Shop;
 use App\Repositories\Contracts\CostRepositoryInterface;
 use App\Services\Import\PurchaseOrderCsv;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
@@ -28,6 +29,7 @@ class CostService
     public function __construct(
         private readonly CostRepositoryInterface $costs,
         private readonly PurchaseOrderCsv $csv,
+        private readonly ChangeLogService $changes,
     ) {}
 
     public function list(Shop $shop, bool $missingOnly, ?string $search): array
@@ -54,7 +56,19 @@ class CostService
             $costs[(int) $i['variant_id']] = $i['cost'] === null ? null : round((float) $i['cost'], 4);
         }
 
-        return $this->costs->setOverrides($shop, $costs);
+        return $this->save($shop, $costs);
+    }
+
+    /** @param array<int, ?float> $costs variant id => cost (null = back to Shopify's) */
+    private function save(Shop $shop, array $costs, string $source = 'app'): int
+    {
+        $before = DB::table('variants')->where('shop_id', $shop->id)->whereIn('id', array_keys($costs))->pluck('cost_override', 'id')->all();
+        $updated = $this->costs->setOverrides($shop, $costs);
+        foreach ($before as $id => $old) {
+            $this->changes->record($shop, (int) $id, ['cost_override' => $old], ['cost_override' => $costs[$id]], $source);
+        }
+
+        return $updated;
     }
 
     /**
@@ -110,7 +124,7 @@ class CostService
         }
 
         return [
-            'updated' => $costs === [] ? 0 : $this->costs->setOverrides($shop, $costs),
+            'updated' => $costs === [] ? 0 : $this->save($shop, $costs, 'import'),
             'unmatched' => count($unmatched),
             'invalid' => $invalid,
             'unmatched_examples' => array_slice(array_values(array_unique($unmatched)), 0, 10),

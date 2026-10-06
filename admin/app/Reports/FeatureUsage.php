@@ -7,14 +7,16 @@ use Illuminate\Support\Facades\Cache;
 
 /**
  * Which installed shops use which feature, judged by the data they stored: a supplier, a bundle,
- * a manual order... Features that store nothing (what-if, purchase plan, exports) can't be seen
- * this way; see "Usage events" in the README for the plan to track those.
+ * a manual order... Features that store nothing (what-if, purchase plan, exports) are counted by
+ * the app when they are used (table `feature_events`) and reported for the last 28 days.
  *
  * Each feature names the table and columns it needs. When the deployed app doesn't have them
  * yet (an older version), the feature is reported as "not available" instead of failing.
  */
 class FeatureUsage
 {
+    private const USED_DAYS = 28;
+
     public function __construct(private readonly AppData $app) {}
 
     /**
@@ -25,6 +27,11 @@ class FeatureUsage
         $variants = fn (string $label, string $group, string $plan, array $columns, \Closure $where) => [
             'label' => $label, 'group' => $group, 'plan' => $plan, 'table' => 'variants', 'columns' => $columns,
             'where' => fn (Builder $q) => $where($q->where('is_active', true)),
+        ];
+
+        $used = fn (string $label, string $plan, array $features) => [
+            'label' => $label, 'group' => 'Used in the last '.self::USED_DAYS.' days', 'plan' => $plan, 'table' => 'feature_events', 'columns' => ['feature', 'day'],
+            'where' => fn (Builder $q) => $q->whereIn('feature', $features)->where('day', '>=', now('UTC')->subDays(self::USED_DAYS)->toDateString()),
         ];
 
         return [
@@ -96,6 +103,22 @@ class FeatureUsage
                 'where' => fn (Builder $q) => $q->where('realtime', '!=', 'off')],
             'flow' => ['label' => 'Shopify Flow workflow', 'group' => 'Alerts', 'plan' => 'growth', 'table' => 'flow_subscriptions', 'columns' => [],
                 'where' => fn (Builder $q) => $q],
+
+            'snoozed' => $variants('Snoozed a reorder suggestion', 'Ordering', 'free', ['snoozed_until'], fn (Builder $q) => $q->whereNotNull('snoozed_until')),
+
+            // Features that store nothing: counted by the app when used (feature_events), last 28 days.
+            'used_what_if' => $used('What-if scenario', 'starter', ['what_if', 'what_if_export']),
+            'used_purchase_plan' => $used('Purchase plan', 'starter', ['purchase_plan', 'purchase_plan_export']),
+            'used_budget' => $used('Order budget page', 'starter', ['budget']),
+            'used_po_export' => $used('Exported a purchase order', 'starter', ['purchase_order_export']),
+            'used_product_export' => $used('Exported the product list', 'free', ['product_export']),
+            'used_accuracy' => $used('Forecast accuracy', 'free', ['accuracy']),
+            'used_stock_history' => $used('Stock value history', 'free', ['stock_history']),
+            'used_clearance' => $used('Clearance list', 'free', ['clearance', 'clearance_export']),
+            'used_size_runs' => $used('Broken size runs', 'free', ['size_runs']),
+            'used_data_health' => $used('Data check', 'free', ['data_health']),
+            'used_change_log' => $used('Product change history', 'free', ['change_log']),
+            'used_transfers' => $used('Transfer suggestions', 'growth', ['transfers']),
         ];
     }
 

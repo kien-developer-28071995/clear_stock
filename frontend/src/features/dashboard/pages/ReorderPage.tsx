@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DashboardGate } from '@/features/dashboard/components/DashboardGate';
 import { ActionList } from '@/features/dashboard/components/ActionList';
+import { SnoozedList } from '@/features/dashboard/components/SnoozedList';
 import type { ActionGroup, Dashboard } from '@/features/dashboard/types';
 import { Tip } from '@/features/setup/components/Tip';
 import { useTransfers } from '@/features/transfers/hooks/useTransfers';
@@ -68,6 +69,7 @@ export function ReorderPage() {
                         )}
                         {/* key: a new vendor starts a fresh selection */}
                         <ActionList key={vendor} dashboard={forVendor(data, vendor)} />
+                        <SnoozedList items={data.snoozed ?? []} />
                     </s-page>
                 );
             }}
