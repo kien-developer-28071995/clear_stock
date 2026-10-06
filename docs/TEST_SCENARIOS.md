@@ -71,7 +71,7 @@ Quy tắc: mọi lỗi tìm thấy bằng **M** hoặc **S** phải có thêm m�
 | 4.17 | Đổi ngôn ngữ (6 ngôn ngữ) | Toàn bộ chữ đổi, không lộ khoá dịch | A |
 | 4.18 | Xuất CSV (sản phẩm, PO, kế hoạch, what-if, hàng nên xả) | File đúng cột, đúng số dòng, ô bắt đầu bằng `=` bị vô hiệu | A |
 | 4.19 | Màn hình 390 px | Không tràn ngang, mỗi hàng tối đa hai nút | M |
-| 4.20 | Thanh tiêu đề trang (nút Add, Export) trong admin | Hiện và bấm được | S |
+| 4.20 | Thanh tiêu đề trang (nút Add, Export) trong admin | Hiện và bấm được | S (đã kiểm tay 2026-10-06 trên store dev) |
 | 4.24 | Cài đặt → General → Send feedback: gõ rồi bỏ, mở lại, gửi | Nút Send khoá khi chưa gõ; mở lại thì form trống; gửi xong có thông báo, email tới `SUPPORT_EMAIL` kèm Reply-To | A, M |
 | 4.25 | Hỏi đánh giá: mở app; xuất PO / đánh dấu đã đặt; lần sau | Mở app không hỏi; hỏi sau khi xong việc, một lần mỗi lượt mở; Shopify đã hiện hộp thoại thì không bao giờ hỏi lại; shop mới cài < 7 ngày, chưa onboarding hoặc sync lỗi thì không hỏi | A; hộp thoại thật của Shopify: S |
 | 4.21 | Cần nhập hàng → chọn sản phẩm → Snooze 7 ngày → Bring back (từ trang sản phẩm và từ danh sách Snoozed) | Sản phẩm rời danh sách và email cảnh báo, số đếm "cần đặt" và dự báo không đổi; đúng ngày thì tự quay lại; xuất PO theo sản phẩm đã chọn vẫn có nó | A, M |
@@ -156,6 +156,7 @@ make admin-test           # hệ thống báo cáo
 cd frontend && npx tsc --noEmit && npm run i18n:check
 make e2e                  # mọi màn hình trên 3 gói + extension + sự cố (failures.spec)
 make e2e-features-off     # tắt hết công tắc
+make e2e-sweep            # quét mọi màn hình × gói × ngôn ngữ × điện thoại + shop ở trạng thái khác (~9 phút)
 make e2e-split            # frontend build thật, API khác origin
 make feature-screenshots  # bộ v1
 bash deploy/check-web-config.sh   # nginx + Caddy (cần kéo được image caddy)
