@@ -160,7 +160,9 @@
     "seeAll_one": "See all {{count}}",
     "seeAll_other": "See all {{count}}",
     "dataSynced": "Data synced {{when}}",
-    "notSyncedYet": "Waiting for the first sync"
+    "notSyncedYet": "Waiting for the first sync",
+    "failedHeading": "We couldn't import your store data",
+    "failedBody": "The import from Shopify did not finish, so there is nothing to forecast yet. See \"Store data\" below for the reason and to try again."
   },
   "actions": {
     "noneLeft": "0 left",

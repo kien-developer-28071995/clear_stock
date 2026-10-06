@@ -16,6 +16,7 @@ import { SetupGuide } from '@/features/setup/components/SetupGuide';
 export function DashboardPage() {
     const { t } = useTranslation();
     const sync = useSyncStatus();
+    const emptyReason = sync.data?.status === 'running' ? 'preparing' : sync.data?.status === 'failed' ? 'failed' : 'empty';
     const syncNeedsAttention = sync.data?.status === 'running' || sync.data?.status === 'failed';
 
     return (
@@ -24,8 +25,9 @@ export function DashboardPage() {
                 data.counts.total === 0 ? (
                     <s-page heading={appConfig.appName}>
                         <s-section>
-                            <s-empty-state heading={sync.data?.status === 'running' ? t('home.preparingHeading') : t('home.emptyHeading')}>
-                                <s-paragraph slot="subheading">{sync.data?.status === 'running' ? t('home.preparingBody') : t('home.emptyBody')}</s-paragraph>
+                            {/* Why there is nothing yet: still importing, the import failed, or the store has nothing to forecast. */}
+                            <s-empty-state heading={t(`home.${emptyReason}Heading`)}>
+                                <s-paragraph slot="subheading">{t(`home.${emptyReason}Body`)}</s-paragraph>
                             </s-empty-state>
                         </s-section>
                         <SetupGuide />

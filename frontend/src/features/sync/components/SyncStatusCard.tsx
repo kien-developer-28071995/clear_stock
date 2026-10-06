@@ -50,6 +50,9 @@ export function SyncStatusCard() {
                     </s-stack>
                 )}
 
+                {/* Running, but its progress is not known (yet): never an empty card. */}
+                {running && !run && <s-text>{t('sync.updating')}</s-text>}
+
                 {sync.status === 'failed' && sync.error && (
                     <s-banner tone="critical" heading={t('sync.failed')}>
                         <s-paragraph>{syncErrorMessage(sync.error)}</s-paragraph>

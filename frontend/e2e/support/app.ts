@@ -17,8 +17,8 @@ function lastLine(output: string): string {
 }
 
 /** A session token for the dev shop, as App Bridge would hand out. */
-export function sessionToken(): string {
-    return lastLine(artisan('dev:session-token', '--ttl=3600'));
+export function sessionToken(shop: string | null = null): string {
+    return lastLine(artisan('dev:session-token', '--ttl=3600', ...(shop ? [`--shop=${shop}`] : [])));
 }
 
 export function setPlan(plan: PlanKey): void {
@@ -97,9 +97,11 @@ export function stubAppBridge({ token, locale }: { token: string; locale: string
     };
 }
 
-export const test = base.extend<{ app: Page }>({
-    app: async ({ page, baseURL }, use) => {
-        const token = sessionToken();
+export const test = base.extend<{ app: Page; shopDomain: string | null }>({
+    // Another shop than the dev store (`test.use({ shopDomain })`): a store in a state the dev store is not in.
+    shopDomain: [null, { option: true }],
+    app: async ({ page, baseURL, shopDomain }, use) => {
+        const token = sessionToken(shopDomain);
         await page.addInitScript(stubAppBridge, { token, locale: 'en' });
         // Every page navigation gets the shell; API, Vite and CDN requests go through.
         await page.route(

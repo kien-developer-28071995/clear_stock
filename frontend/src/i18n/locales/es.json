@@ -165,7 +165,9 @@
     "seeAll_other": "Ver los {{count}}",
     "seeAll_many": "Ver los {{count}}",
     "dataSynced": "Datos sincronizados {{when}}",
-    "notSyncedYet": "Esperando la primera sincronización"
+    "notSyncedYet": "Esperando la primera sincronización",
+    "failedHeading": "No pudimos importar los datos de tu tienda",
+    "failedBody": "La importación desde Shopify no terminó, así que aún no hay nada que pronosticar. Mira el motivo y vuelve a intentarlo en \"Datos de la tienda\", más abajo."
   },
   "actions": {
     "noneLeft": "Quedan 0",

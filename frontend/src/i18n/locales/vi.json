@@ -155,7 +155,9 @@
     "thisWeekHeading": "Sắp tới trong tuần",
     "seeAll_other": "Xem tất cả {{count}}",
     "dataSynced": "Dữ liệu đồng bộ {{when}}",
-    "notSyncedYet": "Đang chờ lần đồng bộ đầu tiên"
+    "notSyncedYet": "Đang chờ lần đồng bộ đầu tiên",
+    "failedHeading": "Chưa nhập được dữ liệu cửa hàng",
+    "failedBody": "Việc nhập dữ liệu từ Shopify chưa hoàn tất nên chưa có gì để dự báo. Xem lý do và thử lại ở mục \"Dữ liệu cửa hàng\" bên dưới."
   },
   "actions": {
     "noneLeft": "Hết hàng",

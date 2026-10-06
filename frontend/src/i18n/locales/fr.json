@@ -165,7 +165,9 @@
     "seeAll_other": "Voir les {{count}}",
     "seeAll_many": "Voir les {{count}}",
     "dataSynced": "Données synchronisées {{when}}",
-    "notSyncedYet": "En attente de la première synchronisation"
+    "notSyncedYet": "En attente de la première synchronisation",
+    "failedHeading": "Impossible d'importer les données de votre boutique",
+    "failedBody": "L'import depuis Shopify ne s'est pas terminé : il n'y a encore rien à prévoir. Consultez la raison et réessayez dans « Données de la boutique » ci-dessous."
   },
   "actions": {
     "noneLeft": "0 restant",

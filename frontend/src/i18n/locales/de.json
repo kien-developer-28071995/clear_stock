@@ -160,7 +160,9 @@
     "seeAll_one": "{{count}} ansehen",
     "seeAll_other": "Alle {{count}} ansehen",
     "dataSynced": "Daten synchronisiert {{when}}",
-    "notSyncedYet": "Warten auf die erste Synchronisierung"
+    "notSyncedYet": "Warten auf die erste Synchronisierung",
+    "failedHeading": "Deine Shop-Daten konnten nicht importiert werden",
+    "failedBody": "Der Import aus Shopify wurde nicht abgeschlossen, daher gibt es noch nichts zu prognostizieren. Den Grund und einen neuen Versuch findest du unten unter „Shopdaten“."
   },
   "actions": {
     "noneLeft": "0 übrig",
