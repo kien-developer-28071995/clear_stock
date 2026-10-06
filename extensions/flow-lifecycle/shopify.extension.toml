@@ -5,4 +5,5 @@
 name = "Clear Stock Flow lifecycle"
 type = "flow_trigger_lifecycle_callback"
 handle = "flow-lifecycle"
-url = "https://deposit-have-arguments-savings.trycloudflare.com/flow/lifecycle"
+uid = "79bfffb1-47cd-ae35-089f-c257fba435d2f40669a8"
+url = "https://romance-gps-drinks-senators.trycloudflare.com/flow/lifecycle"

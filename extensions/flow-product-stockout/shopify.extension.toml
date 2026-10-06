@@ -5,6 +5,7 @@
 name = "Product stockout threshold reached"
 type = "flow_trigger"
 handle = "product-stockout-threshold-reached"
+uid = "0e66e3cd-1fe8-b53c-ce10-b120b7b6d3545c9de838"
 description = "A product will run out within 30, 14 or 7 days, or just ran out (0), according to its Clear Stock forecast."
 
 [settings]

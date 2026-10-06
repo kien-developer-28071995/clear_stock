@@ -4,6 +4,7 @@
 name = "Supplier reorder date reached"
 type = "flow_trigger"
 handle = "supplier-reorder-date-reached"
+uid = "27405ead-ff61-bf71-acc4-54d2be48399e0dd67c57"
 description = "Products from a supplier need reordering according to Clear Stock. Includes the order lines, total units and cost."
 
 [settings]
