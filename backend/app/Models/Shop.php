@@ -48,6 +48,7 @@ use Illuminate\Support\Carbon;
  * @property ?Carbon $last_synced_at
  * @property ?Carbon $forecasted_at
  * @property ?string $realtime_webhook_id shop-specific inventory_levels/update subscription (real-time alerts)
+ * @property ?Carbon $review_prompted_at Shopify's review dialog was shown (or never will be): not asked again
  * @property ?Carbon $installed_at
  * @property ?Carbon $uninstalled_at
  */
@@ -62,7 +63,7 @@ class Shop extends Model
         'access_token', 'access_token_expires_at', 'refresh_token', 'refresh_token_expires_at', 'scopes',
         'plan', 'plan_interval', 'subscription_id', 'subscription_status', 'plan_renews_at', 'trial_started_at', 'currency', 'timezone', 'locale', 'default_lead_time_days', 'default_safety_days', 'filter_sales_spikes', 'forecast_profile', 'excluded_order_tags', 'excluded_order_sources', 'order_budget', 'onboarded_at', 'setup_guide',
         'sync_status', 'sync_error', 'sync_failure_notified_at', 'last_synced_at', 'forecasted_at', 'realtime_webhook_id',
-        'installed_at', 'uninstalled_at',
+        'installed_at', 'uninstalled_at', 'review_prompted_at', 'review_prompt_result',
     ];
 
     protected $hidden = ['access_token', 'refresh_token'];
@@ -107,6 +108,7 @@ class Shop extends Model
             'last_synced_at' => 'datetime',
             'forecasted_at' => 'datetime',
             'installed_at' => 'datetime',
+            'review_prompted_at' => 'datetime',
             'uninstalled_at' => 'datetime',
             'onboarded_at' => 'datetime',
             'setup_guide' => 'array',

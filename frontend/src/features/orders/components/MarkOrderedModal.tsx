@@ -5,6 +5,7 @@ import type { ModalElement } from '@/hooks/useModal';
 import { fieldError } from '@/lib/http';
 import { useCreateManualOrders } from '@/features/orders/hooks/useManualOrders';
 import { formatNumber } from '@/utils/format';
+import { useReviewPrompt } from '@/hooks/useReviewPrompt';
 
 interface Item {
     variant_id: number;
@@ -27,6 +28,7 @@ export function MarkOrderedModal({ id, modalRef, items, onDone }: Props) {
     const { t } = useTranslation();
     const create = useCreateManualOrders();
     const once = useSubmitOnce();
+    const askForReview = useReviewPrompt();
     // From submit until the dialog has closed, it keeps showing what was submitted: the lists behind
     // it refresh at that moment, and a dialog whose content changes while it closes stays open.
     const [submitted, setSubmitted] = useState<Item[] | null>(null);
@@ -64,6 +66,7 @@ export function MarkOrderedModal({ id, modalRef, items, onDone }: Props) {
                         finished = true;
                         setSubmitted(null);
                         onDone?.();
+                        askForReview(); // a finished task: the moment Shopify recommends
                     };
                     modal?.addEventListener('afterhide', finish, { once: true });
                     setTimeout(finish, 2000); // in case the event never comes

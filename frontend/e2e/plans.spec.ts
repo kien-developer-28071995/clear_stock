@@ -1,5 +1,5 @@
 import fs from 'node:fs';
-import { api, expect, open, pickNext, saveBar, setPlan, settled, test, toasts, variants, type PlanKey } from './support/app';
+import { api, expect, open, php, pickNext, saveBar, setPlan, settled, test, toasts, variants, type PlanKey } from './support/app';
 
 /**
  * Every screen and every feature, once per plan. Each plan block switches the dev shop
@@ -1050,5 +1050,63 @@ for (const plan of ['free', 'starter', 'growth'] as PlanKey[]) {
         });
     });
 }
+
+test('asks for a review once, after a finished task, and the feedback box sends a message', async ({ app }) => {
+    const mayAsk = async () => (await api<{ data: { review_prompt: boolean } }>(app, '/shop')).data.review_prompt;
+    const asked = () => app.evaluate(() => window.__e2e.reviewRequests);
+    const reset = () => php('App\\Models\\Shop::first()->update(["review_prompted_at" => null, "review_prompt_result" => null]); echo json_encode(true);');
+    const exportOrder = async () => {
+        const download = app.waitForEvent('download');
+        await app.getByRole('button', { name: 'Export purchase order' }).first().click();
+        await app.getByRole('menuitem', { name: 'Spreadsheet (CSV)' }).click();
+        await download;
+    };
+    setPlan('starter');
+    reset();
+
+    try {
+        // Opening the app asks for nothing.
+        await open(app, '/reorder');
+        expect(await mayAsk()).toBe(true);
+        await app.waitForTimeout(3000);
+        expect(await asked()).toBe(0);
+
+        // Shopify did not show its dialog this time (cooldown): the shop may be asked another day.
+        await exportOrder();
+        await expect.poll(asked, { timeout: 10_000 }).toBe(1);
+        await exportOrder(); // once per visit
+        await app.waitForTimeout(3500);
+        expect(await asked()).toBe(1);
+        expect(await mayAsk()).toBe(true);
+
+        // Next visit the dialog is shown: never asked again.
+        await open(app, '/reorder');
+        await app.evaluate(() => (window.__e2e.reviewCode = 'success'));
+        await exportOrder();
+        await expect.poll(asked, { timeout: 10_000 }).toBe(1);
+        await expect.poll(mayAsk).toBe(false);
+        await open(app, '/reorder');
+        await exportOrder();
+        await app.waitForTimeout(3500);
+        expect(await asked()).toBe(0);
+
+        // Feedback box in Settings: nothing to send until something is written; the form starts clean each time.
+        await open(app, '/settings?tab=general');
+        const modal = app.locator('s-modal#feedback-modal');
+        const sendButton = modal.locator('s-button[slot="primary-action"]');
+        await app.locator('s-button', { hasText: 'Send feedback' }).click();
+        await expect(sendButton).toHaveAttribute('disabled');
+        await modal.getByRole('textbox', { name: 'Your message' }).fill('Abandoned draft');
+        await app.keyboard.press('Escape');
+        await app.locator('s-button', { hasText: 'Send feedback' }).click();
+        await expect(modal.getByRole('textbox', { name: 'Your message' })).toHaveValue('');
+        await modal.getByRole('textbox', { name: 'Your message' }).fill('E2E: the explanations are clear.');
+        await expect(sendButton).not.toHaveAttribute('disabled');
+        await sendButton.click();
+        await expect.poll(() => toasts(app)).toContainEqual('Feedback sent. Thank you!');
+    } finally {
+        reset();
+    }
+});
 
 test.afterAll(() => setPlan('free'));

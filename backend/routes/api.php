@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\ClientErrorController;
 use App\Http\Controllers\Api\CostController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\DataHealthController;
+use App\Http\Controllers\Api\FeedbackController;
 use App\Http\Controllers\Api\ForecastAccuracyController;
 use App\Http\Controllers\Api\ForecastController;
 use App\Http\Controllers\Api\GrowthScenarioController;
@@ -44,6 +45,10 @@ Route::middleware('shopify.session')->group(function () {
     Route::post('/client-errors', [ClientErrorController::class, 'store'])->middleware('throttle:20,1');
     // Web vitals measured in the admin (App Bridge), for the owner's reports.
     Route::post('/web-vitals', [WebVitalController::class, 'store'])->middleware('throttle:30,1');
+
+    // Feedback box (emailed to support) and the answer of Shopify's review dialog.
+    Route::post('/feedback', [FeedbackController::class, 'store'])->middleware('throttle:5,60')->middleware('feature:feedback');
+    Route::post('/review-prompt', [FeedbackController::class, 'reviewPrompt'])->middleware('throttle:10,1')->middleware('feature:review_prompt');
 
     Route::get('/sync', [SyncController::class, 'show']);
     Route::post('/sync', [SyncController::class, 'store'])->middleware('throttle:10,1');

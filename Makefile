@@ -6,7 +6,7 @@ export UID := $(shell id -u)
 export GID := $(shell id -g)
 
 .DEFAULT_GOAL := help
-.PHONY: help setup up down restart build shell migrate fresh test test-mysql e2e extensions logs tunnel tunnel-url tunnel-down e2e-features-off e2e-split listing-screenshots feature-screenshots listing-video \
+.PHONY: help setup up down restart build shell migrate fresh test test-mysql e2e extensions logs tunnel tunnel-url tunnel-down e2e-features-off e2e-split e2e-sweep listing-screenshots feature-screenshots listing-video \
         app-url webhook artisan composer npm typecheck website website-build admin-setup admin-user admin-test prod-build prod-up prod-down prod-migrate prod-logs
 
 help: ## List available commands
@@ -56,6 +56,9 @@ e2e: ## End-to-end tests in Chromium on every plan + admin extensions (needs mak
 	npm run extensions:locales:check
 	cd frontend && npx playwright test
 
+e2e-sweep: ## Sweep of every screen on every plan, in every language and at phone width: console errors, failed API calls, raw keys, overflow (needs make up)
+	cd frontend && E2E_SWEEP=1 npx playwright test e2e/sweep.spec.ts
+
 e2e-split: ## E2E of the built frontend on its own origin (:4173) calling the API on another (:8080)
 	@cd frontend && VITE_API_URL=http://localhost:$${APP_PORT:-8080} npm run build >/dev/null \
 	&& (npx vite preview --port 4173 --strictPort >/dev/null 2>&1 & echo $$! > .preview.pid) && sleep 2; \
@@ -90,7 +93,7 @@ listing-video: ## Draft App Store walkthrough video (WebM) of the v1 app into do
 	(cd frontend && LISTING_VIDEO=1 npx playwright test e2e/listing-walkthrough.spec.ts)
 
 # Every switch of backend/config/features.php, off (a test fails when a new switch is missing here).
-ALL_OFF = \nFEATURE_WHAT_IF=false\nFEATURE_REFERENCE_PRODUCTS=false\nFEATURE_ABC=false\nFEATURE_PURCHASE_PLAN=false\nFEATURE_ORDER_BUDGET=false\nFEATURE_SPIKE_FILTER=false\nFEATURE_LOST_SALES=false\nFEATURE_ACCURACY=false\nFEATURE_SALES_EVENTS=false\nFEATURE_WEEKLY_SUMMARY=false\nFEATURE_PURCHASE_ORDERS=false\nFEATURE_SHOPIFY_PURCHASE_ORDERS=false\nFEATURE_SUPPLIER_EMAILS=false\nFEATURE_LOCATIONS=false\nFEATURE_TRANSFERS=false\nFEATURE_REALTIME_ALERTS=false\nFEATURE_FLOW_TRIGGERS=false\nFEATURE_BUNDLES=false\nFEATURE_ALERTS=false\nFEATURE_SLACK_ALERTS=false\nFEATURE_LOW_COVER_ALERTS=false\nFEATURE_FORECAST_PROFILES=false\nFEATURE_TREND=false\nFEATURE_ORDER_EXCLUSIONS=false\nFEATURE_LOCATION_EXCLUSIONS=false\nFEATURE_MANUAL_ORDERS=false\nFEATURE_ALTERNATE_SUPPLIERS=false\nFEATURE_SUPPLIER_IMPORT=false\nFEATURE_VENDOR_SUPPLIERS=false\nFEATURE_COSTS=false\nFEATURE_SAVED_VIEWS=false\nFEATURE_PRODUCT_EXPORT=false\nFEATURE_STOCK_HISTORY=false\nFEATURE_CLEARANCE=false\nFEATURE_SIZE_RUNS=false\nFEATURE_DATA_HEALTH=false\nFEATURE_SNOOZE=false\nFEATURE_DEMAND_PROJECTION=false\nFEATURE_CHANGE_LOG=false\n
+ALL_OFF = \nFEATURE_WHAT_IF=false\nFEATURE_REFERENCE_PRODUCTS=false\nFEATURE_ABC=false\nFEATURE_PURCHASE_PLAN=false\nFEATURE_ORDER_BUDGET=false\nFEATURE_SPIKE_FILTER=false\nFEATURE_LOST_SALES=false\nFEATURE_ACCURACY=false\nFEATURE_SALES_EVENTS=false\nFEATURE_WEEKLY_SUMMARY=false\nFEATURE_PURCHASE_ORDERS=false\nFEATURE_SHOPIFY_PURCHASE_ORDERS=false\nFEATURE_SUPPLIER_EMAILS=false\nFEATURE_LOCATIONS=false\nFEATURE_TRANSFERS=false\nFEATURE_REALTIME_ALERTS=false\nFEATURE_FLOW_TRIGGERS=false\nFEATURE_BUNDLES=false\nFEATURE_ALERTS=false\nFEATURE_SLACK_ALERTS=false\nFEATURE_LOW_COVER_ALERTS=false\nFEATURE_FORECAST_PROFILES=false\nFEATURE_TREND=false\nFEATURE_ORDER_EXCLUSIONS=false\nFEATURE_LOCATION_EXCLUSIONS=false\nFEATURE_MANUAL_ORDERS=false\nFEATURE_ALTERNATE_SUPPLIERS=false\nFEATURE_SUPPLIER_IMPORT=false\nFEATURE_VENDOR_SUPPLIERS=false\nFEATURE_COSTS=false\nFEATURE_SAVED_VIEWS=false\nFEATURE_PRODUCT_EXPORT=false\nFEATURE_STOCK_HISTORY=false\nFEATURE_CLEARANCE=false\nFEATURE_SIZE_RUNS=false\nFEATURE_DATA_HEALTH=false\nFEATURE_SNOOZE=false\nFEATURE_DEMAND_PROJECTION=false\nFEATURE_CHANGE_LOG=false\nFEATURE_REVIEW_PROMPT=false\nFEATURE_FEEDBACK=false\n
 
 e2e-features-off: ## E2E check of the app with every optional feature switched off (restores backend/.env afterwards)
 	@env='$(CURDIR)/backend/.env'; cp "$$env" "$$env.e2e-backup"; \

@@ -60,13 +60,14 @@ const SHELL = `<!DOCTYPE html>
 
 declare global {
     interface Window {
-        __e2e: { toasts: string[]; saveBar: Record<string, boolean>; pickerSelection: unknown[]; scopes: string[]; grantScopes: boolean; scopeRequests: string[][] };
+        __e2e: { toasts: string[]; saveBar: Record<string, boolean>; pickerSelection: unknown[]; scopes: string[]; grantScopes: boolean; scopeRequests: string[][]; reviewRequests: number; reviewCode: string };
     }
 }
 
 /** Stub of the App Bridge APIs the app uses (`shopify.*`). */
 export function stubAppBridge({ token, locale }: { token: string; locale: string }) {
-    window.__e2e = { toasts: [], saveBar: {}, pickerSelection: [], scopes: [], grantScopes: true, scopeRequests: [] };
+    // reviewCode: what Shopify's review dialog answers. "cooldown-period" (not shown this time) leaves the shop as it was.
+    window.__e2e = { toasts: [], saveBar: {}, pickerSelection: [], scopes: [], grantScopes: true, scopeRequests: [], reviewRequests: 0, reviewCode: 'cooldown-period' };
     (window as unknown as { shopify: unknown }).shopify = {
         config: { locale },
         idToken: async () => token,
@@ -77,6 +78,13 @@ export function stubAppBridge({ token, locale }: { token: string; locale: string
             leaveConfirmation: async () => undefined,
         },
         resourcePicker: async () => window.__e2e.pickerSelection,
+        reviews: {
+            request: async () => {
+                window.__e2e.reviewRequests++;
+                const code = window.__e2e.reviewCode;
+                return { success: code === 'success', code, message: '' };
+            },
+        },
         // Optional scopes: the merchant approves (grantScopes) or declines the dialog.
         scopes: {
             query: async () => ({ granted: window.__e2e.scopes, required: [], optional: [] }),

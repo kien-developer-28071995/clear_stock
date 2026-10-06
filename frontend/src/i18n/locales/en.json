@@ -1466,5 +1466,15 @@
       "override_lead_time_days": "Lead time (your adjustment)",
       "override_safety_days": "Safety days (your adjustment)"
     }
+  },
+  "feedback": {
+    "heading": "Feedback",
+    "body": "Something missing, wrong or confusing? Tell us. It goes straight to the people who build the app.",
+    "open": "Send feedback",
+    "message": "Your message",
+    "email": "Your email (optional)",
+    "emailHelp": "Only if you want a reply.",
+    "send": "Send",
+    "sent": "Feedback sent. Thank you!"
   }
 }

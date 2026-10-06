@@ -104,6 +104,8 @@ class FeatureUsage
             'flow' => ['label' => 'Shopify Flow workflow', 'group' => 'Alerts', 'plan' => 'growth', 'table' => 'flow_subscriptions', 'columns' => [],
                 'where' => fn (Builder $q) => $q],
 
+            'review_prompted' => ['label' => 'Was shown the review dialog', 'group' => 'Setup', 'plan' => 'free', 'table' => 'shops', 'columns' => ['review_prompted_at', 'review_prompt_result'], 'shop_column' => 'id',
+                'where' => fn (Builder $q) => $q->where('review_prompt_result', 'success')],
             'snoozed' => $variants('Snoozed a reorder suggestion', 'Ordering', 'free', ['snoozed_until'], fn (Builder $q) => $q->whereNotNull('snoozed_until')),
 
             // Features that store nothing: counted by the app when used (feature_events), last 28 days.

@@ -1609,5 +1609,15 @@
       "override_lead_time_days": "Délai de livraison (votre ajustement)",
       "override_safety_days": "Jours de sécurité (votre ajustement)"
     }
+  },
+  "feedback": {
+    "heading": "Vos retours",
+    "body": "Il manque quelque chose, quelque chose est faux ou peu clair ? Dites-le-nous. Votre message arrive directement à l'équipe qui développe l'application.",
+    "open": "Envoyer un retour",
+    "message": "Votre message",
+    "email": "Votre e-mail (facultatif)",
+    "emailHelp": "Seulement si vous souhaitez une réponse.",
+    "send": "Envoyer",
+    "sent": "Retour envoyé. Merci !"
   }
 }

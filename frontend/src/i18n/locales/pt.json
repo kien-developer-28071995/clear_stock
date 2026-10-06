@@ -1609,5 +1609,15 @@
       "override_lead_time_days": "Prazo de entrega (seu ajuste)",
       "override_safety_days": "Dias de segurança (seu ajuste)"
     }
+  },
+  "feedback": {
+    "heading": "Feedback",
+    "body": "Falta algo, algo está errado ou confuso? Conte para nós. Vai direto para quem desenvolve o app.",
+    "open": "Enviar feedback",
+    "message": "Sua mensagem",
+    "email": "Seu e-mail (opcional)",
+    "emailHelp": "Só se você quiser uma resposta.",
+    "send": "Enviar",
+    "sent": "Feedback enviado. Obrigado!"
   }
 }

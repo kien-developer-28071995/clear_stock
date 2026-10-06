@@ -1323,5 +1323,15 @@
       "override_lead_time_days": "Lead time (bạn điều chỉnh)",
       "override_safety_days": "Ngày an toàn (bạn điều chỉnh)"
     }
+  },
+  "feedback": {
+    "heading": "Góp ý",
+    "body": "Thiếu gì, sai gì hay khó hiểu chỗ nào? Hãy cho chúng tôi biết. Góp ý được gửi thẳng tới những người làm ra app.",
+    "open": "Gửi góp ý",
+    "message": "Nội dung",
+    "email": "Email của bạn (không bắt buộc)",
+    "emailHelp": "Chỉ cần nếu bạn muốn nhận trả lời.",
+    "send": "Gửi",
+    "sent": "Đã gửi góp ý. Cảm ơn bạn!"
   }
 }

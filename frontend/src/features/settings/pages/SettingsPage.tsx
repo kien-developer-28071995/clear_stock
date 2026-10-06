@@ -14,6 +14,7 @@ import { TabPanel, Tabs, useTab } from '@/components/ui/Tabs';
 import { SyncStatusCard } from '@/features/sync/components/SyncStatusCard';
 import { StockLocationsSection } from '@/features/settings/components/StockLocationsSection';
 import { FlowSection } from '@/features/settings/components/FlowSection';
+import { FeedbackSection } from '@/features/feedback/components/FeedbackSection';
 import { useExcludeLocations, useSettings, useStockLocations, useUpdateSettings } from '@/features/settings/hooks/useSettings';
 import type { RealtimeAlertMode, Settings } from '@/features/settings/types';
 import { NO_VALUE, fromOption, optionValue } from '@/utils/select';
@@ -53,6 +54,7 @@ export function SettingsPage() {
     const exclusionsExist = useFeature('order_exclusions');
     const costsExist = useFeature('costs');
     const healthExists = useFeature('data_health');
+    const feedbackExists = useFeature('feedback');
 
     useEffect(() => {
         if (data) setForm(data);
@@ -359,6 +361,7 @@ export function SettingsPage() {
                     </s-section>
                 )}
                 <SyncStatusCard />
+                {feedbackExists && <FeedbackSection defaultEmail={data?.alerts.email ?? null} />}
             </TabPanel>
         </s-page>
     );

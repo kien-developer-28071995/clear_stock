@@ -72,6 +72,10 @@ return [
     'demand_projection' => (bool) env('FEATURE_DEMAND_PROJECTION', true), // expected sales over the next 30/60/90 days
     'change_log' => (bool) env('FEATURE_CHANGE_LOG', true),               // what was changed on a product, and when
 
+    // Listening to merchants (every plan)
+    'review_prompt' => (bool) env('FEATURE_REVIEW_PROMPT', true),   // Shopify's review dialog, once, after a finished task
+    'feedback' => (bool) env('FEATURE_FEEDBACK', true),             // feedback box in Settings, emailed to SUPPORT_EMAIL
+
     // Lists and reports (every plan)
     'saved_views' => (bool) env('FEATURE_SAVED_VIEWS', true),       // saved filters of the product list
     'product_export' => (bool) env('FEATURE_PRODUCT_EXPORT', true), // product list as CSV

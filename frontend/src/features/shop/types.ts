@@ -79,7 +79,9 @@ export type FeatureSwitch =
     | 'data_health'
     | 'snooze'
     | 'demand_projection'
-    | 'change_log';
+    | 'change_log'
+    | 'review_prompt'
+    | 'feedback';
 
 export type FeatureSwitches = Record<FeatureSwitch, boolean>;
 
@@ -101,4 +103,6 @@ export interface Shop {
     default_lead_time_days: number;
     default_safety_days: number;
     forecasted_at: string | null;
+    /** The app may ask for an App Store review now (once per shop, after a finished task). */
+    review_prompt: boolean;
 }

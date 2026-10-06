@@ -177,7 +177,7 @@ class EloquentForecastQueryRepository implements ForecastQueryRepositoryInterfac
 
     public function snoozed(Shop $shop, string $today, int $limit): array
     {
-        return Variant::query()->forShop($shop)->where('is_active', true)->where('snoozed_until', '>', $today)
+        return Variant::query()->forShop($shop)->where('is_active', true)->whereDate('snoozed_until', '>', $today)
             ->orderBy('snoozed_until')->orderBy('id')->limit($limit)->get()
             ->map(fn (Variant $v) => ['variant_id' => $v->id, 'name' => $v->displayName(), 'until' => $v->snoozed_until->toDateString()])->all();
     }
@@ -490,7 +490,8 @@ class EloquentForecastQueryRepository implements ForecastQueryRepositoryInterfac
     private function notSnoozed(Builder $query, string $today): void
     {
         if (Features::on('snooze')) {
-            $query->where(fn ($q) => $q->whereNull('variants.snoozed_until')->orWhere('variants.snoozed_until', '<=', $today));
+            // By calendar day whatever the column holds (SQLite keeps a time next to a date saved through the model).
+            $query->where(fn ($q) => $q->whereNull('variants.snoozed_until')->orWhereDate('variants.snoozed_until', '<=', $today));
         }
     }
 

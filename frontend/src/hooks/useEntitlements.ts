@@ -66,6 +66,8 @@ const NONE: Entitlements = {
         snooze: true,
         demand_projection: true,
         change_log: true,
+        review_prompt: true,
+        feedback: true,
     },
 };
 
