@@ -26,7 +26,7 @@ mkdir -p "$work/frontend/assets" "$work/website"
 echo '<!doctype html><title>app</title>' > "$work/frontend/index.html"
 echo 'console.log(1)' > "$work/frontend/assets/app.js"
 sed -e 's|/opt/clear_stock/frontend|/srv/frontend|; s|/opt/clear_stock/website|/srv/website|' \
-    -e 's|^app-api\.clear-stock\.techfoxify\.com.* {|:8081 {|; s|^app\.clear-stock\.techfoxify\.com {|:8082 {|; s|^www\.example\.com {|:8083 {|' deploy/Caddyfile > "$work/Caddyfile"
+    -e 's|^app-api\.clear-stock\.techfoxify\.com {|:8081 {|; s|^app\.clear-stock\.techfoxify\.com {|:8082 {|; s|^clear-stock\.techfoxify\.com {|:8083 {|' deploy/Caddyfile > "$work/Caddyfile"
 grep -q '^:8082 {' "$work/Caddyfile" || fail "deploy/Caddyfile has no app.clear-stock.techfoxify.com block"
 docker run -d --name "$name" -p 127.0.0.1::8082 -v "$work/Caddyfile:/etc/caddy/Caddyfile:ro" -v "$work/frontend:/srv/frontend:ro" -v "$work/website:/srv/website:ro" caddy:2-alpine >/dev/null
 port=$(docker port "$name" 8082/tcp | head -1 | sed 's/.*://')

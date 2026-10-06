@@ -1,13 +1,11 @@
 # HTTPS in front of three separate things (Let's Encrypt certificates, automatic renewal):
 #   app-api.clear-stock.techfoxify.com  the backend: API, webhooks, Horizon (the "web" container)   = APP_URL
 #   app.clear-stock.techfoxify.com  the app's frontend: a static site (app/frontend/)               = FRONTEND_URL
-#   www.example.com  the marketing website (website/)                            = WEBSITE_URL
+#   clear-stock.techfoxify.com  the marketing website (website/)                            = WEBSITE_URL
 # Install Caddy on the server, copy this to /etc/caddy/Caddyfile, replace the domains, then:
 #   sudo systemctl reload caddy
 # The web container listens on 127.0.0.1:8080 (APP_PORT in the deploy dir's .env).
-# clear-stock.techfoxify.com is the address the app had before the split: links to it still reach the backend,
-# which sends browsers on to the frontend.
-app-api.clear-stock.techfoxify.com, clear-stock.techfoxify.com {
+app-api.clear-stock.techfoxify.com {
     encode zstd gzip
     reverse_proxy 127.0.0.1:8080
 }
@@ -47,7 +45,7 @@ app.clear-stock.techfoxify.com {
 
 # Marketing website (website/): static files the Deploy workflow uploads to <deploy dir>/website.
 # Pages are built as privacy.html, vi/support.html...: try_files serves them at /privacy, /vi/support.
-www.example.com {
+clear-stock.techfoxify.com {
     encode zstd gzip
     root * /opt/clear_stock/website
     try_files {path} {path}.html {path}/index.html
