@@ -6,7 +6,7 @@ name = "Product reorder date reached"
 type = "flow_trigger"
 handle = "product-reorder-date-reached"
 uid = "e73a22a2-8164-cf29-1828-f8bd2bf19b7d9086823c"
-description = "A product needs reordering today according to its Clear Stock forecast. Includes the suggested quantity, supplier and days until it runs out."
+description = "A product needs reordering today according to its Clear Stock forecast. Includes the suggested quantity, supplier and days of stock left."
 
 [settings]
 
