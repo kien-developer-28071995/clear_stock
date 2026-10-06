@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ErrorBanner } from '@/components/ui/ErrorBanner';
 import { useChanges } from '@/features/forecasts/hooks/useForecasts';
@@ -8,6 +9,8 @@ import { formatDate, formatDateTime, formatNumber } from '@/utils/format';
 const SWITCHES = ['alerts_muted', 'discontinued'];
 const DATES = ['snoozed_until'];
 const TEXT = ['supplier', 'reference', 'supplier_sku'];
+/** Shown at first: the page stays short, also on a phone where each change takes five lines. */
+const VISIBLE = 10;
 
 /** Locale keys cannot contain a dot: `override.avg_daily_sales` is `override_avg_daily_sales`. */
 const fieldKey = (field: string) => field.replace('.', '_');
@@ -16,6 +19,7 @@ const fieldKey = (field: string) => field.replace('.', '_');
 export function ChangeHistory({ variantId }: { variantId: number }) {
     const { t } = useTranslation();
     const { data, isPending, error, refetch } = useChanges(variantId, true);
+    const [all, setAll] = useState(false);
 
     const value = (c: ChangeEntry, v: string | null): string => {
         if (v === null) return t('history.empty');
@@ -47,7 +51,7 @@ export function ChangeHistory({ variantId }: { variantId: number }) {
                             <s-table-header listSlot="secondary">{t('history.when')}</s-table-header>
                         </s-table-header-row>
                         <s-table-body>
-                            {data.map((c) => (
+                            {(all ? data : data.slice(0, VISIBLE)).map((c) => (
                                 <s-table-row key={c.id}>
                                     <s-table-cell>
                                         <s-stack gap="small-100">
@@ -62,6 +66,7 @@ export function ChangeHistory({ variantId }: { variantId: number }) {
                             ))}
                         </s-table-body>
                     </s-table>
+                    {data.length > VISIBLE && !all && <s-link onClick={() => setAll(true)}>{t('common.showAll', { count: data.length })}</s-link>}
                     <s-text color="subdued">{t('history.kept')}</s-text>
                 </s-stack>
             )}

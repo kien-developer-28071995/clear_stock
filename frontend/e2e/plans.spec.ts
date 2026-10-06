@@ -805,7 +805,8 @@ for (const plan of ['free', 'starter', 'growth'] as PlanKey[]) {
             const row = app.locator('s-table-row', { hasText: name });
             await expect(row).toContainText('9 days');
 
-            await row.locator('s-button', { hasText: 'Edit' }).click();
+            // The supplier's name opens it (Edit is also under More).
+            await row.locator('s-link', { hasText: name }).click();
             await modal.getByRole('spinbutton', { name: /lead time/i }).fill('11');
             // Order days: Monday and Thursday.
             await modal.getByRole('checkbox', { name: 'Mon' }).check();
