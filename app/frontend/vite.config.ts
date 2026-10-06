@@ -4,7 +4,7 @@ import react from '@vitejs/plugin-react';
 import { fileURLToPath, URL } from 'node:url';
 
 export default defineConfig(({ mode }) => {
-    // frontend/.env (see .env.example)
+    // app/frontend/.env (see .env.example)
     const env = loadEnv(mode, process.cwd(), '');
     // In dev the page is served from the tunnel (https, inside the Shopify admin iframe).
     // nginx proxies Vite's paths + HMR websocket, so assets share that same origin.
@@ -16,7 +16,7 @@ export default defineConfig(({ mode }) => {
             laravel({
                 // The embedded admin app (public pages: website/).
                 input: ['src/main.tsx'],
-                // Laravel (backend/) serves the page: write the build + hot file into its public dir.
+                // Laravel (app/backend/) serves the page: write the build + hot file into its public dir.
                 publicDirectory: '../backend/public',
                 hotFile: '../backend/public/hot',
                 refresh: ['../backend/resources/views/**'],

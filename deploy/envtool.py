@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-Production backend/.env from GitHub instead of a hand-edited file on the server.
+Production app/backend/.env from GitHub instead of a hand-edited file on the server.
 
-The template is backend/.env.production.example: it lists every key and its default. A GitHub
+The template is app/backend/.env.production.example: it lists every key and its default. A GitHub
 Secret or Variable (environment `production`) with the same name overrides that default.
 Secrets hold what must stay hidden (keys, passwords, tokens, webhooks); Variables hold the
 rest (APP_URL, FEATURE_*, ...) and can be read and edited in the GitHub UI.
@@ -28,7 +28,7 @@ import subprocess
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-TEMPLATE = os.path.join(ROOT, 'backend', '.env.production.example')
+TEMPLATE = os.path.join(ROOT, 'app', 'backend', '.env.production.example')
 LINE = re.compile(r'^([A-Z][A-Z0-9_]*)=(.*)$')
 
 # Must be set (not empty, not a REPLACE placeholder) for a production deploy.
@@ -102,7 +102,7 @@ def render(args):
         print(f'::warning::{key} is both a Secret and a Variable; the Secret is used.')
 
     if 'APP_KEY' not in given:
-        # Not set up yet: keep the hand-made backend/.env on the server.
+        # Not set up yet: keep the hand-made app/backend/.env on the server.
         print('APP_KEY is not a GitHub Secret: .env is not managed by CI, the server keeps its own file.')
         write_output('managed', 'false')
         return 0
@@ -160,7 +160,7 @@ def render(args):
         os.umask(old)
 
     overridden = sorted(k for k in given if k in values or k in added)
-    print(f'backend/.env rendered: {len(values) + len(added)} keys, {len(overridden)} from GitHub '
+    print(f'app/backend/.env rendered: {len(values) + len(added)} keys, {len(overridden)} from GitHub '
           f'({sum(1 for k in overridden if k in found["SECRETS_JSON"])} secrets).')
     for key in overridden:
         source = 'secret' if key in found['SECRETS_JSON'] else f'variable = {given[key]}'
@@ -233,19 +233,19 @@ def push(args):
         if r.returncode != 0:
             failed += 1
             print(f'!! {key}: {r.stderr.strip()}', file=sys.stderr)
-    print(f'Done: {len(plan) - failed} written, {failed} failed. Next deploy writes backend/.env on the server.')
+    print(f'Done: {len(plan) - failed} written, {failed} failed. Next deploy writes app/backend/.env on the server.')
     return 1 if failed else 0
 
 
 def main():
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = p.add_subparsers(dest='cmd', required=True)
-    r = sub.add_parser('render', help='build backend/.env from SECRETS_JSON / VARS_JSON (Deploy workflow)')
+    r = sub.add_parser('render', help='build app/backend/.env from SECRETS_JSON / VARS_JSON (Deploy workflow)')
     r.add_argument('--template', default=TEMPLATE)
     r.add_argument('--out', required=True)
     s = sub.add_parser('push', help='store values as GitHub Secrets / Variables (needs gh auth login)')
     s.add_argument('--template', default=TEMPLATE)
-    s.add_argument('--from', dest='source', help='an existing .env to copy (e.g. the server backend/.env)')
+    s.add_argument('--from', dest='source', help='an existing .env to copy (e.g. the server app/backend/.env)')
     s.add_argument('--environment', default='production')
     s.add_argument('--yes', action='store_true', help='do not ask for confirmation')
     args = p.parse_args()

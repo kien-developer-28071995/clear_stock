@@ -179,7 +179,7 @@ it('hides bundles and alerts on every plan when switched off', function () {
 });
 
 it('lists every switch in the Makefile lists the E2E runs and the v1 screenshots use', function () {
-    $makefile = file_get_contents(base_path('../Makefile'));
+    $makefile = file_get_contents(base_path('../../Makefile'));
     preg_match('/^ALL_OFF = (.*)$/m', $makefile, $all);
     preg_match('/^V1_OFF = (.*)$/m', $makefile, $v1);
     $example = file_get_contents(base_path('.env.production.example'));
@@ -191,4 +191,4 @@ it('lists every switch in the Makefile lists the E2E runs and the v1 screenshots
         // v1: the Makefile and the production template switch off the same features.
         expect(str_contains($v1[1], "{$env}=false"))->toBe((bool) preg_match("/^{$env}=false$/m", $example), $env);
     }
-})->skip(fn () => ! is_file(base_path('../Makefile')), 'the Makefile is outside the backend image');
+})->skip(fn () => ! is_file(base_path('../../Makefile')), 'the Makefile is outside the backend image');

@@ -1,5 +1,5 @@
 /**
- * Translating API codes in an extension, the same way the app does (frontend/src/i18n/codes.ts).
+ * Translating API codes in an extension, the same way the app does (app/frontend/src/i18n/codes.ts).
  * The `status`, `confidence` and `explanation` sections of the locale files are copied
  * from the app by `npm run locales`, so both say exactly the same thing.
  */

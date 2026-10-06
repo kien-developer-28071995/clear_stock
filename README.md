@@ -18,11 +18,11 @@ Embedded Shopify app that forecasts stock-outs per variant, suggests reorder poi
 ### 2. Configure environment (1 min)
 Backend, frontend and website each have their own env file:
 ```bash
-cp backend/.env.example backend/.env
-cp frontend/.env.example frontend/.env
+cp app/backend/.env.example app/backend/.env
+cp app/frontend/.env.example app/frontend/.env
 cp website/.env.example website/.env
 ```
-In `backend/.env` fill in `SHOPIFY_API_KEY` (Client ID) and `SHOPIFY_API_SECRET` (Client secret). Everything else works as-is for dev (`make setup` also creates missing env files from the examples).
+In `app/backend/.env` fill in `SHOPIFY_API_KEY` (Client ID) and `SHOPIFY_API_SECRET` (Client secret). Everything else works as-is for dev (`make setup` also creates missing env files from the examples).
 
 ### 3. Start the stack (3–4 min on first build)
 ```bash
@@ -35,7 +35,7 @@ This builds images, installs Composer deps, generates `APP_KEY`, runs migrations
 make tunnel
 ```
 Starts a Cloudflare quick tunnel, then **automatically writes the URL** into:
-- `backend/.env` and `frontend/.env` → `APP_URL`
+- `app/backend/.env` and `app/frontend/.env` → `APP_URL`
 - `shopify.app.toml` → `application_url` and `[auth] redirect_urls`
 
 Vite's dev server and HMR websocket are proxied through nginx on the same HTTPS origin, so hot reload works inside the Shopify admin iframe.
@@ -48,7 +48,7 @@ npx @shopify/cli@latest app deploy  # app config + the three admin extensions
 (First run asks you to log in and link the app.) Then in the Dev Dashboard open the app → **Test your app / Install** on your dev store. The app opens embedded in the admin and shows “Hello, <store name>”.
 
 > **The quick tunnel URL changes every time the tunnel restarts.** Re-run `make tunnel` and `npx @shopify/cli@latest app deploy` after each restart.
-> For a stable URL, create a [named Cloudflare tunnel](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/get-started/create-remote-tunnel/) pointing to `http://nginx:80`, put its token in `TUNNEL_TOKEN` (backend/.env), run `docker/scripts/set-app-url.sh https://your-host` once, then `make tunnel` uses the named tunnel.
+> For a stable URL, create a [named Cloudflare tunnel](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/get-started/create-remote-tunnel/) pointing to `http://nginx:80`, put its token in `TUNNEL_TOKEN` (app/backend/.env), run `docker/scripts/set-app-url.sh https://your-host` once, then `make tunnel` uses the named tunnel.
 
 > **Protected customer data:** `read_all_orders` and order access require requesting access in the Partner Dashboard (**API access → Protected customer data access**). For dev stores you can select the fields and continue; the app requests **no** customer fields (name, email, address).
 
@@ -208,7 +208,7 @@ API (session-token authenticated): `GET /api/dashboard`, `GET|POST /api/onboardi
 
 - **Text:** `website/src/i18n/locales/<lang>.json` (the privacy policy and support FAQ are the `legal` section). `npm run i18n:check` (part of `npm run build`) fails on a missing key or a lost `{{placeholder}}`. Bump `PRIVACY_UPDATED` in `website/src/config.ts` when the policy changes, and keep the policy true to what the backend stores.
 - **Settings** (`website/.env`, read at build time): `SITE_URL`, `APP_NAME`, `SUPPORT_EMAIL`, `INSTALL_URL` (the App Store listing, for every Install button), `GROWTH_OFFERED`. In production the Deploy workflow fills them from the same GitHub Variables as the app (`WEBSITE_URL`, `SHOPIFY_APP_NAME`, `SUPPORT_EMAIL`, `INSTALL_URL`, `BILLING_GROWTH_OFFERED`).
-- **Prices** shown on the site mirror `backend/config/billing.php` in `website/src/config.ts`: change both together.
+- **Prices** shown on the site mirror `app/backend/config/billing.php` in `website/src/config.ts`: change both together.
 - **Screenshots** in `website/public/screenshots` are copies of `docs/listing/screenshots` (re-copy after `make listing-screenshots`).
 - **Run:** `make up` starts it with hot reload on http://localhost:4321 (or `cd website && npm install && npm run dev`); `make website-build` checks and builds `website/dist`. Production: Caddy serves the built files (deploy/Caddyfile, docs/DEPLOY.md).
 
@@ -220,8 +220,8 @@ A separate plain Laravel + Blade app for the app owner only: how many shops have
 
 The app is translated into English, Vietnamese, Spanish, German, French and Portuguese (Brazil) (react-i18next). It follows the Shopify admin language; merchants can override it in **Settings → Language** (saved on the shop).
 
-- All UI text lives in the frontend: `frontend/src/i18n/locales/<lang>.json`. The API never returns sentences; it returns snake_case codes with raw params (errors `{code, params}`, validation `errors.<field>[{code, params}]`, forecast `explanation_lines`, sync `stage` and `error`), which the app translates.
-- **Add a language:** copy `en.json` to e.g. `fr.json`, translate, add `'fr'` to `supported_locales` in `backend/config/app.php`. `npm run i18n:check` (also part of `npm run build`) fails on missing keys or plural forms.
+- All UI text lives in the frontend: `app/frontend/src/i18n/locales/<lang>.json`. The API never returns sentences; it returns snake_case codes with raw params (errors `{code, params}`, validation `errors.<field>[{code, params}]`, forecast `explanation_lines`, sync `stage` and `error`), which the app translates.
+- **Add a language:** copy `en.json` to e.g. `fr.json`, translate, add `'fr'` to `supported_locales` in `app/backend/config/app.php`. `npm run i18n:check` (also part of `npm run build`) fails on missing keys or plural forms.
 - Alert emails are English only.
 
 ## Stock transfers between locations (Growth)
@@ -244,13 +244,13 @@ Three [admin UI extensions](https://shopify.dev/docs/api/admin-extensions) in `e
 | `product-order-action` | Product and variant page → **More actions** (`admin.product-details.action.render`, `admin.product-variant-details.action.render`) | Mark as ordered (an order placed outside Shopify): quantities start at the suggested order, optional expected date and reference; counted as on the way in the app. |
 
 - **Backend:** `GET /api/extension/products/{shopifyProductId}`, `GET /api/extension/variants/{shopifyVariantId}`, `POST /api/extension/product-settings` and `POST /api/extension/manual-orders` (`ProductExtensionController` → `ProductExtensionService`). Extensions call relative `api/...` URLs; Shopify resolves them against `application_url` and adds the ID token, verified by the same middleware as the app. They run on Shopify's extension domain, so `config/cors.php` allows cross-origin calls to `api/*` (bearer tokens only, no cookies).
-- **Translations:** extension locale files hold their own strings; the `status`, `confidence` and `explanation` sections are copied from `frontend/src/i18n/locales` by `npm run extensions:locales` (i18next plurals → Shopify plural objects). `make e2e` fails if they are out of date.
+- **Translations:** extension locale files hold their own strings; the `status`, `confidence` and `explanation` sections are copied from `app/frontend/src/i18n/locales` by `npm run extensions:locales` (i18next plurals → Shopify plural objects). `make e2e` fails if they are out of date.
 - **Layout:** the repo-root `package.json` is only the Shopify CLI workspace for the extensions (the CLI installs dependencies from the app root); backend and frontend keep their own.
-- **Tests:** `frontend/e2e/extensions.spec.ts` runs the real bundles against the API with Shopify's extension host stubbed. To see them in the admin, run `npx @shopify/cli@latest app dev` (or deploy) and open a product.
+- **Tests:** `app/frontend/e2e/extensions.spec.ts` runs the real bundles against the API with Shopify's extension host stubbed. To see them in the admin, run `npx @shopify/cli@latest app dev` (or deploy) and open a product.
 
 ## Feature switches (app-wide)
 
-`backend/config/features.php` switches optional features on or off **for every shop**, whatever the plan (e.g. a trimmed first App Store submission). Env vars, all `true` by default:
+`app/backend/config/features.php` switches optional features on or off **for every shop**, whatever the plan (e.g. a trimmed first App Store submission). Env vars, all `true` by default:
 
 | Env | Feature | Notes |
 |---|---|---|
@@ -298,7 +298,7 @@ How it is safe:
 - **Nothing is deleted.** Settings and data stay; switching back on restores the feature.
 - **Core features have no switch:** forecasts and explanations, the product list and product settings, suppliers, sync, onboarding, billing.
 - **Features every plan has** (no plan limit to hang the switch on) are closed by the route middleware `feature:<switch>` and asked with `Features::on()`.
-- **v1 values** live in `backend/.env.production.example` and in `V1_OFF` in the Makefile (keep both in step); `make feature-screenshots` shoots every feature that is on into `docs/screen-feature/`.
+- **v1 values** live in `app/backend/.env.production.example` and in `V1_OFF` in the Makefile (keep both in step); `make feature-screenshots` shoots every feature that is on into `docs/screen-feature/`.
 - Production caches config: restart after changing a switch. Check with `php artisan features:status` (fails on combinations that can't work: a missing scope for a switched-on feature, or Growth offered with nothing Growth-only left). `make e2e-features-off` runs an E2E check with switches off.
 
 ## Shopify Flow triggers (Growth)
@@ -354,7 +354,7 @@ Backend and frontend are separate projects; the repo root only holds infra.
 /                         docker-compose.yml, docker-compose.prod.yml, Dockerfile, Makefile,
 │                         shopify.app.toml, docker/ (nginx, php, scripts)
 ├── extensions/           Shopify admin UI extensions (product page block, product list action) + shared/ helpers
-├── backend/              Laravel 13 — API, webhooks, embedded page shell (composer.json, artisan, tests/, .env)
+├── app/backend/              Laravel 13 — API, webhooks, embedded page shell (composer.json, artisan, tests/, .env)
 │   ├── app/
 │   │   ├── Http/Controllers/Api, Http/Middleware, Http/Resources
 │   │   ├── Models/                 Shop, …
@@ -363,7 +363,7 @@ Backend and frontend are separate projects; the repo root only holds infra.
 │   │   ├── Observers/              cache invalidation
 │   │   └── Support/CacheKeys.php   every cache key lives here
 │   └── resources/views/app.blade.php   loads App Bridge, Polaris and the Vite bundle
-├── frontend/             React 19 + TypeScript + Vite (package.json, vite.config.ts, .env)
+├── app/frontend/             React 19 + TypeScript + Vite (package.json, vite.config.ts, .env)
 │   └── src/
 │       ├── app/                    App, providers, router
 │       ├── features/<module>/      api, hooks, components, pages, types.ts
@@ -373,11 +373,11 @@ Backend and frontend are separate projects; the repo root only holds infra.
 ```
 
 - **Separate env files:**
-  - `backend/.env`: Laravel config (Shopify, DB, Redis, mail, `APP_URL`). The `mysql` container maps its `DB_*` values to `MYSQL_*`, and the named tunnel reads `TUNNEL_TOKEN` from it, so credentials are never duplicated.
-  - `frontend/.env`: Vite only (`APP_URL` for the dev server/HMR origin). Only `VITE_*` variables reach browser code; never put secrets here.
+  - `app/backend/.env`: Laravel config (Shopify, DB, Redis, mail, `APP_URL`). The `mysql` container maps its `DB_*` values to `MYSQL_*`, and the named tunnel reads `TUNNEL_TOKEN` from it, so credentials are never duplicated.
+  - `app/frontend/.env`: Vite only (`APP_URL` for the dev server/HMR origin). Only `VITE_*` variables reach browser code; never put secrets here.
   - `website/.env`: build settings of the static website (all of it ends up in public HTML; never put secrets here).
   - Host ports use compose defaults (`8080`, `33060`, `8025`); override per run, e.g. `APP_PORT=8090 make up`.
-- The frontend builds into `backend/public/build`; in dev, Vite writes `backend/public/hot` so Laravel serves HMR assets.
+- The frontend builds into `app/backend/public/build`; in dev, Vite writes `app/backend/public/hot` so Laravel serves HMR assets.
 - Request flow in the backend: Controller → Service → Repository (Cache → Eloquent) → Model.
 - Running tools outside Docker: `cd backend && composer install && php artisan test`, `cd frontend && npm install && npm run dev`.
 
@@ -435,4 +435,4 @@ make prod-migrate                                   # by hand (CI/CD deploys run
 - Multi-stage `Dockerfile`: frontend build (Node) → `composer install --no-dev` → slim PHP-FPM runtime (`app`), plus an nginx image (`web`) with the built assets.
 - No source mounts, no Node, no Mailpit. `config:cache`, `route:cache`, `view:cache`, `event:cache` run at container start.
 - `horizon` and `scheduler` use `restart: unless-stopped`; healthchecks on `app`, `web`, `mysql`, `redis`, `horizon`. Logs go to stdout.
-- TLS must terminate in front of `web` (load balancer, Caddy, or Cloudflare Tunnel). Set `APP_ENV=production`, `APP_DEBUG=false`, a real `APP_URL` and mail settings in `backend/.env` on the server (the frontend build needs no runtime env).
+- TLS must terminate in front of `web` (load balancer, Caddy, or Cloudflare Tunnel). Set `APP_ENV=production`, `APP_DEBUG=false`, a real `APP_URL` and mail settings in `app/backend/.env` on the server (the frontend build needs no runtime env).

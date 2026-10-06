@@ -1,4 +1,4 @@
-# Env files live in backend/ and frontend/ (each has its own .gitignore).
+# Env files live in app/backend/ and app/frontend/ (each has its own .gitignore).
 .DS_Store
 Thumbs.db
 /.idea

@@ -2,7 +2,7 @@
     "name": "clear-stock",
     "private": true,
     "license": "UNLICENSED",
-    "description": "Shopify CLI workspace: admin extensions only (backend/ and frontend/ manage their own dependencies).",
+    "description": "Shopify CLI workspace: admin extensions only (app/backend/ and app/frontend/ manage their own dependencies).",
     "workspaces": [
         "extensions/product-forecast-block",
         "extensions/product-settings-action",

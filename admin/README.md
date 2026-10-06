@@ -42,7 +42,7 @@ make admin-setup
 make admin-user EMAIL=you@example.com
 ```
 
-Mở http://localhost:8090. Cổng chỉ mở trên máy này (`127.0.0.1`). `make admin-setup` tạo `admin/.env` với thông tin database lấy từ `backend/.env`.
+Mở http://localhost:8090. Cổng chỉ mở trên máy này (`127.0.0.1`). `make admin-setup` tạo `admin/.env` với thông tin database lấy từ `app/backend/.env`.
 
 Không có trang đăng ký. Tài khoản chỉ tạo bằng `admin:user`; chạy lại lệnh để đổi mật khẩu.
 

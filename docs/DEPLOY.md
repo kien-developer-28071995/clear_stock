@@ -8,8 +8,8 @@ push main ─▶ CI (test backend + frontend) ─▶ Deploy: build image ─▶ 
 
 - **CI** (`.github/workflows/ci.yml`): Pint, Pest, kiểm tra TypeScript, i18n, locale extension, build frontend, **build thử 2 image Docker** (không đẩy đi đâu) và kiểm tra template `.env`. Chạy ở mọi push và pull request.
 - **Deploy** (`.github/workflows/deploy.yml`): chỉ chạy khi CI trên `main` pass. Build image `app` và `web` **một lần** trên GitHub, đẩy lên GitHub Container Registry với tag `sha-<commit>`, rồi SSH vào server chạy `deploy/deploy.sh`.
-- Server **không cần mã nguồn** và không build gì: chỉ có `docker-compose.prod.yml`, `deploy.sh` và `backend/.env`, cả ba do workflow tự copy lên.
-- **`backend/.env` được dựng từ GitHub** (Secrets + Variables của environment `production`, mục 2b), không sửa tay trên server.
+- Server **không cần mã nguồn** và không build gì: chỉ có `docker-compose.prod.yml`, `deploy.sh` và `app/backend/.env`, cả ba do workflow tự copy lên.
+- **`app/backend/.env` được dựng từ GitHub** (Secrets + Variables của environment `production`, mục 2b), không sửa tay trên server.
 - **Migration tự chạy nếu chỉ thêm** (bảng, cột, index): script backup database, chạy migration, rồi mới đổi container. Script đọc SQL sẽ chạy (`migrate --pretend`); nếu có xóa, đổi tên, đổi kiểu cột, `UPDATE`/`DELETE` dữ liệu thì deploy **dừng trước khi đổi container** (app cũ vẫn chạy) và in ra câu lệnh đó. Kiểm tra xong thì chạy tay: Actions → Deploy → *Run workflow* → tick `migrate`. Tắt hẳn tự động: Variable `AUTO_MIGRATE` = `false`.
 - **Vì sao không tự chạy mọi migration**: trong lúc migrate, bản cũ vẫn phục vụ; khi quay lại bản cũ (rollback), schema không quay lại theo. Nên đổi schema theo kiểu *mở rộng rồi thu gọn*: bản 1 thêm cột mới và code dùng cả hai; bản sau mới xóa cột cũ (bước này chạy tay).
 - Nếu `app:preflight` báo lỗi cấu hình (debug bật, billing test, scope sai...) thì cũng dừng, không đổi container.
@@ -27,12 +27,12 @@ sudo adduser --disabled-password --gecos "" deploy
 sudo usermod -aG docker deploy
 
 # Thư mục deploy
-sudo mkdir -p /opt/clear_stock/backend && sudo chown -R deploy:deploy /opt/clear_stock
+sudo mkdir -p /opt/clear_stock/app/backend && sudo chown -R deploy:deploy /opt/clear_stock
 ```
 
-**File cấu hình app** (`backend/.env`): không cần tạo tay, workflow dựng từ GitHub (mục 2b).
+**File cấu hình app** (`app/backend/.env`): không cần tạo tay, workflow dựng từ GitHub (mục 2b).
 
-**Cổng**: tạo `/opt/clear_stock/.env` (file này chỉ để compose đọc, khác `backend/.env`) để container `web` chỉ nghe nội bộ, Caddy lo HTTPS phía trước:
+**Cổng**: tạo `/opt/clear_stock/.env` (file này chỉ để compose đọc, khác `app/backend/.env`) để container `web` chỉ nghe nội bộ, Caddy lo HTTPS phía trước:
 
 ```
 APP_PORT=127.0.0.1:8080
@@ -84,16 +84,16 @@ ssh-keygen -t ed25519 -f clear_stock_deploy -N "" -C "github-actions-deploy"
 | `DEPLOY_SSH_KEY` | nội dung file `clear_stock_deploy` (private key) |
 | `DEPLOY_KNOWN_HOSTS` | kết quả `ssh-keyscan` ở trên |
 
-### 2b. Cấu hình app (`backend/.env`) bằng Secrets + Variables
+### 2b. Cấu hình app (`app/backend/.env`) bằng Secrets + Variables
 
-Mỗi lần deploy, workflow chạy `deploy/envtool.py render`: lấy khung `backend/.env.production.example`, key nào có **Secret** hoặc **Variable** cùng tên trong environment `production` thì dùng giá trị đó, còn lại giữ mặc định của khung. File được copy lên server (`chmod 600`) và `deploy.sh` mới đổi sang nó; nếu deploy dừng trước khi đổi container thì file cũ được trả lại (`backend/.env.previous` giữ bản trước).
+Mỗi lần deploy, workflow chạy `deploy/envtool.py render`: lấy khung `app/backend/.env.production.example`, key nào có **Secret** hoặc **Variable** cùng tên trong environment `production` thì dùng giá trị đó, còn lại giữ mặc định của khung. File được copy lên server (`chmod 600`) và `deploy.sh` mới đổi sang nó; nếu deploy dừng trước khi đổi container thì file cũ được trả lại (`app/backend/.env.previous` giữ bản trước).
 
 - **Secret** (ẩn, không đọc lại được): `APP_KEY`, `SHOPIFY_API_SECRET`, `DB_PASSWORD`, `DB_ROOT_PASSWORD`, `HORIZON_BASIC_AUTH_USER`, `HORIZON_BASIC_AUTH_PASSWORD`, `MAIL_USERNAME`, `MAIL_PASSWORD`, `MONITORING_SLACK_WEBHOOK_URL`, `MONITORING_SLACK_EVENTS_WEBHOOK_URL`.
 - **Variable** (xem/sửa trên giao diện GitHub): `APP_URL`, `WEBSITE_URL`, `SHOPIFY_API_KEY` (client ID, vốn công khai), `MAIL_HOST`, `MAIL_PORT`, `MAIL_FROM_ADDRESS`, `SUPPORT_EMAIL`, `LOG_LEVEL`, mọi `FEATURE_*`, `BILLING_GROWTH_OFFERED`...
-- **Chỉ cho website** (Variable, không vào `backend/.env`): `INSTALL_URL` = link App Store listing cho mọi nút "Cài trên Shopify" (chưa có listing thì bỏ trống, nút trỏ tới apps.shopify.com). Website lấy thêm `WEBSITE_URL`, `SHOPIFY_APP_NAME`, `SUPPORT_EMAIL`, `BILLING_GROWTH_OFFERED`. Chưa đặt `WEBSITE_URL` thì workflow bỏ qua bước website.
+- **Chỉ cho website** (Variable, không vào `app/backend/.env`): `INSTALL_URL` = link App Store listing cho mọi nút "Cài trên Shopify" (chưa có listing thì bỏ trống, nút trỏ tới apps.shopify.com). Website lấy thêm `WEBSITE_URL`, `SHOPIFY_APP_NAME`, `SUPPORT_EMAIL`, `BILLING_GROWTH_OFFERED`. Chưa đặt `WEBSITE_URL` thì workflow bỏ qua bước website.
 - **Bắt buộc** (thiếu là deploy dừng, báo rõ key nào): `APP_KEY`, `APP_URL`, `SHOPIFY_API_KEY`, `SHOPIFY_API_SECRET`, `DB_PASSWORD`, `DB_ROOT_PASSWORD` (không được là `secret`/`root`), `HORIZON_BASIC_AUTH_*`, `MAIL_HOST`, `MAIL_FROM_ADDRESS`, `SUPPORT_EMAIL`, `WEBSITE_URL`. Sau đó `app:preflight` vẫn kiểm tra như trước.
 - **Key không có trong khung**: thêm Secret/Variable cùng tên và liệt kê tên đó trong Variable `EXTRA_ENV_KEYS` (cách nhau bằng dấu phẩy).
-- **Chưa có Secret `APP_KEY`** = chưa bật cách này: server giữ nguyên `backend/.env` tự tạo (cách cũ vẫn chạy).
+- **Chưa có Secret `APP_KEY`** = chưa bật cách này: server giữ nguyên `app/backend/.env` tự tạo (cách cũ vẫn chạy).
 
 **Nhập nhanh bằng lệnh** (máy bạn, cần `gh auth login`):
 
@@ -101,10 +101,10 @@ Mỗi lần deploy, workflow chạy `deploy/envtool.py render`: lấy khung `bac
 python3 deploy/envtool.py push
 ```
 
-Lệnh hỏi các giá trị bắt buộc (mật khẩu nhập ẩn), tự tạo `APP_KEY` cho lần đầu, đặt `FEATURE_*` thành Variable để bật/tắt trên GitHub, rồi ghi tất cả vào environment `production`. Đã có `backend/.env` trên server thì chép về rồi dùng `--from`, để giữ **đúng `APP_KEY` đang chạy**:
+Lệnh hỏi các giá trị bắt buộc (mật khẩu nhập ẩn), tự tạo `APP_KEY` cho lần đầu, đặt `FEATURE_*` thành Variable để bật/tắt trên GitHub, rồi ghi tất cả vào environment `production`. Đã có `app/backend/.env` trên server thì chép về rồi dùng `--from`, để giữ **đúng `APP_KEY` đang chạy**:
 
 ```bash
-scp deploy@<server>:/opt/clear_stock/backend/.env ./server.env
+scp deploy@<server>:/opt/clear_stock/app/backend/.env ./server.env
 python3 deploy/envtool.py push --from server.env && rm server.env
 ```
 

@@ -5,8 +5,8 @@
 #   (tables, columns, indexes); ones that drop/rename/change stop the deploy for a manual run.
 #   Variable AUTO_MIGRATE=false turns automatic migrations off (then every one needs migrate = true).
 # - Manual (Actions -> Deploy -> Run workflow): run migrations, roll back to an earlier image tag,
-#   or tag = "current" to only apply changed Secrets/Variables (backend/.env) to the running version.
-# - backend/.env is built from GitHub Secrets/Variables of the `production` environment
+#   or tag = "current" to only apply changed Secrets/Variables (app/backend/.env) to the running version.
+# - app/backend/.env is built from GitHub Secrets/Variables of the `production` environment
 #   (deploy/envtool.py) once APP_KEY is a Secret; until then the server keeps its own file.
 # - The website (website/) is built here from the same Variables (WEBSITE_URL, SUPPORT_EMAIL, ...)
 #   and uploaded to <deploy dir>/website, which Caddy serves (deploy/Caddyfile). Skipped until the
@@ -99,7 +99,7 @@ jobs:
       - uses: actions/checkout@v5
         with:
           ref: ${{ github.event.workflow_run.head_sha || github.sha }}
-      - name: Build backend/.env from Secrets and Variables
+      - name: Build app/backend/.env from Secrets and Variables
         id: env
         env:
           SECRETS_JSON: ${{ toJSON(secrets) }}
@@ -116,11 +116,13 @@ jobs:
           scp -i ~/.ssh/id_deploy -P "${{ secrets.DEPLOY_PORT || 22 }}" \
             docker-compose.prod.yml deploy/deploy.sh deploy/admin-setup.sh \
             "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:${{ secrets.DEPLOY_PATH }}/"
-      - name: Copy backend/.env (deploy.sh switches to it)
+      - name: Copy app/backend/.env (deploy.sh switches to it)
         if: steps.env.outputs.managed == 'true'
         run: |
+          ssh -i ~/.ssh/id_deploy -p "${{ secrets.DEPLOY_PORT || 22 }}" "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}" \
+            "mkdir -p '${{ secrets.DEPLOY_PATH }}/app/backend'"
           scp -p -i ~/.ssh/id_deploy -P "${{ secrets.DEPLOY_PORT || 22 }}" "$RUNNER_TEMP/backend.env" \
-            "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:${{ secrets.DEPLOY_PATH }}/backend/.env.incoming"
+            "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:${{ secrets.DEPLOY_PATH }}/app/backend/.env.incoming"
           rm -f "$RUNNER_TEMP/backend.env"
       - name: Roll out
         run: |

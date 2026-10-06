@@ -4,7 +4,7 @@ import { test as base, expect, type Page } from '@playwright/test';
 
 export type PlanKey = 'free' | 'starter' | 'growth';
 
-const ROOT = path.resolve(import.meta.dirname, '../../..');
+const ROOT = path.resolve(import.meta.dirname, '../../../..');
 
 /** Runs an artisan command in the app container (dev commands only work with APP_ENV=local). */
 export function artisan(...args: string[]): string {

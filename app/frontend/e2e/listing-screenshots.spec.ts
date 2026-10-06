@@ -12,7 +12,7 @@ import { api, expect, open, settled, test } from './support/app';
 test.skip(!process.env.LISTING_SCREENSHOTS, 'run with make listing-screenshots');
 test.use({ viewport: { width: 1600, height: 900 }, deviceScaleFactor: 1 });
 
-const OUT = '../docs/listing/screenshots';
+const OUT = '../../docs/listing/screenshots';
 
 test('listing screenshots', async ({ app }) => {
     await app.route('**/api/setup-guide', async (route) => {
