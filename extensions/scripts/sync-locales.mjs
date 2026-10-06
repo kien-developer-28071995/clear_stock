@@ -11,7 +11,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const ROOT = path.resolve(import.meta.dirname, '..');
-const APP_LOCALES = path.resolve(ROOT, '../frontend/src/i18n/locales');
+const APP_LOCALES = path.resolve(ROOT, '../app/frontend/src/i18n/locales');
 const SHARED = ['status', 'confidence', 'explanation'];
 const EXTENSIONS = ['product-forecast-block'];
 const PLURAL = /^(.*)_(zero|one|two|few|many|other)$/;

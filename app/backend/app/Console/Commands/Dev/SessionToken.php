@@ -9,7 +9,7 @@ use Illuminate\Console\Command;
 
 /**
  * DEV ONLY. Prints an App Bridge-style session token for a shop, so the embedded
- * app can run outside the Shopify admin (end-to-end tests in frontend/e2e).
+ * app can run outside the Shopify admin (end-to-end tests in app/frontend/e2e).
  */
 class SessionToken extends Command
 {

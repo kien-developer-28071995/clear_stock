@@ -1,6 +1,6 @@
 # Clear Stock: danh sách tính năng và gói
 
-Cập nhật: 2026-10-04. Nguồn: `backend/config/billing.php` (gói nào có gì), `backend/config/features.php` (công tắc bật/tắt toàn app) và `backend/.env.production.example` (bản v1 nộp App Store).
+Cập nhật: 2026-10-04. Nguồn: `app/backend/config/billing.php` (gói nào có gì), `app/backend/config/features.php` (công tắc bật/tắt toàn app) và `app/backend/.env.production.example` (bản v1 nộp App Store).
 
 ## Gói và giá
 

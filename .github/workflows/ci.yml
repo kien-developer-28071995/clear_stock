@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: backend
+        working-directory: app/backend
     steps:
       - uses: actions/checkout@v5
       - uses: shivammathur/setup-php@v2
@@ -27,7 +27,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.composer/cache
-          key: composer-${{ hashFiles('backend/composer.lock') }}
+          key: composer-${{ hashFiles('app/backend/composer.lock') }}
       - run: composer install --no-interaction --prefer-dist --no-progress
       - name: Code style (Pint)
         run: vendor/bin/pint --test
@@ -43,20 +43,20 @@ jobs:
         with:
           node-version: '22'
           cache: npm
-          cache-dependency-path: frontend/package-lock.json
+          cache-dependency-path: app/frontend/package-lock.json
       - run: npm ci
-        working-directory: frontend
+        working-directory: app/frontend
       - name: Type check
         run: npx tsc --noEmit -p .
-        working-directory: frontend
+        working-directory: app/frontend
       - name: Translations (keys and plurals in sync)
         run: npm run i18n:check
-        working-directory: frontend
+        working-directory: app/frontend
       - name: Admin extension locales copied from the app
         run: node extensions/scripts/sync-locales.mjs --check
       - name: Build
         run: npm run build
-        working-directory: frontend
+        working-directory: app/frontend
 
   # Marketing website (website/): translations, types and the static build.
   website:
@@ -131,7 +131,7 @@ jobs:
           cache-from: type=gha,scope=admin
           cache-to: type=gha,scope=admin,mode=max
 
-  # backend/.env template renders (deploy/envtool.py) with every required value present.
+  # app/backend/.env template renders (deploy/envtool.py) with every required value present.
   env-template:
     runs-on: ubuntu-latest
     steps:

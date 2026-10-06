@@ -7,7 +7,7 @@ name: clear_stock
 
 x-app: &app
   image: ${APP_IMAGE:-clear_stock-app:latest}
-  env_file: backend/.env
+  env_file: app/backend/.env
   restart: unless-stopped
   depends_on:
     mysql:
@@ -103,8 +103,8 @@ services:
   mysql:
     image: mysql:8.4
     restart: unless-stopped
-    # Reads backend/.env (same DB credentials as Laravel) and maps them to MYSQL_* vars.
-    env_file: backend/.env
+    # Reads app/backend/.env (same DB credentials as Laravel) and maps them to MYSQL_* vars.
+    env_file: app/backend/.env
     entrypoint:
       - sh
       - -c

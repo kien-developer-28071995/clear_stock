@@ -11,7 +11,7 @@ import { artisan, php } from './support/app';
  * Rendering by Shopify's own components isn't covered (they only exist in the admin).
  */
 
-const ROOT = path.resolve(import.meta.dirname, '../..');
+const ROOT = path.resolve(import.meta.dirname, '../../..');
 const EXT = path.join(ROOT, 'extensions');
 const ORIGIN = 'http://localhost:8080';
 

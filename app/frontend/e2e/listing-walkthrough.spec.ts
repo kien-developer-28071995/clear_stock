@@ -12,8 +12,8 @@ test.skip(!process.env.LISTING_VIDEO, 'run with make listing-video');
 test.use({ viewport: { width: 1280, height: 720 }, video: { mode: 'on', size: { width: 1280, height: 720 } } });
 test.setTimeout(180_000);
 
-const OUT = path.resolve('../docs/listing/walkthrough.webm');
-const SAMPLE_CSV = path.resolve('../docs/sample-purchase-orders.csv');
+const OUT = path.resolve('../../docs/listing/walkthrough.webm');
+const SAMPLE_CSV = path.resolve('../../docs/sample-purchase-orders.csv');
 
 /** Caption at the bottom of the screen; kept across page loads (sessionStorage). */
 async function caption(page: Page, text: string, hold = 3500): Promise<void> {

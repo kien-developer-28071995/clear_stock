@@ -35,7 +35,7 @@ switched off with `FEATURE_*` (README "Feature switches") and can be released la
 With every Growth-only feature off, **v1 sells Free and Starter only** (`BILLING_GROWTH_OFFERED=false`).
 Growth comes back with the first of those features (turn it on, re-add its scope / extension, deploy).
 
-Files: `backend/.env.production.example` (all of the above as env), `shopify.app.production.toml`
+Files: `app/backend/.env.production.example` (all of the above as env), `shopify.app.production.toml`
 (v1 scopes, only the two product-page extensions).
 
 ## Checklist
@@ -50,8 +50,8 @@ Files: `backend/.env.production.example` (all of the above as env), `shopify.app
 - [x] Reviewer instructions and listing draft (below), sample CSV `docs/sample-purchase-orders.csv`.
 
 ### Needs you
-- [ ] **Create the production app** in the Partner Dashboard, put its client id in `shopify.app.production.toml`, key/secret in the server `backend/.env`.
-- [ ] **Host production** (HTTPS domain): `backend/.env` from `backend/.env.production.example`, `make prod-build prod-up`, `make prod-migrate`, then `php artisan app:preflight` must pass.
+- [ ] **Create the production app** in the Partner Dashboard, put its client id in `shopify.app.production.toml`, key/secret in the server `app/backend/.env`.
+- [ ] **Host production** (HTTPS domain): `app/backend/.env` from `app/backend/.env.production.example`, `make prod-build prod-up`, `make prod-migrate`, then `php artisan app:preflight` must pass.
 - [ ] **Website domain:** DNS for the website host, `WEBSITE_URL` Variable, Caddy block (docs/DEPLOY.md). Listing URLs: privacy `https://<website>/privacy`, support `https://<website>/support`. After the listing is live, set the `INSTALL_URL` Variable to it so the site's Install buttons point there.
 - [ ] **Email sending domain:** SPF + DKIM (+ DMARC) for the `MAIL_FROM_ADDRESS` domain at your email provider, a real `SUPPORT_EMAIL`.
 - [ ] **Deploy the app config:** `npx @shopify/cli@latest app deploy --config production`.

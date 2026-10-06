@@ -2,14 +2,14 @@ import { api, expect, open, settled, test } from './support/app';
 
 /**
  * One screenshot per feature that is switched on in the App Store version (v1): Starter plan and
- * the v1 switches of backend/.env.production.example. Run with `make feature-screenshots`, which
+ * the v1 switches of app/backend/.env.production.example. Run with `make feature-screenshots`, which
  * sets both and restores them afterwards. Written to docs/screen-feature/. Skipped in the normal
  * E2E run. Nothing is saved: dialogs are opened and left, the what-if only reads.
  */
 test.skip(!process.env.FEATURE_SCREENSHOTS, 'run with make feature-screenshots');
 test.use({ viewport: { width: 1280, height: 900 }, deviceScaleFactor: 1 });
 
-const OUT = '../docs/screen-feature';
+const OUT = '../../docs/screen-feature';
 
 /** Switches the App Store version keeps off: none of them may show up in a screenshot. */
 const V1_OFF = [

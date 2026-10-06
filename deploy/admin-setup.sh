@@ -7,9 +7,9 @@
 #   docker compose -f docker-compose.prod.yml exec admin php artisan admin:user you@example.com
 set -euo pipefail
 cd "$(dirname "$0")"
-[ -f backend/.env ] || { echo "backend/.env is missing: deploy the app first."; exit 1; }
+[ -f app/backend/.env ] || { echo "app/backend/.env is missing: deploy the app first."; exit 1; }
 
-get() { grep -E "^$1=" backend/.env | tail -1 | cut -d= -f2- | sed -e 's/^"//' -e 's/"$//'; }
+get() { grep -E "^$1=" app/backend/.env | tail -1 | cut -d= -f2- | sed -e 's/^"//' -e 's/"$//'; }
 DB_DATABASE="$(get DB_DATABASE)"
 DB_ROOT_PASSWORD="$(get DB_ROOT_PASSWORD)"
 REPORT_USER=report

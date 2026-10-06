@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Runs ON THE SERVER, in the deploy directory (docker-compose.prod.yml + backend/.env).
+# Runs ON THE SERVER, in the deploy directory (docker-compose.prod.yml + app/backend/.env).
 # Called by .github/workflows/deploy.yml over SSH; can also be run by hand:
 #   IMAGE_PREFIX=ghcr.io/<owner>/clear_stock bash deploy.sh sha-1a2b3c4 [--migrate|--migrate=auto]
 #
@@ -10,7 +10,7 @@
 #
 # Order: (new .env) -> pull -> preflight -> (migrations) -> switch containers -> health check.
 # The running version keeps serving until the new images passed preflight and migrations.
-# backend/.env.incoming (written by the workflow from GitHub Secrets/Variables) replaces backend/.env;
+# app/backend/.env.incoming (written by the workflow from GitHub Secrets/Variables) replaces app/backend/.env;
 # if the deploy stops before switching, the previous file is put back.
 # Tag "current" = the version that is running (apply config changes only).
 # The owner reports ("admin" service) start too once admin/.env exists (deploy/admin-setup.sh).
@@ -25,23 +25,32 @@ if [ "${TAG}" = "current" ]; then
     [ -n "${TAG}" ] || { echo "No .deployed-tag yet: deploy a real tag first."; exit 1; }
 fi
 
+# Servers set up before the app moved into app/: the env file lived in backend/. Moved once.
+if [ -f backend/.env ] && [ ! -f app/backend/.env ]; then
+    mkdir -p app/backend
+    mv backend/.env app/backend/.env
+    [ ! -f backend/.env.previous ] || mv backend/.env.previous app/backend/.env.previous
+    rmdir backend 2>/dev/null || true
+    echo "==> backend/.env moved to app/backend/.env"
+fi
+
 ENV_CHANGED=0
 SWITCHED=0
-if [ -f backend/.env.incoming ]; then
-    chmod 600 backend/.env.incoming
-    if [ -f backend/.env ] && cmp -s backend/.env.incoming backend/.env; then
-        rm backend/.env.incoming
-        echo "==> backend/.env unchanged"
+if [ -f app/backend/.env.incoming ]; then
+    chmod 600 app/backend/.env.incoming
+    if [ -f app/backend/.env ] && cmp -s app/backend/.env.incoming app/backend/.env; then
+        rm app/backend/.env.incoming
+        echo "==> app/backend/.env unchanged"
     else
-        [ -f backend/.env ] && cp -p backend/.env backend/.env.previous
-        mv backend/.env.incoming backend/.env
+        [ -f app/backend/.env ] && cp -p app/backend/.env app/backend/.env.previous
+        mv app/backend/.env.incoming app/backend/.env
         ENV_CHANGED=1
-        echo "==> backend/.env updated from GitHub Secrets/Variables"
+        echo "==> app/backend/.env updated from GitHub Secrets/Variables"
         # Stopped before switching: the running containers still use the previous file.
-        trap 'if [ "${SWITCHED}" != 1 ] && [ -f backend/.env.previous ]; then mv backend/.env.previous backend/.env; echo "==> previous backend/.env restored"; fi' EXIT
+        trap 'if [ "${SWITCHED}" != 1 ] && [ -f app/backend/.env.previous ]; then mv app/backend/.env.previous app/backend/.env; echo "==> previous app/backend/.env restored"; fi' EXIT
     fi
 fi
-[ -f backend/.env ] || { echo "backend/.env is missing (see docs/DEPLOY.md)"; exit 1; }
+[ -f app/backend/.env ] || { echo "app/backend/.env is missing (see docs/DEPLOY.md)"; exit 1; }
 
 export APP_IMAGE="${IMAGE_PREFIX}-app:${TAG}"
 export WEB_IMAGE="${IMAGE_PREFIX}-web:${TAG}"
@@ -102,7 +111,7 @@ fi
 
 echo "==> Switching containers"
 SWITCHED=1
-# New config: recreate so every container re-reads backend/.env (config:cache runs on start).
+# New config: recreate so every container re-reads app/backend/.env (config:cache runs on start).
 $DC up -d --no-build --remove-orphans $([ "${ENV_CHANGED}" = 1 ] && echo --force-recreate) app horizon scheduler web
 
 # Owner reports: separate from the app. A failure here is reported, never stops or rolls back the deploy.

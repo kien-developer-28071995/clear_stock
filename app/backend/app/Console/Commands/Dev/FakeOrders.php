@@ -77,7 +77,7 @@ class FakeOrders extends Command
         $scopes = array_column($data['currentAppInstallation']['accessScopes'] ?? [], 'handle');
         if (! $this->option('dry-run') && ! in_array('write_orders', $scopes, true)) {
             $this->error('The app does not have write_orders on this store yet.');
-            $this->line('  1. Add write_orders to scopes in shopify.app.toml and SHOPIFY_SCOPES in backend/.env');
+            $this->line('  1. Add write_orders to scopes in shopify.app.toml and SHOPIFY_SCOPES in app/backend/.env');
             $this->line('  2. npx @shopify/cli@latest app deploy');
             $this->line('  3. Open the app in the Shopify admin and approve the new permission');
 

@@ -1,6 +1,6 @@
 /**
  * Build-time settings (website/.env, see .env.example) and the facts the pages show.
- * Prices and limits mirror backend/config/billing.php: update both together.
+ * Prices and limits mirror app/backend/config/billing.php: update both together.
  */
 const env = import.meta.env;
 

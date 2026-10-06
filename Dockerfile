@@ -2,11 +2,11 @@
 #
 # Multi-stage build for clear_stock.
 #   target "dev"   -> PHP-FPM with dev tooling, repo mounted from host
-#   target "app"   -> production PHP-FPM runtime with backend/ (also horizon + scheduler)
-#   target "web"   -> production nginx serving backend/public + frontend build
+#   target "app"   -> production PHP-FPM runtime with app/backend/ (also horizon + scheduler)
+#   target "web"   -> production nginx serving app/backend/public + frontend build
 #
-# Layout: backend/ = Laravel API + embedded page shell, frontend/ = React SPA (Vite).
-# The frontend build is written into backend/public/build.
+# Layout: app/backend/ = Laravel API + embedded page shell, app/frontend/ = React SPA (Vite).
+# The frontend build is written into app/backend/public/build.
 #
 # Build prod:  docker compose -f docker-compose.prod.yml build
 
@@ -55,12 +55,12 @@ CMD ["php-fpm"]
 ############################
 FROM composer:2 AS vendor
 WORKDIR /app
-COPY backend/composer.json backend/composer.lock ./
+COPY app/backend/composer.json app/backend/composer.lock ./
 RUN --mount=type=cache,target=/tmp/cache \
     COMPOSER_CACHE_DIR=/tmp/cache composer install \
       --no-dev --no-interaction --no-scripts --no-autoloader --prefer-dist \
       --ignore-platform-reqs
-COPY backend/ .
+COPY app/backend/ .
 RUN composer dump-autoload --no-dev --optimize --classmap-authoritative --no-scripts
 
 ############################
@@ -68,9 +68,9 @@ RUN composer dump-autoload --no-dev --optimize --classmap-authoritative --no-scr
 ############################
 FROM node:${NODE_VERSION}-alpine AS frontend
 WORKDIR /app/frontend
-COPY frontend/package.json frontend/package-lock.json frontend/.npmrc ./
+COPY app/frontend/package.json app/frontend/package-lock.json app/frontend/.npmrc ./
 RUN --mount=type=cache,target=/root/.npm npm ci
-COPY frontend/ .
+COPY app/frontend/ .
 # Outputs to /app/backend/public/build. The API key is injected at runtime by Blade, not Vite.
 RUN npm run build
 
@@ -81,7 +81,7 @@ FROM php-base AS app
 
 COPY docker/php/opcache.prod.ini /usr/local/etc/php/conf.d/zz-opcache.ini
 
-COPY --chown=www-data:www-data backend/ .
+COPY --chown=www-data:www-data app/backend/ .
 COPY --chown=www-data:www-data --from=vendor /app/vendor ./vendor
 COPY --chown=www-data:www-data --from=frontend /app/backend/public/build ./public/build
 COPY docker/php/entrypoint.prod.sh /usr/local/bin/entrypoint
@@ -99,5 +99,5 @@ CMD ["php-fpm"]
 ############################
 FROM nginx:1.27-alpine AS web
 COPY docker/nginx/prod.conf /etc/nginx/conf.d/default.conf
-COPY backend/public /var/www/html/public
+COPY app/backend/public /var/www/html/public
 COPY --from=frontend /app/backend/public/build /var/www/html/public/build

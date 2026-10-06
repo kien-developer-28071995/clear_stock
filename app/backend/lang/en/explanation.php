@@ -2,7 +2,7 @@
 
 // English rendering of forecast explanation lines (codes from ExplanationFormatter::lines())
 // for the alert email and the CLI. The app UI translates the same codes itself in
-// frontend/src/i18n/locales/*.json.
+// app/frontend/src/i18n/locales/*.json.
 return [
     'date_format' => 'MMM D',
 

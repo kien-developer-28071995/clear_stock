@@ -11,7 +11,7 @@ return [
     // Dates and "today" in the reports.
     'timezone' => env('REPORT_TIMEZONE', 'Asia/Ho_Chi_Minh'),
 
-    // Plan prices (USD) for the MRR estimate: same as backend/config/billing.php. An estimate:
+    // Plan prices (USD) for the MRR estimate: same as app/backend/config/billing.php. An estimate:
     // shops that subscribed at an older price keep it (price lock), trials pay nothing yet.
     'prices' => [
         'starter' => ['monthly' => (float) env('REPORT_PRICE_STARTER_MONTHLY', 4), 'annual' => (float) env('REPORT_PRICE_STARTER_ANNUAL', 38)],
