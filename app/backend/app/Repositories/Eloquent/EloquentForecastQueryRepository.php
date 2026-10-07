@@ -55,6 +55,8 @@ class EloquentForecastQueryRepository implements ForecastQueryRepositoryInterfac
             'suggested' => $query->orderByDesc('forecasts.suggested_qty'),
             'value' => $query->orderByRaw('(forecasts.current_stock * COALESCE(variants.unit_cost, 0)) DESC'),
             'revenue' => $query->orderByDesc('variants.revenue_90d'),
+            // Profit a day at the forecast pace: what a day without stock costs. No cost known = the whole price.
+            'profit' => $query->orderByRaw('((COALESCE(variants.price, 0) - COALESCE(variants.unit_cost, 0)) * forecasts.avg_daily_sales) DESC'),
             default => $query->orderByRaw('forecasts.reorder_date IS NULL')->orderBy('forecasts.reorder_date')
                 ->orderByRaw('forecasts.stockout_date IS NULL')->orderBy('forecasts.stockout_date'),
         };

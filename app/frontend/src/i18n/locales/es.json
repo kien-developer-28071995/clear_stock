@@ -436,6 +436,7 @@
       "suggested": "Pedido más grande",
       "value": "Mayor valor de stock",
       "revenue": "Mayores ingresos",
+      "profit": "Mayor beneficio por día",
       "name": "Nombre"
     },
     "noMatch": "Ningún producto coincide con estos filtros.",

@@ -436,6 +436,7 @@
       "suggested": "Plus grosse commande",
       "value": "Valeur de stock la plus élevée",
       "revenue": "Chiffre d'affaires le plus élevé",
+      "profit": "Bénéfice par jour le plus élevé",
       "name": "Nom"
     },
     "noMatch": "Aucun produit ne correspond à ces filtres.",
