@@ -408,7 +408,24 @@
     "productType": "Loại sản phẩm",
     "allTypes": "Tất cả loại sản phẩm",
     "exportCsv": "Xuất danh sách (CSV)",
-    "moreFilters": "Thêm bộ lọc"
+    "moreFilters": "Thêm bộ lọc",
+    "import": {
+      "action": "Nhập cài đặt",
+      "heading": "Nhập cài đặt sản phẩm",
+      "help": "File CSV mỗi dòng một sản phẩm: cột SKU (hoặc barcode) và bất kỳ cột nào trong số lead time, ngày an toàn, MOQ, quy cách thùng, tồn tối thiểu, tồn tối đa, nhà cung cấp, ngừng nhập. Ô trống thì giữ nguyên cài đặt đó. Bạn sẽ thấy file thay đổi gì trước khi lưu.",
+      "upload": "Tải CSV lên",
+      "preview_one": "{{count}} sản phẩm sẽ được thay đổi.",
+      "preview_other": "{{count}} sản phẩm sẽ được thay đổi.",
+      "fields": "Cài đặt có trong file: {{fields}}.",
+      "unmatched_one": "{{count}} dòng không khớp sản phẩm nào ({{examples}}).",
+      "unmatched_other": "{{count}} dòng không khớp sản phẩm nào ({{examples}}).",
+      "invalid_one": "{{count}} dòng bị bỏ qua vì giá trị không dùng được: {{examples}}.",
+      "invalid_other": "{{count}} dòng bị bỏ qua vì giá trị không dùng được: {{examples}}.",
+      "unknownSuppliers": "Nhà cung cấp chưa có trong app (hãy thêm trước): {{names}}.",
+      "apply": "Áp dụng",
+      "done_one": "Đã cập nhật cài đặt của {{count}} sản phẩm",
+      "done_other": "Đã cập nhật cài đặt của {{count}} sản phẩm"
+    }
   },
   "settings": {
     "defaultsHeading": "Mặc định cho dự báo",
@@ -637,7 +654,8 @@
     "too_many_views": "Tối đa 20 chế độ xem. Hãy xoá bớt một cái.",
     "alternate_is_main": "Đây đã là nhà cung cấp của sản phẩm.",
     "too_many_suppliers": "Tối đa 5 nhà cung cấp khác cho mỗi sản phẩm.",
-    "not_an_alternate": "Hãy thêm nhà cung cấp này cho sản phẩm trước."
+    "not_an_alternate": "Hãy thêm nhà cung cấp này cho sản phẩm trước.",
+    "settings_columns_missing": "File cần có cột SKU hoặc barcode và ít nhất một cột cài đặt (lead time, MOQ, quy cách thùng, min, max, nhà cung cấp, ngừng nhập)."
   },
   "explanation": {
     "unknown": "—",

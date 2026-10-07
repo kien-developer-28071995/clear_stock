@@ -110,6 +110,38 @@ class ForecastAdjustmentService
     }
 
     /**
+     * Settings of many products at once, each its own (a file import). Same bookkeeping as a
+     * change made on the product page, with one recompute for all of them.
+     *
+     * @param  array<int, array<string, mixed>>  $settingsByVariant  variant id => settings to change
+     */
+    public function applyVariantSettings(Shop $shop, array $settingsByVariant): int
+    {
+        $groups = [];
+        foreach ($settingsByVariant as $id => $settings) {
+            ksort($settings);
+            $groups[json_encode($settings)][] = (int) $id;
+        }
+        $updated = 0;
+        $discontinued = false;
+        foreach ($groups as $encoded => $ids) {
+            $settings = json_decode($encoded, true);
+            $before = $this->variants->findMany($shop, $ids)->mapWithKeys(fn (Variant $v) => [$v->id => $v->only(array_keys($settings))])->all();
+            $updated += $this->variants->bulkUpdateSettings($shop, $ids, $settings);
+            $this->changes->recordMany($shop, $before, $settings);
+            $discontinued = $discontinued || array_key_exists('discontinued', $settings);
+        }
+        if ($settingsByVariant !== []) {
+            RecomputeForecasts::dispatch($shop->id, array_map('intval', array_keys($settingsByVariant)));
+        }
+        if ($discontinued) {
+            $this->refreshLimitedPlan($shop);
+        }
+
+        return $updated;
+    }
+
+    /**
      * Discontinued products sit outside the Free plan's product limit, so marking one frees a
      * slot (or unmarking takes one): the whole shop is recomputed to pick the right products.
      */

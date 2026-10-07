@@ -80,6 +80,7 @@ export type FeatureSwitch =
     | 'snooze'
     | 'demand_projection'
     | 'change_log'
+    | 'settings_import'
     | 'sample_data'
     | 'review_prompt'
     | 'feedback';

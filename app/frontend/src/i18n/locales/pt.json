@@ -448,7 +448,28 @@
     "productType": "Tipo de produto",
     "allTypes": "Todos os tipos de produto",
     "exportCsv": "Exportar lista (CSV)",
-    "moreFilters": "Mais filtros"
+    "moreFilters": "Mais filtros",
+    "import": {
+      "action": "Importar configurações",
+      "heading": "Importar configurações de produtos",
+      "help": "Um CSV com uma linha por produto: uma coluna de SKU (ou código de barras) e qualquer uma de prazo de entrega, dias de segurança, pedido mínimo, tamanho da caixa, estoque mínimo, estoque máximo, fornecedor, descontinuado. Uma célula vazia mantém a configuração como está. Você vê o que o arquivo altera antes de salvar.",
+      "upload": "Enviar CSV",
+      "preview_one": "{{count}} produto será alterado.",
+      "preview_many": "{{count}} produtos serão alterados.",
+      "preview_other": "{{count}} produtos serão alterados.",
+      "fields": "Configurações neste arquivo: {{fields}}.",
+      "unmatched_one": "{{count}} linha não corresponde a nenhum produto ({{examples}}).",
+      "unmatched_many": "{{count}} linhas não correspondem a nenhum produto ({{examples}}).",
+      "unmatched_other": "{{count}} linhas não correspondem a nenhum produto ({{examples}}).",
+      "invalid_one": "{{count}} linha é ignorada, seu valor não pode ser usado: {{examples}}.",
+      "invalid_many": "{{count}} linhas são ignoradas, seus valores não podem ser usados: {{examples}}.",
+      "invalid_other": "{{count}} linhas são ignoradas, seus valores não podem ser usados: {{examples}}.",
+      "unknownSuppliers": "Fornecedores que não estão no app (adicione-os primeiro): {{names}}.",
+      "apply": "Aplicar",
+      "done_one": "Configurações de {{count}} produto atualizadas",
+      "done_many": "Configurações de {{count}} produtos atualizadas",
+      "done_other": "Configurações de {{count}} produtos atualizadas"
+    }
   },
   "settings": {
     "defaultsHeading": "Padrões da previsão",
@@ -693,7 +714,8 @@
     "too_many_views": "Até 20 visualizações. Exclua uma primeiro.",
     "alternate_is_main": "Este já é o fornecedor do produto.",
     "too_many_suppliers": "Até 5 outros fornecedores por produto.",
-    "not_an_alternate": "Adicione primeiro este fornecedor ao produto."
+    "not_an_alternate": "Adicione primeiro este fornecedor ao produto.",
+    "settings_columns_missing": "O arquivo precisa de uma coluna de SKU ou código de barras e de pelo menos uma coluna de configuração (prazo, pedido mínimo, tamanho da caixa, mín., máx., fornecedor, descontinuado)."
   },
   "explanation": {
     "unknown": "—",

@@ -428,7 +428,24 @@
     "productType": "Product type",
     "allTypes": "All product types",
     "exportCsv": "Export list (CSV)",
-    "moreFilters": "More filters"
+    "moreFilters": "More filters",
+    "import": {
+      "action": "Import settings",
+      "heading": "Import product settings",
+      "help": "A CSV with one row per product: a SKU (or barcode) column and any of lead time, safety days, MOQ, pack size, min stock, max stock, supplier, discontinued. An empty cell leaves that setting as it is. You see what the file changes before anything is saved.",
+      "upload": "Upload CSV",
+      "preview_one": "{{count}} product will be changed.",
+      "preview_other": "{{count}} products will be changed.",
+      "fields": "Settings in this file: {{fields}}.",
+      "unmatched_one": "{{count}} row matched no product ({{examples}}).",
+      "unmatched_other": "{{count}} rows matched no product ({{examples}}).",
+      "invalid_one": "{{count}} row is skipped, its value cannot be used: {{examples}}.",
+      "invalid_other": "{{count}} rows are skipped, their values cannot be used: {{examples}}.",
+      "unknownSuppliers": "Suppliers not in the app (add them first): {{names}}.",
+      "apply": "Apply",
+      "done_one": "Settings of {{count}} product updated",
+      "done_other": "Settings of {{count}} products updated"
+    }
   },
   "settings": {
     "defaultsHeading": "Forecast defaults",
@@ -665,7 +682,8 @@
     "too_many_views": "You can keep up to 20 views. Delete one first.",
     "alternate_is_main": "This is already the product's supplier.",
     "too_many_suppliers": "Up to 5 other suppliers per product.",
-    "not_an_alternate": "Add this supplier to the product first."
+    "not_an_alternate": "Add this supplier to the product first.",
+    "settings_columns_missing": "The file needs a SKU or barcode column and at least one setting column (lead time, MOQ, pack size, min, max, supplier, discontinued)."
   },
   "explanation": {
     "unknown": "—",

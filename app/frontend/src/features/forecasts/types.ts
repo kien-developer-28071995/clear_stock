@@ -256,3 +256,15 @@ export interface VariantSettingsInput {
     reference_variant?: number | string | null;
     reference_percent?: number | null;
 }
+
+/** What a settings file changes, or changed once applied (backend ProductSettingsImport). */
+export interface SettingsImportResult {
+    applied: boolean;
+    products: number;
+    fields: string[];
+    unmatched: number;
+    unmatched_examples: string[];
+    invalid: number;
+    invalid_examples: { row: number | null; sku: string; field: string }[];
+    unknown_suppliers: string[];
+}

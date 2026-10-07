@@ -17,7 +17,7 @@ final class FeatureUsage
     public const FEATURES = [
         'what_if', 'what_if_export', 'purchase_plan', 'purchase_plan_export', 'budget', 'accuracy', 'stock_history',
         'data_health', 'clearance', 'clearance_export', 'size_runs', 'product_export', 'purchase_order_export',
-        'transfers', 'change_log',
+        'transfers', 'change_log', 'settings_import',
     ];
 
     public static function record(Shop $shop, string $feature): void

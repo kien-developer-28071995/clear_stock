@@ -77,6 +77,20 @@ export function useChanges(variantId: number, enabled: boolean) {
     return useQuery({ queryKey: [...forecastKeys.detail(variantId), 'changes'], queryFn: () => forecastApi.changes(variantId), enabled });
 }
 
+/** Reorder settings from a CSV: a look first (nothing changes), then the change. */
+export function useImportSettings() {
+    const qc = useQueryClient();
+    return useMutation({
+        mutationFn: forecastApi.importSettings,
+        onSuccess: (result) => {
+            if (!result.applied) return;
+            qc.invalidateQueries({ queryKey: forecastKeys.all });
+            qc.invalidateQueries({ queryKey: ['dashboard'] });
+            qc.invalidateQueries({ queryKey: ['suppliers'] });
+        },
+    });
+}
+
 /** "Not now" for reorder suggestions (days = null brings them back). */
 export const useSnooze = () => useProductMutation(forecastApi.snooze);
 

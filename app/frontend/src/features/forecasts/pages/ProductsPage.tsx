@@ -10,6 +10,8 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useFeature } from '@/hooks/useEntitlements';
 import { SavedViews } from '@/features/forecasts/components/SavedViews';
 import { useIsNarrow } from '@/hooks/useIsNarrow';
+import { useModal } from '@/hooks/useModal';
+import { SettingsImportModal } from '@/features/forecasts/components/SettingsImportModal';
 import { AbcBadge } from '@/features/forecasts/components/AbcBadge';
 import { useFacets, useForecastList, useLocations, useSavedViews } from '@/features/forecasts/hooks/useForecasts';
 import { TREND_THRESHOLD, type ForecastFilters } from '@/features/forecasts/types';
@@ -51,6 +53,8 @@ export function ProductsPage() {
     const viewsExist = useFeature('saved_views');
     const trendExists = useFeature('trend');
     const exportExists = useFeature('product_export');
+    const importExists = useFeature('settings_import');
+    const importModal = useModal();
     const views = useSavedViews(viewsExist);
     // Search, status and sort are always there; the other filters open on demand (or when one is in use).
     const extraActive = [filters.location_id, filters.vendor, filters.product_type, filters.abc, filters.trend].some((v) => v !== '' && v !== undefined);
@@ -90,6 +94,7 @@ export function ProductsPage() {
         <s-page heading={t('nav.products')} inlineSize="large"><SectionTabs group="products" />
             <s-stack slot="secondary-actions">
                 <ExportPurchaseOrderButton locationId={filters.location_id || undefined} />
+                {importExists && <s-button icon="import" onClick={importModal.open}>{t('products.import.action')}</s-button>}
                 {exportExists && <s-button icon="export" loading={exporting || undefined} onClick={exportList}>{t('products.exportCsv')}</s-button>}
             </s-stack>
             {error && <ErrorBanner error={error} onRetry={() => refetch()} />}
@@ -286,6 +291,7 @@ export function ProductsPage() {
                     {t('products.pageInfo', { count: meta.total, total: formatNumber(meta.total), page: meta.current_page, pages: meta.last_page })}
                 </s-text>
             )}
+            {importExists && <SettingsImportModal id="settings-import" modalRef={importModal.ref} />}
         </s-page>
     );
 }

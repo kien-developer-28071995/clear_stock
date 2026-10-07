@@ -448,7 +448,28 @@
     "productType": "Type de produit",
     "allTypes": "Tous les types de produits",
     "exportCsv": "Exporter la liste (CSV)",
-    "moreFilters": "Plus de filtres"
+    "moreFilters": "Plus de filtres",
+    "import": {
+      "action": "Importer les réglages",
+      "heading": "Importer les réglages des produits",
+      "help": "Un CSV avec une ligne par produit : une colonne SKU (ou code-barres) et n’importe lesquelles parmi délai de livraison, jours de sécurité, quantité minimale, taille du colis, stock minimum, stock maximum, fournisseur, arrêté. Une cellule vide laisse le réglage tel quel. Vous voyez ce que le fichier modifie avant tout enregistrement.",
+      "upload": "Importer un CSV",
+      "preview_one": "{{count}} produit sera modifié.",
+      "preview_many": "{{count}} produits seront modifiés.",
+      "preview_other": "{{count}} produits seront modifiés.",
+      "fields": "Réglages dans ce fichier : {{fields}}.",
+      "unmatched_one": "{{count}} ligne ne correspond à aucun produit ({{examples}}).",
+      "unmatched_many": "{{count}} lignes ne correspondent à aucun produit ({{examples}}).",
+      "unmatched_other": "{{count}} lignes ne correspondent à aucun produit ({{examples}}).",
+      "invalid_one": "{{count}} ligne est ignorée, sa valeur est inutilisable : {{examples}}.",
+      "invalid_many": "{{count}} lignes sont ignorées, leurs valeurs sont inutilisables : {{examples}}.",
+      "invalid_other": "{{count}} lignes sont ignorées, leurs valeurs sont inutilisables : {{examples}}.",
+      "unknownSuppliers": "Fournisseurs absents de l’app (ajoutez-les d’abord) : {{names}}.",
+      "apply": "Appliquer",
+      "done_one": "Réglages de {{count}} produit mis à jour",
+      "done_many": "Réglages de {{count}} produits mis à jour",
+      "done_other": "Réglages de {{count}} produits mis à jour"
+    }
   },
   "settings": {
     "defaultsHeading": "Valeurs par défaut des prévisions",
@@ -693,7 +714,8 @@
     "too_many_views": "Jusqu'à 20 vues. Supprimez-en une d'abord.",
     "alternate_is_main": "C'est déjà le fournisseur du produit.",
     "too_many_suppliers": "Jusqu'à 5 autres fournisseurs par produit.",
-    "not_an_alternate": "Ajoutez d'abord ce fournisseur au produit."
+    "not_an_alternate": "Ajoutez d'abord ce fournisseur au produit.",
+    "settings_columns_missing": "Le fichier doit avoir une colonne SKU ou code-barres et au moins une colonne de réglage (délai, quantité minimale, taille du colis, min, max, fournisseur, arrêté)."
   },
   "explanation": {
     "unknown": "—",

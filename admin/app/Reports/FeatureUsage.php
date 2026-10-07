@@ -119,6 +119,7 @@ class FeatureUsage
             'used_clearance' => $used('Clearance list', 'free', ['clearance', 'clearance_export']),
             'used_size_runs' => $used('Broken size runs', 'free', ['size_runs']),
             'used_data_health' => $used('Data check', 'free', ['data_health']),
+            'used_settings_import' => $used('Imported product settings (CSV)', 'free', ['settings_import']),
             'used_change_log' => $used('Product change history', 'free', ['change_log']),
             'used_transfers' => $used('Transfer suggestions', 'growth', ['transfers']),
         ];

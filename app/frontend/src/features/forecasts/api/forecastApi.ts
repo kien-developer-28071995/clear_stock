@@ -9,6 +9,7 @@ import type {
     OverridesInput,
     Paginated,
     VariantSettingsInput,
+    SettingsImportResult,
 } from '@/features/forecasts/types';
 
 export const forecastApi = {
@@ -35,4 +36,10 @@ export const forecastApi = {
     views: async () => (await http.get<{ data: SavedView[] }>('/views')).data,
     saveView: async (body: { name: string; filters: Record<string, string> }) => (await http.post<{ data: SavedView[] }>('/views', body)).data,
     deleteView: async (id: number) => (await http.delete<{ data: SavedView[] }>(`/views/${id}`)).data,
+    importSettings: async ({ file, apply }: { file: File; apply: boolean }) => {
+        const form = new FormData();
+        form.append('file', file);
+        if (apply) form.append('apply', '1');
+        return (await http.postForm<{ data: SettingsImportResult }>('/variants/settings/import', form)).data;
+    },
 };
