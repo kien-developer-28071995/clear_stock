@@ -169,6 +169,21 @@
     "failedHeading": "No pudimos importar los datos de tu tienda",
     "failedBody": "La importación desde Shopify no terminó, así que aún no hay nada que pronosticar. Mira el motivo y vuelve a intentarlo en \"Datos de la tienda\", más abajo."
   },
+  "sample": {
+    "heading": "Mira cómo funciona",
+    "badge": "Datos de ejemplo",
+    "intro": "Son productos inventados, previstos igual que lo serán los tuyos, con tu plazo de entrega. Tus propias cifras los sustituirán en cuanto se importen los datos de tu tienda.",
+    "inStock": "{{stock}} en stock",
+    "why": "¿Por qué estas cifras?",
+    "hide": "Ocultar",
+    "products": {
+      "linen_shirt": "Camisa de lino - Arena / M",
+      "canvas_tote": "Bolsa de lona - Natural",
+      "wool_beanie": "Gorro de lana - Gris",
+      "ceramic_mug": "Taza de cerámica - Blanca",
+      "scented_candle": "Vela aromática - Cedro"
+    }
+  },
   "actions": {
     "noneLeft": "Quedan 0",
     "unitsLeft_one": "Queda {{count}}",

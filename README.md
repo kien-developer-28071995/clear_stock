@@ -292,6 +292,7 @@ Three [admin UI extensions](https://shopify.dev/docs/api/admin-extensions) in `e
 | `FEATURE_DATA_HEALTH` | Product data check |  |
 | `FEATURE_SNOOZE` | "Snooze" on the reorder list: hide a suggestion until a later day | off = nothing is snoozed (stored days are kept, not applied) |
 | `FEATURE_DEMAND_PROJECTION` | Expected sales over the next 30/60/90 days on the product page |  |
+| `FEATURE_SAMPLE_DATA` | Forecasts of a made-up catalog on Home until the shop has forecasts of its own |  |
 | `FEATURE_REVIEW_PROMPT` | Shopify's review dialog, once per shop, after a finished task (7+ days after install, `REVIEW_PROMPT_AFTER_DAYS`) |  |
 | `FEATURE_FEEDBACK` | Feedback box in Settings, emailed to `SUPPORT_EMAIL` |  |
 | `FEATURE_CHANGE_LOG` | History tab of a product (what was changed, when) | off = nothing is logged either |

@@ -164,6 +164,21 @@
     "failedHeading": "We couldn't import your store data",
     "failedBody": "The import from Shopify did not finish, so there is nothing to forecast yet. See \"Store data\" below for the reason and to try again."
   },
+  "sample": {
+    "heading": "See how it works",
+    "badge": "Sample data",
+    "intro": "These are made-up products, forecast the way yours will be, with your lead time. Your own numbers replace them as soon as your store data is in.",
+    "inStock": "{{stock}} in stock",
+    "why": "Why these numbers?",
+    "hide": "Hide",
+    "products": {
+      "linen_shirt": "Linen shirt - Sand / M",
+      "canvas_tote": "Canvas tote - Natural",
+      "wool_beanie": "Wool beanie - Grey",
+      "ceramic_mug": "Ceramic mug - White",
+      "scented_candle": "Scented candle - Cedar"
+    }
+  },
   "actions": {
     "noneLeft": "0 left",
     "unitsLeft_one": "{{count}} left",

@@ -208,7 +208,7 @@ Nguồn lần 6: https://www.shopify.com/editions/spring2026 · https://www.fort
 Danh sách, bảng so tính năng và phân tích nằm ở `docs/COMPETITORS.md`. Đề xuất (chưa làm), theo thứ tự giá trị:
 
 67. PO thành chứng từ: gom dòng đã đặt cùng NCC thành PO có số, PDF, nhận hết một bấm (không cần quyền ghi).
-68. Dữ liệu mẫu để thử app trước khi đồng bộ xong.
+68. ✅ Dữ liệu mẫu để thử app trước khi đồng bộ xong (xong 2026-10-07: `SampleForecasts` chạy calculator thật trên 5 sản phẩm giả định với lead time của shop, không lưu gì; mục "See how it works" trên Home khi shop chưa có dự báo; công tắc `FEATURE_SAMPLE_DATA`).
 69. ✅ Tạm ẩn sản phẩm khỏi danh sách cần nhập trong N ngày (xong 2026-10-06: `variants.snoozed_until`, nút Snooze ở Cần nhập hàng).
 70. ✅ Dự phóng nhu cầu 30/60/90 ngày trên trang sản phẩm (xong 2026-10-06: `DemandProjection`, mục "Expected sales").
 71. Sửa hàng loạt và chọn cột trong danh sách sản phẩm.

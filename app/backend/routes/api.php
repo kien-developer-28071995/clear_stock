@@ -19,6 +19,7 @@ use App\Http\Controllers\Api\ProductExtensionController;
 use App\Http\Controllers\Api\PurchaseOrderController;
 use App\Http\Controllers\Api\PurchasePlanController;
 use App\Http\Controllers\Api\SalesEventController;
+use App\Http\Controllers\Api\SampleForecastController;
 use App\Http\Controllers\Api\SavedViewController;
 use App\Http\Controllers\Api\SettingsController;
 use App\Http\Controllers\Api\SetupGuideController;
@@ -57,6 +58,7 @@ Route::middleware('shopify.session')->group(function () {
     Route::post('/onboarding', [OnboardingController::class, 'store']);
 
     Route::get('/dashboard', DashboardController::class);
+    Route::get('/sample-forecasts', SampleForecastController::class)->middleware('feature:sample_data');
 
     Route::get('/setup-guide', [SetupGuideController::class, 'show']);
     Route::post('/setup-guide/events', [SetupGuideController::class, 'event']);

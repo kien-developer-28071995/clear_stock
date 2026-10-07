@@ -159,6 +159,21 @@
     "failedHeading": "Chưa nhập được dữ liệu cửa hàng",
     "failedBody": "Việc nhập dữ liệu từ Shopify chưa hoàn tất nên chưa có gì để dự báo. Xem lý do và thử lại ở mục \"Dữ liệu cửa hàng\" bên dưới."
   },
+  "sample": {
+    "heading": "Xem app hoạt động thế nào",
+    "badge": "Dữ liệu mẫu",
+    "intro": "Đây là sản phẩm giả định, được dự báo đúng như sản phẩm của bạn sẽ được, theo lead time của bạn. Số liệu thật sẽ thay thế ngay khi dữ liệu cửa hàng được nhập xong.",
+    "inStock": "Còn {{stock}}",
+    "why": "Vì sao ra các số này?",
+    "hide": "Ẩn",
+    "products": {
+      "linen_shirt": "Áo sơ mi lanh - Màu cát / M",
+      "canvas_tote": "Túi vải canvas - Màu mộc",
+      "wool_beanie": "Mũ len - Xám",
+      "ceramic_mug": "Cốc sứ - Trắng",
+      "scented_candle": "Nến thơm - Gỗ tuyết tùng"
+    }
+  },
   "actions": {
     "noneLeft": "Hết hàng",
     "unitsLeft_other": "Còn {{count}}",

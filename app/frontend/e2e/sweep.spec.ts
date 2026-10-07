@@ -16,7 +16,7 @@ const BROKEN = [
     /\bundefined\b/, /\bNaN\b/, /Invalid Date/, /\[object Object\]/, /\{\{\s*\w+\s*\}\}/,
     // A translation key shown instead of its text ("snooze.action"): a known namespace, a dot, a lowercase key.
     // (Two sentences that meet without a space, "…products.Each…", are not one: the second starts with a capital.)
-    /(^|\s)(common|nav|errors|status|table|home|actions|product|products|settings|suppliers|plans|insights|orders|costs|budget|snooze|projection|history|feedback|tabs|sections|explanation|apiErrors|validation)\.[a-z][A-Za-z_]*(\.[A-Za-z_]+)*(\s|$)/,
+    /(^|\s)(common|nav|errors|status|table|home|actions|product|products|settings|suppliers|plans|insights|orders|costs|budget|snooze|projection|history|feedback|sample|tabs|sections|explanation|apiErrors|validation)\.[a-z][A-Za-z_]*(\.[A-Za-z_]+)*(\s|$)/,
 ];
 
 /** Problems seen while the page was used: console errors and failed API calls, tagged with the page. */

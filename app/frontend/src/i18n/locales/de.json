@@ -164,6 +164,21 @@
     "failedHeading": "Deine Shop-Daten konnten nicht importiert werden",
     "failedBody": "Der Import aus Shopify wurde nicht abgeschlossen, daher gibt es noch nichts zu prognostizieren. Den Grund und einen neuen Versuch findest du unten unter „Shopdaten“."
   },
+  "sample": {
+    "heading": "So funktioniert es",
+    "badge": "Beispieldaten",
+    "intro": "Das sind erfundene Produkte, prognostiziert wie später deine eigenen, mit deiner Lieferzeit. Deine eigenen Zahlen ersetzen sie, sobald die Daten deines Shops importiert sind.",
+    "inStock": "{{stock}} auf Lager",
+    "why": "Warum diese Zahlen?",
+    "hide": "Ausblenden",
+    "products": {
+      "linen_shirt": "Leinenhemd - Sand / M",
+      "canvas_tote": "Canvas-Tasche - Natur",
+      "wool_beanie": "Wollmütze - Grau",
+      "ceramic_mug": "Keramiktasse - Weiß",
+      "scented_candle": "Duftkerze - Zeder"
+    }
+  },
   "actions": {
     "noneLeft": "0 übrig",
     "unitsLeft_one": "{{count}} übrig",
