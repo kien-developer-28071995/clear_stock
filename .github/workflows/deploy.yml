@@ -99,6 +99,17 @@ jobs:
       - uses: actions/checkout@v5
         with:
           ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+      # The backend, the frontend build and Shopify must all mean the same app: with another app's
+      # key every API call answers 401 and the merchant only sees "Your session expired".
+      - name: SHOPIFY_API_KEY is the app in shopify.app.production.toml
+        env:
+          API_KEY: ${{ vars.SHOPIFY_API_KEY || secrets.SHOPIFY_API_KEY }}
+        run: |
+          client_id=$(sed -n 's/^client_id *= *"\(.*\)"/\1/p' shopify.app.production.toml)
+          if [ -n "$API_KEY" ] && [ "$API_KEY" != "$client_id" ]; then
+            echo "::error::SHOPIFY_API_KEY (environment production) is not the client_id in shopify.app.production.toml (${client_id:0:8}...). Set SHOPIFY_API_KEY and SHOPIFY_API_SECRET to that app's credentials."
+            exit 1
+          fi
       - name: Build app/backend/.env from Secrets and Variables
         id: env
         env:
