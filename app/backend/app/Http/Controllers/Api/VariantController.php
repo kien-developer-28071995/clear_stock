@@ -9,6 +9,7 @@ use App\Http\Resources\VariantOptionResource;
 use App\Repositories\Contracts\VariantRepositoryInterface;
 use App\Services\App\CostService;
 use App\Services\App\ForecastAdjustmentService;
+use App\Services\App\ProductSettingsImport;
 use App\Support\ShopContext;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -41,6 +42,17 @@ class VariantController extends Controller
         $model = $this->adjust->updateVariantSettings($shop, $model, $request->settings(), $request->referenceSettings());
 
         return response()->json(['data' => $model->only(['id', 'supplier_id', 'lead_time_override', 'safety_days', 'min_order_qty', 'pack_size', 'min_stock', 'max_stock', 'alerts_muted', 'discontinued', 'forecast_profile', 'supplier_sku', 'reference_variant_id', 'reference_percent', 'cost_override'])]);
+    }
+
+    /** Reorder settings from a CSV: a look at what it would change first, then (apply) the change. */
+    public function importSettings(Request $request, ShopContext $context, ProductSettingsImport $import): JsonResponse
+    {
+        $data = $request->validate([
+            'file' => ['required', 'file', 'max:5120', 'mimetypes:text/csv,text/plain,application/csv,application/vnd.ms-excel'],
+            'apply' => ['nullable', 'boolean'],
+        ]);
+
+        return response()->json(['data' => $import->run($context->shop(), $request->file('file'), (bool) ($data['apply'] ?? false))]);
     }
 
     public function bulkUpdateSettings(VariantSettingsRequest $request, ShopContext $context): JsonResponse

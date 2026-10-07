@@ -448,7 +448,28 @@
     "productType": "Tipo de producto",
     "allTypes": "Todos los tipos de producto",
     "exportCsv": "Exportar lista (CSV)",
-    "moreFilters": "Más filtros"
+    "moreFilters": "Más filtros",
+    "import": {
+      "action": "Importar ajustes",
+      "heading": "Importar ajustes de productos",
+      "help": "Un CSV con una fila por producto: una columna de SKU (o código de barras) y cualquiera de plazo de entrega, días de seguridad, pedido mínimo, tamaño de caja, stock mínimo, stock máximo, proveedor, descatalogado. Una celda vacía deja ese ajuste como está. Verás qué cambia el archivo antes de guardar nada.",
+      "upload": "Subir CSV",
+      "preview_one": "Se cambiará {{count}} producto.",
+      "preview_many": "Se cambiarán {{count}} productos.",
+      "preview_other": "Se cambiarán {{count}} productos.",
+      "fields": "Ajustes en este archivo: {{fields}}.",
+      "unmatched_one": "{{count}} fila no coincide con ningún producto ({{examples}}).",
+      "unmatched_many": "{{count}} filas no coinciden con ningún producto ({{examples}}).",
+      "unmatched_other": "{{count}} filas no coinciden con ningún producto ({{examples}}).",
+      "invalid_one": "Se omite {{count}} fila, su valor no se puede usar: {{examples}}.",
+      "invalid_many": "Se omiten {{count}} filas, sus valores no se pueden usar: {{examples}}.",
+      "invalid_other": "Se omiten {{count}} filas, sus valores no se pueden usar: {{examples}}.",
+      "unknownSuppliers": "Proveedores que no están en la app (añádelos primero): {{names}}.",
+      "apply": "Aplicar",
+      "done_one": "Ajustes de {{count}} producto actualizados",
+      "done_many": "Ajustes de {{count}} productos actualizados",
+      "done_other": "Ajustes de {{count}} productos actualizados"
+    }
   },
   "settings": {
     "defaultsHeading": "Valores predeterminados de la previsión",
@@ -693,7 +714,8 @@
     "too_many_views": "Puedes tener hasta 20 vistas. Elimina una primero.",
     "alternate_is_main": "Este ya es el proveedor del producto.",
     "too_many_suppliers": "Hasta 5 proveedores adicionales por producto.",
-    "not_an_alternate": "Añade primero este proveedor al producto."
+    "not_an_alternate": "Añade primero este proveedor al producto.",
+    "settings_columns_missing": "El archivo necesita una columna de SKU o código de barras y al menos una columna de ajuste (plazo de entrega, pedido mínimo, tamaño de caja, mín., máx., proveedor, descatalogado)."
   },
   "explanation": {
     "unknown": "—",

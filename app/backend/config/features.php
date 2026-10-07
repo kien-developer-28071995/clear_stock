@@ -68,6 +68,7 @@ return [
     'costs' => (bool) env('FEATURE_COSTS', true),                             // surface: unit costs entered in the app
 
     // Product page and reorder list (every plan)
+    'settings_import' => (bool) env('FEATURE_SETTINGS_IMPORT', true),     // reorder settings of many products from a CSV
     'snooze' => (bool) env('FEATURE_SNOOZE', true),                       // "not now": hide a reorder suggestion until a later day
     'demand_projection' => (bool) env('FEATURE_DEMAND_PROJECTION', true), // expected sales over the next 30/60/90 days
     'change_log' => (bool) env('FEATURE_CHANGE_LOG', true),               // what was changed on a product, and when

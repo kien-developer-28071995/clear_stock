@@ -87,6 +87,7 @@ Route::middleware('shopify.session')->group(function () {
 
     Route::get('/variants', [VariantController::class, 'index']);
     Route::put('/variants/settings', [VariantController::class, 'bulkUpdateSettings']);
+    Route::post('/variants/settings/import', [VariantController::class, 'importSettings'])->middleware('throttle:10,1')->middleware(['feature:settings_import', 'usage:settings_import']);
     Route::put('/variants/{variant}/settings', [VariantController::class, 'updateSettings'])->whereNumber('variant');
 
     Route::get('/settings', [SettingsController::class, 'show']);

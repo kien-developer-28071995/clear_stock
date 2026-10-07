@@ -428,7 +428,24 @@
     "productType": "Produkttyp",
     "allTypes": "Alle Produkttypen",
     "exportCsv": "Liste exportieren (CSV)",
-    "moreFilters": "Weitere Filter"
+    "moreFilters": "Weitere Filter",
+    "import": {
+      "action": "Einstellungen importieren",
+      "heading": "Produkteinstellungen importieren",
+      "help": "Eine CSV mit einer Zeile pro Produkt: eine Spalte mit SKU (oder Barcode) und beliebige aus Lieferzeit, Sicherheitstage, Mindestbestellmenge, Packungsgröße, Mindestbestand, Höchstbestand, Lieferant, eingestellt. Eine leere Zelle lässt die Einstellung unverändert. Du siehst, was die Datei ändert, bevor etwas gespeichert wird.",
+      "upload": "CSV hochladen",
+      "preview_one": "{{count}} Produkt wird geändert.",
+      "preview_other": "{{count}} Produkte werden geändert.",
+      "fields": "Einstellungen in dieser Datei: {{fields}}.",
+      "unmatched_one": "{{count}} Zeile passt zu keinem Produkt ({{examples}}).",
+      "unmatched_other": "{{count}} Zeilen passen zu keinem Produkt ({{examples}}).",
+      "invalid_one": "{{count}} Zeile wird übersprungen, ihr Wert ist nicht verwendbar: {{examples}}.",
+      "invalid_other": "{{count}} Zeilen werden übersprungen, ihre Werte sind nicht verwendbar: {{examples}}.",
+      "unknownSuppliers": "Lieferanten, die nicht in der App sind (zuerst anlegen): {{names}}.",
+      "apply": "Anwenden",
+      "done_one": "Einstellungen von {{count}} Produkt aktualisiert",
+      "done_other": "Einstellungen von {{count}} Produkten aktualisiert"
+    }
   },
   "settings": {
     "defaultsHeading": "Prognose-Standards",
@@ -665,7 +682,8 @@
     "too_many_views": "Bis zu 20 Ansichten möglich. Lösche zuerst eine.",
     "alternate_is_main": "Das ist bereits der Lieferant des Produkts.",
     "too_many_suppliers": "Bis zu 5 weitere Lieferanten pro Produkt.",
-    "not_an_alternate": "Füge diesen Lieferanten zuerst dem Produkt hinzu."
+    "not_an_alternate": "Füge diesen Lieferanten zuerst dem Produkt hinzu.",
+    "settings_columns_missing": "Die Datei braucht eine SKU- oder Barcode-Spalte und mindestens eine Einstellungsspalte (Lieferzeit, Mindestbestellmenge, Packungsgröße, Min, Max, Lieferant, eingestellt)."
   },
   "explanation": {
     "unknown": "—",
