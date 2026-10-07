@@ -7,7 +7,8 @@ const env = import.meta.env;
 export const site = {
     appName: env.APP_NAME || 'Clear Stock',
     supportEmail: env.SUPPORT_EMAIL || '',
-    installUrl: env.INSTALL_URL || 'https://apps.shopify.com/',
+    // The App Store listing. Empty until the app is listed: every Install button is then left out.
+    installUrl: env.INSTALL_URL || null,
     growthOffered: env.GROWTH_OFFERED === 'true',
 };
 

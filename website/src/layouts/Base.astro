@@ -71,10 +71,10 @@ const section = (id: string) => `${home}#${id}`;
                         <a href={section('pricing')}>{t('nav.pricing')}</a>
                         <a href={section('faq')}>{t('nav.faq')}</a>
                         <a href={localePath(locale, 'support')}>{t('nav.support')}</a>
-                        <a href={site.installUrl}>{t('nav.install')}</a>
+                        {site.installUrl && <a href={site.installUrl}>{t('nav.install')}</a>}
                     </div>
                 </details>
-                <a class="btn btn-primary header-install" href={site.installUrl}>{t('nav.install')}</a>
+                {site.installUrl && <a class="btn btn-primary header-install" href={site.installUrl}>{t('nav.install')}</a>}
             </div>
         </header>
 
@@ -94,7 +94,7 @@ const section = (id: string) => `${home}#${id}`;
                         <ul>
                             <li><a href={section('features')}>{t('nav.features')}</a></li>
                             <li><a href={section('pricing')}>{t('nav.pricing')}</a></li>
-                            <li><a href={site.installUrl}>{t('nav.install')}</a></li>
+                            {site.installUrl && <li><a href={site.installUrl}>{t('nav.install')}</a></li>}
                         </ul>
                     </div>
                     <div>

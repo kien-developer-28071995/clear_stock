@@ -19,7 +19,8 @@
     "lead": "{{app}} prevé la fecha de agotamiento de cada variante y te dice cuándo pedir y cuánto. Cada número muestra su cálculo, para que puedas revisarlo y ajustarlo.",
     "ctaPrimary": "Instalar gratis en Shopify",
     "ctaSecondary": "Ver precios",
-    "note": "Plan gratuito hasta 50 productos · Listo en unos 5 minutos · Sin contrato"
+    "note": "Plan gratuito hasta 50 productos · Listo en unos 5 minutos · Sin contrato",
+    "comingSoon": "Próximamente en la Shopify App Store."
   },
   "demo": {
     "label": "Ejemplo de previsión en la app",

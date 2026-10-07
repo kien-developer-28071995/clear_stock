@@ -72,9 +72,13 @@ const plans = [
                                 </li>
                             ))}
                         </ul>
-                        <a class:list={['btn', plan.featured ? 'btn-primary' : 'btn-ghost']} href={site.installUrl}>
-                            {t('pricing.cta')}
-                        </a>
+                        {
+                            site.installUrl && (
+                                <a class:list={['btn', plan.featured ? 'btn-primary' : 'btn-ghost']} href={site.installUrl}>
+                                    {t('pricing.cta')}
+                                </a>
+                            )
+                        }
                     </article>
                 ))
             }

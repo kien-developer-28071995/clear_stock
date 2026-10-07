@@ -19,7 +19,8 @@
     "lead": "{{app}} prognostiziert das Ausverkaufsdatum jeder Variante und sagt dir, wann und wie viel du bestellen solltest. Zu jeder Zahl gibt es die Rechnung dahinter – zum Prüfen und Anpassen.",
     "ctaPrimary": "Kostenlos auf Shopify installieren",
     "ctaSecondary": "Preise ansehen",
-    "note": "Gratis-Tarif für bis zu 50 Produkte · In etwa 5 Minuten startklar · Kein Vertrag"
+    "note": "Gratis-Tarif für bis zu 50 Produkte · In etwa 5 Minuten startklar · Kein Vertrag",
+    "comingSoon": "Demnächst im Shopify App Store."
   },
   "demo": {
     "label": "Beispielprognose in der App",

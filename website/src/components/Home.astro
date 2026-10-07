@@ -68,10 +68,10 @@ const faq = [
             <h1>{t('hero.title')}</h1>
             <p class="lead">{t('hero.lead', { app })}</p>
             <div class="actions">
-                <a class="btn btn-primary" href={site.installUrl}>{t('hero.ctaPrimary')}</a>
-                <a class="btn btn-ghost" href="#pricing">{t('hero.ctaSecondary')}</a>
+                {site.installUrl && <a class="btn btn-primary" href={site.installUrl}>{t('hero.ctaPrimary')}</a>}
+                <a class:list={['btn', site.installUrl ? 'btn-ghost' : 'btn-primary']} href="#pricing">{t('hero.ctaSecondary')}</a>
             </div>
-            <p class="note">{t('hero.note')}</p>
+            <p class="note">{site.installUrl ? t('hero.note') : t('hero.comingSoon')}</p>
         </div>
 
         <figure class="forecast-card" aria-label={t('demo.label')} style="margin:0">
@@ -214,12 +214,17 @@ const faq = [
     </div>
 </section>
 
-<section style="padding-top:0">
-    <div class="container">
-        <div class="cta-band">
-            <h2>{t('cta.heading')}</h2>
-            <p>{t('cta.body', { app })}</p>
-            <a class="btn" href={site.installUrl}>{t('cta.button')}</a>
-        </div>
-    </div>
-</section>
+{
+    // The closing call to install: only once there is a listing to install from.
+    site.installUrl && (
+        <section style="padding-top:0">
+            <div class="container">
+                <div class="cta-band">
+                    <h2>{t('cta.heading')}</h2>
+                    <p>{t('cta.body', { app })}</p>
+                    <a class="btn" href={site.installUrl}>{t('cta.button')}</a>
+                </div>
+            </div>
+        </section>
+    )
+}

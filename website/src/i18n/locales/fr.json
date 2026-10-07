@@ -19,7 +19,8 @@
     "lead": "{{app}} prévoit la date de rupture de chaque variante et vous dit quand commander et combien. Chaque chiffre est accompagné de son calcul, pour que vous puissiez le vérifier et l’ajuster.",
     "ctaPrimary": "Installer gratuitement sur Shopify",
     "ctaSecondary": "Voir les tarifs",
-    "note": "Offre gratuite jusqu’à 50 produits · Prêt en 5 minutes environ · Sans engagement"
+    "note": "Offre gratuite jusqu’à 50 produits · Prêt en 5 minutes environ · Sans engagement",
+    "comingSoon": "Bientôt sur le Shopify App Store."
   },
   "demo": {
     "label": "Exemple de prévision dans l’app",

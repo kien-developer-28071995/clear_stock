@@ -19,7 +19,8 @@
     "lead": "{{app}} forecasts the stock-out date of every variant and tells you when to order and how much. Every number comes with the math behind it, so you can check it and change it.",
     "ctaPrimary": "Install free on Shopify",
     "ctaSecondary": "See pricing",
-    "note": "Free plan for up to 50 products · Ready in about 5 minutes · No contract"
+    "note": "Free plan for up to 50 products · Ready in about 5 minutes · No contract",
+    "comingSoon": "Coming soon to the Shopify App Store."
   },
   "demo": {
     "label": "Example forecast in the app",

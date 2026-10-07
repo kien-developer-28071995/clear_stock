@@ -19,7 +19,8 @@
     "lead": "{{app}} dự báo ngày hết hàng của từng biến thể, cho bạn biết khi nào cần đặt và đặt bao nhiêu. Mỗi con số đều kèm cách tính, để bạn kiểm tra và tự chỉnh.",
     "ctaPrimary": "Cài miễn phí trên Shopify",
     "ctaSecondary": "Xem bảng giá",
-    "note": "Gói miễn phí tới 50 sản phẩm · Sẵn sàng trong khoảng 5 phút · Không hợp đồng"
+    "note": "Gói miễn phí tới 50 sản phẩm · Sẵn sàng trong khoảng 5 phút · Không hợp đồng",
+    "comingSoon": "Sắp có trên Shopify App Store."
   },
   "demo": {
     "label": "Ví dụ một dự báo trong app",
