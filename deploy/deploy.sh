@@ -15,6 +15,15 @@
 # Tag "current" = the version that is running (apply config changes only).
 # The owner reports ("admin" service) start too once admin/.env exists (deploy/admin-setup.sh).
 set -euo pipefail
+
+# Statements in pending migrations' SQL (stdin) that change or remove what exists. A keyword counts
+# only as a word of its own: a table or column called `change_logs` or `rename_count` is not one.
+risky_sql() {
+    grep -Eio '(^|[^a-z0-9_`])(drop|rename|truncate|modify|change|delete +from|update +[^ ]+ +set)([^a-z0-9_`][^;]{0,80}|$)' || true
+}
+# bash deploy.sh --risky-sql < file: only that check (CI: deploy/check-migration-guard.sh).
+if [ "${1:-}" = "--risky-sql" ]; then risky_sql; exit 0; fi
+
 cd "$(dirname "$0")"
 
 TAG="${1:?usage: deploy.sh <image tag|current> [--migrate|--migrate=auto]}"
@@ -88,7 +97,7 @@ if [ "${pending}" != "0" ]; then
             echo "${sql}" | tail -5 | sed 's/^/     /'
             exit 1
         fi
-        risky=$(echo "${sql}" | grep -Eiw -o '(drop|rename|truncate|modify|change|delete +from|update +[^ ]+ +set)[^;]{0,80}' || true)
+        risky=$(echo "${sql}" | risky_sql)
         if [ -n "${risky}" ]; then
             echo "!! ${pending} pending migration(s) change or remove existing data/schema:"
             echo "${risky}" | sed 's/^/     /'

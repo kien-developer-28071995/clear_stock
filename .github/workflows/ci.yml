@@ -184,6 +184,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
+      - name: Automatic-migration guard of deploy.sh
+        run: bash deploy/check-migration-guard.sh
       - name: Render with placeholder values
         env:
           SECRETS_JSON: '{"APP_KEY":"base64:ci","SHOPIFY_API_KEY":"k","SHOPIFY_API_SECRET":"s","DB_PASSWORD":"p","DB_ROOT_PASSWORD":"r","HORIZON_BASIC_AUTH_USER":"u","HORIZON_BASIC_AUTH_PASSWORD":"p"}'
