@@ -21,6 +21,12 @@ interface DailySalesRepositoryInterface
      */
     public function topSellers(Shop $shop, array $candidateIds, string $fromDate, int $limit): array;
 
+    /** Units sold minus returned by the whole shop on these days (both included). */
+    public function netUnitsBetween(Shop $shop, string $from, string $to): int;
+
+    /** The first day the shop has sales for (null = none yet). */
+    public function firstSalesDate(Shop $shop): ?string;
+
     /** @return array<int, int> variant ids with at least one unit sold since $fromDate */
     public function variantIdsWithSalesSince(Shop $shop, string $fromDate): array;
 

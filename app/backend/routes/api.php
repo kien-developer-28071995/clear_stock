@@ -132,6 +132,7 @@ Route::middleware('shopify.session')->group(function () {
 
     // Sales events (promotions, Black Friday): known changes in sales on set days.
     Route::get('/sales-events', [SalesEventController::class, 'index']);
+    Route::get('/sales-events/suggestions', [SalesEventController::class, 'suggestions']);
     Route::post('/sales-events', [SalesEventController::class, 'store'])->middleware('throttle:30,1');
     Route::put('/sales-events/{event}', [SalesEventController::class, 'update'])->whereNumber('event');
     Route::delete('/sales-events/{event}', [SalesEventController::class, 'destroy'])->whereNumber('event');

@@ -1140,7 +1140,15 @@
     "confirmDelete": "„{{name}}“ löschen? Die Prognosen werden ohne sie neu berechnet.",
     "repeatsYearly": "Wiederholt sich jedes Jahr",
     "repeatsYearlyHelp": "Für eine Saison: dieselbe Änderung an denselben Tagen jedes Jahr.",
-    "yearly": "Jedes Jahr"
+    "yearly": "Jedes Jahr",
+    "peaks": {
+      "bfcm": "Black Friday – Cyber Monday"
+    },
+    "suggestion": {
+      "heading": "{{name}} steht bevor: {{from}} – {{to}}",
+      "body": "An diesen Tagen hast du letztes Jahr {{units}} Stück pro Tag verkauft, gegenüber {{usual}} pro Tag in den Wochen davor: {{change}}. Füge es als Ereignis hinzu, damit deine Bestellungen die Mehrnachfrage rechtzeitig decken. Die Zahl kannst du danach ändern.",
+      "add": "Ereignis mit {{change}} hinzufügen"
+    }
   },
   "orders": {
     "mark": "Als bestellt markieren",

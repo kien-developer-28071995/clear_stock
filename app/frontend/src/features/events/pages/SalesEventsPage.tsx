@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useModal } from '@/hooks/useModal';
 import { useConfirm } from '@/components/ui/ConfirmModal';
 import { ErrorBanner } from '@/components/ui/ErrorBanner';
+import { PeakSuggestions } from '@/features/events/components/PeakSuggestions';
 import { SalesEventModal } from '@/features/events/components/SalesEventModal';
 import { useDeleteSalesEvent, useSalesEvents } from '@/features/events/hooks/useSalesEvents';
 import type { SalesEvent } from '@/features/events/types';
@@ -47,6 +48,7 @@ export function SalesEventsPage() {
             <s-section>
                 <s-paragraph>{t('events.intro')}</s-paragraph>
             </s-section>
+            <PeakSuggestions />
 
             {data && data.length === 0 ? (
                 <s-section>

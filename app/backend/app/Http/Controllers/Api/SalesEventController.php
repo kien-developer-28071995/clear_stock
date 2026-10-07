@@ -6,6 +6,7 @@ use App\Exceptions\ApiException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SalesEventRequest;
 use App\Http\Resources\SalesEventResource;
+use App\Services\App\PeakSeasonAdvisor;
 use App\Services\App\SalesEventService;
 use App\Support\ShopContext;
 use Illuminate\Http\JsonResponse;
@@ -20,6 +21,12 @@ class SalesEventController extends Controller
     public function index(ShopContext $context): AnonymousResourceCollection
     {
         return SalesEventResource::collection($this->events->list($context->shop()));
+    }
+
+    /** Coming peaks worth an event, from what the shop sold in them last year. */
+    public function suggestions(PeakSeasonAdvisor $advisor, ShopContext $context): JsonResponse
+    {
+        return response()->json(['data' => $advisor->suggestions($context->shop())]);
     }
 
     public function store(SalesEventRequest $request, ShopContext $context): JsonResponse

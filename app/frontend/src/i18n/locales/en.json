@@ -1140,7 +1140,15 @@
     "confirmDelete": "Delete \"{{name}}\"? Forecasts will be recomputed without it.",
     "repeatsYearly": "Repeats every year",
     "repeatsYearlyHelp": "For a season: the same change on the same dates each year.",
-    "yearly": "Every year"
+    "yearly": "Every year",
+    "peaks": {
+      "bfcm": "Black Friday – Cyber Monday"
+    },
+    "suggestion": {
+      "heading": "{{name}} is coming: {{from}} – {{to}}",
+      "body": "On those days last year you sold {{units}} units a day, against {{usual}} a day in the weeks before: {{change}}. Add it as an event so your orders cover the extra demand in time. You can change the number afterwards.",
+      "add": "Add event at {{change}}"
+    }
   },
   "orders": {
     "mark": "Mark as ordered",
