@@ -195,7 +195,7 @@ Nguồn: Shopify Editions Spring '26, listing Stockcast và Forthcast (cập nh�
 59. **Bulk operation đọc song song** (S–M): đồng bộ đầu nhanh hơn, onboarding "5 phút" chắc hơn với shop lớn. Đọc docs trước.
 60. ✅ **Nhật ký thay đổi** (M, xong 2026-10-06: bảng `change_logs`, tab History trên trang sản phẩm, giữ 180 ngày; chưa ghi *ai* đổi vì app không lưu thông tin nhân viên): ai đổi lead time, min/max, điều chỉnh dự báo, khi nào; hiện trên trang sản phẩm. Hợp với lời hứa minh bạch; Stockcast đã có.
 61. ✅ **Nhờ đánh giá đúng lúc + hộp góp ý trong app** (S, xong 2026-10-06: hộp thoại đánh giá của Shopify qua `shopify.reviews.request()`, một lần mỗi shop, sau khi đánh dấu đã đặt hoặc xuất PO, từ ngày thứ 7; hộp góp ý ở Cài đặt gửi về `SUPPORT_EMAIL`): hỏi review sau khi merchant xuất PO đầu tiên hoặc sau 14 ngày dùng, tối đa một lần; góp ý gửi về email hỗ trợ. Built for Shopify cần điểm và số review.
-62. **Tích hợp Sidekick** (chưa rõ công): tìm hiểu cách app khai báo dữ liệu/hành động cho Sidekick; nếu mở cho mọi app thì để Sidekick trả lời "cần nhập gì" bằng số của Clear Stock.
+62. **Tích hợp Sidekick** (→ xem #74, lần 8: Sidekick app extensions đã mở cho mọi app) (chưa rõ công): tìm hiểu cách app khai báo dữ liệu/hành động cho Sidekick; nếu mở cho mọi app thì để Sidekick trả lời "cần nhập gì" bằng số của Clear Stock.
 63. **Việc còn dở của lần 5**: PO dạng PDF (#34), nhiều ngày giao cho một đơn (#35), tiền tệ NCC và bậc giá (#37), báo cáo CSV gửi định kỳ (#52), lọc theo tag/collection và cột tuỳ chọn (#53), chia lượng đặt theo tỷ lệ size (#44), ngưỡng ngày tồn tuỳ chọn cho Flow (#49).
 64. **Xuất PO theo mẫu Xero / QuickBooks** (S–M): chỉ là thêm định dạng CSV, không cần OAuth. Forthcast quảng cáo tích hợp này.
 65. **Admin: cohort giữ chân, phễu chuyển đổi, tin tóm tắt hằng ngày** (M): mục 2, 3, 6 trong kế hoạch ở `admin/README.md`.
@@ -215,6 +215,41 @@ Danh sách, bảng so tính năng và phân tích nằm ở `docs/COMPETITORS.md
 72. KPI tồn kho (vòng quay, tỷ lệ ngày hết hàng); xuất XLSX; báo cáo hẹn giờ; kế hoạch nhập 26/52 tuần; thêm ngôn ngữ.
 
 Không làm: chatbot AI, kiểm kê/mã vạch/ghi tồn, backorder, BOM, đa kênh.
+
+## Nghiên cứu bổ sung (2026-10-07, lần 8)
+
+### Phát hiện
+- **Bốn app mới cùng định vị với ta, ra từ tháng 7–9/2026, đều chưa có review:** Foreshelf ("shows the maths", Free 50 SKU, trả tiền từ $19), Days of Cover ("transparent arithmetic", Free 30 biến thể, $19/$39, xếp theo lợi nhuận có nguy cơ mất, nhập CSV Stocky), Replenra (Free **500 SKU**, $4.99/$9.99/$19.99, PO + email NCC + nhiều chi nhánh), Restock ($19, "ML", snooze, email tuần). "Giải thích được" không còn là điểm riêng của ta; giá $4 và gói Free 50 SKU cũng không còn rẻ nhất (Replenra).
+- **Sidekick app extensions mở cho mọi nhà phát triển từ 2026-06-17** (hai loại: *app data* để Sidekick tìm trong dữ liệu của app, *app actions* để mở đúng trang của app với ngữ cảnh điền sẵn; tạo bằng Shopify CLI). Mục #62 trước đây "chưa rõ công" nay làm được.
+- **Shopify nối PO với phiếu chuyển và lô hàng** (Summer '26): nhận hàng từng phần tạo nhiều lô, mỗi lô có ngày gửi, ngày nhận, mã vận đơn. API có `InventoryShipment` (`dateShipped`, `dateReceived`, `tracking`, số đã nhận / từ chối / huỷ; scope `read_inventory_shipments`).
+- **API 2026-10 bỏ dần `ProductVariant.barcode`**, thay bằng connection `barcodes`. Ta đang đồng bộ `barcode` trong `BulkQueries`.
+- **API 2026-04 thêm `InventoryLevel.isActive`**: mức tồn đã ngừng hoạt động có thể được trả về khi xin.
+- **Chưa có API đọc lịch sử điều chỉnh tồn kho** bằng GraphQL (`inventoryHistory` không dùng được); chỉ có bảng ShopifyQL `inventory_adjustment_history`.
+- **BFCM 2026 là 27–30/11**; các hướng dẫn đều khuyên chốt đơn nhập trước 6–8 tuần, tức là ngay lúc này. Than phiền lặp lại trên Reddit: app chỉ lấy trung bình sẽ đặt thừa nhiều tuần sau đợt bán đột biến (ta đã xử lý bằng #17 và #25).
+- Shopify có bản xem trước "physical inventory" (kiểm kê) từ 7/2026: củng cố quyết định không làm kiểm kê.
+
+### Đề xuất (chưa làm), xếp theo giá trị
+73. **Chuẩn bị mùa cao điểm từ số năm ngoái** (S–M, mọi gói): với mỗi sản phẩm có dữ liệu cùng kỳ năm trước, tính mức tăng thực tế của đợt BFCM năm ngoái so với các tuần trước đó và gợi ý tạo sẵn sự kiện bán hàng (#25) với hệ số đó; kèm danh sách "sẽ hết hàng trong đợt này nếu không đặt trước ngày X". Dùng lại `sales_events` và `ForecastCalculator::multiplier`, không thêm thuật toán. Đúng mùa: nên có trước giữa tháng 10.
+74. **Sidekick app extensions** (M, thay cho #62): *app data* cho câu hỏi "cần nhập gì", "món nào sắp hết" trả bằng số của Clear Stock; *app action* mở trang Cần nhập hàng hoặc hộp "Đã đặt hàng" điền sẵn. Đây là cách đứng cạnh thay vì đối đầu với gợi ý nhập hàng của Sidekick. Đọc https://shopify.dev/docs/apps/build/sidekick trước; cần `shopify app deploy`.
+75. **Tự lấy thành phần combo từ Shopify Bundles** (S–M, Starter): ta đã đồng bộ `requiresComponents` nhưng merchant vẫn phải khai thành phần bằng tay. Đọc thành phần và số lượng từ API (scope `read_products` đã có; đọc docs `ProductBundleComponent` / `productVariantComponents` trước), giữ khai tay cho combo ngoài Shopify Bundles.
+76. **Lô hàng đang về có ngày** (M, tắt mặc định như #32): đọc `InventoryShipment` để biết lô nào đã gửi, khi nào, còn bao nhiêu chưa nhận; sửa điểm yếu đã ghi ở #32 (PO Shopify không có ngày dự kiến). Scope tuỳ chọn `read_inventory_shipments`, xin khi bật.
+77. **Chuyển `barcode` sang `barcodes`** (S, kỹ thuật, bắt buộc trước khi nâng lên API 2026-10): sửa `BulkQueries` + `VariantImporter`, giữ cột `variants.barcode` là mã đầu tiên. Thêm test khoá truy vấn theo phiên bản API.
+78. **Xếp theo lợi nhuận có nguy cơ mất** (S, mọi gói): thêm cách sắp xếp ở Cần nhập hàng và Ngân sách = (giá bán − giá vốn) × tốc độ bán × số ngày dự kiến hết hàng trước khi hàng về. Giá và giá vốn đã có; sản phẩm thiếu giá vốn xếp theo doanh thu và nói rõ. (Days of Cover lấy đây làm điểm bán chính.)
+79. **Nhập cài đặt sản phẩm bằng CSV theo SKU** (M, mọi gói): lead time, MOQ, quy cách thùng, NCC, min/max, ngừng nhập; xem trước rồi mới áp dụng, giống `/suppliers/import` và nhập giá vốn. Giải quyết phần lớn nhu cầu "sửa hàng loạt" của #71 mà không cần bảng sửa trực tiếp. (Foreshelf: "any CSV with a SKU column".)
+80. **Kiểm tra mức tồn không hoạt động** (S, kỹ thuật): xác nhận sync không tính `InventoryLevel` có `isActive = false` vào tồn; thêm test.
+81. **Ngày hết hàng chính xác hơn từ lịch sử điều chỉnh** (chưa rõ công): tìm hiểu ShopifyQL `inventory_adjustment_history` (scope, giới hạn, có dùng được trong bulk không) để thay cách dựng lại ngày hết hàng hiện nay. Chỉ làm nếu đọc được bằng scope đang có.
+
+### Quyết định của chủ app (không phải code)
+82. **Giới hạn gói Free**: Replenra cho 500 SKU miễn phí, ta 50 (cùng mức Foreshelf, hơn Days of Cover 30 và Restock 2). Cân nhắc nâng lên 100–200 trước khi nộp; chi phí hạ tầng mỗi shop Free cần đo lại trước.
+83. **Listing**: bốn app trên đều nói "minh bạch". Đưa lên đầu những gì họ chưa có: độ chính xác dự báo đo được (#22), sự kiện bán hàng, combo, 6 ngôn ngữ, giá $4 có cam kết giữ giá, dữ liệu mẫu (#68).
+
+### Không làm (giữ nguyên)
+Kiểm kê / physical inventory (Shopify tự làm), "ML" làm điểm bán (trái định vị giải thích được).
+
+### Thứ tự đề xuất
+#77 (bắt buộc kỹ thuật) → #73 (đúng mùa BFCM) → #75 → #79 → #78 → #74 → #76; #80 làm kèm #77.
+
+Nguồn lần 8: https://shopify.dev/changelog/release-notes/2026-10 · https://shopify.dev/changelog/sidekick-app-extensions-available-today · https://shopify.dev/docs/api/admin-graphql/latest/objects/InventoryShipment · https://changelog.shopify.com/posts/purchase-orders-now-create-transfers-to-move-inventory · https://shopify.dev/docs/api/shopifyql/latest/schemas/inventory/inventory_adjustment_history.md · https://apps.shopify.com/restock-7 · https://apps.shopify.com/days-of-cover · https://apps.shopify.com/inventory-12 · https://www.producthunt.com/products/foreshelf-stock-forecasting · https://www.prediko.io/blog/shopify-black-friday-inventory-checklist
 
 ## Phase tiếp theo: tối ưu UI/UX và hiệu năng (kế hoạch, 2026-10-05)
 
