@@ -294,6 +294,7 @@ Three [admin UI extensions](https://shopify.dev/docs/api/admin-extensions) in `e
 | `FEATURE_DEMAND_PROJECTION` | Expected sales over the next 30/60/90 days on the product page |  |
 | `FEATURE_SETTINGS_IMPORT` | Reorder settings of many products from a CSV (Products → Import settings) |  |
 | `FEATURE_SAMPLE_DATA` | Forecasts of a made-up catalog on Home until the shop has forecasts of its own |  |
+| `FEATURE_WELCOME_EMAIL` | One welcome email to the store's contact email after a first install (never on a reinstall) |  |
 | `FEATURE_REVIEW_PROMPT` | Shopify's review dialog, once per shop, after a finished task (7+ days after install, `REVIEW_PROMPT_AFTER_DAYS`) |  |
 | `FEATURE_FEEDBACK` | Feedback box in Settings, emailed to `SUPPORT_EMAIL` |  |
 | `FEATURE_CHANGE_LOG` | History tab of a product (what was changed, when) | off = nothing is logged either |
