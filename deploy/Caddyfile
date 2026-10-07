@@ -37,6 +37,14 @@ app.clear-stock.techfoxify.com {
         reverse_proxy 127.0.0.1:8080
     }
 
+    # The privacy policy and support pages live on the marketing website. Their old addresses on
+    # this domain go to the backend, which redirects (301) to WEBSITE_URL and keeps ?lang=;
+    # without this they would come back as the app's page, blank outside the Shopify admin.
+    @public path /privacy /support
+    handle @public {
+        reverse_proxy 127.0.0.1:8080
+    }
+
     # Client-side routes (/products/12, /settings...) are all the same page.
     handle {
         try_files {path} /index.html

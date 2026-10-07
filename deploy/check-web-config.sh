@@ -50,4 +50,8 @@ expect "assets are cached for good"        "$(header '/assets/app.js' Cache-Cont
 # (nothing listens there in this check: 502), never come back as the app's page (200).
 expect "extension API goes to the backend"  "$(status '/api/extension/products/1')" "502"
 expect "other /api paths are not proxied"   "$(status '/api/shop')" "200"
+# The privacy and support pages are on the website: the backend redirects there (502 here, as above).
+expect "privacy goes to the backend"        "$(status '/privacy')" "502"
+expect "support goes to the backend"        "$(status '/support?lang=vi')" "502"
+expect "similar paths stay the app's page"  "$(status '/privacy-settings')" "200"
 echo "Web config checks passed."
