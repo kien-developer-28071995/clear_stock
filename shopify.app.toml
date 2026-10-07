@@ -3,7 +3,7 @@
 # application_url / redirect_urls are rewritten by `make tunnel` (docker/scripts/set-app-url.sh).
 
 client_id = "585d48be540225310586b5df5dc1348e"
-name = "Clear Stock"
+name = "Clear Stock Local"
 application_url = "https://deposit-have-arguments-savings.trycloudflare.com"
 embedded = true
 
