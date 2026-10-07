@@ -17,7 +17,7 @@ beforeEach(function () {
 });
 
 /** Units a day from one date to another (both included). */
-function sold(Shop $shop, Variant $variant, string $from, string $to, int $perDay): void
+function peakSales(Shop $shop, Variant $variant, string $from, string $to, int $perDay): void
 {
     $rows = [];
     for ($day = CarbonImmutable::parse($from); $day <= CarbonImmutable::parse($to); $day = $day->addDay()) {
@@ -33,8 +33,8 @@ it('knows the Black Friday weekend of a year', function () {
 });
 
 it('suggests the coming Black Friday weekend from what sold in it last year', function () {
-    sold($this->shop, $this->variant, '2025-10-01', '2025-11-27', 4);
-    sold($this->shop, $this->variant, '2025-11-28', '2025-12-01', 12);
+    peakSales($this->shop, $this->variant, '2025-10-01', '2025-11-27', 4);
+    peakSales($this->shop, $this->variant, '2025-11-28', '2025-12-01', 12);
 
     $this->getJson('/api/sales-events/suggestions', $this->auth)->assertOk()->assertExactJson(['data' => [[
         'key' => 'bfcm',
@@ -49,18 +49,18 @@ it('suggests nothing without last year, without a real rise, or once the merchan
     $none = fn () => $this->getJson('/api/sales-events/suggestions', $this->auth)->assertOk()->assertExactJson(['data' => []]);
 
     // The shop only started selling after the weeks the peak is compared with.
-    sold($this->shop, $this->variant, '2025-11-10', '2025-12-01', 12);
+    peakSales($this->shop, $this->variant, '2025-11-10', '2025-12-01', 12);
     $none();
 
     // A normal weekend.
     DailySale::query()->delete();
-    sold($this->shop, $this->variant, '2025-10-01', '2025-12-01', 4);
+    peakSales($this->shop, $this->variant, '2025-10-01', '2025-12-01', 4);
     $none();
 
     // A real rise, but already planned for (also as a season that repeats every year).
     DailySale::query()->delete();
-    sold($this->shop, $this->variant, '2025-10-01', '2025-11-27', 4);
-    sold($this->shop, $this->variant, '2025-11-28', '2025-12-01', 12);
+    peakSales($this->shop, $this->variant, '2025-10-01', '2025-11-27', 4);
+    peakSales($this->shop, $this->variant, '2025-11-28', '2025-12-01', 12);
     $event = SalesEvent::factory()->for($this->shop)->create(['starts_on' => '2026-11-25', 'ends_on' => '2026-11-28', 'multiplier' => 2]);
     $none();
     $event->update(['starts_on' => '2025-11-20', 'ends_on' => '2025-12-02', 'repeats_yearly' => true]);
@@ -70,8 +70,8 @@ it('suggests nothing without last year, without a real rise, or once the merchan
 });
 
 it('is silent once the peak is more than three months away', function () {
-    sold($this->shop, $this->variant, '2025-10-01', '2025-11-27', 4);
-    sold($this->shop, $this->variant, '2025-11-28', '2025-12-01', 12);
+    peakSales($this->shop, $this->variant, '2025-10-01', '2025-11-27', 4);
+    peakSales($this->shop, $this->variant, '2025-11-28', '2025-12-01', 12);
     $this->travelTo('2026-08-01 10:00:00');
 
     $this->getJson('/api/sales-events/suggestions', $this->auth)->assertOk()->assertExactJson(['data' => []]);
