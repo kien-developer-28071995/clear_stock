@@ -398,6 +398,7 @@
       "suggested": "Cần nhập nhiều nhất",
       "value": "Giá trị tồn cao nhất",
       "revenue": "Doanh thu cao nhất",
+      "profit": "Lợi nhuận mỗi ngày cao nhất",
       "name": "Tên"
     },
     "noMatch": "Không có sản phẩm nào khớp bộ lọc.",

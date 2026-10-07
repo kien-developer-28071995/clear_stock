@@ -17,7 +17,7 @@ import { formatDate, formatNumber } from '@/utils/format';
 import { NO_VALUE, fromOption, optionValue, optionsKey } from '@/utils/select';
 
 const STATUS_OPTIONS = ['reorder_now', 'out_of_stock', 'overstock', 'slow', 'healthy', 'discontinued'] as const;
-const SORT_OPTIONS = ['urgency', 'cover', 'suggested', 'value', 'revenue', 'name'] as const;
+const SORT_OPTIONS = ['urgency', 'cover', 'suggested', 'value', 'revenue', 'profit', 'name'] as const;
 const ABC_OPTIONS = ['A', 'B', 'C'] as const;
 
 /** Every tracked product with its forecast. Filters live in the URL so dashboard cards can link here. */

@@ -83,6 +83,16 @@ it('filters and sorts the product list by class and revenue', function () {
     $this->getJson('/api/forecasts?abc=D', $this->auth)->assertUnprocessable();
 });
 
+it('sorts the product list by profit a day, counting the whole price when no cost is known', function () {
+    abcProducts($this->shop, $this->location);
+    product($this->shop, $this->location, 'No cost', stock: 100, perDay: 1, attrs: ['price' => 20, 'unit_cost' => null]);
+    app(ForecastService::class)->runForShop($this->shop);
+
+    // Star (10 - 4) x 9 = 54 a day, No cost 20 x 1 = 20, Good (5 - 4) x 3 = 3 and Tail (5 - 2) x 1 = 3.
+    expect(array_slice($this->getJson('/api/forecasts?sort=profit', $this->auth)->assertOk()->json('data.*.name'), 0, 4))
+        ->toBe(['Star', 'No cost', 'Good', 'Tail']);
+});
+
 it('explains the class on the product page', function () {
     $p = abcProducts($this->shop, $this->location);
     app(ForecastService::class)->runForShop($this->shop);

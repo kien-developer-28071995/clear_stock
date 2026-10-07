@@ -417,6 +417,7 @@
       "suggested": "Größte Bestellung",
       "value": "Höchster Lagerwert",
       "revenue": "Höchster Umsatz",
+      "profit": "Höchster Gewinn pro Tag",
       "name": "Name"
     },
     "noMatch": "Keine Produkte entsprechen diesen Filtern.",

@@ -417,6 +417,7 @@
       "suggested": "Largest order",
       "value": "Highest stock value",
       "revenue": "Highest revenue",
+      "profit": "Most profit per day",
       "name": "Name"
     },
     "noMatch": "No products match these filters.",

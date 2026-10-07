@@ -232,7 +232,7 @@ export interface ForecastFilters {
     abc?: AbcClass | '';
     trend?: 'up' | 'down' | '';
     search?: string;
-    sort?: 'urgency' | 'cover' | 'name' | 'suggested' | 'value' | 'revenue';
+    sort?: 'urgency' | 'cover' | 'name' | 'suggested' | 'value' | 'revenue' | 'profit';
     page?: number;
 }
 
