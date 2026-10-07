@@ -1,4 +1,5 @@
 import type { Coded } from '@/types/coded';
+import type { Confidence, ForecastStatus } from '@/types/forecast';
 
 export interface ActionItem {
     variant_id: number;
@@ -135,4 +136,19 @@ export interface AccuracyReport {
         top_misses: AccuracyItem[];
     }) | null;
     trend: (AccuracyScore & { week_start: string; products: number })[];
+}
+
+/** A product of the made-up catalog shown on Home before the shop has forecasts (backend SampleForecasts). */
+export interface SampleForecast {
+    key: 'linen_shirt' | 'canvas_tote' | 'wool_beanie' | 'ceramic_mug' | 'scented_candle';
+    sku: string;
+    status: ForecastStatus;
+    current_stock: number;
+    avg_daily_sales: number;
+    days_of_cover: number | null;
+    stockout_date: string | null;
+    reorder_date: string | null;
+    suggested_qty: number;
+    confidence: Confidence;
+    explanation_lines: Coded[];
 }

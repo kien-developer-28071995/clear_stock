@@ -169,6 +169,21 @@
     "failedHeading": "Impossible d'importer les données de votre boutique",
     "failedBody": "L'import depuis Shopify ne s'est pas terminé : il n'y a encore rien à prévoir. Consultez la raison et réessayez dans « Données de la boutique » ci-dessous."
   },
+  "sample": {
+    "heading": "Voyez comment ça marche",
+    "badge": "Données d’exemple",
+    "intro": "Ce sont des produits fictifs, prévus comme le seront les vôtres, avec votre délai de livraison. Vos propres chiffres les remplaceront dès que les données de votre boutique seront importées.",
+    "inStock": "{{stock}} en stock",
+    "why": "Pourquoi ces chiffres ?",
+    "hide": "Masquer",
+    "products": {
+      "linen_shirt": "Chemise en lin - Sable / M",
+      "canvas_tote": "Sac en toile - Naturel",
+      "wool_beanie": "Bonnet en laine - Gris",
+      "ceramic_mug": "Tasse en céramique - Blanc",
+      "scented_candle": "Bougie parfumée - Cèdre"
+    }
+  },
   "actions": {
     "noneLeft": "0 restant",
     "unitsLeft_one": "{{count}} restant",

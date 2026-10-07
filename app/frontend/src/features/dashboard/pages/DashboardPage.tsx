@@ -7,6 +7,8 @@ import { HomeHeader } from '@/features/dashboard/components/HomeHeader';
 import { HomeKpis } from '@/features/dashboard/components/HomeKpis';
 import { UrgentList } from '@/features/dashboard/components/UrgentList';
 import { PlanLimitBanner } from '@/features/dashboard/components/PlanLimitBanner';
+import { SampleForecasts } from '@/features/dashboard/components/SampleForecasts';
+import { useFeature } from '@/hooks/useEntitlements';
 import { SetupGuide } from '@/features/setup/components/SetupGuide';
 
 /**
@@ -17,6 +19,7 @@ export function DashboardPage() {
     const { t } = useTranslation();
     const sync = useSyncStatus();
     const emptyReason = sync.data?.status === 'running' ? 'preparing' : sync.data?.status === 'failed' ? 'failed' : 'empty';
+    const samples = useFeature('sample_data') && emptyReason !== 'failed';
     const syncNeedsAttention = sync.data?.status === 'running' || sync.data?.status === 'failed';
 
     return (
@@ -30,6 +33,7 @@ export function DashboardPage() {
                                 <s-paragraph slot="subheading">{t(`home.${emptyReason}Body`)}</s-paragraph>
                             </s-empty-state>
                         </s-section>
+                        {samples && <SampleForecasts />}
                         <SetupGuide />
                         <SyncStatusCard />
                     </s-page>
