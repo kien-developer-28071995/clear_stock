@@ -27,3 +27,12 @@ export interface SalesEventInput {
     /** Local ids or Shopify variant gids (resource picker). */
     variant_ids?: (number | string)[] | null;
 }
+
+/** A coming peak worth an event, from what the shop sold in it last year (backend PeakSeasonAdvisor). */
+export interface PeakSuggestion {
+    key: 'bfcm';
+    starts_on: string;
+    ends_on: string;
+    multiplier: number;
+    last_year: { starts_on: string; ends_on: string; units_per_day: number; usual_per_day: number };
+}

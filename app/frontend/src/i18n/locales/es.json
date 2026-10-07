@@ -1247,7 +1247,15 @@
     "confirmDelete": "¿Eliminar «{{name}}»? Las previsiones se recalcularán sin él.",
     "repeatsYearly": "Se repite cada año",
     "repeatsYearlyHelp": "Para una temporada: el mismo cambio en las mismas fechas cada año.",
-    "yearly": "Cada año"
+    "yearly": "Cada año",
+    "peaks": {
+      "bfcm": "Black Friday – Cyber Monday"
+    },
+    "suggestion": {
+      "heading": "Se acerca {{name}}: {{from}} – {{to}}",
+      "body": "En esos días del año pasado vendiste {{units}} unidades al día, frente a {{usual}} al día en las semanas anteriores: {{change}}. Añádelo como evento para que tus pedidos cubran a tiempo la demanda extra. Puedes cambiar la cifra después.",
+      "add": "Añadir evento con {{change}}"
+    }
   },
   "orders": {
     "mark": "Marcar como pedido",

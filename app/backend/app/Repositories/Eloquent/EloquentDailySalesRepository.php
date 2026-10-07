@@ -37,6 +37,19 @@ class EloquentDailySalesRepository implements DailySalesRepositoryInterface
         return array_slice($ranked, 0, $limit);
     }
 
+    public function netUnitsBetween(Shop $shop, string $from, string $to): int
+    {
+        return (int) DB::table('daily_sales')->where('shop_id', $shop->id)->whereBetween('date', [$from, $to])
+            ->selectRaw('COALESCE(SUM(units_sold - units_returned), 0) as units')->value('units');
+    }
+
+    public function firstSalesDate(Shop $shop): ?string
+    {
+        $date = DB::table('daily_sales')->where('shop_id', $shop->id)->where('units_sold', '>', 0)->min('date');
+
+        return $date === null ? null : substr((string) $date, 0, 10);
+    }
+
     public function variantIdsWithSalesSince(Shop $shop, string $fromDate): array
     {
         return DB::table('daily_sales')->where('shop_id', $shop->id)->where('date', '>=', $fromDate)

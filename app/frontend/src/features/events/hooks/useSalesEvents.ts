@@ -7,6 +7,11 @@ export function useSalesEvents() {
     return useQuery({ queryKey: key, queryFn: salesEventApi.list });
 }
 
+/** Under the events key: adding or deleting an event changes what is left to suggest. */
+export function usePeakSuggestions() {
+    return useQuery({ queryKey: [...key, 'suggestions'], queryFn: salesEventApi.suggestions, retry: false });
+}
+
 /** Every change recomputes the forecasts server-side: refresh what depends on them. */
 function useEventMutation<T>(fn: (arg: T) => Promise<unknown>) {
     const qc = useQueryClient();

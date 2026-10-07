@@ -1033,7 +1033,15 @@
     "confirmDelete": "Xoá \"{{name}}\"? Dự báo sẽ được tính lại khi không có sự kiện này.",
     "repeatsYearly": "Lặp lại hằng năm",
     "repeatsYearlyHelp": "Dùng cho mùa vụ: cùng mức thay đổi vào cùng ngày mỗi năm.",
-    "yearly": "Hằng năm"
+    "yearly": "Hằng năm",
+    "peaks": {
+      "bfcm": "Black Friday – Cyber Monday"
+    },
+    "suggestion": {
+      "heading": "{{name}} sắp tới: {{from}} – {{to}}",
+      "body": "Những ngày này năm ngoái bạn bán {{units}} sản phẩm mỗi ngày, so với {{usual}} mỗi ngày ở các tuần trước đó: {{change}}. Thêm thành sự kiện để đơn nhập kịp bù phần nhu cầu tăng. Bạn có thể sửa con số sau.",
+      "add": "Thêm sự kiện ở mức {{change}}"
+    }
   },
   "orders": {
     "mark": "Đánh dấu đã đặt",
