@@ -29,9 +29,19 @@ app.clear-stock.techfoxify.com {
     @page not path /assets/*
     header @page Cache-Control "no-cache"
 
+    # Admin extensions (extensions/: the forecast block and actions on Shopify's product page) call
+    # "api/extension/..." relative to the app URL, which is this site, and Shopify adds their token
+    # only there. Passed on to the backend. On a separate frontend server: reverse_proxy to
+    # https://app-api.clear-stock.techfoxify.com with `header_up Host {upstream_hostport}`.
+    handle /api/extension/* {
+        reverse_proxy 127.0.0.1:8080
+    }
+
     # Client-side routes (/products/12, /settings...) are all the same page.
-    try_files {path} /index.html
-    file_server
+    handle {
+        try_files {path} /index.html
+        file_server
+    }
 }
 
 # Owner reports (admin/), only if you want them on a domain instead of an SSH tunnel

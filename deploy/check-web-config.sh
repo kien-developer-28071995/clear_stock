@@ -46,4 +46,8 @@ expect "lookalike shop value: no framing"  "$(header '/?shop=demo.myshopify.com.
 expect "client-side route gets the page"   "$(status '/settings?shop=demo.myshopify.com')" "200"
 expect "page is always re-checked"         "$(header '/?shop=demo.myshopify.com' Cache-Control)" "no-cache"
 expect "assets are cached for good"        "$(header '/assets/app.js' Cache-Control)" "public, max-age=31536000, immutable"
+# Admin extensions call api/extension/... on the frontend's domain: it must go to the backend
+# (nothing listens there in this check: 502), never come back as the app's page (200).
+expect "extension API goes to the backend"  "$(status '/api/extension/products/1')" "502"
+expect "other /api paths are not proxied"   "$(status '/api/shop')" "200"
 echo "Web config checks passed."
