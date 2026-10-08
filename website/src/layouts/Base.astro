@@ -126,5 +126,21 @@ const section = (id: string) => `${home}#${id}`;
             document.addEventListener('click', (e) => close((e.target as Element).closest('details.dropdown') ?? undefined));
             document.addEventListener('keydown', (e) => e.key === 'Escape' && close());
         </script>
+        {
+            site.crispWebsiteId && (
+                <script is:inline define:vars={{ crispWebsiteId: site.crispWebsiteId, locale }}>
+                    // Crisp live chat, loaded once the page is idle so it never delays the content.
+                    window.$crisp = [];
+                    window.CRISP_WEBSITE_ID = crispWebsiteId;
+                    window.CRISP_RUNTIME_CONFIG = { locale };
+                    (window.requestIdleCallback || ((cb) => setTimeout(cb, 1500)))(() => {
+                        const s = document.createElement('script');
+                        s.src = 'https://client.crisp.chat/l.js';
+                        s.async = true;
+                        document.head.appendChild(s);
+                    });
+                </script>
+            )
+        }
     </body>
 </html>

@@ -234,7 +234,8 @@
       },
       "providers": {
         "heading": "Prestadores de serviço",
-        "body": "O app roda em um provedor de hospedagem (servidores e banco de dados), envia e-mails por um provedor de envio de e-mails e reporta erros técnicos (sem dados de clientes; os tokens de acesso ficam mascarados) a um canal de monitoramento interno. Eles só tratam dados em nosso nome, para o app funcionar."
+        "body": "O app roda em um provedor de hospedagem (servidores e banco de dados), envia e-mails por um provedor de envio de e-mails e reporta erros técnicos (sem dados de clientes; os tokens de acesso ficam mascarados) a um canal de monitoramento interno. Eles só tratam dados em nosso nome, para o app funcionar.",
+        "chat": "O chat ao vivo deste site e do app é fornecido pela Crisp. Ela recebe as mensagens que você nos envia e, quando você conversa de dentro do app, o domínio e o plano da sua loja, e define um cookie para manter a sua conversa. Não é usado para publicidade."
       },
       "retention": {
         "heading": "Retenção e exclusão",

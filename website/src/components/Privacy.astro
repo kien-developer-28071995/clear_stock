@@ -39,6 +39,7 @@ const RETENTION = ['uninstall', 'erase', 'sooner'];
 
     <h2>{t('legal.privacy.providers.heading')}</h2>
     <p>{t('legal.privacy.providers.body')}</p>
+    {site.crispWebsiteId && <p>{t('legal.privacy.providers.chat')}</p>}
 
     <h2>{t('legal.privacy.retention.heading')}</h2>
     <ul>

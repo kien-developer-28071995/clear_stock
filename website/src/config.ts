@@ -10,6 +10,8 @@ export const site = {
     // The App Store listing. Empty until the app is listed: every Install button is then left out.
     installUrl: env.INSTALL_URL || null,
     growthOffered: env.GROWTH_OFFERED === 'true',
+    // Crisp live chat (crisp.chat → Settings → Website ID). Empty = no chat widget, nothing loaded.
+    crispWebsiteId: env.CRISP_WEBSITE_ID || null,
 };
 
 /** Y-m-d of the last privacy policy change: bump when legal.privacy changes in the locale files. */

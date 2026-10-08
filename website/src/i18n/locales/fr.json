@@ -234,7 +234,8 @@
       },
       "providers": {
         "heading": "Prestataires",
-        "body": "L'application fonctionne chez un hébergeur (serveurs et base de données), envoie les e-mails via un prestataire d'envoi d'e-mails et signale les erreurs techniques (sans données clients ; les jetons d'accès sont masqués) à un canal de surveillance interne. Ils ne traitent les données que pour notre compte, pour faire fonctionner l'application."
+        "body": "L'application fonctionne chez un hébergeur (serveurs et base de données), envoie les e-mails via un prestataire d'envoi d'e-mails et signale les erreurs techniques (sans données clients ; les jetons d'accès sont masqués) à un canal de surveillance interne. Ils ne traitent les données que pour notre compte, pour faire fonctionner l'application.",
+        "chat": "Le chat en direct de ce site et de l'application est fourni par Crisp. Crisp reçoit les messages que vous nous envoyez et, lorsque vous écrivez depuis l'application, le domaine et le forfait de votre boutique, et dépose un cookie pour conserver votre conversation. Il n'est pas utilisé à des fins publicitaires."
       },
       "retention": {
         "heading": "Conservation et suppression",

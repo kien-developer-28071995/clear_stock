@@ -234,7 +234,8 @@
       },
       "providers": {
         "heading": "Nhà cung cấp dịch vụ",
-        "body": "Ứng dụng chạy trên một nhà cung cấp hosting (máy chủ và cơ sở dữ liệu), gửi email qua một dịch vụ gửi email và báo lỗi kỹ thuật (không có dữ liệu khách hàng, mã truy cập được che) về một kênh giám sát nội bộ. Họ chỉ xử lý dữ liệu thay mặt chúng tôi để vận hành ứng dụng."
+        "body": "Ứng dụng chạy trên một nhà cung cấp hosting (máy chủ và cơ sở dữ liệu), gửi email qua một dịch vụ gửi email và báo lỗi kỹ thuật (không có dữ liệu khách hàng, mã truy cập được che) về một kênh giám sát nội bộ. Họ chỉ xử lý dữ liệu thay mặt chúng tôi để vận hành ứng dụng.",
+        "chat": "Khung chat trực tiếp trên website này và trong ứng dụng do Crisp cung cấp. Crisp nhận tin nhắn bạn gửi cho chúng tôi và, khi bạn chat từ trong ứng dụng, tên miền cửa hàng và gói của bạn; Crisp đặt một cookie để giữ cuộc trò chuyện. Không dùng cho quảng cáo."
       },
       "retention": {
         "heading": "Lưu giữ và xóa dữ liệu",

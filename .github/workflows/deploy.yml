@@ -156,6 +156,7 @@ jobs:
           VITE_SHOPIFY_API_KEY: ${{ vars.SHOPIFY_API_KEY || secrets.SHOPIFY_API_KEY }}
           VITE_APP_NAME: ${{ vars.SHOPIFY_APP_NAME || 'Clear Stock' }}
           VITE_WEBSITE_URL: ${{ vars.WEBSITE_URL }}
+          VITE_CRISP_WEBSITE_ID: ${{ vars.CRISP_WEBSITE_ID }}
         run: npm ci && npm run build && npm run build:check
       - name: Publish the app frontend (swapped in whole)
         if: inputs.tag == ''
@@ -203,6 +204,7 @@ jobs:
           APP_NAME: ${{ vars.SHOPIFY_APP_NAME || 'Clear Stock' }}
           SUPPORT_EMAIL: ${{ vars.SUPPORT_EMAIL }}
           INSTALL_URL: ${{ vars.INSTALL_URL }}
+          CRISP_WEBSITE_ID: ${{ vars.CRISP_WEBSITE_ID }}
           GROWTH_OFFERED: ${{ vars.BILLING_GROWTH_OFFERED || 'false' }}
         run: npm ci && npm run build
       - name: Publish the website (swapped in whole, so visitors never see half a site)

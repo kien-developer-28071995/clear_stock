@@ -234,7 +234,8 @@
       },
       "providers": {
         "heading": "Service providers",
-        "body": "The app runs on a hosting provider (servers and database), sends email through an email delivery provider, and reports technical errors (without customer data; access tokens are masked) to an internal monitoring channel. They process data only on our behalf to run the app."
+        "body": "The app runs on a hosting provider (servers and database), sends email through an email delivery provider, and reports technical errors (without customer data; access tokens are masked) to an internal monitoring channel. They process data only on our behalf to run the app.",
+        "chat": "Live chat on this website and inside the app is provided by Crisp. It receives the messages you send us and, when you chat from inside the app, your shop domain and plan, and it sets a cookie to keep your conversation. It is not used for advertising."
       },
       "retention": {
         "heading": "Retention and deletion",

@@ -234,7 +234,8 @@
       },
       "providers": {
         "heading": "Dienstleister",
-        "body": "Die App läuft bei einem Hosting-Anbieter (Server und Datenbank), versendet E-Mails über einen E-Mail-Zustelldienst und meldet technische Fehler (ohne Kundendaten; Zugriffstokens sind maskiert) an einen internen Überwachungskanal. Sie verarbeiten Daten nur in unserem Auftrag, um die App zu betreiben."
+        "body": "Die App läuft bei einem Hosting-Anbieter (Server und Datenbank), versendet E-Mails über einen E-Mail-Zustelldienst und meldet technische Fehler (ohne Kundendaten; Zugriffstokens sind maskiert) an einen internen Überwachungskanal. Sie verarbeiten Daten nur in unserem Auftrag, um die App zu betreiben.",
+        "chat": "Der Live-Chat auf dieser Website und in der App wird von Crisp bereitgestellt. Crisp erhält die Nachrichten, die du uns sendest, und, wenn du aus der App heraus chattest, deine Shop-Domain und deinen Tarif, und setzt ein Cookie, um deine Unterhaltung zu behalten. Er wird nicht für Werbung verwendet."
       },
       "retention": {
         "heading": "Aufbewahrung und Löschung",
