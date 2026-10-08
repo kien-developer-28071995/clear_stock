@@ -154,8 +154,6 @@ function ProductForecastBlock() {
                     </s-table-body>
                 </s-table>
 
-                {variants.some((v) => v.not_forecast_reason === 'plan_limit') && <s-link href="app:plans">{t('seePlans')}</s-link>}
-
                 {explained?.forecast && explained.forecast.explanation_lines.length > 0 && (
                     <s-stack gap="small-200">
                         <s-heading>{showVariant && explained.title ? t('whyFor', { name: explained.title }) : t('why')}</s-heading>

@@ -13,7 +13,6 @@
     "why": "Vì sao có những con số này",
     "whyFor": "Vì sao có những con số này ({{name}})",
     "open": "Mở trong Clear Stock",
-    "seePlans": "Xem các gói",
     "summary": "{{status}} · đặt {{qty}} trước {{date}}",
     "summaryNoOrder": "{{status}}",
     "notSynced": "Sản phẩm này chưa có trong Clear Stock. Nó sẽ xuất hiện sau lần đồng bộ tới (mỗi đêm, hoặc Cài đặt › Đồng bộ ngay trong app).",

@@ -13,7 +13,6 @@
     "why": "Por que estes números",
     "whyFor": "Por que estes números ({{name}})",
     "open": "Abrir no Clear Stock",
-    "seePlans": "Ver planos",
     "summary": "{{status}} · pedir {{qty}} até {{date}}",
     "summaryNoOrder": "{{status}}",
     "notSynced": "Este produto ainda não está no Clear Stock. Ele aparece após a próxima sincronização (toda noite, ou Configurações › Sincronizar agora no app).",
